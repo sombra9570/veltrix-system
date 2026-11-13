@@ -42,7 +42,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/productos', icon: '📦', label: 'nav.products' },
   { href: '/dashboard/owner/ventas', icon: '🧾', label: 'nav.sales', soon: true },
   { href: '/dashboard/owner/caja', icon: '💵', label: 'nav.cash', soon: true },
-  { href: '/dashboard/owner/clientes', icon: '🤝', label: 'nav.customers', soon: true },
+  { href: '/dashboard/owner/clientes', icon: '🤝', label: 'nav.customers' },
   { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory', soon: true },
   { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports', soon: true },
 ];

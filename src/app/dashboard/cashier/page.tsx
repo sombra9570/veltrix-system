@@ -26,9 +26,10 @@ type QueueRow = {
 type Settlement = { settlement_id: string; route_name: string; collector_name: string; created_at: string };
 type Item = { description: string; qty: number; unit_price: number; line_total: number };
 
-type Tab = 'queue' | 'settlements' | 'movements' | 'payments' | 'close';
+type Tab = 'queue' | 'debts' | 'settlements' | 'movements' | 'payments' | 'close';
 const TABS: { id: Tab; icon: string; label: DictKey }[] = [
   { id: 'queue', icon: '🧾', label: 'cash.tabQueue' },
+  { id: 'debts', icon: '📅', label: 'cash.tabDebts' },
   { id: 'settlements', icon: '🛵', label: 'cash.tabSettlements' },
   { id: 'movements', icon: '↕️', label: 'cash.tabMovements' },
   { id: 'payments', icon: '✅', label: 'cash.tabPayments' },
@@ -140,6 +141,9 @@ export default function CashierPage() {
 
           {tab === 'queue' && (
             <QueueTab queue={queue} shiftId={s.id} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
+          )}
+          {tab === 'debts' && (
+            <DebtsTab shiftId={s.id} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
           )}
           {tab === 'settlements' && (
             <SettlementsTab list={settlements} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
@@ -403,6 +407,117 @@ function QueueTab({
           </button>
         </Card>
       )}
+    </div>
+  );
+}
+
+/* ---------------- Cobro de cuotas (cliente que viene a pagar) ---------------- */
+type Debtor = { id: string; name: string; doc: string | null; balance: number; overdue: number };
+function DebtsTab({
+  shiftId, fmt, busy, setBusy, onDone, flash,
+}: Common & { shiftId: string; fmt: (n: number) => string }) {
+  const { t } = useT();
+  const [q, setQ] = useState('');
+  const [list, setList] = useState<Debtor[]>([]);
+  const [sel, setSel] = useState<Debtor | null>(null);
+  const [amount, setAmount] = useState('');
+  const [method, setMethod] = useState<Method>('cash');
+
+  useEffect(() => {
+    if (sel) return;
+    const id = setTimeout(() => {
+      rpc<Debtor[]>('cashier_find_debtors', { p_search: q }).then((r) => setList(r ?? [])).catch(() => setList([]));
+    }, 300);
+    return () => clearTimeout(id);
+  }, [q, sel]);
+
+  const pick = (d: Debtor) => {
+    setSel(d);
+    setMethod('cash');
+    setAmount(String(Number(d.overdue) > 0 ? Number(d.overdue) : Number(d.balance)));
+  };
+
+  const n = parseAmount(amount);
+  const invalid = !sel || Number.isNaN(n) || n <= 0 || n > Number(sel.balance);
+
+  const charge = async () => {
+    if (!sel || invalid) return;
+    setBusy(true);
+    try {
+      await rpc('register_payment', {
+        p_customer: sel.id, p_origin: 'pos_counter', p_method: method, p_amount: n,
+        p_shift: shiftId, p_offline_uuid: crypto.randomUUID(),
+      });
+      flash(true, t('cash.charged'));
+      setSel(null);
+      setQ('');
+      await onDone();
+    } catch (err) {
+      flash(false, cashError((err as Error).message, t));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (sel) {
+    return (
+      <div className="mx-auto w-full max-w-lg">
+        <Card className="space-y-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="truncate text-lg font-bold">{sel.name}</p>
+              <p className={`text-xs ${ui.muted}`}>{sel.doc ?? ''}</p>
+            </div>
+            <button type="button" onClick={() => setSel(null)} aria-label={t('cash.cancel')} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+          </div>
+          <div className="grid grid-cols-2 gap-3 text-center">
+            <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50">
+              <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('cust.balance')}</p>
+              <p className="font-extrabold">{fmt(sel.balance)}</p>
+            </div>
+            <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50">
+              <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('cust.overdue')}</p>
+              <p className={`font-extrabold ${Number(sel.overdue) > 0 ? 'text-red-600 dark:text-red-400' : ''}`}>{fmt(sel.overdue)}</p>
+            </div>
+          </div>
+          <div>
+            <label className={ui.label}>{t('cash.amount')}</label>
+            <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} className={`${ui.input} text-lg`} />
+            {!Number.isNaN(n) && n > Number(sel.balance) && <p className="mt-1 text-sm font-semibold text-red-600 dark:text-red-400">{t('cash.exceeds')}</p>}
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {METHODS.map((m) => (
+              <button key={m} type="button" onClick={() => setMethod(m)}
+                className={`rounded-xl px-2 py-2.5 text-xs font-bold transition cursor-pointer sm:text-sm ${method === m ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
+                {t(`cash.m.${m}` as DictKey)}
+              </button>
+            ))}
+          </div>
+          <button type="button" disabled={busy || invalid} onClick={charge} className={`${ui.btnPrimary} w-full py-3 text-base`}>
+            {busy ? t('common.wait') : `${t('cash.confirm')} · ${Number.isNaN(n) ? '' : fmt(n)}`}
+          </button>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('cash.debtSearch')} className={ui.input} />
+      {q.trim().length >= 2 && list.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('cash.noDebtors')}</p></Card>}
+      <ul className="space-y-2">
+        {list.map((d) => (
+          <li key={d.id}>
+            <button type="button" onClick={() => pick(d)} className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer hover:border-blue-400 ${ui.card}`}>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-bold">{d.name}</p>
+                <p className={`text-xs ${ui.muted}`}>{d.doc ?? ''}{Number(d.overdue) > 0 ? ` · ${t('cust.overdue')}: ${fmt(d.overdue)}` : ''}</p>
+              </div>
+              <span className="text-lg font-extrabold">{fmt(d.balance)}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
