@@ -34,7 +34,14 @@ export default function RestablecerPage() {
     setBusy(true);
     const { error: err } = await supabase.auth.updateUser({ password: pass1 });
     setBusy(false);
-    if (err) return setError(t('reset.failed'));
+    if (err) {
+      // Si escribió la misma contraseña que ya tenía, puede ingresar con ella
+      if ((err as { code?: string }).code === 'same_password' || /different from the old/i.test(err.message)) {
+        return setError(t('reset.samePassword'));
+      }
+      if ((err as { code?: string }).code === 'weak_password') return setError(t('val.passMin'));
+      return setError(t('reset.failed'));
+    }
     await supabase.auth.signOut();
     setDone(true);
     setTimeout(() => router.push('/ingresar'), 2500);

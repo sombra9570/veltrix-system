@@ -87,6 +87,7 @@ const ja: Record<DictKey, string> = {
   'reset.save': 'パスワードを保存',
   'reset.saving': '保存中…',
   'reset.failed': '変更できませんでした。新しいリンクを申請して、もう一度お試しください。',
+  'reset.samePassword': "これはすでに現在のパスワードです。このままログインするか、別のパスワードを入力して変更してください。",
 
   'val.passMin': 'パスワードは8文字以上にしてください。',
   'val.passMatch': '2つのパスワードが一致しません。',

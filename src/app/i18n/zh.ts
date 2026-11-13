@@ -87,6 +87,7 @@ const zh: Record<DictKey, string> = {
   'reset.save': '保存密码',
   'reset.saving': '正在保存…',
   'reset.failed': '修改失败。请重新申请链接后再试。',
+  'reset.samePassword': "这已经是你当前的密码。你可以直接用它登录，或输入一个不同的密码来更改。",
 
   'val.passMin': '密码至少需要 8 个字符。',
   'val.passMatch': '两次输入的密码不一致。',

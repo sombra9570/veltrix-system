@@ -87,6 +87,7 @@ const it: Record<DictKey, string> = {
   'reset.save': 'Salva password',
   'reset.saving': 'Salvataggio…',
   'reset.failed': 'Impossibile cambiarla. Richiedi un nuovo link e riprova.',
+  'reset.samePassword': "Questa è già la tua password attuale. Puoi accedere con essa o scriverne una diversa per cambiarla.",
 
   'val.passMin': 'La password deve avere almeno 8 caratteri.',
   'val.passMatch': 'Le due password non coincidono.',

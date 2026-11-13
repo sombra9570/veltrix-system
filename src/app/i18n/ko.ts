@@ -87,6 +87,7 @@ const ko: Record<DictKey, string> = {
   'reset.save': '비밀번호 저장',
   'reset.saving': '저장 중…',
   'reset.failed': '변경하지 못했습니다. 새 링크를 요청해 다시 시도해 주세요.',
+  'reset.samePassword': "이미 현재 비밀번호입니다. 그대로 로그인하거나, 다른 비밀번호를 입력해 변경하세요.",
 
   'val.passMin': '비밀번호는 8자 이상이어야 합니다.',
   'val.passMatch': '두 비밀번호가 일치하지 않습니다.',

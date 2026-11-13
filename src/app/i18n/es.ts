@@ -91,6 +91,7 @@ const es = {
   'reset.save': 'Guardar contraseña',
   'reset.saving': 'Guardando…',
   'reset.failed': 'No se pudo cambiar. Pide un enlace nuevo e inténtalo otra vez.',
+  'reset.samePassword': "Esa ya es tu contraseña actual. Puedes ingresar con ella, o escribe una distinta para cambiarla.",
 
   // ---------- Validaciones ----------
   'val.passMin': 'La contraseña debe tener al menos 8 caracteres.',
