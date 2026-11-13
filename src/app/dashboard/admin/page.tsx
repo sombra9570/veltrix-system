@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage, LanguageDropdown, RegionalStatusBar } from '../../language-selector';
 import { useVeltrixAuth } from '../../auth-system';
-import { rpc } from '../../../lib/supabase';
+import { rpc, supabase } from '../../../lib/supabase';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -68,6 +68,32 @@ export default function GlobalCoreAdminPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
+  // Correo desde el dominio de Veltrix (no desde el correo personal del teléfono)
+  const [mail, setMail] = useState<{ to: string; name: string; subject: string; text: string } | null>(null);
+  const [mailMsg, setMailMsg] = useState('');
+  const [sending, setSending] = useState(false);
+  const sendMail = async () => {
+    if (!mail) return;
+    setSending(true);
+    setMailMsg('');
+    try {
+      const { data: s } = await supabase.auth.getSession();
+      const res = await fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${s.session?.access_token ?? ''}` },
+        body: JSON.stringify({ to: mail.to, subject: mail.subject, text: mail.text }),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (res.ok) { setMail(null); setMailMsg('✅ Correo enviado desde Veltrix.'); }
+      else setMailMsg(j.error === 'EMAIL_NOT_CONFIGURED'
+        ? '⚠️ Falta conectar el correo de Veltrix (Resend). Te guío en el chat.'
+        : '⚠️ No se pudo enviar el correo. Inténtalo otra vez.');
+    } catch {
+      setMailMsg('⚠️ Sin conexión.');
+    } finally {
+      setSending(false);
+    }
+  };
 
   useEffect(() => {
     if (loaded && (!session || session.role !== 'superadmin')) router.replace('/');
@@ -234,12 +260,17 @@ export default function GlobalCoreAdminPage() {
                     }`}>
                       {x.days_left === 0 ? 'Vence hoy' : `${x.days_left} día${x.days_left === 1 ? '' : 's'}`}
                     </span>
-                    <a
-                      href={`mailto:${x.email}?subject=${encodeURIComponent('Tu prueba de Veltrix')}`}
-                      className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 font-bold px-3 py-1.5 rounded-lg"
+                    <button
+                      type="button"
+                      onClick={() => setMail({
+                        to: x.email, name: x.name,
+                        subject: 'Tu prueba de Veltrix',
+                        text: `Hola, equipo de ${x.name}:\n\nTe escribimos porque a tu prueba gratis de Veltrix le ${x.days_left === 1 ? 'queda 1 día' : `quedan ${x.days_left} días`}. ¿Cómo te ha ido? Si tienes dudas o quieres ayuda para configurar tu negocio, responde este correo y te ayudamos.\n\nSaludos,\nEquipo Veltrix`,
+                      })}
+                      className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer"
                     >
                       ✉️ Escribir
-                    </a>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -281,6 +312,28 @@ export default function GlobalCoreAdminPage() {
           ))}
         </section>
       </div>
+      {mailMsg && !mail && (
+        <div className="fixed inset-x-0 bottom-4 z-50 mx-auto w-fit max-w-[90vw] rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold shadow-xl">{mailMsg}</div>
+      )}
+      {mail && (
+        <div className="fixed inset-x-0 top-0 z-50 h-dvh">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setMail(null)} />
+          <div className="absolute inset-x-0 bottom-0 mx-auto max-h-[90dvh] max-w-xl space-y-3 overflow-y-auto rounded-t-3xl bg-slate-900 p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:rounded-3xl">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold">✉️ Correo a {mail.name}</h2>
+              <button type="button" onClick={() => setMail(null)} className="h-9 w-9 rounded-lg border border-slate-700 cursor-pointer">✕</button>
+            </div>
+            <p className="text-xs text-slate-400">Sale desde el correo de Veltrix (veltrixsystem.app), no desde tu correo personal.</p>
+            <p className="text-sm"><span className="text-slate-400">Para:</span> {mail.to}</p>
+            <input value={mail.subject} onChange={(e) => setMail({ ...mail, subject: e.target.value })} className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm" />
+            <textarea rows={9} value={mail.text} onChange={(e) => setMail({ ...mail, text: e.target.value })} className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm" />
+            {mailMsg && <p className="text-sm font-semibold text-amber-300">{mailMsg}</p>}
+            <button type="button" disabled={sending} onClick={sendMail} className="w-full rounded-xl bg-blue-600 py-3 font-bold cursor-pointer disabled:opacity-50">
+              {sending ? 'Enviando…' : 'Enviar desde Veltrix'}
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
