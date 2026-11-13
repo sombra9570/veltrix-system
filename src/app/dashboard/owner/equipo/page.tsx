@@ -105,7 +105,7 @@ export default function TeamPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold">{t('team.title')}</h1>
+          <h1 className="text-xl font-extrabold sm:text-2xl">{t('team.title')}</h1>
           <p className={`text-sm ${ui.muted}`}>{t('team.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
@@ -161,7 +161,7 @@ export default function TeamPage() {
             </div>
             <div className="flex justify-end gap-2 sm:col-span-2">
               <button type="button" onClick={() => setShowForm(false)} className={ui.btnGhost}>{t('pwa.close')}</button>
-              <button type="submit" disabled={busy} className={ui.btnPrimary}>{busy ? t('common.wait') : t('team.create')}</button>
+              <button type="submit" disabled={busy} className={`${ui.btnPrimary} max-sm:w-full`}>{busy ? t('common.wait') : t('team.create')}</button>
             </div>
           </form>
         </Card>
@@ -182,9 +182,13 @@ export default function TeamPage() {
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-semibold">{r.name || r.email}</p>
                   <p className={`truncate text-xs ${ui.muted}`}>
-                    {r.email} · {r.roles.map(roleLabel).join(', ')} · {r.branchIds.map(branchName).join(', ')}
+                    {r.email}
+                  </p>
+                  <p className={`truncate text-xs ${ui.muted}`}>
+                    {r.roles.map(roleLabel).join(', ')} · {r.branchIds.map(branchName).join(', ')}
                   </p>
                 </div>
+                <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
                 <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${r.active
                   ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
                   : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
@@ -193,6 +197,7 @@ export default function TeamPage() {
                 <button type="button" onClick={() => toggle(r)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>
                   {r.active ? t('team.deactivate') : t('team.activate')}
                 </button>
+                </div>
               </li>
             ))}
           </ul>

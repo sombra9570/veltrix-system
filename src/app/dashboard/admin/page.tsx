@@ -88,7 +88,7 @@ export default function GlobalCoreAdminPage() {
   }, [loaded, session, refresh]);
 
   if (!loaded || !session || session.role !== 'superadmin') {
-    return <div className="min-h-screen bg-slate-950" />;
+    return <div className="min-h-dvh bg-slate-950" />;
   }
 
   const f = m?.funnel ?? { total: 0, trial: 0, paying: 0, grace: 0, suspended: 0 };
@@ -106,7 +106,7 @@ export default function GlobalCoreAdminPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-4 md:p-8">
+    <main className="min-h-dvh bg-slate-950 text-white px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-6 gap-4">
           <div>

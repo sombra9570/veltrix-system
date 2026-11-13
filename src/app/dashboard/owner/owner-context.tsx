@@ -90,11 +90,11 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => { reload(); }, [reload]);
 
-  if (!loaded || !session) return <div className="min-h-screen bg-slate-50 dark:bg-slate-950" />;
+  if (!loaded || !session) return <div className="min-h-dvh bg-slate-50 dark:bg-slate-950" />;
 
   if (denied) {
     return (
-      <div className="grid min-h-screen place-items-center bg-slate-50 p-6 text-center dark:bg-slate-950">
+      <div className="grid min-h-dvh place-items-center bg-slate-50 p-6 text-center dark:bg-slate-950">
         <div>
           <p className="font-bold">{t('owner.notOwner')}</p>
           <button type="button" onClick={logout} className="mt-4 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white cursor-pointer">

@@ -50,7 +50,7 @@ export default function CashierTerminalPage() {
   }, [loaded, session, router]);
 
   if (!loaded || !session || session.role !== 'cashier') {
-    return <div className="min-h-screen bg-slate-950" />;
+    return <div className="min-h-dvh bg-slate-950" />;
   }
 
   const myCompany = companies.find((c) => c.id === session.companyId);
@@ -117,7 +117,7 @@ export default function CashierTerminalPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-6 md:p-8">
+    <main className="min-h-dvh bg-slate-950 text-white px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <header className="flex flex-wrap justify-between items-center border-b border-slate-800 pb-5 gap-4">
           <div>

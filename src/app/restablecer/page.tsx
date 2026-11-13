@@ -41,10 +41,10 @@ export default function RestablecerPage() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col">
+    <main className="flex min-h-dvh flex-col">
       <SiteHeader showAuthButtons={false} />
-      <div className="flex flex-1 items-center justify-center px-4 py-12">
-        <div className={`w-full max-w-sm rounded-2xl p-7 ${ui.card}`}>
+      <div className="flex flex-1 items-center justify-center px-4 py-8 sm:py-12">
+        <div className={`w-full max-w-sm rounded-2xl p-5 sm:p-7 ${ui.card}`}>
           <h1 className="text-2xl font-extrabold">{t('reset.title')}</h1>
 
           {done ? (

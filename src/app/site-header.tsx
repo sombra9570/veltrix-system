@@ -38,7 +38,7 @@ export function useCountryChange() {
   };
 }
 
-export function RegionSelectors() {
+export function RegionSelectors({ stacked = false }: { stacked?: boolean }) {
   const { lang, setLanguage, country } = useLanguage();
   const { t } = useT();
   const changeCountry = useCountryChange();
@@ -46,12 +46,12 @@ export function RegionSelectors() {
     .map((c) => ({ ...c, label: countryName(lang, c.code, c.name) }))
     .sort((a, b) => a.label.localeCompare(b.label, lang));
   return (
-    <div className="flex items-center gap-2">
+    <div className={stacked ? 'grid grid-cols-2 gap-2' : 'flex items-center gap-2'}>
       <select
         aria-label={t('common.country')}
         value={country.code}
         onChange={(e) => changeCountry(e.target.value as CountryCode)}
-        className={selectCls}
+        className={`${selectCls} ${stacked ? 'h-11 w-full' : 'max-w-[11rem]'}`}
       >
         {sorted.map((c) => (
           <option key={c.code} value={c.code}>
@@ -63,7 +63,7 @@ export function RegionSelectors() {
         aria-label={t('common.language')}
         value={lang}
         onChange={(e) => setLanguage(e.target.value as LangCode)}
-        className={`${selectCls} hidden sm:block`}
+        className={`${selectCls} ${stacked ? 'h-11 w-full' : 'hidden sm:block'}`}
       >
         {LANGUAGES.map((l) => (
           <option key={l.code} value={l.code}>
@@ -85,26 +85,54 @@ export function Logo() {
 
 export function SiteHeader({ showAuthButtons = true }: { showAuthButtons?: boolean }) {
   const { t } = useT();
+  const [open, setOpen] = useState(false);
   return (
-    <header className="border-b border-slate-200 dark:border-slate-800/80">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+    <header className="safe-top sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800/80 dark:bg-slate-950/90">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Logo />
-        <div className="flex flex-wrap items-center gap-2">
+
+        {/* Computadora y tablet: todo a la vista */}
+        <div className="hidden items-center gap-2 md:flex">
           <RegionSelectors />
           <InstallAppButton className={`${ui.btnGhost} !py-2`} />
           <ThemeToggle />
           {showAuthButtons && (
             <>
-              <Link href="/ingresar" className={`${ui.btnGhost} !py-2`}>
-                {t('common.login')}
-              </Link>
-              <Link href="/registro" className={`${ui.btnPrimary} !py-2`}>
-                {t('common.freeTrial')}
-              </Link>
+              <Link href="/ingresar" className={`${ui.btnGhost} !py-2`}>{t('common.login')}</Link>
+              <Link href="/registro" className={`${ui.btnPrimary} !py-2`}>{t('common.freeTrial')}</Link>
             </>
           )}
         </div>
+
+        {/* Celular: solo lo esencial + menú */}
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={t('shell.menu')}
+            aria-expanded={open}
+            className="grid h-10 w-10 cursor-pointer place-items-center rounded-lg border border-slate-300 text-lg dark:border-slate-700"
+          >
+            {open ? '✕' : '☰'}
+          </button>
+        </div>
       </div>
+
+      {open && (
+        <div className="border-t border-slate-200 px-4 pb-4 pt-3 md:hidden dark:border-slate-800">
+          <div className="flex flex-col gap-3">
+            <RegionSelectors stacked />
+            <InstallAppButton className={`${ui.btnGhost} w-full`} />
+            {showAuthButtons && (
+              <div className="grid grid-cols-2 gap-2">
+                <Link href="/ingresar" onClick={() => setOpen(false)} className={ui.btnGhost}>{t('common.login')}</Link>
+                <Link href="/registro" onClick={() => setOpen(false)} className={ui.btnPrimary}>{t('common.freeTrial')}</Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }
@@ -115,7 +143,7 @@ export function SiteFooter() {
   useEffect(() => setYear(new Date().getFullYear()), []);
   const { t } = useT();
   return (
-    <footer className="mt-auto border-t border-slate-200 py-6 text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-500">
+    <footer className="mt-auto border-t border-slate-200 px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-500">
       {t('footer.text', { year })}
     </footer>
   );

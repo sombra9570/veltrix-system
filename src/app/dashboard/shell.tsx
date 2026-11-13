@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '../theme';
@@ -28,8 +28,21 @@ export function AppShell({
   const { t } = useT();
   const [open, setOpen] = useState(false);
 
+  // Menú móvil: se cierra con Escape y no deja mover la página de fondo
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   const menu = (
-    <nav className="flex h-full flex-col">
+    <nav className="safe-top safe-bottom flex h-full flex-col">
       <div className="px-5 py-5">
         <Link href="/" className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
           Veltrix <span className="text-blue-600 dark:text-blue-500">System</span>
@@ -73,7 +86,12 @@ export function AppShell({
         })}
       </ul>
 
-      <div className="border-t border-slate-200 p-4 dark:border-slate-800">
+      {/* En celular el país y el idioma viven aquí (arriba no caben) */}
+      <div className="border-t border-slate-200 px-4 pt-4 sm:hidden dark:border-slate-800">
+        <RegionSelectors stacked />
+      </div>
+
+      <div className="border-t border-slate-200 p-4 dark:border-slate-800 max-sm:border-t-0">
         <p className="truncate text-sm font-bold text-slate-900 dark:text-white">{userName}</p>
         <p className="text-xs text-slate-500 dark:text-slate-400">{roleLabel}</p>
         <button type="button" onClick={onLogout} className={`${ui.btnGhost} mt-3 w-full !py-2 text-xs`}>
@@ -84,27 +102,27 @@ export function AppShell({
   );
 
   return (
-    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="flex min-h-dvh bg-slate-50 dark:bg-slate-950">
       {/* Menú lateral fijo en pantallas grandes */}
       <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white lg:block dark:border-slate-800 dark:bg-slate-900/60">
-        <div className="sticky top-0 h-screen">{menu}</div>
+        <div className="sticky top-0 h-dvh">{menu}</div>
       </aside>
 
       {/* Menú desplegable en celular */}
       {open && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 w-72 bg-white shadow-xl rtl:left-auto rtl:right-0 dark:bg-slate-900">{menu}</aside>
+          <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-white shadow-xl rtl:left-auto rtl:right-0 dark:bg-slate-900">{menu}</aside>
         </div>
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
+        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-slate-200 bg-white/90 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
           <button
             type="button"
             onClick={() => setOpen(true)}
             aria-label={t('shell.menu')}
-            className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 text-lg lg:hidden dark:border-slate-700 cursor-pointer"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg lg:hidden dark:border-slate-700 cursor-pointer"
           >
             ☰
           </button>
@@ -116,7 +134,7 @@ export function AppShell({
         </header>
 
         {banner}
-        <main className="mx-auto w-full max-w-6xl flex-1 p-4 md:p-8">{children}</main>
+        <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 pt-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 md:p-8">{children}</main>
       </div>
     </div>
   );

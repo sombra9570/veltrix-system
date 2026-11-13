@@ -27,22 +27,22 @@ export default function OwnerHome() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold">{t('owner.welcome', { name: firstName })}</h1>
+        <h1 className="text-xl font-extrabold sm:text-2xl">{t('owner.welcome', { name: firstName })}</h1>
         <p className={`text-sm ${ui.muted}`}>{t('owner.subtitle')}</p>
       </div>
 
       {/* HOY */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="sm:col-span-2">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <Card className="col-span-2">
           <p className={`text-xs font-semibold uppercase tracking-wide ${ui.muted}`}>{t('owner.collectedToday')}</p>
           {overview.today.length === 0 ? (
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{t('owner.noPaymentsToday')}</p>
           ) : (
             <div className="mt-2 space-y-1">
               {overview.today.map((x) => (
-                <p key={x.currency} className="text-3xl font-extrabold">
+                <p key={x.currency} className="text-2xl font-extrabold sm:text-3xl">
                   {money(Number(x.amount), x.currency, lang)}
-                  <span className={`ml-2 text-sm font-semibold ${ui.muted}`}>{t('owner.payments', { n: x.count })}</span>
+                  <span className={`block text-sm font-semibold sm:ml-2 sm:inline ${ui.muted}`}>{t('owner.payments', { n: x.count })}</span>
                 </p>
               ))}
             </div>
@@ -50,11 +50,11 @@ export default function OwnerHome() {
         </Card>
         <Card>
           <p className={`text-xs font-semibold uppercase tracking-wide ${ui.muted}`}>{t('owner.openShifts')}</p>
-          <p className="mt-2 text-3xl font-extrabold">{overview.open_shifts}</p>
+          <p className="mt-2 text-2xl font-extrabold sm:text-3xl">{overview.open_shifts}</p>
         </Card>
         <Card>
           <p className={`text-xs font-semibold uppercase tracking-wide ${ui.muted}`}>{t('owner.toReview')}</p>
-          <p className="mt-2 text-3xl font-extrabold">{overview.pending_reversals + overview.pending_settlements}</p>
+          <p className="mt-2 text-2xl font-extrabold sm:text-3xl">{overview.pending_reversals + overview.pending_settlements}</p>
           <p className={`mt-1 text-xs ${ui.muted}`}>
             {t('owner.pendingReversals', { n: overview.pending_reversals })} · {t('owner.pendingSettlements', { n: overview.pending_settlements })}
           </p>
@@ -64,7 +64,7 @@ export default function OwnerHome() {
       <div className="grid gap-4 lg:grid-cols-3">
         {/* USO DEL PLAN */}
         <Card className="lg:col-span-2">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-bold">{t('owner.planUsage')}</h2>
             <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
               {t('owner.planName', { plan })}

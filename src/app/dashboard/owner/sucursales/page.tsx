@@ -91,7 +91,7 @@ export default function BranchesPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold">{t('branches.title')}</h1>
+          <h1 className="text-xl font-extrabold sm:text-2xl">{t('branches.title')}</h1>
           <p className={`text-sm ${ui.muted}`}>{t('branches.subtitle')}</p>
         </div>
         {u && (
@@ -154,7 +154,7 @@ export default function BranchesPage() {
                 </div>
                 <div className="flex justify-end gap-2 sm:col-span-2">
                   <button type="button" onClick={() => setBranchForm({ ...branchForm, open: false })} className={ui.btnGhost}>{t('pwa.close')}</button>
-                  <button type="submit" disabled={busy} className={ui.btnPrimary}>{busy ? t('common.wait') : t('branches.create')}</button>
+                  <button type="submit" disabled={busy} className={`${ui.btnPrimary} max-sm:w-full`}>{busy ? t('common.wait') : t('branches.create')}</button>
                 </div>
               </form>
             )}
@@ -200,7 +200,7 @@ export default function BranchesPage() {
             </p>
             <div className="flex justify-end gap-2 sm:col-span-2">
               <button type="button" onClick={() => setCompForm({ ...compForm, open: false })} className={ui.btnGhost}>{t('pwa.close')}</button>
-              <button type="submit" disabled={busy} className={ui.btnPrimary}>{busy ? t('common.wait') : t('companies.create')}</button>
+              <button type="submit" disabled={busy} className={`${ui.btnPrimary} max-sm:w-full`}>{busy ? t('common.wait') : t('companies.create')}</button>
             </div>
           </form>
         )}

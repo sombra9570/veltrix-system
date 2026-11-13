@@ -33,20 +33,20 @@ export default function HomePage() {
   const k = (key: string) => t(key as DictKey);
 
   return (
-    <main className="flex min-h-screen flex-col">
+    <main className="flex min-h-dvh flex-col">
       <SiteHeader showAuthButtons={!(loaded && session)} />
 
       {/* PORTADA */}
-      <section className="mx-auto w-full max-w-6xl px-4 pt-16 pb-12 text-center">
+      <section className="mx-auto w-full max-w-6xl px-4 pt-10 pb-10 text-center sm:pt-16 sm:pb-12">
         <span className="rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
           {t('home.badge')}
         </span>
-        <h1 className="mx-auto mt-5 max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl">
+        <h1 className="mx-auto mt-5 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl">
           {t('home.title1')}{' '}
           <span className="text-blue-600 dark:text-blue-500">{t('home.title2')}</span>
         </h1>
         <p className={`mx-auto mt-4 max-w-2xl text-base ${ui.muted}`}>{t('home.subtitle')}</p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           {loaded && session ? (
             <Link href={homeForRole(session.role)} className={`${ui.btnPrimary} px-7 py-3`}>{t('home.ctaPanel')}</Link>
           ) : (
@@ -61,7 +61,7 @@ export default function HomePage() {
 
       {/* PARA QUÉ NEGOCIOS */}
       <section className="mx-auto w-full max-w-6xl px-4 py-10">
-        <h2 className="text-center text-2xl font-extrabold">{t('home.forYourBusiness')}</h2>
+        <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.forYourBusiness')}</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {BUSINESS_KINDS.filter((kd) => kd.id !== 'mixed').map((kd) => (
             <div key={kd.id} className={`rounded-2xl p-5 ${ui.card}`}>
@@ -81,7 +81,7 @@ export default function HomePage() {
 
       {/* FUNCIONES */}
       <section className="mx-auto w-full max-w-6xl px-4 py-10">
-        <h2 className="text-center text-2xl font-extrabold">{t('home.featuresTitle')}</h2>
+        <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.featuresTitle')}</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
             <div key={f.n} className={`rounded-2xl p-5 ${ui.card}`}>
@@ -95,10 +95,10 @@ export default function HomePage() {
 
       {/* PLANES */}
       <section className="mx-auto w-full max-w-6xl px-4 py-10">
-        <h2 className="text-center text-2xl font-extrabold">{t('home.plansTitle')}</h2>
+        <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.plansTitle')}</h2>
         <p className={`mt-1 text-center text-sm ${ui.muted}`}>{t('home.plansSubtitle')}</p>
         <p className={`text-center text-xs ${ui.muted}`}>{t('home.pricesLocal')}</p>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="mt-8 grid gap-6 md:grid-cols-3 md:gap-4">
           {PLANS.map((p) => (
             <div key={p.id} className={`relative rounded-2xl p-6 ${ui.card} ${p.best ? 'ring-2 ring-blue-500' : ''}`}>
               {p.best && (
@@ -108,7 +108,7 @@ export default function HomePage() {
               )}
               <p className="text-lg font-bold">{p.name}</p>
               <p className={`text-xs ${ui.muted}`}>{k(`plan.${p.id}.desc`)}</p>
-              <p className="mt-4 text-3xl font-extrabold">
+              <p className="mt-4 text-2xl font-extrabold sm:text-3xl">
                 {formatMoney(prices[p.id])}
                 <span className={`text-sm font-semibold ${ui.muted}`}> {t('common.perMonth')}</span>
               </p>

@@ -81,7 +81,7 @@ export default function RegistroPage() {
   // Alguien con sesión abierta no debe registrar otra empresa sin salir primero
   if (loaded && session) {
     return (
-      <main className="flex min-h-screen flex-col">
+      <main className="flex min-h-dvh flex-col">
         <SiteHeader showAuthButtons={false} />
         <div className="flex flex-1 items-center justify-center px-4">
           <div className={`max-w-md rounded-2xl p-7 text-center ${ui.card}`}>
@@ -97,15 +97,15 @@ export default function RegistroPage() {
   const modules = suggestedModules(cats);
 
   return (
-    <main className="flex min-h-screen flex-col">
+    <main className="flex min-h-dvh flex-col">
       <SiteHeader showAuthButtons={false} />
 
-      <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
+      <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 sm:py-10">
         <div className="text-center">
           <span className="rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
             {t('reg.badge')}
           </span>
-          <h1 className="mt-4 text-3xl font-extrabold">{t('reg.title')}</h1>
+          <h1 className="mt-4 text-2xl font-extrabold sm:text-3xl">{t('reg.title')}</h1>
         </div>
 
         {/* Barra de progreso */}
@@ -113,14 +113,18 @@ export default function RegistroPage() {
           {STEPS.map((s, i) => (
             <li key={s}>
               <div className={`h-1.5 rounded-full ${i <= step ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-800'}`} />
-              <p className={`mt-1.5 text-[11px] font-semibold ${i === step ? 'text-blue-600 dark:text-blue-400' : ui.muted}`}>
+              <p className={`mt-1.5 hidden text-[11px] font-semibold sm:block ${i === step ? 'text-blue-600 dark:text-blue-400' : ui.muted}`}>
                 {i + 1}. {t(s)}
               </p>
             </li>
           ))}
         </ol>
+        {/* En celular solo se muestra el paso actual */}
+        <p className="mt-2 text-xs font-semibold text-blue-600 sm:hidden dark:text-blue-400">
+          {step + 1}/{STEPS.length} · {t(STEPS[step])}
+        </p>
 
-        <section className={`mt-6 rounded-2xl p-6 ${ui.card}`}>
+        <section className={`mt-6 rounded-2xl p-4 sm:p-6 ${ui.card}`}>
           {step === 0 && (
             <>
               <h2 className="text-lg font-bold">{t('reg.q1')}</h2>
