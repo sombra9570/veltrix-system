@@ -1,240 +1,517 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useLanguage, LanguageDropdown, RegionalStatusBar } from '../../language-selector';
-import { useVeltrixAuth } from '../../auth-system';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { rpc } from '../../../lib/supabase';
+import { Card } from '../shell';
+import { ui } from '../../site-header';
+import { useT } from '../../i18n';
+import type { DictKey } from '../../i18n/es';
+import { money, parseAmount } from '../format';
+import { useStaff } from '../staff-context';
 
-interface RouteAssignment {
-  id: number;
-  clientName: string;
-  address: string;
-  phone: string;
-  overdueUsd: number;
-  status: 'pending' | 'collected' | 'promised' | 'rejected';
+/* ------------------------------------------------------------------
+ * Cobrador de calle: trabaja SIN internet.
+ *  - "El día" se descarga y queda guardado en el teléfono.
+ *  - Cada cobro, visita o gasto entra a una cola local con su propio id.
+ *  - Cuando hay señal, la cola se envía sola; repetir un envío no duplica nada.
+ * ------------------------------------------------------------------ */
+
+type Method = 'cash' | 'qr_transfer' | 'card';
+type VisitResult = 'no_one_home' | 'promise' | 'refused' | 'other';
+type Customer = {
+  id: string; name: string; phone: string | null; address: string | null; lat: number | null; lng: number | null;
+  balance: number; overdue: number; due_today: number; next_due: string | null; visited_today: boolean;
+};
+type Settlement = { id: string; at: string; status: string; cash: number; expenses: number; deliver: number };
+type Route = {
+  id: string; name: string; branch: string; currency: string; today: string;
+  unsettled_cash: number; unsettled_digital: number; unsettled_expenses: number;
+  customers: Customer[]; settlements: Settlement[];
+};
+type Day = { generated_at: string; routes: Route[] };
+type Op =
+  | { kind: 'payment'; id: string; at: string; route: string; customer: string; method: Method; amount: number }
+  | { kind: 'visit'; id: string; at: string; route: string; customer: string; result: VisitResult; promise_date?: string; promise_amount?: number; notes?: string; lat?: number; lng?: number }
+  | { kind: 'expense'; id: string; at: string; route: string; amount: number; description: string };
+
+const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
+const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
+const VISITS: VisitResult[] = ['no_one_home', 'promise', 'refused', 'other'];
+
+const load = <T,>(k: string, d: T): T => { try { return JSON.parse(localStorage.getItem(k) ?? 'null') ?? d; } catch { return d; } };
+const save = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* lleno */ } };
+
+/** Ubicación aproximada, sin bloquear si el teléfono no la da en 5 s */
+function getPosition(): Promise<{ lat: number; lng: number } | null> {
+  return new Promise((resolve) => {
+    if (!('geolocation' in navigator)) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (p) => resolve({ lat: +p.coords.latitude.toFixed(6), lng: +p.coords.longitude.toFixed(6) }),
+      () => resolve(null),
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 120000 },
+    );
+  });
 }
 
-const INITIAL_ROUTE: RouteAssignment[] = [
-  { id: 1, clientName: 'Comercial El Ahorro S.R.L.', address: 'Av. 3 Pasos al Frente #240', phone: '352-9182', overdueUsd: 180, status: 'pending' },
-  { id: 2, clientName: 'Ferretería Constructiva Ltda.', address: 'Radial 19, 4to Anillo', phone: '348-1920', overdueUsd: 450, status: 'pending' },
-  { id: 3, clientName: 'Minimarket Don Pepe', address: 'Barrio Las Palmas, Calle 3', phone: '358-9921', overdueUsd: 120, status: 'pending' },
-];
+export default function CollectorPage() {
+  const { t, lang } = useT();
+  const { userId } = useStaff();
+  const DAY_KEY = `vx_collector_day_${userId}`;
+  const QUEUE_KEY = `vx_collector_queue_${userId}`;
 
-export default function FieldCollectorStationPage() {
-  const router = useRouter();
-  const { country, formatMoney } = useLanguage();
-  const { loaded, session, companies, logout } = useVeltrixAuth();
+  const [day, setDay] = useState<Day | null>(null);
+  const [queue, setQueue] = useState<Op[]>([]);
+  const [online, setOnline] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [routeId, setRouteId] = useState('');
+  const [sel, setSel] = useState<Customer | null>(null);
+  const [panel, setPanel] = useState<'pay' | 'visit' | 'expense' | 'settle' | null>(null);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const flushing = useRef(false);
 
-  const [route, setRoute] = useState<RouteAssignment[]>(INITIAL_ROUTE);
-  const [selectedClient, setSelectedClient] = useState<RouteAssignment | null>(null);
-  const [collectionAmount, setCollectionAmount] = useState<number>(0);
-  const [paymentChannel, setPaymentChannel] = useState<'cash' | 'qr'>('cash');
-  const [shiftSettled, setShiftSettled] = useState(false);
+  const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 5000); };
 
+  // Lo guardado en el teléfono aparece al instante, aun sin señal
   useEffect(() => {
-    if (loaded && (!session || session.role !== 'collector')) {
-      router.replace('/');
+    const d = load<Day | null>(DAY_KEY, null);
+    if (d) { setDay(d); setRouteId((r) => r || d.routes[0]?.id || ''); }
+    setQueue(load<Op[]>(QUEUE_KEY, []));
+    setOnline(navigator.onLine);
+    const on = () => setOnline(true);
+    const off = () => setOnline(false);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
+  }, [DAY_KEY, QUEUE_KEY]);
+
+  const refresh = useCallback(async () => {
+    try {
+      const d = await rpc<Day>('collector_day');
+      setDay(d);
+      save(DAY_KEY, d);
+      setRouteId((r) => (d.routes.some((x) => x.id === r) ? r : d.routes[0]?.id ?? ''));
+    } catch { /* sin señal: seguimos con lo guardado */ }
+  }, [DAY_KEY]);
+
+  // Envía la cola, de a uno y en orden
+  const flush = useCallback(async () => {
+    if (flushing.current) return;
+    flushing.current = true;
+    setSyncing(true);
+    try {
+      let pending = load<Op[]>(QUEUE_KEY, []);
+      while (pending.length) {
+        const op = pending[0];
+        try {
+          if (op.kind === 'payment') {
+            await rpc('register_payment', {
+              p_customer: op.customer, p_origin: 'field_route', p_method: op.method, p_amount: op.amount,
+              p_route: op.route, p_offline_uuid: op.id, p_collected_at: op.at,
+            });
+          } else if (op.kind === 'visit') {
+            await rpc('collector_visit', {
+              p_route: op.route, p_customer: op.customer, p_result: op.result,
+              p_promise_date: op.promise_date ?? null, p_promise_amount: op.promise_amount ?? null,
+              p_notes: op.notes ?? null, p_lat: op.lat ?? null, p_lng: op.lng ?? null,
+              p_offline_uuid: op.id, p_visited_at: op.at,
+            });
+          } else {
+            await rpc('collector_expense', { p_route: op.route, p_amount: op.amount, p_description: op.description, p_offline_uuid: op.id });
+          }
+        } catch (err) {
+          const m = (err as Error).message;
+          // Sin señal: se reintenta más tarde. Rechazo real (p. ej. monto mayor a la deuda): se descarta y se avisa.
+          if (/fetch|network|Failed|Load failed/i.test(m) || !navigator.onLine) break;
+          flash(false, `${t('col.rejected')}: ${m}`);
+        }
+        pending = pending.slice(1);
+        save(QUEUE_KEY, pending);
+        setQueue(pending);
+      }
+    } finally {
+      flushing.current = false;
+      setSyncing(false);
     }
-  }, [loaded, session, router]);
+    await refresh();
+  }, [QUEUE_KEY, refresh, t]);
 
-  if (!loaded || !session || session.role !== 'collector') {
-    return <div className="min-h-dvh bg-slate-950" />;
-  }
+  // Al abrir y cada vez que vuelve la señal: sincroniza; además cada 60 s
+  useEffect(() => {
+    if (!online) return;
+    flush();
+    const id = setInterval(flush, 60_000);
+    return () => clearInterval(id);
+  }, [online, flush]);
 
-  const myCompany = companies.find((c) => c.id === session.companyId) || companies[0];
-
-  const handleRecordCollection = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedClient || collectionAmount <= 0) return;
-
-    setRoute(
-      route.map((item) =>
-        item.id === selectedClient.id ? { ...item, status: 'collected' } : item
-      )
-    );
-    setSelectedClient(null);
-    setCollectionAmount(0);
+  const enqueue = (op: Op) => {
+    const next = [...load<Op[]>(QUEUE_KEY, []), op];
+    save(QUEUE_KEY, next);
+    setQueue(next);
+    // Refleja el cambio en lo guardado para seguir trabajando sin señal
+    setDay((d) => {
+      if (!d) return d;
+      const nd: Day = {
+        ...d,
+        routes: d.routes.map((r) => {
+          if (r.id !== op.route) return r;
+          if (op.kind === 'expense') return { ...r, unsettled_expenses: Number(r.unsettled_expenses) + op.amount };
+          const customers = r.customers.map((c) => {
+            if (c.id !== op.customer) return c;
+            if (op.kind === 'payment') {
+              const paid = op.amount;
+              return {
+                ...c, visited_today: true,
+                balance: Math.max(0, Number(c.balance) - paid),
+                overdue: Math.max(0, Number(c.overdue) - paid),
+                due_today: Math.max(0, Number(c.due_today) - Math.max(0, paid - Number(c.overdue))),
+              };
+            }
+            return { ...c, visited_today: true };
+          });
+          const cashAdd = op.kind === 'payment' && op.method === 'cash' ? op.amount : 0;
+          const digAdd = op.kind === 'payment' && op.method !== 'cash' ? op.amount : 0;
+          return {
+            ...r, customers,
+            unsettled_cash: Number(r.unsettled_cash) + cashAdd,
+            unsettled_digital: Number(r.unsettled_digital) + digAdd,
+          };
+        }),
+      };
+      save(DAY_KEY, nd);
+      return nd;
+    });
+    if (navigator.onLine) flush();
   };
 
-  const totalCollectedUsd = route
-    .filter((r) => r.status === 'collected')
-    .reduce((sum, r) => sum + r.overdueUsd, 0);
+  const route = day?.routes.find((r) => r.id === routeId);
+  const fmt = (n: number) => money(Number(n), route?.currency ?? 'USD', lang);
 
-  const handleLogout = () => {
-    logout();
-    if (typeof window !== 'undefined') {
-      window.location.href = '/';
+  /* ---------- Pantallas ---------- */
+  if (!day) {
+    return <Card><p className={`text-sm ${ui.muted}`}>{online ? t('common.wait') : t('col.noDataOffline')}</p></Card>;
+  }
+  if (day.routes.length === 0) {
+    return <Card><p className={`text-sm ${ui.muted}`}>{t('col.noRoute')}</p></Card>;
+  }
+  if (!route) return null;
+
+  const pendingRoute = queue.filter((q) => q.route === route.id).length;
+  const visited = route.customers.filter((c) => c.visited_today).length;
+  const inHand = Number(route.unsettled_cash) - Number(route.unsettled_expenses);
+
+  return (
+    <div className="space-y-4">
+      {/* Estado de conexión y sincronización */}
+      <div className={`flex flex-wrap items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold ${online ? okBox : 'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300'}`}>
+        <span>{online ? `🟢 ${t('col.online')}` : `🟠 ${t('col.offline')}`}</span>
+        <span className="flex-1 text-xs font-normal">
+          {queue.length > 0 ? t('col.pending', { n: queue.length }) : t('col.synced')}
+          {' · '}{t('col.updated', { time: new Date(day.generated_at).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' }) })}
+        </span>
+        {online && (
+          <button type="button" onClick={flush} disabled={syncing} className="rounded-lg border border-current px-2.5 py-1 text-xs cursor-pointer disabled:opacity-50">
+            {syncing ? '…' : `↻ ${t('col.sync')}`}
+          </button>
+        )}
+      </div>
+
+      {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? okBox : errBox}`}>{msg.text}</p>}
+
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-xl font-extrabold sm:text-2xl">🛵 {route.name}</h1>
+          <p className={`text-sm ${ui.muted}`}>{route.branch} · {t('col.visited', { n: visited, total: route.customers.length })}</p>
+        </div>
+        {day.routes.length > 1 && (
+          <select value={routeId} onChange={(e) => setRouteId(e.target.value)} className={`${ui.input} !w-auto`}>
+            {day.routes.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+          </select>
+        )}
+      </div>
+
+      {/* Lo que llevo encima */}
+      <div className="grid grid-cols-3 gap-2 text-center">
+        <Card className="!p-3">
+          <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.cash')}</p>
+          <p className="font-extrabold">{fmt(route.unsettled_cash)}</p>
+        </Card>
+        <Card className="!p-3">
+          <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.expenses')}</p>
+          <p className="font-extrabold text-red-600 dark:text-red-400">{fmt(route.unsettled_expenses)}</p>
+        </Card>
+        <Card className="!p-3">
+          <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.toDeliver')}</p>
+          <p className="font-extrabold text-emerald-600 dark:text-emerald-400">{fmt(inHand)}</p>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <button type="button" onClick={() => { setSel(null); setPanel('expense'); }} className={ui.btnGhost}>⛽ {t('col.addExpense')}</button>
+        <button type="button" onClick={() => { setSel(null); setPanel('settle'); }} className={ui.btnGhost}>🏁 {t('col.settle')}</button>
+      </div>
+
+      {/* Clientes del día: primero los vencidos */}
+      <ul className="space-y-2">
+        {route.customers.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('col.noCustomers')}</p></Card>}
+        {route.customers.map((c) => (
+          <li key={c.id}>
+            <button type="button" onClick={() => { setSel(c); setPanel(null); }}
+              className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer ${ui.card} ${c.visited_today ? 'opacity-60' : ''} ${sel?.id === c.id ? 'ring-2 ring-blue-500' : ''}`}>
+              <span className="text-xl">{c.visited_today ? '✅' : Number(c.overdue) > 0 ? '🔴' : Number(c.due_today) > 0 ? '🟡' : '⚪'}</span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-bold">{c.name}</p>
+                <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-extrabold">{fmt(Number(c.overdue) + Number(c.due_today))}</p>
+                <p className={`text-[11px] ${ui.muted}`}>{t('col.ofBalance', { amount: fmt(c.balance) })}</p>
+              </div>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {/* Hoja inferior: cliente / gasto / rendición */}
+      {(sel || panel) && (
+        <div className="fixed inset-x-0 top-0 z-40 h-dvh">
+          <div className="absolute inset-0 bg-black/50" onClick={() => { setSel(null); setPanel(null); }} />
+          <div className="absolute inset-x-0 bottom-0 mx-auto max-h-[90dvh] max-w-xl overflow-y-auto overscroll-contain rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] dark:bg-slate-900">
+            <div className="mb-3 flex justify-end">
+              <button type="button" onClick={() => { setSel(null); setPanel(null); }} aria-label={t('pos.close')} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+            </div>
+
+            {sel && !panel && (
+              <CustomerSheet c={sel} fmt={fmt} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')} />
+            )}
+            {sel && panel === 'pay' && (
+              <PayForm c={sel} fmt={fmt} onDone={(method, amount) => {
+                enqueue({ kind: 'payment', id: crypto.randomUUID(), at: new Date().toISOString(), route: route.id, customer: sel.id, method, amount });
+                flash(true, online ? t('col.paySaved') : t('col.savedOffline'));
+                setSel(null); setPanel(null);
+              }} />
+            )}
+            {sel && panel === 'visit' && (
+              <VisitForm onDone={async (v) => {
+                const pos = await getPosition();
+                enqueue({ kind: 'visit', id: crypto.randomUUID(), at: new Date().toISOString(), route: route.id, customer: sel.id, ...v, ...(pos ?? {}) });
+                flash(true, online ? t('col.visitSaved') : t('col.savedOffline'));
+                setSel(null); setPanel(null);
+              }} />
+            )}
+            {panel === 'expense' && (
+              <ExpenseForm onDone={(amount, description) => {
+                enqueue({ kind: 'expense', id: crypto.randomUUID(), at: new Date().toISOString(), route: route.id, amount, description });
+                flash(true, online ? t('cash.movementSaved') : t('col.savedOffline'));
+                setPanel(null);
+              }} />
+            )}
+            {panel === 'settle' && (
+              <SettleSheet route={route} fmt={fmt} online={online} pending={pendingRoute}
+                onClosed={async () => { await refresh(); flash(true, t('col.settled')); setPanel(null); }} />
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------- Ficha rápida del cliente ---------- */
+function CustomerSheet({ c, fmt, onPay, onVisit }: { c: Customer; fmt: (n: number) => string; onPay: () => void; onVisit: () => void }) {
+  const { t, lang } = useT();
+  const map = c.lat != null && c.lng != null
+    ? `https://maps.google.com/?q=${c.lat},${c.lng}`
+    : c.address ? `https://maps.google.com/?q=${encodeURIComponent(c.address)}` : null;
+  return (
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-lg font-bold">{c.name}</h2>
+        <p className={`text-sm ${ui.muted}`}>{c.address ?? '—'}</p>
+      </div>
+      <div className="grid grid-cols-3 gap-2 text-center">
+        <div className="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/50">
+          <p className={`text-[11px] uppercase ${ui.muted}`}>{t('cust.overdue')}</p>
+          <p className={`font-extrabold ${Number(c.overdue) > 0 ? 'text-red-600 dark:text-red-400' : ''}`}>{fmt(c.overdue)}</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/50">
+          <p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.dueToday')}</p>
+          <p className="font-extrabold">{fmt(c.due_today)}</p>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/50">
+          <p className={`text-[11px] uppercase ${ui.muted}`}>{t('cust.balance')}</p>
+          <p className="font-extrabold">{fmt(c.balance)}</p>
+        </div>
+      </div>
+      {c.next_due && <p className={`text-xs ${ui.muted}`}>{t('col.nextDue', { date: new Date(c.next_due + 'T12:00:00').toLocaleDateString(lang) })}</p>}
+      <div className="grid grid-cols-2 gap-2">
+        {c.phone ? <a href={`tel:${c.phone}`} className={ui.btnGhost}>📞 {t('col.call')}</a> : <span />}
+        {map ? <a href={map} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>📍 {t('col.map')}</a> : <span />}
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <button type="button" onClick={onVisit} className={ui.btnGhost}>📝 {t('col.visit')}</button>
+        <button type="button" onClick={onPay} className={`${ui.btnPrimary} py-3`}>💵 {t('col.collect')}</button>
+      </div>
+    </div>
+  );
+}
+
+function PayForm({ c, fmt, onDone }: { c: Customer; fmt: (n: number) => string; onDone: (m: Method, a: number) => void }) {
+  const { t } = useT();
+  const suggested = Number(c.overdue) + Number(c.due_today) || Number(c.balance);
+  const [amount, setAmount] = useState(String(Math.min(suggested, Number(c.balance))));
+  const [method, setMethod] = useState<Method>('cash');
+  const n = parseAmount(amount);
+  const invalid = Number.isNaN(n) || n <= 0 || n > Number(c.balance);
+  return (
+    <div className="space-y-4">
+      <h2 className="text-lg font-bold">💵 {c.name}</h2>
+      <div>
+        <label className={ui.label}>{t('cash.amount')}</label>
+        <input inputMode="decimal" autoFocus value={amount} onChange={(e) => setAmount(e.target.value)} className={`${ui.input} text-2xl font-bold`} />
+        {!Number.isNaN(n) && n > Number(c.balance) && <p className="mt-1 text-sm font-semibold text-red-600 dark:text-red-400">{t('cash.exceeds')}</p>}
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        {(['cash', 'qr_transfer', 'card'] as Method[]).map((m) => (
+          <button key={m} type="button" onClick={() => setMethod(m)}
+            className={`rounded-xl px-2 py-2.5 text-xs font-bold transition cursor-pointer ${method === m ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
+            {t(`cash.m.${m}` as DictKey)}
+          </button>
+        ))}
+      </div>
+      <button type="button" disabled={invalid} onClick={() => onDone(method, Math.round(n * 100) / 100)} className={`${ui.btnPrimary} w-full py-3 text-base`}>
+        {t('cash.confirm')} {invalid ? '' : `· ${fmt(n)}`}
+      </button>
+    </div>
+  );
+}
+
+function VisitForm({ onDone }: { onDone: (v: { result: VisitResult; promise_date?: string; promise_amount?: number; notes?: string }) => void }) {
+  const { t } = useT();
+  const [result, setResult] = useState<VisitResult>('no_one_home');
+  const [date, setDate] = useState('');
+  const [amount, setAmount] = useState('');
+  const [notes, setNotes] = useState('');
+  const [busy, setBusy] = useState(false);
+  const promiseInvalid = result === 'promise' && !date;
+  return (
+    <div className="space-y-4">
+      <h2 className="text-lg font-bold">📝 {t('col.visit')}</h2>
+      <div className="grid grid-cols-2 gap-2">
+        {VISITS.map((v) => (
+          <button key={v} type="button" onClick={() => setResult(v)}
+            className={`rounded-xl px-2 py-2.5 text-sm font-semibold transition cursor-pointer ${result === v ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
+            {t(`col.v.${v}` as DictKey)}
+          </button>
+        ))}
+      </div>
+      {result === 'promise' && (
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className={ui.label}>{t('col.promiseDate')}</label>
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={ui.input} />
+          </div>
+          <div>
+            <label className={ui.label}>{t('cash.amount')}</label>
+            <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} className={ui.input} />
+          </div>
+        </div>
+      )}
+      <div>
+        <label className={ui.label}>{t('cust.notes')}</label>
+        <input value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={300} className={ui.input} />
+      </div>
+      <button type="button" disabled={busy || promiseInvalid} className={`${ui.btnPrimary} w-full py-3`}
+        onClick={async () => {
+          setBusy(true);
+          const a = parseAmount(amount);
+          await onDone({ result, promise_date: date || undefined, promise_amount: Number.isNaN(a) || a <= 0 ? undefined : a, notes: notes || undefined });
+          setBusy(false);
+        }}>
+        {busy ? t('common.wait') : t('col.saveVisit')}
+      </button>
+    </div>
+  );
+}
+
+function ExpenseForm({ onDone }: { onDone: (amount: number, description: string) => void }) {
+  const { t } = useT();
+  const [amount, setAmount] = useState('');
+  const [desc, setDesc] = useState('');
+  const n = parseAmount(amount);
+  const invalid = Number.isNaN(n) || n <= 0 || !desc.trim();
+  return (
+    <div className="space-y-4">
+      <h2 className="text-lg font-bold">⛽ {t('col.addExpense')}</h2>
+      <p className={`text-sm ${ui.muted}`}>{t('col.expenseHint')}</p>
+      <div>
+        <label className={ui.label}>{t('cash.amount')}</label>
+        <input inputMode="decimal" autoFocus value={amount} onChange={(e) => setAmount(e.target.value)} className={ui.input} />
+      </div>
+      <div>
+        <label className={ui.label}>{t('cash.reason')}</label>
+        <input value={desc} onChange={(e) => setDesc(e.target.value)} maxLength={200} className={ui.input} />
+      </div>
+      <button type="button" disabled={invalid} onClick={() => onDone(Math.round(n * 100) / 100, desc.trim())} className={`${ui.btnPrimary} w-full py-3`}>
+        {t('cash.addMovement')}
+      </button>
+    </div>
+  );
+}
+
+function SettleSheet({ route, fmt, online, pending, onClosed }: {
+  route: Route; fmt: (n: number) => string; online: boolean; pending: number; onClosed: () => Promise<void>;
+}) {
+  const { t, lang } = useT();
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const deliver = Number(route.unsettled_cash) - Number(route.unsettled_expenses);
+  const nothing = Number(route.unsettled_cash) === 0 && Number(route.unsettled_digital) === 0 && Number(route.unsettled_expenses) === 0;
+
+  const close = async () => {
+    setBusy(true);
+    setErr('');
+    try {
+      await rpc('close_route', { p_route: route.id });
+      await onClosed();
+    } catch {
+      setErr(t('err.generic'));
+    } finally {
+      setBusy(false);
     }
   };
 
   return (
-    <main className="min-h-dvh bg-slate-950 text-white px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:p-8">
-      <div className="w-full max-w-[1600px] mx-auto space-y-6 min-w-0">
-        <header className="flex flex-wrap justify-between items-center border-b border-slate-800 pb-5 gap-4">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full">
-              🛵 Ruta de Cobranza en Calle (Modo Offline / Sincronizado)
-            </span>
-            <h1 className="text-2xl font-extrabold mt-2">{myCompany.name}</h1>
-            <p className="text-xs text-slate-400">
-              Cobrador en Ruta: <strong className="text-white">{session.name}</strong> · Zona Operativa: Santa Cruz Centro
-            </p>
-          </div>
+    <div className="space-y-4">
+      <h2 className="text-lg font-bold">🏁 {t('col.settle')}</h2>
+      <ul className="space-y-1 text-sm">
+        <li className="flex justify-between"><span>{t('col.cash')}</span><b>{fmt(route.unsettled_cash)}</b></li>
+        <li className="flex justify-between"><span>{t('col.digital')}</span><b>{fmt(route.unsettled_digital)}</b></li>
+        <li className="flex justify-between"><span>{t('col.expenses')}</span><b className="text-red-600 dark:text-red-400">− {fmt(route.unsettled_expenses)}</b></li>
+        <li className="flex justify-between border-t border-slate-200 pt-2 text-base dark:border-slate-800"><span>{t('col.toDeliver')}</span><b>{fmt(deliver)}</b></li>
+      </ul>
+      <p className={`text-xs ${ui.muted}`}>{t('col.settleHint')}</p>
+      {!online && <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">{t('col.settleNeedsSignal')}</p>}
+      {online && pending > 0 && <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">{t('col.settleSyncFirst')}</p>}
+      {err && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{err}</p>}
+      <button type="button" disabled={busy || !online || pending > 0 || nothing} onClick={close} className={`${ui.btnPrimary} w-full py-3`}>
+        {busy ? t('common.wait') : t('col.settleBtn')}
+      </button>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl text-right">
-              <p className="text-[11px] text-slate-400">Efectivo Recaudado en Ruta</p>
-              <p className="text-base font-bold text-amber-400">{formatMoney(totalCollectedUsd)}</p>
-            </div>
-            <LanguageDropdown />
-            <button
-              onClick={handleLogout}
-              className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-semibold px-4 py-2.5 rounded-lg cursor-pointer"
-            >
-              Cerrar Jornada / Salir
-            </button>
-          </div>
-        </header>
-
-        <RegionalStatusBar />
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-base font-bold text-slate-200">
-              Itinerario Asignado del Día ({route.length} Clientes)
-            </h2>
-            <div className="space-y-3">
-              {route.map((item) => (
-                <div
-                  key={item.id}
-                  className={`p-4 rounded-xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 ${
-                    item.status === 'collected'
-                      ? 'bg-emerald-950/20 border-emerald-500/40'
-                      : 'bg-slate-900/80 border-slate-800'
-                  }`}
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-sm text-white">{item.clientName}</h3>
-                      <span className={`text-[10px] px-2 py-0.5 rounded font-semibold ${
-                        item.status === 'collected' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'
-                      }`}>
-                        {item.status === 'collected' ? '✓ Cobrado / Sincronizado' : '⏳ Pendiente en Ruta'}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-400">📍 {item.address} · Tel: {item.phone}</p>
-                  </div>
-
-                  <div className="flex items-center gap-3 self-end sm:self-center">
-                    <div className="text-right">
-                      <p className="text-[10px] text-slate-400">Saldo Vencido</p>
-                      <p className="text-sm font-extrabold text-amber-400">{formatMoney(item.overdueUsd)}</p>
-                    </div>
-                    {item.status !== 'collected' && (
-                      <button
-                        onClick={() => {
-                          setSelectedClient(item);
-                          setCollectionAmount(item.overdueUsd);
-                        }}
-                        className="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-3.5 py-2 rounded-lg text-xs transition cursor-pointer"
-                      >
-                        Registrar Abono →
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-            <h2 className="text-base font-bold border-b border-slate-800 pb-3">
-              Liquidación de Visita en Terreno
-            </h2>
-
-            {selectedClient ? (
-              <form onSubmit={handleRecordCollection} className="space-y-4 text-xs">
-                <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-1">
-                  <p className="text-slate-400">Cliente Seleccionado:</p>
-                  <p className="font-bold text-sm text-white">{selectedClient.clientName}</p>
-                  <p className="text-amber-300 font-semibold">Deuda Total: {formatMoney(selectedClient.overdueUsd)}</p>
-                </div>
-
-                <div>
-                  <label className="block text-slate-400 mb-1">Monto a Recaudar (USD) *</label>
-                  <input
-                    type="number"
-                    value={collectionAmount}
-                    onChange={(e) => setCollectionAmount(Number(e.target.value))}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2.5 text-white font-bold"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-slate-400 mb-1">Medio de Recepción</label>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setPaymentChannel('cash')}
-                      className={`flex-1 py-2 rounded-lg font-bold cursor-pointer border ${
-                        paymentChannel === 'cash' ? 'bg-amber-600/30 border-amber-500 text-amber-300' : 'bg-slate-950 border-slate-800 text-slate-400'
-                      }`}
-                    >
-                      💵 Efectivo (Bolsa)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPaymentChannel('qr')}
-                      className={`flex-1 py-2 rounded-lg font-bold cursor-pointer border ${
-                        paymentChannel === 'qr' ? 'bg-blue-600/30 border-blue-500 text-blue-300' : 'bg-slate-950 border-slate-800 text-slate-400'
-                      }`}
-                    >
-                      📱 QR / Transferencia
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm transition cursor-pointer"
-                >
-                  ✓ Confirmar Abono y Sincronizar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedClient(null)}
-                  className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2 rounded-xl text-xs transition cursor-pointer"
-                >
-                  Cancelar
-                </button>
-              </form>
-            ) : (
-              <p className="text-xs text-slate-500 text-center py-12">
-                Seleccione un cliente del itinerario de ruta para registrar un cobro o promesa de pago.
-              </p>
-            )}
-
-            <div className="border-t border-slate-800 pt-4 space-y-2">
-              <h3 className="font-bold text-xs text-slate-300">Resumen de Rendición al Supervisor:</h3>
-              <div className="flex justify-between text-xs text-slate-400">
-                <span>Visitas Ejecutadas:</span>
-                <span className="font-bold text-white">{route.filter(r => r.status === 'collected').length} / {route.length}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShiftSettled(true)}
-                className="w-full mt-3 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition cursor-pointer"
-              >
-                📥 Solicitar Arqueo de Rendición Final
-              </button>
-              {shiftSettled && (
-                <p className="text-[11px] text-emerald-400 text-center font-semibold pt-1">
-                  ✓ Rendición enviada a Tesorería corporativa exitosamente.
-                </p>
-              )}
-            </div>
-          </div>
+      {route.settlements.length > 0 && (
+        <div>
+          <p className={ui.label}>{t('col.lastSettlements')}</p>
+          <ul className="divide-y divide-slate-100 text-sm dark:divide-slate-800">
+            {route.settlements.map((s) => (
+              <li key={s.id} className="flex items-center justify-between py-1.5">
+                <span className={ui.muted}>{new Date(s.at).toLocaleString(lang, { dateStyle: 'short', timeStyle: 'short' })}</span>
+                <span className="flex items-center gap-2">
+                  <b>{fmt(s.deliver)}</b>
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold dark:bg-slate-800">{t(`col.st.${s.status}` as DictKey)}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
-    </main>
+      )}
+    </div>
   );
 }

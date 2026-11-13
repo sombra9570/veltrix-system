@@ -129,6 +129,19 @@ async function finishRegistration(details: NewCompany, email: string) {
 }
 
 // ---------- hook principal ----------
+// ----- Sesión guardada para poder abrir la app sin internet -----
+const SESSION_KEY = 'vx_last_session';
+function readCachedSession(): ActiveSession | null {
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY) ?? 'null'); } catch { return null; }
+}
+function writeCachedSession(s: ActiveSession | null) {
+  try { if (s) localStorage.setItem(SESSION_KEY, JSON.stringify(s)); else localStorage.removeItem(SESSION_KEY); } catch { /* sin almacenamiento */ }
+}
+function isOfflineError(e: { message?: string; name?: string }) {
+  return (typeof navigator !== 'undefined' && !navigator.onLine)
+    || /fetch|network|Retryable/i.test(`${e.name ?? ''} ${e.message ?? ''}`);
+}
+
 export function useVeltrixAuth() {
   const [companies, setCompanies] = useState<TenantCompany[]>([]);
   const [workers, setWorkers] = useState<WorkerAccount[]>([]);
@@ -136,7 +149,16 @@ export function useVeltrixAuth() {
   const [loaded, setLoaded] = useState(false);
 
   const load = useCallback(async (): Promise<ActiveSession | null> => {
-    const { data: auth } = await supabase.auth.getUser();
+    const { data: auth, error: authError } = await supabase.auth.getUser();
+    // Sin internet (cobrador en la calle): se usa la última sesión guardada en el teléfono
+    if (authError && isOfflineError(authError)) {
+      const { data: local } = await supabase.auth.getSession();
+      const cached = readCachedSession();
+      if (local.session && cached && cached.userId === local.session.user.id) {
+        setSession(cached); setLoaded(true);
+        return cached;
+      }
+    }
     const user = auth.user;
     if (!user) {
       setSession(null); setCompanies([]); setWorkers([]); setLoaded(true);
@@ -228,13 +250,14 @@ export function useVeltrixAuth() {
     };
     setSession(s);
     setLoaded(true);
+    writeCachedSession(s);
     return s;
   }, []);
 
   useEffect(() => {
     load();
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') { setSession(null); setCompanies([]); setWorkers([]); }
+      if (event === 'SIGNED_OUT') { setSession(null); setCompanies([]); setWorkers([]); writeCachedSession(null); }
     });
     return () => sub.subscription.unsubscribe();
   }, [load]);
