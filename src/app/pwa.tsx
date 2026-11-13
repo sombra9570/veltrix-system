@@ -14,6 +14,34 @@ export function PwaRegister() {
   return null;
 }
 
+/**
+ * La app no se agranda ni se achica: bloquea el zoom con dos dedos, el doble toque,
+ * Ctrl + rueda del mouse y Ctrl + / Ctrl - en computadoras.
+ */
+export function NoZoom() {
+  useEffect(() => {
+    const stop = (e: Event) => e.preventDefault();
+    const onTouch = (e: TouchEvent) => { if (e.touches.length > 1) e.preventDefault(); };
+    const onWheel = (e: WheelEvent) => { if (e.ctrlKey || e.metaKey) e.preventDefault(); };
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && ['+', '-', '=', '0', '_'].includes(e.key)) e.preventDefault();
+    };
+    document.addEventListener('gesturestart', stop, { passive: false });
+    document.addEventListener('gesturechange', stop, { passive: false });
+    document.addEventListener('touchmove', onTouch, { passive: false });
+    window.addEventListener('wheel', onWheel, { passive: false });
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('gesturestart', stop);
+      document.removeEventListener('gesturechange', stop);
+      document.removeEventListener('touchmove', onTouch);
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, []);
+  return null;
+}
+
 function isStandalone() {
   return (
     window.matchMedia('(display-mode: standalone)').matches ||

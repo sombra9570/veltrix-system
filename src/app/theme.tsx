@@ -14,6 +14,10 @@ export function useTheme() {
   const setTheme = (t: Theme) => {
     document.documentElement.classList.toggle('dark', t === 'dark');
     try { localStorage.setItem('veltrix_theme', t); } catch {}
+    // La barra del teléfono / navegador toma el mismo color que la app
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) =>
+      m.setAttribute('content', t === 'dark' ? '#020617' : '#ffffff'),
+    );
     setThemeState(t);
   };
 

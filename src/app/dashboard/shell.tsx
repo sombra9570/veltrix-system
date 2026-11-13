@@ -110,9 +110,9 @@ export function AppShell({
 
       {/* Menú desplegable en celular */}
       {open && (
-        <div className="fixed inset-0 z-40 lg:hidden">
+        <div className="fixed inset-x-0 top-0 z-40 h-dvh lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-white shadow-xl rtl:left-auto rtl:right-0 dark:bg-slate-900">{menu}</aside>
+          <aside className="absolute left-0 top-0 h-dvh w-72 max-w-[85vw] overflow-y-auto overscroll-contain bg-white shadow-xl rtl:left-auto rtl:right-0 dark:bg-slate-900">{menu}</aside>
         </div>
       )}
 

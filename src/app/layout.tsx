@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { LanguageProvider } from './language-selector';
 import { LangSync } from './i18n';
-import { PwaRegister } from './pwa';
+import { PwaRegister, NoZoom } from './pwa';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -27,15 +27,20 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#2563eb',
+  themeColor: '#020617',
   width: 'device-width',
   initialScale: 1,
+  minimumScale: 1,
+  maximumScale: 1,
+  userScalable: false,
   viewportFit: 'cover',
+  interactiveWidget: 'resizes-content',
 };
 
 // Aplica el tema guardado antes de pintar la página (evita el parpadeo).
 // Por defecto: oscuro.
-const themeScript = `try{var t=localStorage.getItem('veltrix_theme');if(t!=='light'){document.documentElement.classList.add('dark')}}catch(e){document.documentElement.classList.add('dark')}`;
+// También pinta la barra del teléfono/navegador del mismo color que la app.
+const themeScript = `(function(){var d=true;try{d=localStorage.getItem('veltrix_theme')!=='light'}catch(e){}if(d){document.documentElement.classList.add('dark')}var m=document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m)}m.content=d?'#020617':'#ffffff'})()`;
 
 export default function RootLayout({
   children,
@@ -55,6 +60,9 @@ export default function RootLayout({
         <LanguageProvider>
           <LangSync />
           <PwaRegister />
+          <NoZoom />
+          {/* Franja bajo el reloj y la batería del iPhone (app instalada): siempre oscura para que se lean */}
+          <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[env(safe-area-inset-top)] bg-slate-950" />
           {children}
         </LanguageProvider>
       </body>
