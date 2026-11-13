@@ -19,9 +19,9 @@ export async function POST(request: Request) {
   const token = (request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '');
   if (!token) return fail(401, 'Sesión no válida');
 
-  let body: { companyId?: string; name?: string; email?: string; password?: string; role?: string };
+  let body: { companyId?: string; branchId?: string; name?: string; email?: string; password?: string; role?: string };
   try { body = await request.json(); } catch { return fail(400, 'Datos inválidos'); }
-  const { companyId, name, email, password, role } = body;
+  const { companyId, branchId, name, email, password, role } = body;
   if (!companyId || !name?.trim() || !email?.trim() || !role) return fail(400, 'Faltan datos del trabajador');
   if (!ROLES.includes(role)) return fail(400, 'Rol no permitido');
   if (!password || password.length < 8) return fail(400, 'La contraseña debe tener al menos 8 caracteres');
@@ -38,9 +38,11 @@ export async function POST(request: Request) {
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
 
-  const { data: branch } = await admin.from('branches').select('id')
-    .eq('company_id', companyId).is('deleted_at', null).order('created_at').limit(1).maybeSingle();
-  if (!branch) return fail(400, 'La empresa no tiene sucursal');
+  // Sucursal elegida por el dueño (debe ser de esa empresa); si no eligió, la primera
+  let q = admin.from('branches').select('id').eq('company_id', companyId).is('deleted_at', null);
+  q = branchId ? q.eq('id', branchId) : q.order('created_at').limit(1);
+  const { data: branch } = await q.maybeSingle();
+  if (!branch) return fail(400, 'Sucursal no encontrada');
 
   // 2) Crea el login
   const { data: created, error: authErr } = await admin.auth.admin.createUser({
