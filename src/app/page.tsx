@@ -811,12 +811,12 @@ export default function VeltrixSaaSControlPanel() {
     else if (role === 'supervisor') router.push('/dashboard/owner');
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
     setLoading(true);
 
-    const res = login(email, password);
+    const res = await login(email, password);
     setLoading(false);
 
     if (res.ok && res.session) {
@@ -826,11 +826,11 @@ export default function VeltrixSaaSControlPanel() {
     }
   };
 
-  const quickLogin = (em: string, pass: string) => {
+  const quickLogin = async (em: string, pass: string) => {
     setEmail(em);
     setPassword(pass);
     setErrorMsg('');
-    const res = login(em, pass);
+    const res = await login(em, pass);
     if (res.ok && res.session) {
       routeByRole(res.session.role);
     }

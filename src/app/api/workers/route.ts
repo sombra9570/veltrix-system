@@ -1,0 +1,66 @@
+// Crea un trabajador (cajero, vendedor, cobrador, supervisor...) con su login real.
+// Corre SOLO en el servidor: usa la clave secreta SUPABASE_SERVICE_ROLE_KEY.
+import { createClient } from '@supabase/supabase-js';
+
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+const ROLES = ['supervisor', 'cashier', 'vendor', 'collector', 'waiter', 'kitchen',
+               'technician', 'storekeeper', 'accountant'];
+
+function fail(status: number, error: string) {
+  return Response.json({ error }, { status });
+}
+
+export async function POST(request: Request) {
+  if (!url || !anonKey || !serviceKey) return fail(500, 'Faltan las claves de Supabase en .env.local');
+
+  const token = (request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '');
+  if (!token) return fail(401, 'Sesión no válida');
+
+  let body: { companyId?: string; name?: string; email?: string; password?: string; role?: string };
+  try { body = await request.json(); } catch { return fail(400, 'Datos inválidos'); }
+  const { companyId, name, email, password, role } = body;
+  if (!companyId || !name?.trim() || !email?.trim() || !role) return fail(400, 'Faltan datos del trabajador');
+  if (!ROLES.includes(role)) return fail(400, 'Rol no permitido');
+  if (!password || password.length < 8) return fail(400, 'La contraseña debe tener al menos 8 caracteres');
+
+  // 1) Quien llama debe ser el DUEÑO de esa empresa (se verifica con su propia sesión y el RLS)
+  const asUser = createClient(url, anonKey, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
+    auth: { persistSession: false },
+  });
+  const { data: company } = await asUser.from('companies').select('id, org_id').eq('id', companyId).maybeSingle();
+  if (!company) return fail(403, 'Empresa no encontrada');
+  const { data: isOwner } = await asUser.rpc('is_org_owner', { p_org: company.org_id });
+  if (!isOwner) return fail(403, 'Solo el dueño puede crear trabajadores');
+
+  const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
+
+  const { data: branch } = await admin.from('branches').select('id')
+    .eq('company_id', companyId).is('deleted_at', null).order('created_at').limit(1).maybeSingle();
+  if (!branch) return fail(400, 'La empresa no tiene sucursal');
+
+  // 2) Crea el login
+  const { data: created, error: authErr } = await admin.auth.admin.createUser({
+    email: email.trim().toLowerCase(),
+    password,
+    email_confirm: true,
+    user_metadata: { full_name: name.trim() },
+  });
+  if (authErr || !created.user) return fail(400, authErr?.message ?? 'No se pudo crear el usuario');
+  const uid = created.user.id;
+
+  // 3) Perfil + rol en la sucursal (si algo falla, se deshace el login)
+  const { error: pErr } = await admin.from('profiles')
+    .insert({ id: uid, org_id: company.org_id, full_name: name.trim(), email: email.trim().toLowerCase() });
+  const { error: mErr } = pErr ? { error: pErr } : await admin.from('memberships')
+    .insert({ org_id: company.org_id, user_id: uid, company_id: companyId, branch_id: branch.id, role });
+  if (pErr || mErr) {
+    await admin.auth.admin.deleteUser(uid);
+    return fail(400, (pErr ?? mErr)!.message);
+  }
+
+  return Response.json({ id: uid });
+}
