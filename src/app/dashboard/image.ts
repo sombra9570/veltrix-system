@@ -46,3 +46,10 @@ async function loadImage(file: File): Promise<ImageBitmap | HTMLImageElement> {
 export function extFor(blob: Blob) {
   return blob.type === 'image/webp' ? 'webp' : 'jpg';
 }
+
+/** Enlace público de una foto de la tienda (bucket público "store-images") */
+export function storeImageUrl(path: string | null | undefined) {
+  if (!path) return null;
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
+  return `${base}/storage/v1/object/public/store-images/${path}`;
+}

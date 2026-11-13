@@ -1,0 +1,217 @@
+'use client';
+import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { supabase } from '../../../lib/supabase';
+import { useT } from '../../i18n';
+import { ThemeToggle } from '../../theme';
+import { ui } from '../../site-header';
+import { storeImageUrl } from '../../dashboard/image';
+
+type Product = { id: string; name: string; price: number; type: string; description: string | null; photo: string | null; unit: string; available: boolean };
+type Store = { slug: string; name: string; description: string | null; whatsapp: string | null; logo: string | null; currency: string; products: Product[] };
+type Line = { p: Product; qty: number };
+
+/** Tienda pública: catálogo, carrito y pedido por WhatsApp. No guarda nada en la base. */
+export function StoreView({ slug }: { slug: string }) {
+  const { t, lang } = useT();
+  const [store, setStore] = useState<Store | null | undefined>(undefined);
+  const [q, setQ] = useState('');
+  const [cart, setCart] = useState<Line[]>([]);
+  const [open, setOpen] = useState(false);
+  const [view, setView] = useState<Product | null>(null);
+  const [name, setName] = useState('');
+  const [note, setNote] = useState('');
+  const CART_KEY = `vx_store_cart_${slug}`;
+
+  useEffect(() => {
+    supabase.rpc('public_store', { p_slug: slug }).then(({ data }) => setStore((data as Store | null) ?? null));
+    try { setCart(JSON.parse(localStorage.getItem(CART_KEY) ?? '[]')); } catch { /* */ }
+  }, [slug, CART_KEY]);
+  useEffect(() => { try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch { /* */ } }, [cart, CART_KEY]);
+
+  const fmt = (n: number) => {
+    try { return new Intl.NumberFormat(lang, { style: 'currency', currency: store?.currency ?? 'USD' }).format(n); }
+    catch { return `${store?.currency ?? ''} ${n.toFixed(2)}`; }
+  };
+
+  const list = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    const all = store?.products ?? [];
+    return s ? all.filter((p) => p.name.toLowerCase().includes(s) || (p.description ?? '').toLowerCase().includes(s)) : all;
+  }, [store, q]);
+
+  const add = (p: Product) => setCart((c) => {
+    const ex = c.find((l) => l.p.id === p.id);
+    return ex ? c.map((l) => (l.p.id === p.id ? { ...l, qty: l.qty + 1 } : l)) : [...c, { p, qty: 1 }];
+  });
+  const change = (id: string, d: number) => setCart((c) => c.map((l) => (l.p.id === id ? { ...l, qty: l.qty + d } : l)).filter((l) => l.qty > 0));
+  const total = cart.reduce((s, l) => s + l.qty * Number(l.p.price), 0);
+  const units = cart.reduce((s, l) => s + l.qty, 0);
+
+  const sendWhatsApp = () => {
+    if (!store?.whatsapp || !cart.length) return;
+    const lines = cart.map((l) => `• ${l.qty} × ${l.p.name} — ${fmt(l.qty * Number(l.p.price))}`).join('\n');
+    const text = [
+      t('shop2.waHello', { store: store.name }),
+      '',
+      lines,
+      '',
+      `${t('pos.total')}: ${fmt(total)}`,
+      name.trim() ? `${t('shop2.waName')}: ${name.trim()}` : '',
+      note.trim() ? `${t('shop2.waNote')}: ${note.trim()}` : '',
+    ].filter((x, i, a) => x !== '' || (a[i - 1] ?? '') !== '').join('\n');
+    window.open(`https://wa.me/${store.whatsapp}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+  };
+
+  const shareStore = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share) await navigator.share({ title: store?.name, url });
+      else await navigator.clipboard.writeText(url);
+    } catch { /* cancelado */ }
+  };
+
+  if (store === undefined) return <div className="min-h-dvh bg-slate-50 dark:bg-slate-950" />;
+  if (store === null) {
+    return (
+      <main className="grid min-h-dvh place-items-center bg-slate-50 p-6 text-center dark:bg-slate-950">
+        <div>
+          <p className="text-5xl">🏪</p>
+          <h1 className="mt-3 text-xl font-bold">{t('shop2.notFound')}</h1>
+          <Link href="/" className={`${ui.btnGhost} mt-5`}>Veltrix</Link>
+        </div>
+      </main>
+    );
+  }
+
+  const logo = storeImageUrl(store.logo);
+
+  return (
+    <main className="min-h-dvh bg-slate-50 pb-28 dark:bg-slate-950">
+      {/* Encabezado de la tienda */}
+      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 pt-[env(safe-area-inset-top)] backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {logo ? <img src={logo} alt="" className="h-11 w-11 rounded-xl object-cover" /> : <span className="grid h-11 w-11 place-items-center rounded-xl bg-blue-600 text-xl text-white">🏪</span>}
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-lg font-extrabold">{store.name}</h1>
+            {store.description && <p className={`truncate text-xs ${ui.muted}`}>{store.description}</p>}
+          </div>
+          <button type="button" onClick={shareStore} aria-label={t('store.shareBtn')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">🔗</button>
+          <ThemeToggle />
+        </div>
+        <div className="mx-auto max-w-6xl px-4 pb-3">
+          <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('shop2.search')} className={ui.input} />
+        </div>
+      </header>
+
+      {/* Catálogo */}
+      <section className="mx-auto max-w-6xl px-4 py-5">
+        {store.products.length === 0 ? (
+          <p className={`py-10 text-center ${ui.muted}`}>{t('shop2.empty')}</p>
+        ) : list.length === 0 ? (
+          <p className={`py-10 text-center ${ui.muted}`}>{t('pos.noResults')}</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {list.map((p) => {
+              const src = storeImageUrl(p.photo);
+              const qty = cart.find((l) => l.p.id === p.id)?.qty ?? 0;
+              return (
+                <article key={p.id} className={`flex flex-col overflow-hidden rounded-2xl ${ui.card}`}>
+                  <button type="button" onClick={() => setView(p)} className="relative aspect-square bg-slate-100 cursor-pointer dark:bg-slate-800">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    {src ? <img src={src} alt={p.name} loading="lazy" className="h-full w-full object-cover" /> : <span className="grid h-full place-items-center text-4xl">{p.type === 'service' ? '🛠️' : '📦'}</span>}
+                    {!p.available && <span className="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-center text-xs font-bold text-white">{t('pos.out')}</span>}
+                  </button>
+                  <div className="flex flex-1 flex-col gap-2 p-3">
+                    <p className="line-clamp-2 text-sm font-semibold">{p.name}</p>
+                    <p className="mt-auto text-lg font-extrabold">{fmt(p.price)}</p>
+                    {qty > 0 ? (
+                      <div className="flex items-center justify-between rounded-xl border border-blue-500">
+                        <button type="button" onClick={() => change(p.id, -1)} className="h-9 w-10 text-lg font-bold cursor-pointer">−</button>
+                        <span className="font-bold">{qty}</span>
+                        <button type="button" onClick={() => change(p.id, 1)} className="h-9 w-10 text-lg font-bold cursor-pointer">+</button>
+                      </div>
+                    ) : (
+                      <button type="button" disabled={!p.available} onClick={() => add(p)} className={`${ui.btnPrimary} !py-2`}>{t('shop2.add')}</button>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+        <p className={`mt-10 text-center text-xs ${ui.muted}`}>
+          {t('shop2.poweredBy')} <Link href="/" className="font-bold text-blue-600 dark:text-blue-400">Veltrix</Link>
+        </p>
+      </section>
+
+      {/* Barra del carrito */}
+      {cart.length > 0 && !open && (
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
+          <button type="button" onClick={() => setOpen(true)} className={`${ui.btnPrimary} mx-auto w-full max-w-xl justify-between py-3 text-base`}>
+            <span>🛒 {t('shop2.cart')} · {units}</span><span>{fmt(total)}</span>
+          </button>
+        </div>
+      )}
+
+      {/* Detalle de producto */}
+      {view && (
+        <div className="fixed inset-x-0 top-0 z-40 h-dvh">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setView(null)} />
+          <div className="absolute inset-x-0 bottom-0 mx-auto max-h-[90dvh] max-w-xl overflow-y-auto rounded-t-3xl bg-white pb-[calc(1.25rem+env(safe-area-inset-bottom))] dark:bg-slate-900">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {storeImageUrl(view.photo) && <img src={storeImageUrl(view.photo)!} alt={view.name} className="max-h-[50dvh] w-full object-cover" />}
+            <div className="space-y-3 p-5">
+              <h2 className="text-xl font-extrabold">{view.name}</h2>
+              <p className="text-2xl font-extrabold">{fmt(view.price)}</p>
+              {view.description && <p className={`text-sm ${ui.muted}`}>{view.description}</p>}
+              <div className="grid grid-cols-2 gap-2">
+                <button type="button" onClick={() => setView(null)} className={ui.btnGhost}>{t('pos.close')}</button>
+                <button type="button" disabled={!view.available} onClick={() => { add(view); setView(null); }} className={ui.btnPrimary}>{t('shop2.add')}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Carrito y pedido */}
+      {open && (
+        <div className="fixed inset-x-0 top-0 z-40 h-dvh">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
+          <div className="absolute inset-x-0 bottom-0 mx-auto max-h-[90dvh] max-w-xl space-y-4 overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] dark:bg-slate-900">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-extrabold">🛒 {t('shop2.cart')}</h2>
+              <button type="button" onClick={() => setOpen(false)} aria-label={t('pos.close')} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+            </div>
+            <ul className="space-y-2">
+              {cart.map((l) => (
+                <li key={l.p.id} className="flex items-center gap-2">
+                  <span className="min-w-0 flex-1 truncate text-sm font-semibold">{l.p.name}</span>
+                  <button type="button" onClick={() => change(l.p.id, -1)} className="h-8 w-8 rounded-lg border border-slate-300 font-bold cursor-pointer dark:border-slate-700">−</button>
+                  <span className="w-6 text-center font-bold">{l.qty}</span>
+                  <button type="button" onClick={() => change(l.p.id, 1)} className="h-8 w-8 rounded-lg border border-slate-300 font-bold cursor-pointer dark:border-slate-700">+</button>
+                  <span className="w-20 text-right text-sm font-bold">{fmt(l.qty * Number(l.p.price))}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="flex items-baseline justify-between border-t border-slate-200 pt-3 dark:border-slate-800">
+              <span className="font-semibold">{t('pos.total')}</span>
+              <span className="text-2xl font-extrabold">{fmt(total)}</span>
+            </div>
+            <input value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder={t('shop2.yourName')} className={ui.input} />
+            <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} rows={2} placeholder={t('shop2.noteHint')} className={ui.input} />
+            {store.whatsapp ? (
+              <button type="button" onClick={sendWhatsApp} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-base font-bold text-white cursor-pointer hover:brightness-95">
+                💬 {t('shop2.order')}
+              </button>
+            ) : (
+              <p className={`text-center text-sm ${ui.muted}`}>{t('shop2.noWhatsapp')}</p>
+            )}
+            <button type="button" onClick={() => setCart([])} className={`w-full text-xs font-semibold ${ui.muted} hover:underline cursor-pointer`}>{t('pos.clear')}</button>
+          </div>
+        </div>
+      )}
+    </main>
+  );
+}
