@@ -11,7 +11,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase, rpc } from '../lib/supabase';
 import { COUNTRIES, CountryCode, TaxRegimeId, BusinessSectorId } from './language-selector';
 
-export type UserRole = 'superadmin' | 'owner' | 'cashier' | 'vendor' | 'collector' | 'supervisor';
+export type UserRole = 'superadmin' | 'owner' | 'cashier' | 'vendor' | 'collector' | 'supervisor' | 'waiter' | 'kitchen' | 'technician';
 
 // Panel de inicio de cada rol (un solo botón "Ingresar" para todos)
 export function homeForRole(role: UserRole): string {
@@ -21,6 +21,9 @@ export function homeForRole(role: UserRole): string {
     case 'supervisor': return '/dashboard/owner';
     case 'cashier': return '/dashboard/cashier';
     case 'collector': return '/dashboard/collector';
+    case 'waiter': return '/dashboard/waiter';
+    case 'kitchen': return '/dashboard/kitchen';
+    case 'technician': return '/dashboard/workshop';
     default: return '/dashboard/vendor';
   }
 }

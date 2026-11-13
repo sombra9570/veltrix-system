@@ -43,7 +43,10 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/ventas', icon: '🧾', label: 'nav.sales', soon: true },
   { href: '/dashboard/owner/caja', icon: '💵', label: 'nav.cash', soon: true },
   { href: '/dashboard/owner/clientes', icon: '🤝', label: 'nav.customers' },
-  { href: '/dashboard/owner/rutas', icon: '🛵', label: 'nav.routes' },
+  { href: '/dashboard/owner/rutas', icon: '🛵', label: 'nav.routes', module: 'field_collection' },
+  { href: '/dashboard/owner/mesas', icon: '🍽️', label: 'nav.tables', module: 'restaurant' },
+  { href: '/dashboard/owner/cocina', icon: '🔥', label: 'nav.kitchen', module: 'restaurant' },
+  { href: '/dashboard/owner/taller', icon: '🔧', label: 'nav.workshop', module: 'workshop' },
   { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory', soon: true },
   { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports', soon: true },
 ];
@@ -67,6 +70,13 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   const [orgId, setOrgId] = useState<string>('');
   const [overview, setOverview] = useState<Overview | null>(null);
   const [denied, setDenied] = useState(false);
+  const [modules, setModules] = useState<string[]>([]);
+
+  // Solo se muestran las herramientas de los rubros que tiene activos la empresa
+  useEffect(() => {
+    if (!session || session.role !== 'owner') return;
+    rpc<string[]>('my_modules').then((m) => setModules(m ?? [])).catch(() => setModules([]));
+  }, [session]);
 
   useEffect(() => {
     if (!loaded) return;
@@ -133,7 +143,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   return (
     <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name }}>
       <AppShell
-        nav={NAV}
+        nav={NAV.filter((n) => !n.module || modules.includes(n.module))}
         orgName={o?.name ?? ''}
         userName={session.name || session.email}
         roleLabel={t('role.owner')}

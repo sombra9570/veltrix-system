@@ -1,0 +1,5 @@
+import { WaiterLayout } from './staff-shell';
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return <WaiterLayout>{children}</WaiterLayout>;
+}

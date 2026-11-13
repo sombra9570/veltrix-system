@@ -7,7 +7,7 @@ import { RegionSelectors, ui } from '../site-header';
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 
-export type NavItem = { href: string; icon: string; label: DictKey; soon?: boolean };
+export type NavItem = { href: string; icon: string; label: DictKey; soon?: boolean; module?: string };
 
 /**
  * Estructura común de todos los paneles: menú lateral (en celular, desplegable),
