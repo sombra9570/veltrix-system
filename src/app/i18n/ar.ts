@@ -43,6 +43,8 @@ const ar: Record<DictKey, string> = {
   'home.plansSubtitle': 'ابدأ بـ 14 يومًا مجانًا مع كل الميزات. بعدها اختر باقتك.',
   'home.bestPlan': 'الأكثر اختيارًا',
   'home.startFree': 'ابدأ مجانًا',
+  'home.extraBranch': 'فرع إضافي: {price} / شهريًا',
+  'home.pricesLocal': 'الأسعار بعملة بلدك وفق سعر الصرف الرسمي لليوم.',
   'plan.starter.desc': 'لعمل في بدايته',
   'plan.starter.i1': 'نقطة البيع',
   'plan.starter.i2': 'المخزون',

@@ -43,6 +43,8 @@ const ja: Record<DictKey, string> = {
   'home.plansSubtitle': 'まずはすべての機能付きで14日間無料。その後プランを選べます。',
   'home.bestPlan': '一番人気',
   'home.startFree': '無料で始める',
+  'home.extraBranch': '追加支店：{price} / 月',
+  'home.pricesLocal': '価格はお住まいの国の通貨で、当日の公式為替レートで表示しています。',
   'plan.starter.desc': '始めたばかりのビジネスに',
   'plan.starter.i1': 'POSレジ',
   'plan.starter.i2': '在庫',

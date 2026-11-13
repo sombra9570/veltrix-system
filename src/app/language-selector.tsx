@@ -1205,6 +1205,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
           const val = Number(data.rates[curr]);
           roundedRates[curr] = val >= 100 ? Math.round(val) : Number(val.toFixed(2));
         });
+        // Bolivia: el oficial del BCB manda sobre la fuente internacional
+        try {
+          const bcb = await fetch('/api/fx/bob');
+          if (bcb.ok) {
+            const j = await bcb.json();
+            if (typeof j.rate === 'number' && j.rate > 0) roundedRates.BOB = Number(j.rate.toFixed(2));
+          }
+        } catch {
+          // sin conexión al BCB: se queda la tasa internacional
+        }
         const nowTs = Date.now();
         setLiveRates(roundedRates);
         localStorage.setItem('veltrix_fx_rates', JSON.stringify(roundedRates));

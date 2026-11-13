@@ -12,15 +12,23 @@ const FEATURES: { icon: string; n: number }[] = [
   { icon: '📦', n: 4 }, { icon: '🍽️', n: 5 }, { icon: '📊', n: 6 },
 ];
 
-const PLANS: { id: 'starter' | 'pro' | 'enterprise'; name: string; usd: number; best?: boolean }[] = [
-  { id: 'starter', name: 'Starter', usd: 35 },
-  { id: 'pro', name: 'Pro', usd: 60, best: true },
-  { id: 'enterprise', name: 'Enterprise', usd: 199 },
+// Precios anclados en dólares; la app los muestra en la moneda local con el tipo de cambio del día.
+// Latinoamérica tiene precio regional (poder adquisitivo); el resto del mundo, precio global.
+const LATAM = new Set(['BO', 'MX', 'CO', 'AR', 'CL', 'PE', 'BR', 'EC', 'PY', 'UY', 'VE', 'GT', 'HN', 'SV', 'NI', 'CR', 'PA', 'DO', 'PR', 'CU']);
+const PRICES = {
+  latam: { starter: 19, pro: 40, enterprise: 115, extraBranch: 10 },
+  global: { starter: 29, pro: 59, enterprise: 199, extraBranch: 15 },
+};
+const PLANS: { id: 'starter' | 'pro' | 'enterprise'; name: string; best?: boolean }[] = [
+  { id: 'starter', name: 'Starter' },
+  { id: 'pro', name: 'Pro', best: true },
+  { id: 'enterprise', name: 'Enterprise' },
 ];
 
 export default function HomePage() {
   const { loaded, session } = useVeltrixAuth();
-  const { formatMoney } = useLanguage();
+  const { formatMoney, country } = useLanguage();
+  const prices = LATAM.has(country.code) ? PRICES.latam : PRICES.global;
   const { t } = useT();
   const k = (key: string) => t(key as DictKey);
 
@@ -89,6 +97,7 @@ export default function HomePage() {
       <section className="mx-auto w-full max-w-6xl px-4 py-10">
         <h2 className="text-center text-2xl font-extrabold">{t('home.plansTitle')}</h2>
         <p className={`mt-1 text-center text-sm ${ui.muted}`}>{t('home.plansSubtitle')}</p>
+        <p className={`text-center text-xs ${ui.muted}`}>{t('home.pricesLocal')}</p>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {PLANS.map((p) => (
             <div key={p.id} className={`relative rounded-2xl p-6 ${ui.card} ${p.best ? 'ring-2 ring-blue-500' : ''}`}>
@@ -100,7 +109,7 @@ export default function HomePage() {
               <p className="text-lg font-bold">{p.name}</p>
               <p className={`text-xs ${ui.muted}`}>{k(`plan.${p.id}.desc`)}</p>
               <p className="mt-4 text-3xl font-extrabold">
-                {formatMoney(p.usd)}
+                {formatMoney(prices[p.id])}
                 <span className={`text-sm font-semibold ${ui.muted}`}> {t('common.perMonth')}</span>
               </p>
               <ul className="mt-4 space-y-1.5 text-sm">
@@ -114,6 +123,9 @@ export default function HomePage() {
             </div>
           ))}
         </div>
+        <p className={`mt-4 text-center text-sm font-semibold ${ui.muted}`}>
+          {t('home.extraBranch', { price: formatMoney(prices.extraBranch) })}
+        </p>
       </section>
 
       <SiteFooter />

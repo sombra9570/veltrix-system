@@ -43,6 +43,8 @@ const it: Record<DictKey, string> = {
   'home.plansSubtitle': 'Inizia con 14 giorni gratis con tutto incluso. Poi scegli il tuo piano.',
   'home.bestPlan': 'Il più scelto',
   'home.startFree': 'Inizia gratis',
+  'home.extraBranch': 'Filiale extra: {price} / mese',
+  'home.pricesLocal': 'Prezzi nella valuta del tuo paese, al cambio ufficiale del giorno.',
   'plan.starter.desc': 'Per un’attività che sta iniziando',
   'plan.starter.i1': 'Punto vendita',
   'plan.starter.i2': 'Magazzino',

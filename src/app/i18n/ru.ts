@@ -43,6 +43,8 @@ const ru: Record<DictKey, string> = {
   'home.plansSubtitle': 'Начните с 14 бесплатных дней со всеми функциями. Потом выберите тариф.',
   'home.bestPlan': 'Самый популярный',
   'home.startFree': 'Начать бесплатно',
+  'home.extraBranch': 'Доп. филиал: {price} / мес.',
+  'home.pricesLocal': 'Цены в валюте вашей страны по официальному курсу дня.',
   'plan.starter.desc': 'Для начинающего бизнеса',
   'plan.starter.i1': 'Касса',
   'plan.starter.i2': 'Склад',

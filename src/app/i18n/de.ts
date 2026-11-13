@@ -43,6 +43,8 @@ const de: Record<DictKey, string> = {
   'home.plansSubtitle': 'Starten Sie mit 14 kostenlosen Tagen, alles inklusive. Danach wählen Sie Ihren Tarif.',
   'home.bestPlan': 'Am beliebtesten',
   'home.startFree': 'Kostenlos starten',
+  'home.extraBranch': 'Zusätzliche Filiale: {price} / Monat',
+  'home.pricesLocal': 'Preise in der Währung Ihres Landes, zum offiziellen Tageskurs.',
   'plan.starter.desc': 'Für ein Unternehmen am Anfang',
   'plan.starter.i1': 'Kasse',
   'plan.starter.i2': 'Lager',

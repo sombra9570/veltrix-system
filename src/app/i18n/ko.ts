@@ -43,6 +43,8 @@ const ko: Record<DictKey, string> = {
   'home.plansSubtitle': '모든 기능이 포함된 14일 무료 체험으로 시작하세요. 그다음 요금제를 고르면 됩니다.',
   'home.bestPlan': '가장 인기',
   'home.startFree': '무료로 시작',
+  'home.extraBranch': '추가 지점: {price} / 월',
+  'home.pricesLocal': '가격은 해당 국가 통화로, 당일 공식 환율로 표시됩니다.',
   'plan.starter.desc': '이제 막 시작하는 사업에',
   'plan.starter.i1': 'POS',
   'plan.starter.i2': '재고',

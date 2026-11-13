@@ -43,6 +43,8 @@ const zh: Record<DictKey, string> = {
   'home.plansSubtitle': '先免费试用 14 天，全部功能都包含。之后再选择套餐。',
   'home.bestPlan': '最受欢迎',
   'home.startFree': '免费开始',
+  'home.extraBranch': '额外分店：{price} / 月',
+  'home.pricesLocal': '价格以您所在国家的货币显示，按当日官方汇率换算。',
   'plan.starter.desc': '适合刚起步的企业',
   'plan.starter.i1': '收银台',
   'plan.starter.i2': '库存',

@@ -45,6 +45,8 @@ const es = {
   'home.plansSubtitle': 'Empieza con 14 días gratis con todo incluido. Después eliges tu plan.',
   'home.bestPlan': 'Más elegido',
   'home.startFree': 'Empezar gratis',
+  'home.extraBranch': 'Sucursal extra: {price} / mes',
+  'home.pricesLocal': 'Precios en la moneda de tu país, con el tipo de cambio oficial del día.',
   'plan.starter.desc': 'Para un negocio que empieza',
   'plan.starter.i1': 'Punto de venta',
   'plan.starter.i2': 'Inventario',

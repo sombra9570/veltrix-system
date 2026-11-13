@@ -43,6 +43,8 @@ const hi: Record<DictKey, string> = {
   'home.plansSubtitle': 'सब कुछ शामिल के साथ 14 दिन मुफ़्त से शुरू करें। फिर अपना प्लान चुनें।',
   'home.bestPlan': 'सबसे लोकप्रिय',
   'home.startFree': 'मुफ़्त शुरू करें',
+  'home.extraBranch': 'अतिरिक्त शाखा: {price} / माह',
+  'home.pricesLocal': 'कीमतें आपके देश की मुद्रा में, आज की आधिकारिक विनिमय दर पर।',
   'plan.starter.desc': 'शुरुआत कर रहे व्यवसाय के लिए',
   'plan.starter.i1': 'पॉइंट ऑफ़ सेल',
   'plan.starter.i2': 'स्टॉक',
