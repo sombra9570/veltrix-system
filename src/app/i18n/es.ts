@@ -659,6 +659,31 @@ const es = {
   'help.a9': "1. En Ingresar toca \"¿Olvidaste tu contraseña?\" y escribe tu correo.\n2. Abre el correo más reciente y toca el enlace.\n3. Escribe tu contraseña nueva (usa el ojito para verla). Si eres trabajador, también puede ayudarte el dueño.",
   'help.q10': "¿Cómo instalo Veltrix en el celular o la computadora?",
   'help.a10': "Android y computadora: toca \"Instalar app\" en la página de inicio o el ícono de instalar en la barra del navegador.\niPhone: abre veltrixsystem.app en Safari, toca Compartir → \"Agregar a inicio\".\nQueda como una app más, en pantalla completa.",
+
+  // ---------- Veltrix IA ----------
+  'nav.ai': "Veltrix IA",
+  'ai.subtitle': "Pregúntale a tu negocio: ventas, deudas, stock y más. También redacta mensajes por ti.",
+  'ai.onlyOwners': "Veltrix IA está disponible para el dueño y los supervisores.",
+  'ai.offTitle': "Veltrix IA no está activa en tu cuenta",
+  'ai.offText': "Es un complemento con cupo mensual de preguntas. Con ella puedes, por ejemplo:",
+  'ai.request': "Pedir Veltrix IA",
+  'ai.usage': "Preguntas de este mes",
+  'ai.resets': "Se renueva el {date}",
+  'ai.try': "Prueba con alguna de estas:",
+  'ai.s1': "¿Cuánto cobré esta semana comparado con la anterior?",
+  'ai.s2': "¿Qué clientes me deben más y desde cuándo?",
+  'ai.s3': "¿Qué productos se venden más y cuáles se están acabando?",
+  'ai.s4': "Redacta un recordatorio de pago amable para mis clientes atrasados",
+  'ai.s5': "Escribe una descripción atractiva para mi producto más vendido",
+  'ai.s6': "Dame 3 ideas para vender más este mes",
+  'ai.copy': "Copiar",
+  'ai.thinking': "Pensando…",
+  'ai.placeholder': "Pregunta lo que necesites de tu negocio…",
+  'ai.quotaExceeded': "Se acabaron las preguntas de este mes.",
+  'ai.notEnabled': "Veltrix IA no está activa en tu cuenta.",
+  'ai.notConfigured': "Veltrix IA todavía no está conectada. Inténtalo más tarde.",
+  'ai.failed': "No se pudo responder. Inténtalo otra vez (no se descontó del cupo).",
+  'ai.privacy': "Solo se usan los datos de tu empresa. Las preguntas no se guardan.",
 };
 
 export default es;

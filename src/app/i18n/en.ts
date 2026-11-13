@@ -650,6 +650,31 @@ const en: Record<DictKey, string> = {
   'help.a9': "1. In Sign in tap \"Forgot your password?\" and enter your email.\n2. Open the most recent email and tap the link.\n3. Enter your new password (use the eye to see it). Workers can also ask the owner for help.",
   'help.q10': "How do I install Veltrix on my phone or computer?",
   'help.a10': "Android and computer: tap \"Install app\" on the home page or the install icon in the browser bar.\niPhone: open veltrixsystem.app in Safari, tap Share → \"Add to Home Screen\".\nIt works like any other app, full screen.",
+
+  // ---------- Veltrix IA ----------
+  'nav.ai': "Veltrix AI",
+  'ai.subtitle': "Ask your business: sales, debts, stock and more. It also drafts messages for you.",
+  'ai.onlyOwners': "Veltrix AI is available to the owner and supervisors.",
+  'ai.offTitle': "Veltrix AI is not active on your account",
+  'ai.offText': "It is an add-on with a monthly question allowance. With it you can, for example:",
+  'ai.request': "Request Veltrix AI",
+  'ai.usage': "Questions this month",
+  'ai.resets': "Renews on {date}",
+  'ai.try': "Try one of these:",
+  'ai.s1': "How much did I collect this week compared with last week?",
+  'ai.s2': "Which customers owe me the most and since when?",
+  'ai.s3': "Which products sell the most and which are running out?",
+  'ai.s4': "Draft a friendly payment reminder for my late customers",
+  'ai.s5': "Write an attractive description for my best-selling product",
+  'ai.s6': "Give me 3 ideas to sell more this month",
+  'ai.copy': "Copy",
+  'ai.thinking': "Thinking…",
+  'ai.placeholder': "Ask anything about your business…",
+  'ai.quotaExceeded': "You have used all questions for this month.",
+  'ai.notEnabled': "Veltrix AI is not active on your account.",
+  'ai.notConfigured': "Veltrix AI is not connected yet. Try again later.",
+  'ai.failed': "Could not answer. Try again (it was not deducted).",
+  'ai.privacy': "Only your company data is used. Questions are not stored.",
 };
 
 export default en;

@@ -650,6 +650,31 @@ const it: Record<DictKey, string> = {
   'help.a9': "1. In Accedi tocca \"Password dimenticata?\" e scrivi la tua email.\n2. Apri l’email più recente e tocca il link.\n3. Scrivi la nuova password (usa l’occhio per vederla). I dipendenti possono chiedere aiuto anche al titolare.",
   'help.q10': "Come installo Veltrix sul telefono o sul computer?",
   'help.a10': "Android e computer: tocca \"Installa app\" nella pagina iniziale o l’icona di installazione nella barra del browser.\niPhone: apri veltrixsystem.app in Safari, tocca Condividi → \"Aggiungi alla schermata Home\".\nFunziona come un’app, a schermo intero.",
+
+  // ---------- Veltrix IA ----------
+  'nav.ai': "Veltrix IA",
+  'ai.subtitle': "Chiedi alla tua attività: vendite, debiti, magazzino e altro. Scrive anche messaggi per te.",
+  'ai.onlyOwners': "Veltrix IA è disponibile per il titolare e i supervisori.",
+  'ai.offTitle': "Veltrix IA non è attiva sul tuo account",
+  'ai.offText': "È un componente aggiuntivo con un numero mensile di domande. Per esempio puoi:",
+  'ai.request': "Richiedi Veltrix IA",
+  'ai.usage': "Domande di questo mese",
+  'ai.resets': "Si rinnova il {date}",
+  'ai.try': "Prova una di queste:",
+  'ai.s1': "Quanto ho incassato questa settimana rispetto alla precedente?",
+  'ai.s2': "Quali clienti mi devono di più e da quando?",
+  'ai.s3': "Quali prodotti vendono di più e quali stanno finendo?",
+  'ai.s4': "Scrivi un promemoria di pagamento cortese per i clienti in ritardo",
+  'ai.s5': "Scrivi una descrizione accattivante del prodotto più venduto",
+  'ai.s6': "Dammi 3 idee per vendere di più questo mese",
+  'ai.copy': "Copia",
+  'ai.thinking': "Sto pensando…",
+  'ai.placeholder': "Chiedi ciò che ti serve sulla tua attività…",
+  'ai.quotaExceeded': "Hai esaurito le domande di questo mese.",
+  'ai.notEnabled': "Veltrix IA non è attiva sul tuo account.",
+  'ai.notConfigured': "Veltrix IA non è ancora collegata. Riprova più tardi.",
+  'ai.failed': "Impossibile rispondere. Riprova (non è stata scalata).",
+  'ai.privacy': "Si usano solo i dati della tua azienda. Le domande non vengono salvate.",
 };
 
 export default it;

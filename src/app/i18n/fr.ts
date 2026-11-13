@@ -650,6 +650,31 @@ const fr: Record<DictKey, string> = {
   'help.a9': "1. Dans Se connecter touchez « Mot de passe oublié ? » et saisissez votre e-mail.\n2. Ouvrez l’e-mail le plus récent et touchez le lien.\n3. Saisissez le nouveau mot de passe (l’œil permet de le voir). Les employés peuvent aussi demander au propriétaire.",
   'help.q10': "Comment installer Veltrix sur le téléphone ou l’ordinateur ?",
   'help.a10': "Android et ordinateur : touchez « Installer l’app » sur la page d’accueil ou l’icône d’installation dans la barre du navigateur.\niPhone : ouvrez veltrixsystem.app dans Safari, touchez Partager → « Sur l’écran d’accueil ».\nElle fonctionne comme une app, en plein écran.",
+
+  // ---------- Veltrix IA ----------
+  'nav.ai': "Veltrix IA",
+  'ai.subtitle': "Interrogez votre activité : ventes, dettes, stock et plus. Elle rédige aussi des messages pour vous.",
+  'ai.onlyOwners': "Veltrix IA est disponible pour le propriétaire et les superviseurs.",
+  'ai.offTitle': "Veltrix IA n’est pas active sur votre compte",
+  'ai.offText': "C’est une option avec un quota mensuel de questions. Par exemple, vous pouvez :",
+  'ai.request': "Demander Veltrix IA",
+  'ai.usage': "Questions ce mois-ci",
+  'ai.resets': "Renouvelé le {date}",
+  'ai.try': "Essayez l’une de celles-ci :",
+  'ai.s1': "Combien ai-je encaissé cette semaine par rapport à la précédente ?",
+  'ai.s2': "Quels clients me doivent le plus et depuis quand ?",
+  'ai.s3': "Quels produits se vendent le mieux et lesquels s’épuisent ?",
+  'ai.s4': "Rédige un rappel de paiement aimable pour mes clients en retard",
+  'ai.s5': "Écris une description attrayante pour mon produit le plus vendu",
+  'ai.s6': "Donne-moi 3 idées pour vendre plus ce mois-ci",
+  'ai.copy': "Copier",
+  'ai.thinking': "Réflexion…",
+  'ai.placeholder': "Posez une question sur votre activité…",
+  'ai.quotaExceeded': "Vous avez utilisé toutes les questions du mois.",
+  'ai.notEnabled': "Veltrix IA n’est pas active sur votre compte.",
+  'ai.notConfigured': "Veltrix IA n’est pas encore connectée. Réessayez plus tard.",
+  'ai.failed': "Impossible de répondre. Réessayez (non décompté).",
+  'ai.privacy': "Seules les données de votre entreprise sont utilisées. Les questions ne sont pas enregistrées.",
 };
 
 export default fr;

@@ -70,6 +70,16 @@ export default function GlobalCoreAdminPage() {
   const [filter, setFilter] = useState<Filter>('all');
   // Correo desde el dominio de Veltrix (no desde el correo personal del teléfono)
   const [mail, setMail] = useState<{ to: string; name: string; subject: string; text: string } | null>(null);
+  // Veltrix IA: cupo mensual por organización
+  const [ai, setAi] = useState<{ org_id: string; name: string; quota: number; used: number; tokens_in: number; tokens_out: number }[]>([]);
+  const [aiEdit, setAiEdit] = useState<Record<string, string>>({});
+  const loadAi = useCallback(async () => { try { setAi(await rpc('ai_admin_overview') ?? []); } catch { /* */ } }, []);
+  useEffect(() => { if (loaded && session?.role === 'superadmin') loadAi(); }, [loaded, session, loadAi]);
+  const saveQuota = async (org: string) => {
+    const n = parseInt(aiEdit[org] ?? '', 10);
+    if (Number.isNaN(n) || n < 0) return;
+    try { await rpc('ai_set_quota', { p_org: org, p_quota: n }); setAiEdit((e) => { const c = { ...e }; delete c[org]; return c; }); await loadAi(); } catch { /* */ }
+  };
   const [mailMsg, setMailMsg] = useState('');
   const [sending, setSending] = useState(false);
   const sendMail = async () => {
@@ -276,6 +286,27 @@ export default function GlobalCoreAdminPage() {
               ))}
             </div>
           )}
+        </section>
+
+        {/* VELTRIX IA */}
+        <section className="bg-slate-900/60 border border-violet-900/50 rounded-2xl p-5 space-y-3">
+          <div>
+            <h2 className="text-sm font-bold">✨ Veltrix IA (complemento pagado)</h2>
+            <p className="text-[11px] text-slate-500">Cupo mensual de preguntas por empresa. 0 = apagada. El consumo se reinicia cada mes.</p>
+          </div>
+          <div className="space-y-2">
+            {ai.map((o) => (
+              <div key={o.org_id} className="flex flex-wrap items-center gap-3 bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-xs">
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-sm truncate">{o.name}</p>
+                  <p className="text-slate-400">Usadas {o.used} de {o.quota} · tokens {o.tokens_in.toLocaleString()} entrada / {o.tokens_out.toLocaleString()} salida</p>
+                </div>
+                <input inputMode="numeric" value={aiEdit[o.org_id] ?? String(o.quota)} onChange={(e) => setAiEdit({ ...aiEdit, [o.org_id]: e.target.value.replace(/\D/g, '') })}
+                  className="w-20 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
+                <button type="button" onClick={() => saveQuota(o.org_id)} className="bg-violet-600/20 hover:bg-violet-600/30 text-violet-200 border border-violet-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar cupo</button>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* LISTA DE ORGANIZACIONES */}

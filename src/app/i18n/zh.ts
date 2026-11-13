@@ -650,6 +650,31 @@ const zh: Record<DictKey, string> = {
   'help.a9': "1. 在“登录”点“忘记密码？”，输入邮箱。\n2. 打开最新的一封邮件，点击链接。\n3. 输入新密码（点眼睛图标可查看）。员工也可以请店主帮忙。",
   'help.q10': "如何在手机或电脑上安装 Veltrix？",
   'help.a10': "安卓和电脑：在首页点“安装应用”，或点浏览器地址栏中的安装图标。\niPhone：在 Safari 打开 veltrixsystem.app，点“分享”→“添加到主屏幕”。\n安装后像普通应用一样全屏使用。",
+
+  // ---------- Veltrix IA ----------
+  'nav.ai': "Veltrix 智能助手",
+  'ai.subtitle': "向你的生意提问：销售、欠款、库存等，还能帮你写消息。",
+  'ai.onlyOwners': "Veltrix 智能助手仅供店主和主管使用。",
+  'ai.offTitle': "你的账户未开通 Veltrix 智能助手",
+  'ai.offText': "这是按月计次提问的增值服务。例如你可以：",
+  'ai.request': "申请开通 Veltrix 智能助手",
+  'ai.usage': "本月提问次数",
+  'ai.resets': "{date} 重置",
+  'ai.try': "试试这些：",
+  'ai.s1': "这周收款和上周比怎么样？",
+  'ai.s2': "哪些客户欠我最多，欠了多久？",
+  'ai.s3': "哪些商品卖得最好，哪些快卖完了？",
+  'ai.s4': "给逾期客户写一条礼貌的还款提醒",
+  'ai.s5': "为我最畅销的商品写一段吸引人的介绍",
+  'ai.s6': "给我 3 个本月多卖货的点子",
+  'ai.copy': "复制",
+  'ai.thinking': "思考中…",
+  'ai.placeholder': "问问关于你生意的任何问题…",
+  'ai.quotaExceeded': "本月提问次数已用完。",
+  'ai.notEnabled': "你的账户未开通 Veltrix 智能助手。",
+  'ai.notConfigured': "Veltrix 智能助手尚未连接，请稍后再试。",
+  'ai.failed': "无法回答，请重试（未扣次数）。",
+  'ai.privacy': "只使用你公司的数据，提问内容不会保存。",
 };
 
 export default zh;

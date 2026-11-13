@@ -650,6 +650,31 @@ const pt: Record<DictKey, string> = {
   'help.a9': "1. Em Entrar toque \"Esqueceu sua senha?\" e digite seu e-mail.\n2. Abra o e-mail mais recente e toque no link.\n3. Digite a nova senha (use o olho para vê-la). Funcionários também podem pedir ajuda ao dono.",
   'help.q10': "Como instalo o Veltrix no celular ou no computador?",
   'help.a10': "Android e computador: toque \"Instalar app\" na página inicial ou no ícone de instalar na barra do navegador.\niPhone: abra veltrixsystem.app no Safari, toque Compartilhar → \"Adicionar à Tela de Início\".\nFica como mais um app, em tela cheia.",
+
+  // ---------- Veltrix IA ----------
+  'nav.ai': "Veltrix IA",
+  'ai.subtitle': "Pergunte ao seu negócio: vendas, dívidas, estoque e mais. Também redige mensagens para você.",
+  'ai.onlyOwners': "A Veltrix IA está disponível para o dono e os supervisores.",
+  'ai.offTitle': "A Veltrix IA não está ativa na sua conta",
+  'ai.offText': "É um complemento com cota mensal de perguntas. Com ela você pode, por exemplo:",
+  'ai.request': "Pedir a Veltrix IA",
+  'ai.usage': "Perguntas deste mês",
+  'ai.resets': "Renova em {date}",
+  'ai.try': "Experimente uma destas:",
+  'ai.s1': "Quanto recebi esta semana comparado com a anterior?",
+  'ai.s2': "Quais clientes me devem mais e desde quando?",
+  'ai.s3': "Quais produtos vendem mais e quais estão acabando?",
+  'ai.s4': "Redija um lembrete de pagamento gentil para meus clientes atrasados",
+  'ai.s5': "Escreva uma descrição atraente para meu produto mais vendido",
+  'ai.s6': "Dê 3 ideias para vender mais este mês",
+  'ai.copy': "Copiar",
+  'ai.thinking': "Pensando…",
+  'ai.placeholder': "Pergunte o que precisar do seu negócio…",
+  'ai.quotaExceeded': "Acabaram as perguntas deste mês.",
+  'ai.notEnabled': "A Veltrix IA não está ativa na sua conta.",
+  'ai.notConfigured': "A Veltrix IA ainda não está conectada. Tente mais tarde.",
+  'ai.failed': "Não foi possível responder. Tente de novo (não foi descontado).",
+  'ai.privacy': "Só os dados da sua empresa são usados. As perguntas não são salvas.",
 };
 
 export default pt;

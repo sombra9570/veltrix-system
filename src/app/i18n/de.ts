@@ -650,6 +650,31 @@ const de: Record<DictKey, string> = {
   'help.a9': "1. Tippe bei Anmelden auf „Passwort vergessen?“ und gib deine E-Mail ein.\n2. Öffne die neueste E-Mail und tippe auf den Link.\n3. Gib dein neues Passwort ein (mit dem Auge siehst du es). Mitarbeiter können auch den Inhaber fragen.",
   'help.q10': "Wie installiere ich Veltrix auf Handy oder Computer?",
   'help.a10': "Android und Computer: Tippe auf der Startseite auf „App installieren“ oder auf das Installationssymbol in der Browserleiste.\niPhone: Öffne veltrixsystem.app in Safari, tippe auf Teilen → „Zum Home-Bildschirm“.\nSie läuft wie eine App, im Vollbild.",
+
+  // ---------- Veltrix IA ----------
+  'nav.ai': "Veltrix KI",
+  'ai.subtitle': "Frag dein Geschäft: Umsatz, Schulden, Bestand und mehr. Sie schreibt auch Nachrichten für dich.",
+  'ai.onlyOwners': "Veltrix KI steht Inhaber und Supervisoren zur Verfügung.",
+  'ai.offTitle': "Veltrix KI ist in deinem Konto nicht aktiv",
+  'ai.offText': "Es ist ein Zusatz mit monatlichem Fragenkontingent. Damit kannst du zum Beispiel:",
+  'ai.request': "Veltrix KI anfragen",
+  'ai.usage': "Fragen in diesem Monat",
+  'ai.resets': "Erneuert am {date}",
+  'ai.try': "Probiere eine davon:",
+  'ai.s1': "Wie viel habe ich diese Woche im Vergleich zur letzten kassiert?",
+  'ai.s2': "Welche Kunden schulden mir am meisten und seit wann?",
+  'ai.s3': "Welche Produkte verkaufen sich am besten und welche gehen zur Neige?",
+  'ai.s4': "Schreibe eine freundliche Zahlungserinnerung für säumige Kunden",
+  'ai.s5': "Schreibe eine ansprechende Beschreibung für mein meistverkauftes Produkt",
+  'ai.s6': "Gib mir 3 Ideen, um diesen Monat mehr zu verkaufen",
+  'ai.copy': "Kopieren",
+  'ai.thinking': "Denke nach…",
+  'ai.placeholder': "Frag alles über dein Geschäft…",
+  'ai.quotaExceeded': "Du hast alle Fragen dieses Monats verbraucht.",
+  'ai.notEnabled': "Veltrix KI ist in deinem Konto nicht aktiv.",
+  'ai.notConfigured': "Veltrix KI ist noch nicht verbunden. Versuche es später.",
+  'ai.failed': "Keine Antwort möglich. Versuche es erneut (nicht abgezogen).",
+  'ai.privacy': "Es werden nur die Daten deines Unternehmens genutzt. Fragen werden nicht gespeichert.",
 };
 
 export default de;
