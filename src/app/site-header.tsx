@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLanguage, COUNTRIES, LANGUAGES, CountryCode, LangCode } from './language-selector';
 import { ThemeToggle } from './theme';
@@ -84,9 +85,12 @@ export function SiteHeader({ showAuthButtons = true }: { showAuthButtons?: boole
 }
 
 export function SiteFooter() {
+  // El año se calcula en el navegador: con cacheComponents no se puede leer la fecha al prerenderizar
+  const [year, setYear] = useState(2026);
+  useEffect(() => setYear(new Date().getFullYear()), []);
   return (
     <footer className="mt-auto border-t border-slate-200 py-6 text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-500">
-      Veltrix System © {new Date().getFullYear()} · Control financiero para negocios
+      Veltrix System © {year} · Control financiero para negocios
     </footer>
   );
 }
