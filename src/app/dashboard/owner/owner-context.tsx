@@ -38,10 +38,12 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner', icon: '🏠', label: 'nav.home' },
   { href: '/dashboard/owner/equipo', icon: '👥', label: 'nav.team' },
   { href: '/dashboard/owner/sucursales', icon: '🏢', label: 'nav.branches' },
+  { href: '/dashboard/owner/vender', icon: '🛒', label: 'nav.pos' },
+  { href: '/dashboard/owner/productos', icon: '📦', label: 'nav.products' },
   { href: '/dashboard/owner/ventas', icon: '🧾', label: 'nav.sales', soon: true },
   { href: '/dashboard/owner/caja', icon: '💵', label: 'nav.cash', soon: true },
   { href: '/dashboard/owner/clientes', icon: '🤝', label: 'nav.customers', soon: true },
-  { href: '/dashboard/owner/inventario', icon: '📦', label: 'nav.inventory', soon: true },
+  { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory', soon: true },
   { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports', soon: true },
 ];
 
