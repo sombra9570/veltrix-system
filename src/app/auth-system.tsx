@@ -51,6 +51,7 @@ export interface ActiveSession {
 type NewCompany = {
   name: string; taxId: string; type: string; plan: number; modules: string[];
   ownerName: string; ownerEmail: string; ownerPassword: string;
+  categories?: string[];   // rubros elegidos (business-catalog.ts)
 };
 
 const PENDING_KEY = 'veltrix_pending_org';
@@ -107,7 +108,8 @@ async function finishRegistration(details: NewCompany, email: string) {
   const { data: comp } = await supabase.from('companies').select('id').limit(1).single();
   if (comp) {
     await supabase.from('companies')
-      .update({ business_type: details.type, tax_regime: regime, business_sector: sector,
+      .update({ business_type: details.type, business_categories: details.categories ?? [],
+                tax_regime: regime, business_sector: sector,
                 tax_rate: country.taxRate / 100 })
       .eq('id', comp.id);
     await rpc('bootstrap_company', { p_company: comp.id });
@@ -264,26 +266,26 @@ export function useVeltrixAuth() {
     if (typeof window !== 'undefined') window.location.href = '/';
   };
 
-  async function registerCompany(newComp: NewCompany) {
+  async function registerCompany(newComp: NewCompany): Promise<boolean> {
     const email = newComp.ownerEmail.trim().toLowerCase();
     const { data, error } = await supabase.auth.signUp({
       email,
       password: newComp.ownerPassword,
       options: { data: { full_name: newComp.ownerName } },
     });
-    if (error) { alertError(error); return null; }
+    if (error) { alertError(error); return false; }
 
     if (!data.session) {
       // Supabase pide confirmar el correo: guardamos los datos y se completa al primer ingreso
       try { localStorage.setItem(PENDING_KEY, JSON.stringify({ ...newComp, ownerPassword: '' })); } catch {}
       window.alert('Te enviamos un correo para confirmar la cuenta. Después ingresa con tu correo y contraseña.');
-      return null;
+      return false;
     }
     try {
       await finishRegistration(newComp, email);
       await load();
-    } catch (e) { alertError(e); }
-    return null;
+      return true;
+    } catch (e) { alertError(e); return false; }
   }
 
   const addWorkerToCompany = async (worker: Omit<WorkerAccount, 'id' | 'active'>) => {

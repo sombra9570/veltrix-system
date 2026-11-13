@@ -8,6 +8,13 @@ import {
   LangCode,
 } from './language-selector';
 import { useVeltrixAuth, UserRole } from './auth-system';
+import {
+  BUSINESS_KINDS,
+  BusinessKind,
+  categoriesForKind,
+  suggestedModules,
+  MODULE_LABELS,
+} from './business-catalog';
 
 interface ModuleItem {
   id: 'crm' | 'pos' | 'credit' | 'hr' | 'routes' | 'audit';
@@ -753,6 +760,7 @@ export default function VeltrixSaaSControlPanel() {
     companies,
     login,
     updateCompanyOverdue,
+    registerCompany,
   } = auth;
 
   // Estado de módulos seleccionados en el configurador SaaS
@@ -774,7 +782,10 @@ export default function VeltrixSaaSControlPanel() {
   const [showNewCompForm, setShowNewCompForm] = useState(false);
   const [compName, setCompName] = useState('');
   const [compTaxId, setCompTaxId] = useState('');
-  const [compSector, setCompSector] = useState('Distribución Mayorista & Rutas');
+  const [bizKind, setBizKind] = useState<BusinessKind | null>(null);
+  const [bizCats, setBizCats] = useState<string[]>([]);
+  const [creating, setCreating] = useState(false);
+  const [formError, setFormError] = useState('');
   const [ownerName, setOwnerName] = useState('');
   const [ownerEmail, setOwnerEmail] = useState('');
   const [ownerPass, setOwnerPass] = useState('');
@@ -826,44 +837,48 @@ export default function VeltrixSaaSControlPanel() {
     }
   };
 
-  const handleCreateCompany = (e: React.FormEvent) => {
+  const toggleCat = (id: string) =>
+    setBizCats((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+
+  const chooseKind = (k: BusinessKind) => {
+    setBizKind(k);
+    // al cambiar de tipo, conserva solo los rubros que siguen disponibles
+    const allowed = new Set(categoriesForKind(k).map((c) => c.id));
+    setBizCats((prev) => prev.filter((id) => allowed.has(id)));
+  };
+
+  const handleCreateCompany = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
     if (!compName.trim() || !compTaxId.trim() || !ownerEmail.trim()) return;
+    if (!bizKind) return setFormError('Elige si tu negocio es de productos, servicios o mixto.');
+    if (bizCats.length === 0) return setFormError('Elige al menos un rubro.');
+    if (ownerPass.trim().length < 8) return setFormError('La contraseña debe tener al menos 8 caracteres.');
 
-    const moduleTitles = CORE_MODULES.filter((m) =>
-      selectedModules.includes(m.id)
-    ).map((m) => getModuleText(m.id).title);
-
-    const companyDetails = {
+    setCreating(true);
+    const ok = await registerCompany({
       name: compName.trim(),
       taxId: compTaxId.trim(),
-      type: compSector,
+      type: bizKind,
+      categories: bizCats,
       plan: totalMonthlyUsd,
-      modules: moduleTitles,
+      modules: suggestedModules(bizCats),
       ownerName: ownerName.trim() || 'Director General',
       ownerEmail: ownerEmail.trim(),
-      ownerPassword: ownerPass.trim() || '123',
-    };
-    const authActions = auth as unknown as Record<string, unknown>;
-    const registerCompany =
-      authActions.registerCompany ??
-      authActions.createCompany ??
-      authActions.addCompany ??
-      authActions.registerNewCompany;
-
-    if (typeof registerCompany !== 'function') {
-      setErrorMsg('No está disponible el registro de empresas.');
-      return;
-    }
-
-    registerCompany(companyDetails);
+      ownerPassword: ownerPass.trim(),
+    });
+    setCreating(false);
+    if (!ok) return;
 
     setCompName('');
     setCompTaxId('');
     setOwnerName('');
     setOwnerEmail('');
     setOwnerPass('');
+    setBizKind(null);
+    setBizCats([]);
     setShowNewCompForm(false);
+    router.push('/dashboard/owner');
   };
 
   return (
@@ -1095,6 +1110,71 @@ export default function VeltrixSaaSControlPanel() {
                 </h3>
                 <p className="text-slate-400">{ui.registerCompanyDesc}</p>
               </div>
+
+              {/* 1. Tipo de negocio */}
+              <div className="space-y-2">
+                <p className="font-semibold text-slate-300">1. ¿Qué vende tu negocio?</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {BUSINESS_KINDS.map((k) => (
+                    <button
+                      key={k.id}
+                      type="button"
+                      onClick={() => chooseKind(k.id)}
+                      className={`text-left p-3 rounded-xl border transition cursor-pointer ${
+                        bizKind === k.id
+                          ? 'bg-emerald-950/40 border-emerald-500'
+                          : 'bg-slate-950 border-slate-700 hover:border-slate-500'
+                      }`}
+                    >
+                      <p className="font-bold text-sm text-white">{k.icon} {k.label}</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{k.desc}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 2. Rubros (puede elegir varios) */}
+              {bizKind && (
+                <div className="space-y-2">
+                  <p className="font-semibold text-slate-300">
+                    2. ¿A qué se dedica? <span className="text-slate-500 font-normal">Puedes elegir uno o varios</span>
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {categoriesForKind(bizKind).map((c) => {
+                      const on = bizCats.includes(c.id);
+                      return (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => toggleCat(c.id)}
+                          className={`px-3 py-1.5 rounded-full border text-[11px] font-semibold transition cursor-pointer ${
+                            on
+                              ? 'bg-blue-600/30 border-blue-400 text-blue-100'
+                              : 'bg-slate-950 border-slate-700 text-slate-300 hover:border-slate-500'
+                          }`}
+                        >
+                          {on ? '✓ ' : ''}{c.icon} {c.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {bizCats.length > 0 && (
+                    <p className="text-[11px] text-slate-400">
+                      Tu panel incluirá: <span className="text-emerald-300">
+                        {suggestedModules(bizCats).map((m) => MODULE_LABELS[m]).join(' · ')}
+                      </span>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* 3. Datos de la empresa y del dueño */}
+              <p className="font-semibold text-slate-300">3. Datos de la empresa y del dueño</p>
+              {formError && (
+                <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-2.5 rounded-lg font-semibold">
+                  ⚠️ {formError}
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <input
                   type="text"
@@ -1112,16 +1192,6 @@ export default function VeltrixSaaSControlPanel() {
                   onChange={(e) => setCompTaxId(e.target.value)}
                   className="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white"
                 />
-                <select
-                  value={compSector}
-                  onChange={(e) => setCompSector(e.target.value)}
-                  className="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white"
-                >
-                  <option value={ui.sectorDistribution}>{ui.sectorDistribution}</option>
-                  <option value={ui.sectorRetail}>{ui.sectorRetail}</option>
-                  <option value={ui.sectorFinance}>{ui.sectorFinance}</option>
-                  <option value={ui.sectorServices}>{ui.sectorServices}</option>
-                </select>
                 <input
                   type="text"
                   required
@@ -1140,18 +1210,21 @@ export default function VeltrixSaaSControlPanel() {
                 />
                 <div className="flex gap-2">
                   <input
-                    type="text"
+                    type="password"
                     required
-                    placeholder={ui.ownerPassPh}
+                    minLength={8}
+                    autoComplete="new-password"
+                    placeholder={`${ui.ownerPassPh} (mín. 8)`}
                     value={ownerPass}
                     onChange={(e) => setOwnerPass(e.target.value)}
                     className="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white flex-1"
                   />
                   <button
                     type="submit"
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-lg cursor-pointer shrink-0"
+                    disabled={creating}
+                    className="bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold px-4 py-2 rounded-lg cursor-pointer shrink-0"
                   >
-                    {ui.createTenantBtn}
+                    {creating ? 'Creando…' : ui.createTenantBtn}
                   </button>
                 </div>
               </div>
