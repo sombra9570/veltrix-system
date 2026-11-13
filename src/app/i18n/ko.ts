@@ -609,6 +609,20 @@ const ko: Record<DictKey, string> = {
   'shop2.waHello': "안녕하세요 {store}! 다음을 주문하고 싶어요:",
   'shop2.waName': "이름",
   'shop2.waNote': "메모",
+
+  // ---------- Mensajería ----------
+  'nav.messages': "메시지",
+  'chat.title': "메시지",
+  'chat.new': "새 대화",
+  'chat.announce': "공지",
+  'chat.empty': "아직 메시지가 없습니다",
+  'chat.noPeople': "회사에 다른 사람이 없습니다.",
+  'chat.pick': "대화를 선택하세요",
+  'chat.write': "메시지 입력…",
+  'chat.photo': "사진 보내기",
+  'chat.readOnly': "공지에는 사장과 관리자만 쓸 수 있습니다.",
+  'chat.sendFailed': "보내지 못했습니다. 다시 시도하세요.",
+  'chat.offline': "오프라인: 메시지가 전송되지 않았습니다.",
 };
 
 export default ko;

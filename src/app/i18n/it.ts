@@ -609,6 +609,20 @@ const it: Record<DictKey, string> = {
   'shop2.waHello': "Ciao {store}! Vorrei ordinare:",
   'shop2.waName': "Nome",
   'shop2.waNote': "Nota",
+
+  // ---------- Mensajería ----------
+  'nav.messages': "Messaggi",
+  'chat.title': "Messaggi",
+  'chat.new': "Nuovo",
+  'chat.announce': "Avvisi",
+  'chat.empty': "Ancora nessun messaggio",
+  'chat.noPeople': "Non ci sono altre persone nella tua azienda.",
+  'chat.pick': "Scegli una conversazione",
+  'chat.write': "Scrivi un messaggio…",
+  'chat.photo': "Invia foto",
+  'chat.readOnly': "Solo il titolare e i supervisori scrivono negli Avvisi.",
+  'chat.sendFailed': "Invio non riuscito. Riprova.",
+  'chat.offline': "Offline: il messaggio non è stato inviato.",
 };
 
 export default it;

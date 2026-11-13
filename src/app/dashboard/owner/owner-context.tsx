@@ -36,6 +36,7 @@ export function useOwner() {
 
 const NAV: NavItem[] = [
   { href: '/dashboard/owner', icon: '🏠', label: 'nav.home' },
+  { href: '/dashboard/owner/mensajes', icon: '💬', label: 'nav.messages' },
   { href: '/dashboard/owner/equipo', icon: '👥', label: 'nav.team' },
   { href: '/dashboard/owner/sucursales', icon: '🏢', label: 'nav.branches' },
   { href: '/dashboard/owner/vender', icon: '🛒', label: 'nav.pos' },

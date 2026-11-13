@@ -4,6 +4,7 @@ import type { NavItem } from '../shell';
 
 const NAV: NavItem[] = [
   { href: '/dashboard/kitchen', icon: '🔥', label: 'nav.kitchen' },
+  { href: '/dashboard/kitchen/mensajes', icon: '💬', label: 'nav.messages' },
 ];
 
 export function KitchenLayout({ children }: { children: React.ReactNode }) {

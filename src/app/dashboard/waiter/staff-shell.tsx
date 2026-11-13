@@ -4,6 +4,7 @@ import type { NavItem } from '../shell';
 
 const NAV: NavItem[] = [
   { href: '/dashboard/waiter', icon: '🍽️', label: 'nav.tables' },
+  { href: '/dashboard/waiter/mensajes', icon: '💬', label: 'nav.messages' },
 ];
 
 export function WaiterLayout({ children }: { children: React.ReactNode }) {

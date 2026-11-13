@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { rpc } from '../../lib/supabase';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '../theme';
@@ -27,6 +28,15 @@ export function AppShell({
   const pathname = usePathname();
   const { t } = useT();
   const [open, setOpen] = useState(false);
+  const [unread, setUnread] = useState(0);
+
+  // Mensajes sin leer del equipo (insignia en "Mensajes")
+  useEffect(() => {
+    const load = () => rpc<number>('chat_unread_total').then((n) => setUnread(n ?? 0)).catch(() => {});
+    load();
+    const id = setInterval(load, 45_000);
+    return () => clearInterval(id);
+  }, [pathname]);
 
   // Menú móvil: se cierra con Escape y no deja mover la página de fondo
   useEffect(() => {
@@ -79,7 +89,10 @@ export function AppShell({
                 }`}
               >
                 <span className="text-base">{item.icon}</span>
-                <span>{t(item.label)}</span>
+                <span className="flex-1">{t(item.label)}</span>
+                {item.href.endsWith('/mensajes') && unread > 0 && (
+                  <span className={`grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-bold ${active ? 'bg-white text-blue-700' : 'bg-blue-600 text-white'}`}>{unread > 99 ? '99+' : unread}</span>
+                )}
               </Link>
             </li>
           );
@@ -122,9 +135,10 @@ export function AppShell({
             type="button"
             onClick={() => setOpen(true)}
             aria-label={t('shell.menu')}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg lg:hidden dark:border-slate-700 cursor-pointer"
+            className="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg lg:hidden dark:border-slate-700 cursor-pointer"
           >
             ☰
+            {unread > 0 && <span className="absolute -end-1 -top-1 h-3 w-3 rounded-full bg-blue-600 ring-2 ring-white dark:ring-slate-950" />}
           </button>
           <p className="truncate text-sm font-bold text-slate-900 lg:hidden dark:text-white">{orgName}</p>
           <div className="ml-auto flex items-center gap-2 rtl:ml-0 rtl:mr-auto">

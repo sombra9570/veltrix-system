@@ -609,6 +609,20 @@ const hi: Record<DictKey, string> = {
   'shop2.waHello': "नमस्ते {store}! मैं यह ऑर्डर करना चाहता हूँ:",
   'shop2.waName': "नाम",
   'shop2.waNote': "नोट",
+
+  // ---------- Mensajería ----------
+  'nav.messages': "संदेश",
+  'chat.title': "संदेश",
+  'chat.new': "नया",
+  'chat.announce': "सूचनाएँ",
+  'chat.empty': "अभी कोई संदेश नहीं",
+  'chat.noPeople': "आपकी कंपनी में और कोई नहीं है।",
+  'chat.pick': "कोई बातचीत चुनें",
+  'chat.write': "संदेश लिखें…",
+  'chat.photo': "फ़ोटो भेजें",
+  'chat.readOnly': "सूचनाओं में सिर्फ़ मालिक और सुपरवाइज़र लिखते हैं।",
+  'chat.sendFailed': "भेजा नहीं जा सका। फिर कोशिश करें।",
+  'chat.offline': "ऑफ़लाइन: संदेश नहीं भेजा गया।",
 };
 
 export default hi;

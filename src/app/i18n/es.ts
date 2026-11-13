@@ -618,6 +618,20 @@ const es = {
   'shop2.waHello': "¡Hola {store}! Quiero hacer este pedido:",
   'shop2.waName': "Nombre",
   'shop2.waNote': "Nota",
+
+  // ---------- Mensajería ----------
+  'nav.messages': "Mensajes",
+  'chat.title': "Mensajes",
+  'chat.new': "Nuevo",
+  'chat.announce': "Avisos",
+  'chat.empty': "Sin mensajes todavía",
+  'chat.noPeople': "No hay más personas en tu empresa.",
+  'chat.pick': "Elige una conversación",
+  'chat.write': "Escribe un mensaje…",
+  'chat.photo': "Enviar foto",
+  'chat.readOnly': "Solo el dueño y los supervisores escriben en Avisos.",
+  'chat.sendFailed': "No se pudo enviar. Inténtalo otra vez.",
+  'chat.offline': "Sin conexión: el mensaje no se envió.",
 };
 
 export default es;

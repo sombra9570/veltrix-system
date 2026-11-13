@@ -609,6 +609,20 @@ const ru: Record<DictKey, string> = {
   'shop2.waHello': "Здравствуйте, {store}! Хочу заказать:",
   'shop2.waName': "Имя",
   'shop2.waNote': "Комментарий",
+
+  // ---------- Mensajería ----------
+  'nav.messages': "Сообщения",
+  'chat.title': "Сообщения",
+  'chat.new': "Новое",
+  'chat.announce': "Объявления",
+  'chat.empty': "Сообщений пока нет",
+  'chat.noPeople': "В компании больше никого нет.",
+  'chat.pick': "Выберите чат",
+  'chat.write': "Напишите сообщение…",
+  'chat.photo': "Отправить фото",
+  'chat.readOnly': "В Объявлениях пишут только владелец и супервайзеры.",
+  'chat.sendFailed': "Не удалось отправить. Повторите.",
+  'chat.offline': "Нет сети: сообщение не отправлено.",
 };
 
 export default ru;

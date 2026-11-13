@@ -609,6 +609,20 @@ const ja: Record<DictKey, string> = {
   'shop2.waHello': "こんにちは {store}！次の注文をお願いします：",
   'shop2.waName': "名前",
   'shop2.waNote': "備考",
+
+  // ---------- Mensajería ----------
+  'nav.messages': "メッセージ",
+  'chat.title': "メッセージ",
+  'chat.new': "新規",
+  'chat.announce': "お知らせ",
+  'chat.empty': "まだメッセージはありません",
+  'chat.noPeople': "会社に他のメンバーがいません。",
+  'chat.pick': "会話を選んでください",
+  'chat.write': "メッセージを入力…",
+  'chat.photo': "写真を送る",
+  'chat.readOnly': "お知らせに投稿できるのはオーナーとスーパーバイザーだけです。",
+  'chat.sendFailed': "送信できませんでした。もう一度お試しください。",
+  'chat.offline': "オフライン：メッセージは送信されていません。",
 };
 
 export default ja;

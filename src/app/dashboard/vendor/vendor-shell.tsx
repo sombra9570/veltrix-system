@@ -5,6 +5,7 @@ import type { NavItem } from '../shell';
 const NAV: NavItem[] = [
   { href: '/dashboard/vendor', icon: '🛒', label: 'nav.pos' },
   { href: '/dashboard/vendor/clientes', icon: '🤝', label: 'nav.customers' },
+  { href: '/dashboard/vendor/mensajes', icon: '💬', label: 'nav.messages' },
 ];
 
 export function VendorLayout({ children }: { children: React.ReactNode }) {

@@ -609,6 +609,20 @@ const zh: Record<DictKey, string> = {
   'shop2.waHello': "你好 {store}！我想订购：",
   'shop2.waName': "姓名",
   'shop2.waNote': "备注",
+
+  // ---------- Mensajería ----------
+  'nav.messages': "消息",
+  'chat.title': "消息",
+  'chat.new': "新建",
+  'chat.announce': "公告",
+  'chat.empty': "还没有消息",
+  'chat.noPeople': "公司里没有其他人。",
+  'chat.pick': "选择一个对话",
+  'chat.write': "输入消息…",
+  'chat.photo': "发送照片",
+  'chat.readOnly': "只有店主和主管可以在公告中发言。",
+  'chat.sendFailed': "发送失败，请重试。",
+  'chat.offline': "离线：消息未发送。",
 };
 
 export default zh;
