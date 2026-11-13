@@ -41,7 +41,7 @@ export const COUNTRIES: CountryConfig[] = [
     flag: '🇧🇴',
     currency: 'BOB',
     symbol: 'Bs',
-    rate: 6.96,
+    rate: 12.06, // TCO del BCB (4-nov-2026). Desde el 29-jun-2026 el tipo de cambio es flexible: se actualiza a diario
     timezones: [{ tz: 'America/La_Paz', label: 'Santa Cruz / La Paz / Cochabamba', utcOffset: 'UTC-4' }],
     taxName: 'IVA',
     taxRate: 13,
