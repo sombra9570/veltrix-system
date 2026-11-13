@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLanguage, COUNTRIES, LANGUAGES, CountryCode, LangCode } from './language-selector';
+import { useT, countryName } from './i18n';
 import { ThemeToggle } from './theme';
 
 // Estilos compartidos por las pantallas públicas (inicio, ingresar, registro)
@@ -20,24 +21,45 @@ export const ui = {
 const selectCls =
   'h-9 rounded-lg border border-slate-300 bg-white px-2 text-xs font-semibold text-slate-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200';
 
+/** Idioma principal de un país (por su locale). Si no lo tenemos, inglés. */
+export function langForCountry(code: CountryCode): LangCode {
+  const loc = COUNTRIES.find((c) => c.code === code)?.locale ?? 'en';
+  const base = loc.split('-')[0] as LangCode;
+  return LANGUAGES.some((l) => l.code === base) ? base : 'en';
+}
+
+/** Al elegir país también cambia el idioma; el selector de idioma queda para quien prefiera otro. */
+export function useCountryChange() {
+  const { setCountryByCode, setLanguage } = useLanguage();
+  return (code: CountryCode) => {
+    setCountryByCode(code);
+    setLanguage(langForCountry(code));
+  };
+}
+
 export function RegionSelectors() {
-  const { lang, setLanguage, country, setCountryByCode } = useLanguage();
+  const { lang, setLanguage, country } = useLanguage();
+  const { t } = useT();
+  const changeCountry = useCountryChange();
+  const sorted = [...COUNTRIES]
+    .map((c) => ({ ...c, label: countryName(lang, c.code, c.name) }))
+    .sort((a, b) => a.label.localeCompare(b.label, lang));
   return (
     <div className="flex items-center gap-2">
       <select
-        aria-label="País"
+        aria-label={t('common.country')}
         value={country.code}
-        onChange={(e) => setCountryByCode(e.target.value as CountryCode)}
+        onChange={(e) => changeCountry(e.target.value as CountryCode)}
         className={selectCls}
       >
-        {COUNTRIES.map((c) => (
+        {sorted.map((c) => (
           <option key={c.code} value={c.code}>
-            {c.flag} {c.name}
+            {c.flag} {c.label}
           </option>
         ))}
       </select>
       <select
-        aria-label="Idioma"
+        aria-label={t('common.language')}
         value={lang}
         onChange={(e) => setLanguage(e.target.value as LangCode)}
         className={`${selectCls} hidden sm:block`}
@@ -61,6 +83,7 @@ export function Logo() {
 }
 
 export function SiteHeader({ showAuthButtons = true }: { showAuthButtons?: boolean }) {
+  const { t } = useT();
   return (
     <header className="border-b border-slate-200 dark:border-slate-800/80">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
@@ -71,10 +94,10 @@ export function SiteHeader({ showAuthButtons = true }: { showAuthButtons?: boole
           {showAuthButtons && (
             <>
               <Link href="/ingresar" className={`${ui.btnGhost} !py-2`}>
-                Ingresar
+                {t('common.login')}
               </Link>
               <Link href="/registro" className={`${ui.btnPrimary} !py-2`}>
-                Prueba gratis
+                {t('common.freeTrial')}
               </Link>
             </>
           )}
@@ -88,9 +111,10 @@ export function SiteFooter() {
   // El año se calcula en el navegador: con cacheComponents no se puede leer la fecha al prerenderizar
   const [year, setYear] = useState(2026);
   useEffect(() => setYear(new Date().getFullYear()), []);
+  const { t } = useT();
   return (
     <footer className="mt-auto border-t border-slate-200 py-6 text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-500">
-      Veltrix System © {year} · Control financiero para negocios
+      {t('footer.text', { year })}
     </footer>
   );
 }

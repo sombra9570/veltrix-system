@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useT } from './i18n';
 
 export type Theme = 'light' | 'dark';
 
@@ -21,12 +22,14 @@ export function useTheme() {
 
 export function ThemeToggle() {
   const { theme, toggle } = useTheme();
+  const { t } = useT();
+  const label = theme === 'dark' ? t('common.themeToLight') : t('common.themeToDark');
   return (
     <button
       type="button"
       onClick={toggle}
-      title={theme === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-      aria-label="Cambiar tema"
+      title={label}
+      aria-label={label}
       className="h-9 w-9 grid place-items-center rounded-lg border border-slate-300 bg-white text-base hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-500 transition cursor-pointer"
     >
       {theme === 'dark' ? '☀️' : '🌙'}

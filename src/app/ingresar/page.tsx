@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useVeltrixAuth, homeForRole } from '../auth-system';
 import { supabase } from '../../lib/supabase';
 import { SiteHeader, SiteFooter, ui } from '../site-header';
+import { useT } from '../i18n';
 
 export default function IngresarPage() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function IngresarPage() {
   const [info, setInfo] = useState('');
   const [busy, setBusy] = useState(false);
   const [mode, setMode] = useState<'login' | 'forgot'>('login');
+  const { t } = useT();
 
   // Si ya tiene sesión, directo a su panel
   useEffect(() => {
@@ -28,7 +30,7 @@ export default function IngresarPage() {
     const res = await login(email, password);
     setBusy(false);
     if (res.ok && res.session) router.push(homeForRole(res.session.role));
-    else setError(res.error || 'Correo o contraseña incorrectos.');
+    else setError(t('login.error'));
   };
 
   const handleForgot = async (e: React.FormEvent) => {
@@ -40,8 +42,8 @@ export default function IngresarPage() {
       redirectTo: `${window.location.origin}/restablecer`,
     });
     setBusy(false);
-    if (err) setError('No se pudo enviar el correo. Intenta de nuevo en unos minutos.');
-    else setInfo('Si ese correo está registrado, te llegará un enlace para crear una contraseña nueva. Revisa también la carpeta de spam.');
+    if (err) setError(t('forgot.error'));
+    else setInfo(t('forgot.sent'));
   };
 
   return (
@@ -50,11 +52,11 @@ export default function IngresarPage() {
 
       <div className="flex flex-1 items-center justify-center px-4 py-12">
         <div className={`w-full max-w-sm rounded-2xl p-7 ${ui.card}`}>
-          <h1 className="text-2xl font-extrabold">{mode === 'login' ? 'Ingresar' : 'Recuperar contraseña'}</h1>
+          <h1 className="text-2xl font-extrabold">{mode === 'login' ? t('login.title') : t('forgot.title')}</h1>
           <p className={`mt-1 text-sm ${ui.muted}`}>
             {mode === 'login'
-              ? 'Dueños, supervisores y trabajadores entran aquí. Te llevamos directo a tu panel.'
-              : 'Escribe tu correo y te enviamos un enlace para crear una contraseña nueva.'}
+              ? t('login.subtitle')
+              : t('forgot.subtitle')}
           </p>
 
           {error && (
@@ -70,7 +72,7 @@ export default function IngresarPage() {
 
           <form onSubmit={mode === 'login' ? handleLogin : handleForgot} className="mt-5 space-y-4">
             <div>
-              <label className={ui.label}>Correo</label>
+              <label className={ui.label}>{t('common.email')}</label>
               <input
                 type="email"
                 required
@@ -85,13 +87,13 @@ export default function IngresarPage() {
             {mode === 'login' && (
               <div>
                 <div className="flex items-center justify-between">
-                  <label className={ui.label}>Contraseña</label>
+                  <label className={ui.label}>{t('common.password')}</label>
                   <button
                     type="button"
                     onClick={() => { setMode('forgot'); setError(''); setInfo(''); }}
                     className="mb-1 text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400 cursor-pointer"
                   >
-                    ¿La olvidaste?
+                    {t('login.forgot')}
                   </button>
                 </div>
                 <input
@@ -107,16 +109,16 @@ export default function IngresarPage() {
             )}
 
             <button type="submit" disabled={busy} className={`${ui.btnPrimary} w-full`}>
-              {busy ? 'Un momento…' : mode === 'login' ? 'Ingresar' : 'Enviar enlace'}
+              {busy ? t('common.wait') : mode === 'login' ? t('login.submit') : t('forgot.submit')}
             </button>
           </form>
 
           <div className={`mt-6 text-center text-xs ${ui.muted}`}>
             {mode === 'login' ? (
               <>
-                ¿Tu negocio aún no usa Veltrix?{' '}
+                {t('login.noAccount')}{' '}
                 <Link href="/registro" className="font-semibold text-blue-600 hover:underline dark:text-blue-400">
-                  Prueba 14 días gratis
+                  {t('login.tryFree')}
                 </Link>
               </>
             ) : (
@@ -125,7 +127,7 @@ export default function IngresarPage() {
                 onClick={() => { setMode('login'); setError(''); setInfo(''); }}
                 className="font-semibold text-blue-600 hover:underline dark:text-blue-400 cursor-pointer"
               >
-                ← Volver a ingresar
+                {t('forgot.backToLogin')}
               </button>
             )}
           </div>

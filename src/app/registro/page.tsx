@@ -4,17 +4,21 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useVeltrixAuth, homeForRole } from '../auth-system';
 import { useLanguage, COUNTRIES, CountryCode } from '../language-selector';
+import { useT, countryName } from '../i18n';
 import {
-  BUSINESS_KINDS, BusinessKind, categoriesForKind, suggestedModules, MODULE_LABELS,
+  BUSINESS_KINDS, BusinessKind, categoriesForKind, suggestedModules, kindKey, kindDescKey, catKey, modKey,
 } from '../business-catalog';
-import { SiteHeader, SiteFooter, ui } from '../site-header';
+import { SiteHeader, SiteFooter, ui, useCountryChange } from '../site-header';
+import type { DictKey } from '../i18n/es';
 
-const STEPS = ['Tipo de negocio', 'Rubros', 'Tu empresa', 'Tu cuenta'];
+const STEPS: DictKey[] = ['reg.step1', 'reg.step2', 'reg.step3', 'reg.step4'];
 
 export default function RegistroPage() {
   const router = useRouter();
   const { loaded, session, registerCompany } = useVeltrixAuth();
-  const { country, setCountryByCode } = useLanguage();
+  const { country, lang } = useLanguage();
+  const { t } = useT();
+  const changeCountry = useCountryChange();
 
   const [step, setStep] = useState(0);
   const [kind, setKind] = useState<BusinessKind | null>(null);
@@ -38,14 +42,14 @@ export default function RegistroPage() {
 
   // Qué falta en cada paso para poder avanzar
   const stepError = (): string => {
-    if (step === 0 && !kind) return 'Elige una opción para continuar.';
-    if (step === 1 && cats.length === 0) return 'Elige al menos un rubro.';
-    if (step === 2 && !compName.trim()) return 'Escribe el nombre de tu empresa.';
+    if (step === 0 && !kind) return t('val.chooseKind');
+    if (step === 1 && cats.length === 0) return t('val.chooseCat');
+    if (step === 2 && !compName.trim()) return t('val.companyName');
     if (step === 3) {
-      if (!ownerName.trim()) return 'Escribe tu nombre.';
-      if (!/^\S+@\S+\.\S+$/.test(email.trim())) return 'Escribe un correo válido.';
-      if (pass1.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
-      if (pass1 !== pass2) return 'Las dos contraseñas no coinciden.';
+      if (!ownerName.trim()) return t('val.ownerName');
+      if (!/^\S+@\S+\.\S+$/.test(email.trim())) return t('val.email');
+      if (pass1.length < 8) return t('val.passMin');
+      if (pass1 !== pass2) return t('val.passMatch');
     }
     return '';
   };
@@ -81,9 +85,9 @@ export default function RegistroPage() {
         <SiteHeader showAuthButtons={false} />
         <div className="flex flex-1 items-center justify-center px-4">
           <div className={`max-w-md rounded-2xl p-7 text-center ${ui.card}`}>
-            <p className="font-bold">Ya tienes una sesión abierta.</p>
-            <p className={`mt-1 text-sm ${ui.muted}`}>Para registrar otra empresa, primero cierra sesión desde tu panel.</p>
-            <Link href={homeForRole(session.role)} className={`${ui.btnPrimary} mt-4`}>Ir a mi panel</Link>
+            <p className="font-bold">{t('reg.sessionOpen')}</p>
+            <p className={`mt-1 text-sm ${ui.muted}`}>{t('reg.sessionOpenHint')}</p>
+            <Link href={homeForRole(session.role)} className={`${ui.btnPrimary} mt-4`}>{t('common.goToPanel')}</Link>
           </div>
         </div>
       </main>
@@ -99,9 +103,9 @@ export default function RegistroPage() {
       <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
         <div className="text-center">
           <span className="rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
-            14 días gratis · con todo incluido · sin tarjeta
+            {t('reg.badge')}
           </span>
-          <h1 className="mt-4 text-3xl font-extrabold">Crea la cuenta de tu negocio</h1>
+          <h1 className="mt-4 text-3xl font-extrabold">{t('reg.title')}</h1>
         </div>
 
         {/* Barra de progreso */}
@@ -110,7 +114,7 @@ export default function RegistroPage() {
             <li key={s}>
               <div className={`h-1.5 rounded-full ${i <= step ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-800'}`} />
               <p className={`mt-1.5 text-[11px] font-semibold ${i === step ? 'text-blue-600 dark:text-blue-400' : ui.muted}`}>
-                {i + 1}. {s}
+                {i + 1}. {t(s)}
               </p>
             </li>
           ))}
@@ -119,7 +123,7 @@ export default function RegistroPage() {
         <section className={`mt-6 rounded-2xl p-6 ${ui.card}`}>
           {step === 0 && (
             <>
-              <h2 className="text-lg font-bold">¿Qué vende tu negocio?</h2>
+              <h2 className="text-lg font-bold">{t('reg.q1')}</h2>
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 {BUSINESS_KINDS.map((k) => (
                   <button
@@ -133,8 +137,8 @@ export default function RegistroPage() {
                     }`}
                   >
                     <p className="text-2xl">{k.icon}</p>
-                    <p className="mt-2 font-bold">{k.label}</p>
-                    <p className={`mt-1 text-xs ${ui.muted}`}>{k.desc}</p>
+                    <p className="mt-2 font-bold">{t(kindKey(k.id))}</p>
+                    <p className={`mt-1 text-xs ${ui.muted}`}>{t(kindDescKey(k.id))}</p>
                   </button>
                 ))}
               </div>
@@ -143,8 +147,8 @@ export default function RegistroPage() {
 
           {step === 1 && (
             <>
-              <h2 className="text-lg font-bold">¿A qué se dedica?</h2>
-              <p className={`text-sm ${ui.muted}`}>Puedes elegir uno o varios.</p>
+              <h2 className="text-lg font-bold">{t('reg.q2')}</h2>
+              <p className={`text-sm ${ui.muted}`}>{t('reg.q2hint')}</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 {categoriesForKind(kind).map((c) => {
                   const on = cats.includes(c.id);
@@ -159,16 +163,16 @@ export default function RegistroPage() {
                           : 'border-slate-300 text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500'
                       }`}
                     >
-                      {on ? '✓ ' : ''}{c.icon} {c.label}
+                      {on ? '✓ ' : ''}{c.icon} {t(catKey(c.id))}
                     </button>
                   );
                 })}
               </div>
               {cats.length > 0 && (
                 <div className="mt-5 rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-xs dark:border-emerald-500/30 dark:bg-emerald-500/10">
-                  <p className="font-bold text-emerald-700 dark:text-emerald-300">Tu panel incluirá:</p>
+                  <p className="font-bold text-emerald-700 dark:text-emerald-300">{t('reg.panelIncludes')}</p>
                   <p className="mt-1 text-emerald-800 dark:text-emerald-200">
-                    {modules.map((m) => MODULE_LABELS[m]).join(' · ')}
+                    {modules.map((m) => t(modKey(m))).join(' · ')}
                   </p>
                 </div>
               )}
@@ -177,53 +181,53 @@ export default function RegistroPage() {
 
           {step === 2 && (
             <>
-              <h2 className="text-lg font-bold">Datos de tu empresa</h2>
+              <h2 className="text-lg font-bold">{t('reg.companyData')}</h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <label className={ui.label}>Nombre de la empresa</label>
+                  <label className={ui.label}>{t('reg.companyName')}</label>
                   <input className={ui.input} value={compName} onChange={(e) => setCompName(e.target.value)}
-                    placeholder="Ej.: Distribuidora El Sol" />
+                    placeholder={t('reg.companyNamePh')} />
                 </div>
                 <div>
-                  <label className={ui.label}>País</label>
+                  <label className={ui.label}>{t('common.country')}</label>
                   <select className={ui.input} value={country.code}
-                    onChange={(e) => setCountryByCode(e.target.value as CountryCode)}>
-                    {COUNTRIES.map((c) => (
-                      <option key={c.code} value={c.code}>{c.flag} {c.name} ({c.currency})</option>
+                    onChange={(e) => changeCountry(e.target.value as CountryCode)}>
+                    {[...COUNTRIES].sort((x, y) => countryName(lang, x.code, x.name).localeCompare(countryName(lang, y.code, y.name), lang)).map((c) => (
+                      <option key={c.code} value={c.code}>{c.flag} {countryName(lang, c.code, c.name)} ({c.currency})</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className={ui.label}>{country.taxIdName} (opcional)</label>
+                  <label className={ui.label}>{t('reg.taxIdOptional', { taxId: country.taxIdName })}</label>
                   <input className={ui.input} value={taxId} onChange={(e) => setTaxId(e.target.value)}
-                    placeholder={`Número de ${country.taxIdName}`} />
+                    placeholder={t('reg.taxIdPh', { taxId: country.taxIdName })} />
                 </div>
               </div>
               <p className={`mt-3 text-xs ${ui.muted}`}>
-                Moneda: {country.currency} · Impuesto: {country.taxName} {country.taxRate}%. Podrás cambiarlo después.
+                {t('reg.currencyInfo', { currency: country.currency, taxName: country.taxName, taxRate: country.taxRate })}
               </p>
             </>
           )}
 
           {step === 3 && (
             <>
-              <h2 className="text-lg font-bold">Tu cuenta de dueño</h2>
-              <p className={`text-sm ${ui.muted}`}>Con este correo y contraseña entrarás siempre. A tus trabajadores los creas tú desde tu panel.</p>
+              <h2 className="text-lg font-bold">{t('reg.ownerTitle')}</h2>
+              <p className={`text-sm ${ui.muted}`}>{t('reg.ownerHint')}</p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <label className={ui.label}>Tu nombre completo</label>
+                  <label className={ui.label}>{t('reg.ownerName')}</label>
                   <input className={ui.input} value={ownerName} onChange={(e) => setOwnerName(e.target.value)} autoComplete="name" />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className={ui.label}>Correo</label>
+                  <label className={ui.label}>{t('common.email')}</label>
                   <input className={ui.input} type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
                 </div>
                 <div>
-                  <label className={ui.label}>Contraseña (mínimo 8)</label>
+                  <label className={ui.label}>{t('reg.passMin')}</label>
                   <input className={ui.input} type="password" value={pass1} onChange={(e) => setPass1(e.target.value)} autoComplete="new-password" />
                 </div>
                 <div>
-                  <label className={ui.label}>Repite la contraseña</label>
+                  <label className={ui.label}>{t('reg.passRepeat')}</label>
                   <input className={ui.input} type="password" value={pass2} onChange={(e) => setPass2(e.target.value)} autoComplete="new-password" />
                 </div>
               </div>
@@ -238,14 +242,14 @@ export default function RegistroPage() {
 
           <div className="mt-6 flex items-center justify-between gap-3">
             {step > 0 ? (
-              <button type="button" onClick={back} className={ui.btnGhost}>← Atrás</button>
+              <button type="button" onClick={back} className={ui.btnGhost}>{t('common.back')}</button>
             ) : (
               <Link href="/ingresar" className={`text-xs font-semibold ${ui.muted} hover:underline`}>
-                Ya tengo cuenta
+                {t('reg.haveAccount')}
               </Link>
             )}
             <button type="button" onClick={next} disabled={busy} className={ui.btnPrimary}>
-              {busy ? 'Creando tu empresa…' : step === STEPS.length - 1 ? 'Crear mi empresa' : 'Siguiente →'}
+              {busy ? t('reg.creating') : step === STEPS.length - 1 ? t('reg.create') : t('common.next')}
             </button>
           </div>
         </section>

@@ -2,27 +2,27 @@
 import Link from 'next/link';
 import { useVeltrixAuth, homeForRole } from './auth-system';
 import { useLanguage } from './language-selector';
-import { BUSINESS_KINDS, categoriesForKind } from './business-catalog';
+import { BUSINESS_KINDS, categoriesForKind, kindKey, catKey } from './business-catalog';
 import { SiteHeader, SiteFooter, ui } from './site-header';
+import { useT } from './i18n';
+import type { DictKey } from './i18n/es';
 
-const FEATURES = [
-  { icon: '🧾', title: 'Ventas y punto de venta', desc: 'Cobra en mostrador, en mesa o a domicilio. Contado, crédito, QR o efectivo.' },
-  { icon: '💵', title: 'Caja con arqueo ciego', desc: 'El cajero declara lo que contó sin ver lo esperado. Cuadres sin trampas.' },
-  { icon: '🛵', title: 'Créditos y cobranza en calle', desc: 'Rutas para cobradores, cobro sin internet y rendición diaria al cajero.' },
-  { icon: '📦', title: 'Inventario y compras', desc: 'Stock por almacén, costo promedio, proveedores y alertas de faltantes.' },
-  { icon: '🍽️', title: 'Restaurante y talleres', desc: 'Mesas, cocina y cuenta dividida. Órdenes de trabajo para talleres y servicios.' },
-  { icon: '📊', title: 'Reportes por sucursal', desc: 'Ganancias, deudas y comisiones de todas tus sucursales en un solo panel.' },
+const FEATURES: { icon: string; n: number }[] = [
+  { icon: '🧾', n: 1 }, { icon: '💵', n: 2 }, { icon: '🛵', n: 3 },
+  { icon: '📦', n: 4 }, { icon: '🍽️', n: 5 }, { icon: '📊', n: 6 },
 ];
 
-const PLANS = [
-  { name: 'Starter', usd: 35, desc: 'Para un negocio que empieza', items: ['Punto de venta', 'Inventario', '1 sucursal'] },
-  { name: 'Pro', usd: 60, desc: 'Para negocios en crecimiento', items: ['Todo lo de Starter', 'Compras y finanzas', 'Créditos y cobranza en calle'], best: true },
-  { name: 'Enterprise', usd: 199, desc: 'Para empresas con varias sucursales', items: ['Todos los módulos', 'Sucursales ilimitadas', 'Soporte prioritario'] },
+const PLANS: { id: 'starter' | 'pro' | 'enterprise'; name: string; usd: number; best?: boolean }[] = [
+  { id: 'starter', name: 'Starter', usd: 35 },
+  { id: 'pro', name: 'Pro', usd: 60, best: true },
+  { id: 'enterprise', name: 'Enterprise', usd: 199 },
 ];
 
 export default function HomePage() {
   const { loaded, session } = useVeltrixAuth();
   const { formatMoney } = useLanguage();
+  const { t } = useT();
+  const k = (key: string) => t(key as DictKey);
 
   return (
     <main className="flex min-h-screen flex-col">
@@ -31,58 +31,55 @@ export default function HomePage() {
       {/* PORTADA */}
       <section className="mx-auto w-full max-w-6xl px-4 pt-16 pb-12 text-center">
         <span className="rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
-          Control financiero para tu negocio
+          {t('home.badge')}
         </span>
         <h1 className="mx-auto mt-5 max-w-3xl text-4xl font-extrabold tracking-tight md:text-5xl">
-          Ventas, caja, inventario y cobranza{' '}
-          <span className="text-blue-600 dark:text-blue-500">en un solo lugar</span>
+          {t('home.title1')}{' '}
+          <span className="text-blue-600 dark:text-blue-500">{t('home.title2')}</span>
         </h1>
-        <p className={`mx-auto mt-4 max-w-2xl text-base ${ui.muted}`}>
-          Para tiendas, distribuidoras, restaurantes, talleres y negocios de préstamos.
-          Cada trabajador ve solo lo suyo y tú controlas todo.
-        </p>
+        <p className={`mx-auto mt-4 max-w-2xl text-base ${ui.muted}`}>{t('home.subtitle')}</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {loaded && session ? (
-            <Link href={homeForRole(session.role)} className={`${ui.btnPrimary} px-7 py-3`}>Ir a mi panel →</Link>
+            <Link href={homeForRole(session.role)} className={`${ui.btnPrimary} px-7 py-3`}>{t('home.ctaPanel')}</Link>
           ) : (
             <>
-              <Link href="/registro" className={`${ui.btnPrimary} px-7 py-3`}>Probar 14 días gratis</Link>
-              <Link href="/ingresar" className={`${ui.btnGhost} px-7 py-3`}>Ya tengo cuenta</Link>
+              <Link href="/registro" className={`${ui.btnPrimary} px-7 py-3`}>{t('home.ctaTrial')}</Link>
+              <Link href="/ingresar" className={`${ui.btnGhost} px-7 py-3`}>{t('home.ctaHaveAccount')}</Link>
             </>
           )}
         </div>
-        <p className={`mt-3 text-xs ${ui.muted}`}>Sin tarjeta · Cancela cuando quieras</p>
+        <p className={`mt-3 text-xs ${ui.muted}`}>{t('home.noCard')}</p>
       </section>
 
       {/* PARA QUÉ NEGOCIOS */}
       <section className="mx-auto w-full max-w-6xl px-4 py-10">
-        <h2 className="text-center text-2xl font-extrabold">Hecho para tu tipo de negocio</h2>
+        <h2 className="text-center text-2xl font-extrabold">{t('home.forYourBusiness')}</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {BUSINESS_KINDS.filter((k) => k.id !== 'mixed').map((k) => (
-            <div key={k.id} className={`rounded-2xl p-5 ${ui.card}`}>
-              <p className="text-lg font-bold">{k.icon} {k.label}</p>
+          {BUSINESS_KINDS.filter((kd) => kd.id !== 'mixed').map((kd) => (
+            <div key={kd.id} className={`rounded-2xl p-5 ${ui.card}`}>
+              <p className="text-lg font-bold">{kd.icon} {t(kindKey(kd.id))}</p>
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {categoriesForKind(k.id).map((c) => (
+                {categoriesForKind(kd.id).map((c) => (
                   <span key={c.id} className="rounded-full border border-slate-200 px-2.5 py-1 text-[11px] font-semibold text-slate-600 dark:border-slate-700 dark:text-slate-300">
-                    {c.icon} {c.label}
+                    {c.icon} {t(catKey(c.id))}
                   </span>
                 ))}
               </div>
             </div>
           ))}
         </div>
-        <p className={`mt-3 text-center text-xs ${ui.muted}`}>¿Vendes productos y además das servicios? Elige “Mixto” al registrarte.</p>
+        <p className={`mt-3 text-center text-xs ${ui.muted}`}>{t('home.mixedHint')}</p>
       </section>
 
       {/* FUNCIONES */}
       <section className="mx-auto w-full max-w-6xl px-4 py-10">
-        <h2 className="text-center text-2xl font-extrabold">Todo lo que necesitas para controlar tu dinero</h2>
+        <h2 className="text-center text-2xl font-extrabold">{t('home.featuresTitle')}</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
-            <div key={f.title} className={`rounded-2xl p-5 ${ui.card}`}>
+            <div key={f.n} className={`rounded-2xl p-5 ${ui.card}`}>
               <p className="text-2xl">{f.icon}</p>
-              <p className="mt-2 font-bold">{f.title}</p>
-              <p className={`mt-1 text-sm ${ui.muted}`}>{f.desc}</p>
+              <p className="mt-2 font-bold">{k(`home.f${f.n}.title`)}</p>
+              <p className={`mt-1 text-sm ${ui.muted}`}>{k(`home.f${f.n}.desc`)}</p>
             </div>
           ))}
         </div>
@@ -90,32 +87,29 @@ export default function HomePage() {
 
       {/* PLANES */}
       <section className="mx-auto w-full max-w-6xl px-4 py-10">
-        <h2 className="text-center text-2xl font-extrabold">Planes</h2>
-        <p className={`mt-1 text-center text-sm ${ui.muted}`}>Empieza con 14 días gratis con todo incluido. Después eliges tu plan.</p>
+        <h2 className="text-center text-2xl font-extrabold">{t('home.plansTitle')}</h2>
+        <p className={`mt-1 text-center text-sm ${ui.muted}`}>{t('home.plansSubtitle')}</p>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {PLANS.map((p) => (
-            <div
-              key={p.name}
-              className={`relative rounded-2xl p-6 ${ui.card} ${p.best ? 'ring-2 ring-blue-500' : ''}`}
-            >
+            <div key={p.id} className={`relative rounded-2xl p-6 ${ui.card} ${p.best ? 'ring-2 ring-blue-500' : ''}`}>
               {p.best && (
                 <span className="absolute -top-3 left-6 rounded-full bg-blue-600 px-3 py-0.5 text-[11px] font-bold text-white">
-                  Más elegido
+                  {t('home.bestPlan')}
                 </span>
               )}
               <p className="text-lg font-bold">{p.name}</p>
-              <p className={`text-xs ${ui.muted}`}>{p.desc}</p>
+              <p className={`text-xs ${ui.muted}`}>{k(`plan.${p.id}.desc`)}</p>
               <p className="mt-4 text-3xl font-extrabold">
                 {formatMoney(p.usd)}
-                <span className={`text-sm font-semibold ${ui.muted}`}> / mes</span>
+                <span className={`text-sm font-semibold ${ui.muted}`}> {t('common.perMonth')}</span>
               </p>
               <ul className="mt-4 space-y-1.5 text-sm">
-                {p.items.map((i) => (
-                  <li key={i}>✓ {i}</li>
+                {[1, 2, 3].map((i) => (
+                  <li key={i}>✓ {k(`plan.${p.id}.i${i}`)}</li>
                 ))}
               </ul>
               <Link href="/registro" className={`${p.best ? ui.btnPrimary : ui.btnGhost} mt-6 w-full`}>
-                Empezar gratis
+                {t('home.startFree')}
               </Link>
             </div>
           ))}

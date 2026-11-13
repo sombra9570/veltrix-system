@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
 import { SiteHeader, SiteFooter, ui } from '../site-header';
+import { useT } from '../i18n';
 
 // Aquí llega el enlace del correo "¿Olvidaste tu contraseña?"
 export default function RestablecerPage() {
@@ -14,6 +15,7 @@ export default function RestablecerPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const { t } = useT();
 
   useEffect(() => {
     // Supabase lee el enlace del correo y abre una sesión temporal de recuperación
@@ -27,12 +29,12 @@ export default function RestablecerPage() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (pass1.length < 8) return setError('La contraseña debe tener al menos 8 caracteres.');
-    if (pass1 !== pass2) return setError('Las dos contraseñas no coinciden.');
+    if (pass1.length < 8) return setError(t('val.passMin'));
+    if (pass1 !== pass2) return setError(t('val.passMatch'));
     setBusy(true);
     const { error: err } = await supabase.auth.updateUser({ password: pass1 });
     setBusy(false);
-    if (err) return setError('No se pudo cambiar. Pide un enlace nuevo e inténtalo otra vez.');
+    if (err) return setError(t('reset.failed'));
     await supabase.auth.signOut();
     setDone(true);
     setTimeout(() => router.push('/ingresar'), 2500);
@@ -43,17 +45,17 @@ export default function RestablecerPage() {
       <SiteHeader showAuthButtons={false} />
       <div className="flex flex-1 items-center justify-center px-4 py-12">
         <div className={`w-full max-w-sm rounded-2xl p-7 ${ui.card}`}>
-          <h1 className="text-2xl font-extrabold">Nueva contraseña</h1>
+          <h1 className="text-2xl font-extrabold">{t('reset.title')}</h1>
 
           {done ? (
             <p className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-sm font-semibold text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300">
-              ✅ Listo. Ya puedes ingresar con tu contraseña nueva.
+              ✅ {t('reset.done')}
             </p>
           ) : !ready ? (
             <p className={`mt-3 text-sm ${ui.muted}`}>
-              Abre esta página desde el enlace que te llegó al correo. Si el enlace venció,{' '}
+              {t('reset.openFromEmail')}{' '}
               <Link href="/ingresar" className="font-semibold text-blue-600 hover:underline dark:text-blue-400">
-                pide uno nuevo
+                {t('reset.requestNew')}
               </Link>
               .
             </p>
@@ -65,17 +67,17 @@ export default function RestablecerPage() {
                 </div>
               )}
               <div>
-                <label className={ui.label}>Contraseña nueva (mínimo 8)</label>
+                <label className={ui.label}>{t('reset.newPassword')}</label>
                 <input type="password" autoComplete="new-password" value={pass1}
                   onChange={(e) => setPass1(e.target.value)} className={ui.input} required />
               </div>
               <div>
-                <label className={ui.label}>Repítela</label>
+                <label className={ui.label}>{t('reset.repeat')}</label>
                 <input type="password" autoComplete="new-password" value={pass2}
                   onChange={(e) => setPass2(e.target.value)} className={ui.input} required />
               </div>
               <button type="submit" disabled={busy} className={`${ui.btnPrimary} w-full`}>
-                {busy ? 'Guardando…' : 'Guardar contraseña'}
+                {busy ? t('reset.saving') : t('reset.save')}
               </button>
             </form>
           )}

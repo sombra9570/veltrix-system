@@ -1,4 +1,6 @@
 // Catálogo de tipos de negocio y rubros de Veltrix.
+// Los textos visibles salen de i18n (claves kind.* / cat.* / mod.*); los label aquí son solo referencia.
+import type { DictKey } from './i18n/es';
 // Cada rubro sugiere los módulos que la empresa va a usar (códigos de la tabla org_modules).
 
 export type BusinessKind = 'products' | 'services' | 'mixed';
@@ -78,3 +80,9 @@ export const MODULE_LABELS: Record<ModuleCode, string> = {
   distribution: 'Distribución y rutas',
   hr: 'Personal y asistencia',
 };
+
+// Claves de traducción
+export const kindKey = (id: BusinessKind) => `kind.${id}` as DictKey;
+export const kindDescKey = (id: BusinessKind) => `kind.${id}.desc` as DictKey;
+export const catKey = (id: string) => `cat.${id}` as DictKey;
+export const modKey = (m: ModuleCode) => `mod.${m}` as DictKey;
