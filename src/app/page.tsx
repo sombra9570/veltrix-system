@@ -826,16 +826,6 @@ export default function VeltrixSaaSControlPanel() {
     }
   };
 
-  const quickLogin = async (em: string, pass: string) => {
-    setEmail(em);
-    setPassword(pass);
-    setErrorMsg('');
-    const res = await login(em, pass);
-    if (res.ok && res.session) {
-      routeByRole(res.session.role);
-    }
-  };
-
   const handleCreateCompany = (e: React.FormEvent) => {
     e.preventDefault();
     if (!compName.trim() || !compTaxId.trim() || !ownerEmail.trim()) return;
@@ -901,7 +891,7 @@ export default function VeltrixSaaSControlPanel() {
           <div className="flex flex-wrap items-center gap-3">
             <LanguageDropdown />
             <button
-              onClick={() => quickLogin('admin@veltrix.com', 'admin123')}
+              onClick={() => document.getElementById('login')?.scrollIntoView({ behavior: 'smooth' })}
               className="bg-slate-900 hover:bg-slate-800 text-blue-400 border border-blue-500/30 text-xs font-bold px-4 py-2.5 rounded-lg transition cursor-pointer"
             >
               {t.goToAdmin}
@@ -1002,7 +992,7 @@ export default function VeltrixSaaSControlPanel() {
         {/* SECCIÓN 3: AUTENTICACIÓN IAM Y ACCESOS DIRECTOS POR ROL */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Pasarela IAM */}
-          <div className="lg:col-span-5 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
+          <div id="login" className="lg:col-span-5 scroll-mt-6 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
             <div>
               <h2 className="text-lg font-bold">🔐 {ui.iamTitle}</h2>
               <p className="text-xs text-slate-400 mt-1">{ui.iamSubtitle}</p>
@@ -1053,81 +1043,28 @@ export default function VeltrixSaaSControlPanel() {
             </form>
           </div>
 
-          {/* Botonera de Roles Jerárquicos */}
+          {/* Roles jerárquicos: solo informativo, sin cuentas de demo */}
           <div className="lg:col-span-7 bg-slate-900/70 border border-slate-800 rounded-2xl p-6 space-y-4">
             <div>
-              <h2 className="text-base font-bold text-slate-100">
-                {ui.quickAccessTitle}
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">{ui.quickAccessDesc}</p>
+              <h2 className="text-base font-bold text-slate-100">🧭 Roles jerárquicos</h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Cada persona entra con su propio correo y contraseña. El sistema detecta su rol y la lleva a su panel.
+                Los trabajadores los crea el dueño de la empresa desde su panel.
+              </p>
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-              <button
-                type="button"
-                onClick={() => quickLogin('admin@veltrix.com', 'admin123')}
-                className="text-left p-3 rounded-xl bg-purple-950/30 border border-purple-500/30 hover:border-purple-400 transition cursor-pointer"
-              >
-                <p className="font-bold text-purple-300">{ui.roleSuperAdmin}</p>
-                <p className="text-slate-400 text-[11px] mt-0.5">
-                  admin@veltrix.com · admin123
-                </p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin('dueno@buensabor.com', '123')}
-                className="text-left p-3 rounded-xl bg-blue-950/30 border border-blue-500/30 hover:border-blue-400 transition cursor-pointer"
-              >
-                <p className="font-bold text-blue-300">{ui.roleOwner}</p>
-                <p className="text-slate-400 text-[11px] mt-0.5">
-                  dueno@buensabor.com · 123
-                </p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin('caja@buensabor.com', '123')}
-                className="text-left p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30 hover:border-emerald-400 transition cursor-pointer"
-              >
-                <p className="font-bold text-emerald-300">{ui.roleCashier}</p>
-                <p className="text-slate-400 text-[11px] mt-0.5">
-                  caja@buensabor.com · 123
-                </p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin('ventas@buensabor.com', '123')}
-                className="text-left p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/30 hover:border-cyan-400 transition cursor-pointer"
-              >
-                <p className="font-bold text-cyan-300">{ui.roleVendor}</p>
-                <p className="text-slate-400 text-[11px] mt-0.5">
-                  ventas@buensabor.com · 123
-                </p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin('ruta@buensabor.com', '123')}
-                className="text-left p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 hover:border-amber-400 transition cursor-pointer"
-              >
-                <p className="font-bold text-amber-300">{ui.roleCollector}</p>
-                <p className="text-slate-400 text-[11px] mt-0.5">
-                  ruta@buensabor.com · 123
-                </p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => quickLogin('dueno@buensabor.com', '123')}
-                className="text-left p-3 rounded-xl bg-rose-950/30 border border-rose-500/30 hover:border-rose-400 transition cursor-pointer"
-              >
-                <p className="font-bold text-rose-300">{ui.roleSupervisor}</p>
-                <p className="text-slate-400 text-[11px] mt-0.5">
-                  dueno@buensabor.com · 123
-                </p>
-              </button>
+              {[
+                { label: ui.roleSuperAdmin, cls: 'bg-purple-950/30 border-purple-500/30 text-purple-300' },
+                { label: ui.roleOwner, cls: 'bg-blue-950/30 border-blue-500/30 text-blue-300' },
+                { label: ui.roleSupervisor, cls: 'bg-rose-950/30 border-rose-500/30 text-rose-300' },
+                { label: ui.roleCashier, cls: 'bg-emerald-950/30 border-emerald-500/30 text-emerald-300' },
+                { label: ui.roleVendor, cls: 'bg-cyan-950/30 border-cyan-500/30 text-cyan-300' },
+                { label: ui.roleCollector, cls: 'bg-amber-950/30 border-amber-500/30 text-amber-300' },
+              ].map((r) => (
+                <div key={r.label} className={`p-3 rounded-xl border ${r.cls}`}>
+                  <p className="font-bold">{r.label}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -1294,12 +1231,6 @@ export default function VeltrixSaaSControlPanel() {
                         {isActive ? t.suspendBtn : t.reactivateBtn}
                       </button>
 
-                      <button
-                        onClick={() => quickLogin(c.ownerEmail, c.ownerPassword)}
-                        className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 font-bold px-3 py-1.5 rounded-lg text-[11px] cursor-pointer transition"
-                      >
-                        {ui.enterConsoleBtn}
-                      </button>
                     </div>
                   </div>
                 </div>
