@@ -1,323 +1,602 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  useLanguage,
-  LanguageDropdown,
-  RegionalStatusBar,
-  COUNTRIES,
-} from '../../language-selector';
-import { useVeltrixAuth } from '../../auth-system';
+import { useCallback, useEffect, useState } from 'react';
+import { rpc } from '../../../lib/supabase';
+import { Card } from '../shell';
+import { ui } from '../../site-header';
+import { useT } from '../../i18n';
+import type { DictKey } from '../../i18n/es';
+import { money, shortTime, parseAmount } from '../format';
 
-interface ProductItem {
-  id: number;
-  sku: string;
-  name: string;
-  priceUsd: number;
-  stock: number;
-}
+type Method = 'cash' | 'qr_transfer' | 'card';
+type MovType = 'expense' | 'withdrawal' | 'deposit' | 'change_fund';
 
-interface CartItem extends ProductItem {
-  qty: number;
-}
+type Home = {
+  shift: null | {
+    id: string; opened_at: string; opening_cash: number; register: string; branch: string; currency: string;
+    payments: { id: string; at: string; customer: string; method: Method; amount: number }[];
+    movements: { id: string; at: string; type: MovType; amount: number; description: string }[];
+  };
+  registers: { id: string; name: string; branch: string; currency: string; busy: boolean }[];
+  last_closed: null | { status: 'closed_ok' | 'discrepancy'; difference: number; closed_at: string; currency: string };
+};
+type QueueRow = {
+  order_id: string; customer_id: string; customer_name: string; vendor_name: string;
+  total: number; balance: number; created_at: string;
+};
+type Settlement = { settlement_id: string; route_name: string; collector_name: string; created_at: string };
+type Item = { description: string; qty: number; unit_price: number; line_total: number };
 
-const CATALOG_SEED: ProductItem[] = [
-  { id: 1, sku: 'POS-101', name: 'Producto / Servicio Estándar A', priceUsd: 8.5, stock: 42 },
-  { id: 2, sku: 'POS-102', name: 'Insumo Comercial Corporativo B', priceUsd: 15.0, stock: 28 },
-  { id: 3, sku: 'POS-103', name: 'Paquete Operativo Ejecutivo C', priceUsd: 24.0, stock: 15 },
-  { id: 4, sku: 'POS-104', name: 'Suministro Técnico Especial D', priceUsd: 5.25, stock: 90 },
-  { id: 5, sku: 'POS-105', name: 'Licencia / Mantenimiento Express', priceUsd: 32.0, stock: 12 },
-  { id: 6, sku: 'POS-106', name: 'Kit Mayorista Distribución', priceUsd: 48.0, stock: 9 },
+type Tab = 'queue' | 'settlements' | 'movements' | 'payments' | 'close';
+const TABS: { id: Tab; icon: string; label: DictKey }[] = [
+  { id: 'queue', icon: '🧾', label: 'cash.tabQueue' },
+  { id: 'settlements', icon: '🛵', label: 'cash.tabSettlements' },
+  { id: 'movements', icon: '↕️', label: 'cash.tabMovements' },
+  { id: 'payments', icon: '✅', label: 'cash.tabPayments' },
+  { id: 'close', icon: '🔒', label: 'cash.tabClose' },
 ];
+const METHODS: Method[] = ['cash', 'qr_transfer', 'card'];
+const MOV_TYPES: MovType[] = ['expense', 'withdrawal', 'deposit', 'change_fund'];
 
-export default function CashierTerminalPage() {
-  const router = useRouter();
-  const { country, formatMoney } = useLanguage();
-  const { loaded, session, companies, logout } = useVeltrixAuth();
+const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
+const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
 
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [clientTaxId, setClientTaxId] = useState('');
-  const [clientName, setClientName] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'cash' | 'qr' | 'card'>('cash');
-  const [salesHistory, setSalesHistory] = useState<
-    { id: number; client: string; totalUsd: number; method: string; time: string }[]
-  >([]);
+/** Mensajes de la base → texto claro en el idioma del usuario */
+function cashError(msg: string, t: (k: DictKey) => string) {
+  if (/turno de caja abierto/i.test(msg)) return t('cash.needShift');
+  if (/excede/i.test(msg)) return t('cash.exceeds');
+  if (/suspendida/i.test(msg)) return t('err.suspended');
+  if (/Monto inválido|efectivo contado/i.test(msg)) return t('cash.invalidAmount');
+  return t('err.generic');
+}
 
+export default function CashierPage() {
+  const { t, lang } = useT();
+  const [home, setHome] = useState<Home | null>(null);
+  const [queue, setQueue] = useState<QueueRow[]>([]);
+  const [settlements, setSettlements] = useState<Settlement[]>([]);
+  const [tab, setTab] = useState<Tab>('queue');
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const load = useCallback(async () => {
+    try {
+      const h = await rpc<Home>('cashier_home');
+      setHome(h);
+      if (h.shift) {
+        const [q, s] = await Promise.all([
+          rpc<QueueRow[]>('get_cashier_queue'),
+          rpc<Settlement[]>('get_pending_settlements'),
+        ]);
+        setQueue(q ?? []);
+        setSettlements(s ?? []);
+      }
+    } catch { /* sin conexión: se reintenta en el próximo ciclo */ }
+  }, []);
+
+  // Carga inicial y actualización automática cada 20 s
   useEffect(() => {
-    if (loaded && (!session || session.role !== 'cashier')) {
-      router.replace('/');
-    }
-  }, [loaded, session, router]);
+    load();
+    const id = setInterval(load, 20_000);
+    return () => clearInterval(id);
+  }, [load]);
 
-  if (!loaded || !session || session.role !== 'cashier') {
-    return <div className="min-h-dvh bg-slate-950" />;
-  }
-
-  const myCompany = companies.find((c) => c.id === session.companyId);
-  if (!myCompany) return null;
-
-  const rawCountry = COUNTRIES.find((c) => c.code === country.code) || COUNTRIES[0];
-
-  // Impuesto calculado automáticamente según el encuadre fiscal de ESTA empresa
-  const companyTaxRate =
-    myCompany.regime === 'simplified' || myCompany.regime === 'exempt'
-      ? 0
-      : myCompany.sector === 'essential'
-      ? rawCountry.reducedTaxRate
-      : myCompany.sector === 'special'
-      ? rawCountry.specialTaxRate
-      : rawCountry.taxRate;
-
-  const addToCart = (prod: ProductItem) => {
-    const exists = cart.find((item) => item.id === prod.id);
-    if (exists) {
-      setCart(cart.map((item) => (item.id === prod.id ? { ...item, qty: item.qty + 1 } : item)));
-    } else {
-      setCart([...cart, { ...prod, qty: 1 }]);
-    }
+  const flash = (ok: boolean, text: string) => {
+    setMsg({ ok, text });
+    setTimeout(() => setMsg(null), 5000);
   };
 
-  const updateQty = (id: number, delta: number) => {
-    setCart(
-      cart
-        .map((item) => (item.id === id ? { ...item, qty: item.qty + delta } : item))
-        .filter((item) => item.qty > 0)
-    );
-  };
+  if (!home) return <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p>;
 
-  const subtotalUsd = cart.reduce((sum, item) => sum + item.priceUsd * item.qty, 0);
-  const taxAmountUsd = subtotalUsd * (companyTaxRate / 100);
-  const grandTotalUsd = subtotalUsd + taxAmountUsd;
+  const s = home.shift;
+  const fmt = (n: number, cur?: string) => money(Number(n), cur ?? s?.currency ?? 'USD', lang);
 
-  const handleCheckout = (e: React.FormEvent) => {
+  return (
+    <div className="space-y-5">
+      {msg && (
+        <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? okBox : errBox}`}>{msg.text}</p>
+      )}
+
+      {!s ? (
+        <OpenShift home={home} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
+      ) : (
+        <>
+          {/* Encabezado del turno */}
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="text-xl font-extrabold sm:text-2xl">💵 {s.register} · {s.branch}</h1>
+              <p className={`text-sm ${ui.muted}`}>{t('cash.openSince', { time: shortTime(s.opened_at, lang) })}</p>
+            </div>
+            <button type="button" onClick={load} className={`${ui.btnGhost} !py-2 text-sm`}>↻ {t('cash.refresh')}</button>
+          </div>
+
+          {/* Pestañas: en celular se deslizan; en computadora caben todas */}
+          <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+            <div className="flex w-max gap-2 sm:w-auto sm:flex-wrap">
+              {TABS.map((x) => {
+                const count = x.id === 'queue' ? queue.length : x.id === 'settlements' ? settlements.length : 0;
+                return (
+                  <button
+                    key={x.id}
+                    type="button"
+                    onClick={() => setTab(x.id)}
+                    className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition cursor-pointer ${
+                      tab === x.id
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'border border-slate-300 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300'
+                    }`}
+                  >
+                    <span>{x.icon}</span>
+                    <span>{t(x.label)}</span>
+                    {count > 0 && (
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${tab === x.id ? 'bg-white/25' : 'bg-blue-600 text-white'}`}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {tab === 'queue' && (
+            <QueueTab queue={queue} shiftId={s.id} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
+          )}
+          {tab === 'settlements' && (
+            <SettlementsTab list={settlements} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
+          )}
+          {tab === 'movements' && (
+            <MovementsTab movements={s.movements} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
+          )}
+          {tab === 'payments' && (
+            <Card className="!p-0 overflow-hidden">
+              {s.payments.length === 0 ? (
+                <p className={`p-5 text-sm ${ui.muted}`}>{t('cash.paymentsEmpty')}</p>
+              ) : (
+                <ul className="divide-y divide-slate-200 dark:divide-slate-800">
+                  {s.payments.map((p) => (
+                    <li key={p.id} className="flex items-center gap-3 p-4">
+                      <span className={`w-12 shrink-0 text-xs ${ui.muted}`}>{shortTime(p.at, lang)}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-semibold">{p.customer}</p>
+                        <p className={`text-xs ${ui.muted}`}>{t(`cash.m.${p.method}` as DictKey)}</p>
+                      </div>
+                      <span className={`font-bold ${p.amount < 0 ? 'text-red-600 dark:text-red-400' : ''}`}>{fmt(p.amount)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+          )}
+          {tab === 'close' && (
+            <CloseTab shiftId={s.id} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+type Common = {
+  busy: boolean;
+  setBusy: (b: boolean) => void;
+  onDone: () => Promise<void>;
+  flash: (ok: boolean, text: string) => void;
+};
+
+/* ---------------- Abrir caja ---------------- */
+function OpenShift({ home, busy, setBusy, onDone, flash }: Common & { home: Home }) {
+  const { t, lang } = useT();
+  const free = home.registers.filter((r) => !r.busy);
+  const [register, setRegister] = useState('');
+  const [cash, setCash] = useState('');
+  const selected = register || free[0]?.id || '';
+  const lc = home.last_closed;
+
+  const open = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (cart.length === 0) return;
-
-    const newTicket = {
-      id: Math.floor(100000 + Math.random() * 900000),
-      client: clientName.trim() || 'Consumidor Final',
-      totalUsd: grandTotalUsd,
-      method: paymentMethod.toUpperCase(),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-
-    setSalesHistory([newTicket, ...salesHistory]);
-    setCart([]);
-    setClientTaxId('');
-    setClientName('');
-  };
-
-  const shiftTotalUsd = salesHistory.reduce((sum, s) => sum + s.totalUsd, 0);
-
-  const handleLogout = () => {
-    logout();
-    if (typeof window !== 'undefined') {
-      window.location.href = '/';
+    const amount = parseAmount(cash || '0');
+    if (!selected || Number.isNaN(amount) || amount < 0) return flash(false, t('cash.invalidAmount'));
+    setBusy(true);
+    try {
+      await rpc('open_shift', { p_register: selected, p_opening_cash: amount });
+      await onDone();
+    } catch (err) {
+      flash(false, cashError((err as Error).message, t));
+    } finally {
+      setBusy(false);
     }
   };
 
   return (
-    <main className="min-h-dvh bg-slate-950 text-white px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:p-8">
-      <div className="w-full max-w-[1600px] mx-auto space-y-6 min-w-0">
-        <header className="flex flex-wrap justify-between items-center border-b border-slate-800 pb-5 gap-4">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <span className="text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full">
-                💳 Terminal Operativa POS & Tesorería
-              </span>
-              <span className="text-xs text-slate-400">
-                {country.taxIdName} Emisor: <strong className="text-slate-200">{myCompany.taxId}</strong>
-              </span>
-            </div>
-            <h1 className="text-2xl font-extrabold mt-2">{myCompany.name}</h1>
-            <p className="text-xs text-slate-400">
-              Operador en Turno: <strong className="text-white">{session.name}</strong> · Tasa Fiscal Aplicada:{' '}
-              <strong className="text-purple-300">
-                {country.taxName} {companyTaxRate}%
-              </strong>
-            </p>
-          </div>
+    <div className="mx-auto w-full max-w-lg space-y-4">
+      {lc && (
+        <p className={`rounded-xl border p-3 text-sm font-semibold ${lc.status === 'closed_ok' ? okBox : errBox}`}>
+          {lc.status === 'closed_ok'
+            ? t('cash.lastClosedOk')
+            : t('cash.lastClosedDiff', { amount: money(Number(lc.difference), lc.currency, lang) })}
+        </p>
+      )}
+      <Card>
+        <h1 className="text-xl font-extrabold">🔓 {t('cash.openTitle')}</h1>
+        <p className={`mt-1 text-sm ${ui.muted}`}>{t('cash.openHint')}</p>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="bg-slate-900 border border-slate-800 px-4 py-2 rounded-xl text-right">
-              <p className="text-[11px] text-slate-400">Arqueo Acumulado de Turno</p>
-              <p className="text-base font-bold text-emerald-400">{formatMoney(shiftTotalUsd)}</p>
+        {home.registers.length === 0 ? (
+          <p className={`mt-4 text-sm ${ui.muted}`}>{t('cash.noRegisters')}</p>
+        ) : (
+          <form onSubmit={open} className="mt-5 space-y-4">
+            <div>
+              <label className={ui.label}>{t('cash.register')}</label>
+              <div className="grid gap-2">
+                {home.registers.map((r) => (
+                  <label
+                    key={r.id}
+                    className={`flex items-center gap-3 rounded-xl border p-3 text-sm ${
+                      r.busy ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                    } ${selected === r.id ? 'border-blue-500 ring-2 ring-blue-500/30' : 'border-slate-300 dark:border-slate-700'}`}
+                  >
+                    <input
+                      type="radio"
+                      name="register"
+                      disabled={r.busy}
+                      checked={selected === r.id}
+                      onChange={() => setRegister(r.id)}
+                    />
+                    <span className="flex-1 font-semibold">{r.name} · {r.branch}</span>
+                    {r.busy && <span className="text-xs font-bold">{t('cash.busy')}</span>}
+                  </label>
+                ))}
+              </div>
             </div>
-            <LanguageDropdown />
-            <button
-              onClick={handleLogout}
-              className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-semibold px-4 py-2.5 rounded-lg cursor-pointer"
-            >
-              Cerrar Caja / Salir
+            <div>
+              <label className={ui.label}>{t('cash.openingCash')}</label>
+              <input inputMode="decimal" value={cash} onChange={(e) => setCash(e.target.value)} placeholder="0" className={ui.input} />
+            </div>
+            <button type="submit" disabled={busy || !selected} className={`${ui.btnPrimary} w-full`}>
+              {busy ? t('common.wait') : t('cash.open')}
             </button>
+          </form>
+        )}
+      </Card>
+    </div>
+  );
+}
+
+/* ---------------- Por cobrar ---------------- */
+function QueueTab({
+  queue, shiftId, fmt, busy, setBusy, onDone, flash,
+}: Common & { queue: QueueRow[]; shiftId: string; fmt: (n: number) => string }) {
+  const { t, lang } = useT();
+  const [active, setActive] = useState<QueueRow | null>(null);
+  const [items, setItems] = useState<Item[]>([]);
+  const [method, setMethod] = useState<Method>('cash');
+  const [received, setReceived] = useState('');
+
+  const pick = async (row: QueueRow) => {
+    setActive(row);
+    setMethod('cash');
+    setReceived('');
+    setItems([]);
+    try { setItems((await rpc<Item[]>('cashier_order_items', { p_order: row.order_id })) ?? []); } catch { /* opcional */ }
+  };
+
+  if (queue.length === 0 && !active) {
+    return <Card><p className={`text-sm ${ui.muted}`}>{t('cash.queueEmpty')}</p></Card>;
+  }
+
+  const balance = active ? Number(active.balance) : 0;
+  const got = parseAmount(received);
+  const change = method === 'cash' && !Number.isNaN(got) ? got - balance : 0;
+  const short = method === 'cash' && received !== '' && (Number.isNaN(got) || got < balance);
+
+  const charge = async () => {
+    if (!active || short) return;
+    setBusy(true);
+    try {
+      await rpc('register_payment', {
+        p_customer: active.customer_id,
+        p_origin: 'pos_counter',
+        p_method: method,
+        p_amount: balance,
+        p_shift: shiftId,
+        p_order: active.order_id,
+        p_offline_uuid: crypto.randomUUID(),
+      });
+      flash(true, t('cash.charged'));
+      setActive(null);
+      await onDone();
+    } catch (err) {
+      flash(false, cashError((err as Error).message, t));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-5">
+      <ul className={`space-y-2 lg:col-span-3 ${active ? 'max-lg:hidden' : ''}`}>
+        {queue.map((q) => (
+          <li key={q.order_id}>
+            <button
+              type="button"
+              onClick={() => pick(q)}
+              className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer ${ui.card} ${
+                active?.order_id === q.order_id ? 'ring-2 ring-blue-500' : 'hover:border-blue-400'
+              }`}
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-bold">{q.customer_name}</p>
+                <p className={`truncate text-xs ${ui.muted}`}>
+                  {shortTime(q.created_at, lang)} · {t('cash.soldBy', { name: q.vendor_name })}
+                </p>
+              </div>
+              <span className="text-lg font-extrabold">{fmt(q.balance)}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {active && (
+        <Card className="space-y-4 lg:col-span-2 lg:self-start lg:sticky lg:top-24">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className={`text-xs font-semibold uppercase tracking-wide ${ui.muted}`}>{t('cash.customer')}</p>
+              <p className="truncate text-lg font-bold">{active.customer_name}</p>
+            </div>
+            <button type="button" onClick={() => setActive(null)} aria-label={t('cash.cancel')} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
           </div>
-        </header>
 
-        <RegionalStatusBar />
+          {items.length > 0 && (
+            <div>
+              <p className={ui.label}>{t('cash.items')}</p>
+              <ul className="space-y-1 text-sm">
+                {items.map((it, i) => (
+                  <li key={i} className="flex justify-between gap-3">
+                    <span className="min-w-0 truncate">{Number(it.qty)} × {it.description}</span>
+                    <span className="shrink-0 font-semibold">{fmt(it.line_total)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Catálogo Rápido de Facturación */}
-          <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-base font-bold text-slate-200">
-              Catálogo Operativo Habilitado — Seleccionar Ítem
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {CATALOG_SEED.map((prod) => (
+          <div className="flex items-baseline justify-between border-t border-slate-200 pt-3 dark:border-slate-800">
+            <span className="font-semibold">{t('cash.toCharge')}</span>
+            <span className="text-2xl font-extrabold">{fmt(balance)}</span>
+          </div>
+
+          <div>
+            <p className={ui.label}>{t('cash.method')}</p>
+            <div className="grid grid-cols-3 gap-2">
+              {METHODS.map((m) => (
                 <button
-                  key={prod.id}
+                  key={m}
                   type="button"
-                  onClick={() => addToCart(prod)}
-                  className="p-4 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-emerald-500 text-left transition cursor-pointer flex flex-col justify-between gap-3"
+                  onClick={() => setMethod(m)}
+                  className={`rounded-xl px-2 py-2.5 text-xs font-bold transition cursor-pointer sm:text-sm ${
+                    method === m ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'
+                  }`}
                 >
-                  <div>
-                    <span className="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded">
-                      {prod.sku} · Stock: {prod.stock}
-                    </span>
-                    <p className="font-bold text-sm text-white mt-2">{prod.name}</p>
-                  </div>
-                  <p className="text-sm font-extrabold text-emerald-400">
-                    {formatMoney(prod.priceUsd)}
-                  </p>
+                  {t(`cash.m.${m}` as DictKey)}
                 </button>
               ))}
             </div>
-
-            {/* Historial de Comprobantes Emitidos en el Turno */}
-            {salesHistory.length > 0 && (
-              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 space-y-2.5 mt-4">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  Comprobantes Emitidos en esta Sesión
-                </h3>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {salesHistory.map((ticket) => (
-                    <div
-                      key={ticket.id}
-                      className="flex justify-between items-center text-xs bg-slate-950 px-3 py-2 rounded-lg border border-slate-800"
-                    >
-                      <span>
-                        <strong className="text-emerald-400">#{ticket.id}</strong> · {ticket.client} ({ticket.method})
-                      </span>
-                      <span className="font-bold text-white">
-                        {formatMoney(ticket.totalUsd)} <span className="text-slate-500">({ticket.time})</span>
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Comprobante Fiscal y Liquidación */}
-          <form
-            onSubmit={handleCheckout}
-            className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-5"
-          >
-            <div className="space-y-4">
-              <h2 className="text-base font-bold border-b border-slate-800 pb-3">
-                Emisión de Comprobante Fiscal
-              </h2>
-
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <input
-                  type="text"
-                  placeholder={`${country.taxIdName} Cliente`}
-                  value={clientTaxId}
-                  onChange={(e) => setClientTaxId(e.target.value)}
-                  className="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white"
-                />
-                <input
-                  type="text"
-                  placeholder="Razón Social / Nombre"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
-                  className="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white"
-                />
+          {method === 'cash' && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={ui.label}>{t('cash.received')}</label>
+                <input inputMode="decimal" value={received} onChange={(e) => setReceived(e.target.value)} placeholder={String(balance)} className={ui.input} />
               </div>
-
-              <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
-                {cart.length === 0 ? (
-                  <p className="text-xs text-slate-500 text-center py-8">
-                    Seleccione productos del catálogo para iniciar la liquidación.
-                  </p>
-                ) : (
-                  cart.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs"
-                    >
-                      <div className="flex-1 pr-2">
-                        <p className="font-semibold text-white truncate">{item.name}</p>
-                        <p className="text-slate-400">{formatMoney(item.priceUsd)} c/u</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => updateQty(item.id, -1)}
-                          className="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 font-bold cursor-pointer"
-                        >
-                          -
-                        </button>
-                        <span className="font-bold w-4 text-center">{item.qty}</span>
-                        <button
-                          type="button"
-                          onClick={() => updateQty(item.id, 1)}
-                          className="w-6 h-6 rounded bg-slate-800 hover:bg-slate-700 font-bold cursor-pointer"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
+              <div>
+                <p className={ui.label}>{t('cash.change')}</p>
+                <p className={`py-2.5 text-lg font-extrabold ${change > 0 ? 'text-emerald-600 dark:text-emerald-400' : ''}`}>
+                  {fmt(Math.max(0, change))}
+                </p>
               </div>
             </div>
+          )}
+          {short && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{t('cash.notEnough')}</p>}
 
-            <div className="space-y-3 border-t border-slate-800 pt-4 text-xs">
-              <div className="flex gap-2">
-                {(['cash', 'qr', 'card'] as const).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => setPaymentMethod(m)}
-                    className={`flex-1 py-2 rounded-lg font-bold uppercase cursor-pointer border ${
-                      paymentMethod === m
-                        ? 'bg-blue-600/30 border-blue-500 text-blue-300'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
-                    }`}
-                  >
-                    {m === 'cash' ? 'Efectivo' : m === 'qr' ? 'QR Simple' : 'Tarjeta'}
-                  </button>
-                ))}
-              </div>
+          <button type="button" onClick={charge} disabled={busy || short} className={`${ui.btnPrimary} w-full py-3 text-base`}>
+            {busy ? t('common.wait') : `${t('cash.confirm')} · ${fmt(balance)}`}
+          </button>
+        </Card>
+      )}
+    </div>
+  );
+}
 
-              <div className="space-y-1 text-slate-300">
-                <div className="flex justify-between">
-                  <span>Subtotal Neto:</span>
-                  <span>{formatMoney(subtotalUsd)}</span>
-                </div>
-                <div className="flex justify-between text-purple-300">
-                  <span>
-                    {country.taxName} ({companyTaxRate}%):
+/* ---------------- Rendiciones (conteo ciego) ---------------- */
+function SettlementsTab({ list, busy, setBusy, onDone, flash }: Common & { list: Settlement[] }) {
+  const { t, lang } = useT();
+  const [counts, setCounts] = useState<Record<string, string>>({});
+
+  if (list.length === 0) return <Card><p className={`text-sm ${ui.muted}`}>{t('cash.settlementsEmpty')}</p></Card>;
+
+  const receive = async (id: string) => {
+    const amount = parseAmount(counts[id] ?? '');
+    if (Number.isNaN(amount) || amount < 0) return flash(false, t('cash.invalidAmount'));
+    setBusy(true);
+    try {
+      await rpc('receive_settlement', { p_settlement: id, p_declared_cash: amount });
+      flash(true, t('cash.settlementReceived'));
+      await onDone();
+    } catch (err) {
+      flash(false, cashError((err as Error).message, t));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <p className={`text-sm ${ui.muted}`}>{t('cash.settlementHint')}</p>
+      {list.map((x) => (
+        <Card key={x.settlement_id}>
+          <p className="font-bold">🛵 {x.collector_name}</p>
+          <p className={`text-xs ${ui.muted}`}>{x.route_name} · {shortTime(x.created_at, lang)}</p>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <input
+              inputMode="decimal"
+              aria-label={t('cash.counted')}
+              placeholder={t('cash.counted')}
+              value={counts[x.settlement_id] ?? ''}
+              onChange={(e) => setCounts({ ...counts, [x.settlement_id]: e.target.value })}
+              className={ui.input}
+            />
+            <button type="button" disabled={busy} onClick={() => receive(x.settlement_id)} className={`${ui.btnPrimary} shrink-0`}>
+              {t('cash.receive')}
+            </button>
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------- Movimientos de caja ---------------- */
+function MovementsTab({
+  movements, fmt, busy, setBusy, onDone, flash,
+}: Common & { movements: NonNullable<Home['shift']>['movements']; fmt: (n: number) => string }) {
+  const { t, lang } = useT();
+  const [type, setType] = useState<MovType>('expense');
+  const [amount, setAmount] = useState('');
+  const [reason, setReason] = useState('');
+
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const n = parseAmount(amount);
+    if (Number.isNaN(n) || n <= 0) return flash(false, t('cash.invalidAmount'));
+    setBusy(true);
+    try {
+      await rpc('add_cash_movement', { p_type: type, p_amount: n, p_description: reason });
+      flash(true, t('cash.movementSaved'));
+      setAmount('');
+      setReason('');
+      await onDone();
+    } catch (err) {
+      flash(false, cashError((err as Error).message, t));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-2">
+      <Card>
+        <form onSubmit={save} className="space-y-3">
+          <div>
+            <p className={ui.label}>{t('cash.movType')}</p>
+            <div className="grid grid-cols-2 gap-2">
+              {MOV_TYPES.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setType(m)}
+                  className={`rounded-xl px-2 py-2.5 text-sm font-semibold transition cursor-pointer ${
+                    type === m ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'
+                  }`}
+                >
+                  {t(`cash.mov.${m}` as DictKey)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className={ui.label}>{t('cash.amount')}</label>
+            <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} className={ui.input} />
+          </div>
+          <div>
+            <label className={ui.label}>{t('cash.reason')}</label>
+            <input required value={reason} onChange={(e) => setReason(e.target.value)} className={ui.input} />
+          </div>
+          <button type="submit" disabled={busy} className={`${ui.btnPrimary} w-full`}>
+            {busy ? t('common.wait') : t('cash.addMovement')}
+          </button>
+        </form>
+      </Card>
+
+      <Card className="!p-0 overflow-hidden">
+        {movements.length === 0 ? (
+          <p className={`p-5 text-sm ${ui.muted}`}>{t('cash.movementsEmpty')}</p>
+        ) : (
+          <ul className="divide-y divide-slate-200 dark:divide-slate-800">
+            {movements.map((m) => {
+              const out = m.type === 'expense' || m.type === 'withdrawal';
+              return (
+                <li key={m.id} className="flex items-center gap-3 p-4">
+                  <span className={`w-12 shrink-0 text-xs ${ui.muted}`}>{shortTime(m.at, lang)}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold">{m.description}</p>
+                    <p className={`text-xs ${ui.muted}`}>{t(`cash.mov.${m.type}` as DictKey)}</p>
+                  </div>
+                  <span className={`font-bold ${out ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                    {out ? '−' : '+'}{fmt(m.amount)}
                   </span>
-                  <span>{formatMoney(taxAmountUsd)}</span>
-                </div>
-                <div className="flex justify-between text-base font-extrabold text-emerald-400 pt-1 border-t border-slate-800">
-                  <span>Total a Cobrar:</span>
-                  <span>{formatMoney(grandTotalUsd)}</span>
-                </div>
-              </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </Card>
+    </div>
+  );
+}
 
-              <button
-                type="submit"
-                disabled={cart.length === 0}
-                className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold py-3 rounded-xl text-sm transition cursor-pointer"
-              >
-                ✓ Emitir Comprobante y Registrar Cobro
+/* ---------------- Cierre ciego ---------------- */
+function CloseTab({
+  shiftId, fmt, busy, setBusy, onDone, flash,
+}: Common & { shiftId: string; fmt: (n: number) => string }) {
+  const { t } = useT();
+  const [declared, setDeclared] = useState('');
+  const [confirming, setConfirming] = useState(false);
+  const n = parseAmount(declared);
+  const valid = declared !== '' && !Number.isNaN(n) && n >= 0;
+
+  const close = async () => {
+    setBusy(true);
+    try {
+      const status = await rpc<'closed_ok' | 'discrepancy'>('close_shift', { p_shift: shiftId, p_declared_cash: n });
+      flash(status === 'closed_ok', status === 'closed_ok' ? t('cash.closedOk') : t('cash.closedDiff'));
+      setConfirming(false);
+      await onDone();
+    } catch (err) {
+      flash(false, cashError((err as Error).message, t));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mx-auto w-full max-w-lg">
+      <Card className="space-y-4">
+        <p className={`text-sm ${ui.muted}`}>{t('cash.closeHint')}</p>
+        <div>
+          <label className={ui.label}>{t('cash.counted')}</label>
+          <input
+            inputMode="decimal"
+            value={declared}
+            onChange={(e) => { setDeclared(e.target.value); setConfirming(false); }}
+            className={`${ui.input} text-lg`}
+          />
+        </div>
+        {!confirming ? (
+          <button type="button" disabled={!valid || busy} onClick={() => setConfirming(true)} className={`${ui.btnPrimary} w-full`}>
+            🔒 {t('cash.closeBtn')}
+          </button>
+        ) : (
+          <div className="space-y-3 rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-500/30 dark:bg-amber-500/10">
+            <p className="text-sm font-semibold">{t('cash.closeConfirm', { amount: fmt(n) })}</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => setConfirming(false)} className={ui.btnGhost}>{t('cash.cancel')}</button>
+              <button type="button" disabled={busy} onClick={close} className={ui.btnPrimary}>
+                {busy ? t('common.wait') : t('cash.closeBtn')}
               </button>
             </div>
-          </form>
-        </div>
-      </div>
-    </main>
+          </div>
+        )}
+      </Card>
+    </div>
   );
 }
