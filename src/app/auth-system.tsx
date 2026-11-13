@@ -13,6 +13,18 @@ import { COUNTRIES, CountryCode, TaxRegimeId, BusinessSectorId } from './languag
 
 export type UserRole = 'superadmin' | 'owner' | 'cashier' | 'vendor' | 'collector' | 'supervisor';
 
+// Panel de inicio de cada rol (un solo botón "Ingresar" para todos)
+export function homeForRole(role: UserRole): string {
+  switch (role) {
+    case 'superadmin': return '/dashboard/admin';
+    case 'owner':
+    case 'supervisor': return '/dashboard/owner';
+    case 'cashier': return '/dashboard/cashier';
+    case 'collector': return '/dashboard/collector';
+    default: return '/dashboard/vendor';
+  }
+}
+
 export interface WorkerAccount {
   id: string;
   companyId: string;

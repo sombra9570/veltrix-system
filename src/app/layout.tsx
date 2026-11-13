@@ -15,8 +15,12 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Veltrix System',
-  description: 'Panel de Control SaaS',
+  description: 'Control financiero para tu negocio: ventas, caja, inventario, créditos y cobranza.',
 };
+
+// Aplica el tema guardado antes de pintar la página (evita el parpadeo).
+// Por defecto: oscuro.
+const themeScript = `try{var t=localStorage.getItem('veltrix_theme');if(t!=='light'){document.documentElement.classList.add('dark')}}catch(e){document.documentElement.classList.add('dark')}`;
 
 export default function RootLayout({
   children,
@@ -26,8 +30,12 @@ export default function RootLayout({
   return (
     <html
       lang="es"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-full flex flex-col">
         <LanguageProvider>{children}</LanguageProvider>
       </body>
