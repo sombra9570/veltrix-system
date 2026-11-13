@@ -632,6 +632,33 @@ const es = {
   'chat.readOnly': "Solo el dueño y los supervisores escriben en Avisos.",
   'chat.sendFailed': "No se pudo enviar. Inténtalo otra vez.",
   'chat.offline': "Sin conexión: el mensaje no se envió.",
+
+  // ---------- Ayuda ----------
+  'help.title': "Ayuda",
+  'help.subtitle': "Las dudas más comunes, paso a paso.",
+  'help.search': "Buscar en la ayuda…",
+  'help.noResults': "No encontramos esa duda.",
+  'help.more': "¿No resolviste tu duda? Escríbenos a",
+  'help.q1': "¿Cómo agrego a un trabajador?",
+  'help.a1': "1. Entra a Equipo → Agregar trabajador.\n2. Pon nombre, correo, rol (cajero, vendedor, cobrador…), sucursal y una contraseña.\n3. Entrégale el correo y la contraseña: entra por el mismo botón \"Ingresar\" y ve solo su trabajo.",
+  'help.q2': "¿Cómo abro y cierro la caja?",
+  'help.a2': "1. El cajero entra y elige su caja, cuenta el efectivo inicial y toca Abrir caja.\n2. Cobra en \"Por cobrar\", registra gastos en \"Movimientos\".\n3. Al final, en \"Cerrar caja\", cuenta todo el efectivo y lo declara. El sistema compara después: si no cuadra, el supervisor lo revisa.",
+  'help.q3': "¿Cómo hago una venta?",
+  'help.a3': "1. Entra a Vender y toca los productos.\n2. Elige Contado y toca \"Enviar a caja\".\n3. El cajero la ve al instante en \"Por cobrar\" y la cobra en efectivo, QR o tarjeta.",
+  'help.q4': "¿Cómo vendo a crédito y cobro las cuotas?",
+  'help.a4': "1. Registra al cliente en Clientes (con límite de crédito).\n2. En Vender elige Crédito, el cliente, cuántas cuotas y cada cuánto.\n3. Si pasa el límite, el dueño o supervisor lo aprueba en Clientes.\n4. Las cuotas se cobran en caja (pestaña Cuotas) o en la calle con el cobrador.",
+  'help.q5': "¿Cómo cargo productos y stock?",
+  'help.a5': "1. Entra a Productos → Nuevo producto.\n2. Pon nombre y precio final al cliente. Si es mercadería, activa \"Controlar stock\".\n3. Toca el número de stock para escribir cuánto hay en esa sucursal. Baja solo con cada venta.",
+  'help.q6': "¿Cómo trabaja el cobrador sin internet?",
+  'help.a6': "1. En Rutas de cobro asigna una ruta, un cobrador y sus clientes.\n2. El cobrador abre la app una vez con señal al empezar el día.\n3. Cobra, registra visitas y gastos aunque no haya señal: todo se guarda en el teléfono y se envía solo al volver la conexión.\n4. Al terminar, toca Rendir y entrega el efectivo al cajero.",
+  'help.q7': "¿Cómo publico mi tienda virtual?",
+  'help.a7': "1. Entra a Tienda virtual, pon logo, nombre y WhatsApp.\n2. En cada producto toca Publicar y agrega una foto.\n3. Activa \"Tienda publicada\" y comparte el enlace o el QR. Los pedidos te llegan por WhatsApp.",
+  'help.q8': "¿Cómo agrego una sucursal u otro país?",
+  'help.a8': "1. Entra a Sucursales → Agregar sucursal: se crea con su propia caja.\n2. Para operar en otro país (con su moneda e impuesto), usa \"Operar en otro país\" (plan Enterprise).\n3. Si llegas al límite de tu plan, puedes comprar sucursales extra o mejorar el plan.",
+  'help.q9': "Olvidé mi contraseña, ¿qué hago?",
+  'help.a9': "1. En Ingresar toca \"¿Olvidaste tu contraseña?\" y escribe tu correo.\n2. Abre el correo más reciente y toca el enlace.\n3. Escribe tu contraseña nueva (usa el ojito para verla). Si eres trabajador, también puede ayudarte el dueño.",
+  'help.q10': "¿Cómo instalo Veltrix en el celular o la computadora?",
+  'help.a10': "Android y computadora: toca \"Instalar app\" en la página de inicio o el ícono de instalar en la barra del navegador.\niPhone: abre veltrixsystem.app en Safari, toca Compartir → \"Agregar a inicio\".\nQueda como una app más, en pantalla completa.",
 };
 
 export default es;

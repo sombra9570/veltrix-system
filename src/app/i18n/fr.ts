@@ -623,6 +623,33 @@ const fr: Record<DictKey, string> = {
   'chat.readOnly': "Seuls le propriétaire et les superviseurs écrivent dans Annonces.",
   'chat.sendFailed': "Échec de l’envoi. Réessayez.",
   'chat.offline': "Hors ligne : le message n’a pas été envoyé.",
+
+  // ---------- Ayuda ----------
+  'help.title': "Aide",
+  'help.subtitle': "Les questions les plus fréquentes, étape par étape.",
+  'help.search': "Rechercher dans l’aide…",
+  'help.noResults': "Nous n’avons pas trouvé cette question.",
+  'help.more': "Besoin d’aide ? Écrivez-nous à",
+  'help.q1': "Comment ajouter un employé ?",
+  'help.a1': "1. Allez dans Équipe → Ajouter un employé.\n2. Saisissez nom, e-mail, rôle (caissier, vendeur, encaisseur…), point de vente et un mot de passe.\n3. Donnez-lui l’e-mail et le mot de passe : il se connecte avec le même bouton « Se connecter » et ne voit que son travail.",
+  'help.q2': "Comment ouvrir et clôturer la caisse ?",
+  'help.a2': "1. Le caissier se connecte, choisit sa caisse, compte le fond initial et touche Ouvrir la caisse.\n2. Il encaisse dans « À encaisser » et note les dépenses dans « Mouvements ».\n3. À la fin, dans « Clôturer la caisse », il compte toutes les espèces et les déclare. Le système compare ensuite ; en cas d’écart, le superviseur vérifie.",
+  'help.q3': "Comment faire une vente ?",
+  'help.a3': "1. Allez dans Vendre et touchez les produits.\n2. Choisissez Comptant et touchez « Envoyer à la caisse ».\n3. Le caissier la voit tout de suite dans « À encaisser » et encaisse en espèces, QR ou carte.",
+  'help.q4': "Comment vendre à crédit et encaisser les échéances ?",
+  'help.a4': "1. Enregistrez le client dans Clients (avec un plafond de crédit).\n2. Dans Vendre choisissez Crédit, le client, le nombre d’échéances et la fréquence.\n3. S’il dépasse le plafond, le propriétaire ou le superviseur approuve dans Clients.\n4. Les échéances s’encaissent à la caisse (onglet Échéances) ou sur le terrain par l’encaisseur.",
+  'help.q5': "Comment ajouter des produits et du stock ?",
+  'help.a5': "1. Allez dans Produits → Nouveau produit.\n2. Saisissez le nom et le prix final client. Pour la marchandise, activez « Suivre le stock ».\n3. Touchez le chiffre du stock pour indiquer la quantité du point de vente. Il baisse à chaque vente.",
+  'help.q6': "Comment l’encaisseur travaille-t-il sans internet ?",
+  'help.a6': "1. Dans Tournées de recouvrement, définissez la tournée, l’encaisseur et les clients.\n2. L’encaisseur ouvre l’app une fois avec du réseau en début de journée.\n3. Il encaisse, note visites et dépenses même sans réseau : tout reste sur le téléphone et s’envoie au retour de la connexion.\n4. À la fin, il touche Remettre et donne les espèces au caissier.",
+  'help.q7': "Comment publier ma boutique en ligne ?",
+  'help.a7': "1. Allez dans Boutique en ligne et ajoutez logo, nom et WhatsApp.\n2. Sur chaque produit touchez Publier et ajoutez une photo.\n3. Activez « Boutique publiée » et partagez le lien ou le QR. Les commandes arrivent sur WhatsApp.",
+  'help.q8': "Comment ajouter un point de vente ou un autre pays ?",
+  'help.a8': "1. Allez dans Points de vente → Ajouter : il est créé avec sa propre caisse.\n2. Pour opérer dans un autre pays (avec sa devise et sa taxe), utilisez « Opérer dans un autre pays » (forfait Enterprise).\n3. Si vous atteignez la limite du forfait, achetez des points de vente supplémentaires ou passez au forfait supérieur.",
+  'help.q9': "J’ai oublié mon mot de passe, que faire ?",
+  'help.a9': "1. Dans Se connecter touchez « Mot de passe oublié ? » et saisissez votre e-mail.\n2. Ouvrez l’e-mail le plus récent et touchez le lien.\n3. Saisissez le nouveau mot de passe (l’œil permet de le voir). Les employés peuvent aussi demander au propriétaire.",
+  'help.q10': "Comment installer Veltrix sur le téléphone ou l’ordinateur ?",
+  'help.a10': "Android et ordinateur : touchez « Installer l’app » sur la page d’accueil ou l’icône d’installation dans la barre du navigateur.\niPhone : ouvrez veltrixsystem.app dans Safari, touchez Partager → « Sur l’écran d’accueil ».\nElle fonctionne comme une app, en plein écran.",
 };
 
 export default fr;

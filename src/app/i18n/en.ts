@@ -623,6 +623,33 @@ const en: Record<DictKey, string> = {
   'chat.readOnly': "Only the owner and supervisors post in Announcements.",
   'chat.sendFailed': "Could not send. Try again.",
   'chat.offline': "Offline: the message was not sent.",
+
+  // ---------- Ayuda ----------
+  'help.title': "Help",
+  'help.subtitle': "The most common questions, step by step.",
+  'help.search': "Search help…",
+  'help.noResults': "We could not find that question.",
+  'help.more': "Still need help? Write to us at",
+  'help.q1': "How do I add a worker?",
+  'help.a1': "1. Go to Team → Add worker.\n2. Enter name, email, role (cashier, seller, collector…), branch and a password.\n3. Give them the email and password: they sign in with the same \"Sign in\" button and only see their own work.",
+  'help.q2': "How do I open and close the register?",
+  'help.a2': "1. The cashier signs in, picks a register, counts the opening cash and taps Open register.\n2. They charge in \"To charge\" and record expenses in \"Cash movements\".\n3. At the end, in \"Close register\", they count all the cash and declare it. The system compares afterwards; if it does not match, the supervisor reviews it.",
+  'help.q3': "How do I make a sale?",
+  'help.a3': "1. Go to Sell and tap the products.\n2. Choose Cash and tap \"Send to register\".\n3. The cashier sees it instantly in \"To charge\" and takes cash, QR or card.",
+  'help.q4': "How do I sell on credit and collect installments?",
+  'help.a4': "1. Register the customer in Customers (with a credit limit).\n2. In Sell choose Credit, the customer, how many installments and how often.\n3. If it exceeds the limit, the owner or supervisor approves it in Customers.\n4. Installments are collected at the register (Installments tab) or in the street by the collector.",
+  'help.q5': "How do I add products and stock?",
+  'help.a5': "1. Go to Products → New product.\n2. Enter the name and the final customer price. For goods, turn on \"Track stock\".\n3. Tap the stock number to enter how much there is in that branch. It goes down with each sale.",
+  'help.q6': "How does the collector work offline?",
+  'help.a6': "1. In Collection routes assign a route, a collector and their customers.\n2. The collector opens the app once with signal at the start of the day.\n3. They collect, record visits and expenses even without signal: everything is saved on the phone and sent when the connection returns.\n4. At the end they tap Hand in and give the cash to the cashier.",
+  'help.q7': "How do I publish my online store?",
+  'help.a7': "1. Go to Online store and add logo, name and WhatsApp.\n2. On each product tap Publish and add a photo.\n3. Turn on \"Store published\" and share the link or QR. Orders reach you on WhatsApp.",
+  'help.q8': "How do I add a branch or another country?",
+  'help.a8': "1. Go to Branches → Add branch: it is created with its own register.\n2. To operate in another country (with its currency and tax) use \"Operate in another country\" (Enterprise plan).\n3. If you reach your plan limit you can buy extra branches or upgrade.",
+  'help.q9': "I forgot my password, what do I do?",
+  'help.a9': "1. In Sign in tap \"Forgot your password?\" and enter your email.\n2. Open the most recent email and tap the link.\n3. Enter your new password (use the eye to see it). Workers can also ask the owner for help.",
+  'help.q10': "How do I install Veltrix on my phone or computer?",
+  'help.a10': "Android and computer: tap \"Install app\" on the home page or the install icon in the browser bar.\niPhone: open veltrixsystem.app in Safari, tap Share → \"Add to Home Screen\".\nIt works like any other app, full screen.",
 };
 
 export default en;

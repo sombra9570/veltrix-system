@@ -623,6 +623,33 @@ const it: Record<DictKey, string> = {
   'chat.readOnly': "Solo il titolare e i supervisori scrivono negli Avvisi.",
   'chat.sendFailed': "Invio non riuscito. Riprova.",
   'chat.offline': "Offline: il messaggio non è stato inviato.",
+
+  // ---------- Ayuda ----------
+  'help.title': "Aiuto",
+  'help.subtitle': "Le domande più comuni, passo dopo passo.",
+  'help.search': "Cerca nell’aiuto…",
+  'help.noResults': "Non abbiamo trovato questa domanda.",
+  'help.more': "Serve altro aiuto? Scrivici a",
+  'help.q1': "Come aggiungo un dipendente?",
+  'help.a1': "1. Vai in Team → Aggiungi dipendente.\n2. Inserisci nome, email, ruolo (cassiere, venditore, esattore…), sede e una password.\n3. Consegnagli email e password: entra con lo stesso pulsante \"Accedi\" e vede solo il suo lavoro.",
+  'help.q2': "Come apro e chiudo la cassa?",
+  'help.a2': "1. Il cassiere entra, sceglie la cassa, conta il contante iniziale e tocca Apri cassa.\n2. Incassa in \"Da incassare\" e registra le spese in \"Movimenti\".\n3. Alla fine, in \"Chiudi cassa\", conta tutto il contante e lo dichiara. Il sistema confronta dopo; se non torna, il supervisore verifica.",
+  'help.q3': "Come faccio una vendita?",
+  'help.a3': "1. Vai in Vendi e tocca i prodotti.\n2. Scegli Contanti e tocca \"Invia alla cassa\".\n3. Il cassiere la vede subito in \"Da incassare\" e incassa in contanti, QR o carta.",
+  'help.q4': "Come vendo a credito e incasso le rate?",
+  'help.a4': "1. Registra il cliente in Clienti (con limite di credito).\n2. In Vendi scegli Credito, il cliente, quante rate e la frequenza.\n3. Se supera il limite, il titolare o il supervisore approva in Clienti.\n4. Le rate si incassano in cassa (scheda Rate) o in strada con l’esattore.",
+  'help.q5': "Come carico prodotti e magazzino?",
+  'help.a5': "1. Vai in Prodotti → Nuovo prodotto.\n2. Inserisci nome e prezzo finale al cliente. Per la merce attiva \"Gestisci magazzino\".\n3. Tocca il numero di magazzino per indicare quanto c’è nella sede. Scende a ogni vendita.",
+  'help.q6': "Come lavora l’esattore senza internet?",
+  'help.a6': "1. In Giri di riscossione assegna giro, esattore e clienti.\n2. L’esattore apre l’app una volta con segnale all’inizio della giornata.\n3. Incassa, registra visite e spese anche senza segnale: tutto resta sul telefono e si invia quando torna la connessione.\n4. Alla fine tocca Rendiconta e consegna i contanti al cassiere.",
+  'help.q7': "Come pubblico il mio negozio online?",
+  'help.a7': "1. Vai in Negozio online e metti logo, nome e WhatsApp.\n2. Su ogni prodotto tocca Pubblica e aggiungi una foto.\n3. Attiva \"Negozio pubblicato\" e condividi il link o il QR. Gli ordini arrivano su WhatsApp.",
+  'help.q8': "Come aggiungo una sede o un altro paese?",
+  'help.a8': "1. Vai in Sedi → Aggiungi sede: viene creata con la sua cassa.\n2. Per operare in un altro paese (con valuta e imposte) usa \"Opera in un altro paese\" (piano Enterprise).\n3. Se raggiungi il limite del piano puoi comprare sedi extra o passare a un piano superiore.",
+  'help.q9': "Ho dimenticato la password, cosa faccio?",
+  'help.a9': "1. In Accedi tocca \"Password dimenticata?\" e scrivi la tua email.\n2. Apri l’email più recente e tocca il link.\n3. Scrivi la nuova password (usa l’occhio per vederla). I dipendenti possono chiedere aiuto anche al titolare.",
+  'help.q10': "Come installo Veltrix sul telefono o sul computer?",
+  'help.a10': "Android e computer: tocca \"Installa app\" nella pagina iniziale o l’icona di installazione nella barra del browser.\niPhone: apri veltrixsystem.app in Safari, tocca Condividi → \"Aggiungi alla schermata Home\".\nFunziona come un’app, a schermo intero.",
 };
 
 export default it;

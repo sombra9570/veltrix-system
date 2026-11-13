@@ -623,6 +623,33 @@ const de: Record<DictKey, string> = {
   'chat.readOnly': "Nur Inhaber und Supervisoren schreiben in Mitteilungen.",
   'chat.sendFailed': "Senden fehlgeschlagen. Versuche es erneut.",
   'chat.offline': "Offline: Die Nachricht wurde nicht gesendet.",
+
+  // ---------- Ayuda ----------
+  'help.title': "Hilfe",
+  'help.subtitle': "Die häufigsten Fragen, Schritt für Schritt.",
+  'help.search': "Hilfe durchsuchen…",
+  'help.noResults': "Diese Frage haben wir nicht gefunden.",
+  'help.more': "Noch Fragen? Schreib uns an",
+  'help.q1': "Wie füge ich einen Mitarbeiter hinzu?",
+  'help.a1': "1. Öffne Team → Mitarbeiter hinzufügen.\n2. Gib Name, E-Mail, Rolle (Kassierer, Verkäufer, Inkasso…), Filiale und ein Passwort ein.\n3. Gib ihm E-Mail und Passwort: Er meldet sich über denselben „Anmelden“-Button an und sieht nur seine Arbeit.",
+  'help.q2': "Wie öffne und schließe ich die Kasse?",
+  'help.a2': "1. Der Kassierer meldet sich an, wählt seine Kasse, zählt den Anfangsbestand und tippt auf Kasse öffnen.\n2. Er kassiert unter „Zu kassieren“ und erfasst Ausgaben unter „Kassenbewegungen“.\n3. Am Ende zählt er unter „Kasse schließen“ das ganze Bargeld und meldet es. Das System vergleicht danach; bei Differenz prüft der Supervisor.",
+  'help.q3': "Wie mache ich einen Verkauf?",
+  'help.a3': "1. Öffne Verkaufen und tippe auf die Produkte.\n2. Wähle Bar und tippe auf „An die Kasse senden“.\n3. Der Kassierer sieht ihn sofort unter „Zu kassieren“ und kassiert bar, per QR oder Karte.",
+  'help.q4': "Wie verkaufe ich auf Kredit und kassiere Raten?",
+  'help.a4': "1. Lege den Kunden unter Kunden an (mit Kreditlimit).\n2. Wähle unter Verkaufen Kredit, den Kunden, die Anzahl der Raten und die Häufigkeit.\n3. Wird das Limit überschritten, genehmigt der Inhaber oder Supervisor unter Kunden.\n4. Raten werden an der Kasse (Reiter Raten) oder unterwegs vom Inkasso kassiert.",
+  'help.q5': "Wie lege ich Produkte und Bestand an?",
+  'help.a5': "1. Öffne Produkte → Neues Produkt.\n2. Gib Name und Endpreis ein. Bei Ware schalte „Bestand führen“ ein.\n3. Tippe auf die Bestandszahl, um die Menge der Filiale einzugeben. Sie sinkt mit jedem Verkauf.",
+  'help.q6': "Wie arbeitet das Inkasso ohne Internet?",
+  'help.a6': "1. Lege unter Inkasso-Touren Tour, Kassierer und Kunden fest.\n2. Der Kassierer öffnet die App morgens einmal mit Netz.\n3. Er kassiert, erfasst Besuche und Ausgaben auch ohne Netz: Alles bleibt auf dem Handy und wird gesendet, sobald Netz da ist.\n4. Am Ende tippt er auf Abrechnen und gibt das Bargeld an der Kasse ab.",
+  'help.q7': "Wie veröffentliche ich meinen Onlineshop?",
+  'help.a7': "1. Öffne Onlineshop und füge Logo, Name und WhatsApp hinzu.\n2. Tippe bei jedem Produkt auf Veröffentlichen und füge ein Foto hinzu.\n3. Schalte „Shop veröffentlicht“ ein und teile Link oder QR-Code. Bestellungen kommen per WhatsApp.",
+  'help.q8': "Wie füge ich eine Filiale oder ein anderes Land hinzu?",
+  'help.a8': "1. Öffne Filialen → Filiale hinzufügen: Sie wird mit eigener Kasse angelegt.\n2. Für ein anderes Land (mit eigener Währung und Steuer) nutze „In einem anderen Land arbeiten“ (Enterprise-Plan).\n3. Erreichst du das Planlimit, kannst du Filialen dazukaufen oder upgraden.",
+  'help.q9': "Ich habe mein Passwort vergessen. Was tun?",
+  'help.a9': "1. Tippe bei Anmelden auf „Passwort vergessen?“ und gib deine E-Mail ein.\n2. Öffne die neueste E-Mail und tippe auf den Link.\n3. Gib dein neues Passwort ein (mit dem Auge siehst du es). Mitarbeiter können auch den Inhaber fragen.",
+  'help.q10': "Wie installiere ich Veltrix auf Handy oder Computer?",
+  'help.a10': "Android und Computer: Tippe auf der Startseite auf „App installieren“ oder auf das Installationssymbol in der Browserleiste.\niPhone: Öffne veltrixsystem.app in Safari, tippe auf Teilen → „Zum Home-Bildschirm“.\nSie läuft wie eine App, im Vollbild.",
 };
 
 export default de;

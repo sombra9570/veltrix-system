@@ -623,6 +623,33 @@ const pt: Record<DictKey, string> = {
   'chat.readOnly': "Só o dono e os supervisores escrevem em Avisos.",
   'chat.sendFailed': "Não foi possível enviar. Tente de novo.",
   'chat.offline': "Sem conexão: a mensagem não foi enviada.",
+
+  // ---------- Ayuda ----------
+  'help.title': "Ajuda",
+  'help.subtitle': "As dúvidas mais comuns, passo a passo.",
+  'help.search': "Buscar na ajuda…",
+  'help.noResults': "Não encontramos essa dúvida.",
+  'help.more': "Ainda com dúvida? Escreva para",
+  'help.q1': "Como adiciono um funcionário?",
+  'help.a1': "1. Vá em Equipe → Adicionar funcionário.\n2. Informe nome, e-mail, função (caixa, vendedor, cobrador…), filial e uma senha.\n3. Entregue o e-mail e a senha: ele entra pelo mesmo botão \"Entrar\" e vê só o seu trabalho.",
+  'help.q2': "Como abro e fecho o caixa?",
+  'help.a2': "1. O caixa entra, escolhe o caixa, conta o dinheiro inicial e toca Abrir caixa.\n2. Cobra em \"A cobrar\" e registra despesas em \"Movimentações\".\n3. No fim, em \"Fechar caixa\", conta todo o dinheiro e declara. O sistema compara depois; se não bater, o supervisor revisa.",
+  'help.q3': "Como faço uma venda?",
+  'help.a3': "1. Vá em Vender e toque nos produtos.\n2. Escolha À vista e toque \"Enviar ao caixa\".\n3. O caixa vê na hora em \"A cobrar\" e recebe em dinheiro, QR/Pix ou cartão.",
+  'help.q4': "Como vendo a prazo e cobro as parcelas?",
+  'help.a4': "1. Cadastre o cliente em Clientes (com limite de crédito).\n2. Em Vender escolha A prazo, o cliente, quantas parcelas e a frequência.\n3. Se passar do limite, o dono ou supervisor aprova em Clientes.\n4. As parcelas são cobradas no caixa (aba Parcelas) ou na rua pelo cobrador.",
+  'help.q5': "Como cadastro produtos e estoque?",
+  'help.a5': "1. Vá em Produtos → Novo produto.\n2. Informe o nome e o preço final ao cliente. Se for mercadoria, ative \"Controlar estoque\".\n3. Toque no número do estoque para informar quanto há na filial. Ele baixa a cada venda.",
+  'help.q6': "Como o cobrador trabalha sem internet?",
+  'help.a6': "1. Em Rotas de cobrança defina a rota, o cobrador e os clientes.\n2. O cobrador abre o app uma vez com sinal no início do dia.\n3. Cobra, registra visitas e despesas mesmo sem sinal: tudo fica no telefone e é enviado quando a conexão volta.\n4. No fim, toca Prestar contas e entrega o dinheiro ao caixa.",
+  'help.q7': "Como publico minha loja virtual?",
+  'help.a7': "1. Vá em Loja virtual e coloque logo, nome e WhatsApp.\n2. Em cada produto toque Publicar e adicione uma foto.\n3. Ative \"Loja publicada\" e compartilhe o link ou o QR. Os pedidos chegam pelo WhatsApp.",
+  'help.q8': "Como adiciono uma filial ou outro país?",
+  'help.a8': "1. Vá em Filiais → Adicionar filial: ela é criada com seu próprio caixa.\n2. Para operar em outro país (com sua moeda e imposto) use \"Operar em outro país\" (plano Enterprise).\n3. Se atingir o limite do plano, compre filiais extras ou faça upgrade.",
+  'help.q9': "Esqueci minha senha, o que faço?",
+  'help.a9': "1. Em Entrar toque \"Esqueceu sua senha?\" e digite seu e-mail.\n2. Abra o e-mail mais recente e toque no link.\n3. Digite a nova senha (use o olho para vê-la). Funcionários também podem pedir ajuda ao dono.",
+  'help.q10': "Como instalo o Veltrix no celular ou no computador?",
+  'help.a10': "Android e computador: toque \"Instalar app\" na página inicial ou no ícone de instalar na barra do navegador.\niPhone: abra veltrixsystem.app no Safari, toque Compartilhar → \"Adicionar à Tela de Início\".\nFica como mais um app, em tela cheia.",
 };
 
 export default pt;

@@ -4,6 +4,7 @@ import { rpc } from '../../lib/supabase';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ThemeToggle } from '../theme';
+import { HelpButton } from './help';
 import { RegionSelectors, ui } from '../site-header';
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
@@ -143,6 +144,7 @@ export function AppShell({
           <p className="truncate text-sm font-bold text-slate-900 lg:hidden dark:text-white">{orgName}</p>
           <div className="ml-auto flex items-center gap-2 rtl:ml-0 rtl:mr-auto">
             <div className="hidden sm:block"><RegionSelectors /></div>
+            <HelpButton />
             <ThemeToggle />
           </div>
         </header>
