@@ -14,6 +14,10 @@ const en: Record<DictKey, string> = {
   'common.wait': 'One moment…',
   'common.goToPanel': 'Go to my dashboard',
   'common.perMonth': '/ month',
+  'pwa.install': 'Install app',
+  'pwa.iosTitle': 'Install on iPhone',
+  'pwa.iosSteps': 'Tap the Share button (the square with the up arrow), then “Add to Home Screen”.',
+  'pwa.close': 'Got it',
   'footer.text': 'Veltrix System © {year} · Financial control for businesses',
 
   'home.badge': 'Financial control for your business',
@@ -55,7 +59,7 @@ const en: Record<DictKey, string> = {
   'plan.pro.i3': 'Credit and field collections',
   'plan.enterprise.desc': 'For companies with several branches',
   'plan.enterprise.i1': 'All modules',
-  'plan.enterprise.i2': 'Unlimited branches',
+  'plan.enterprise.i2': 'Up to 10 branches',
   'plan.enterprise.i3': 'Priority support',
 
   'login.title': 'Log in',

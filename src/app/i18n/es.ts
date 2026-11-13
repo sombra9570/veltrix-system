@@ -15,6 +15,10 @@ const es = {
   'common.wait': 'Un momento…',
   'common.goToPanel': 'Ir a mi panel',
   'common.perMonth': '/ mes',
+  'pwa.install': 'Instalar app',
+  'pwa.iosTitle': 'Instalar en iPhone',
+  'pwa.iosSteps': 'Toca el botón Compartir (el cuadrito con la flecha hacia arriba) y luego «Agregar a pantalla de inicio».',
+  'pwa.close': 'Entendido',
   'footer.text': 'Veltrix System © {year} · Control financiero para negocios',
 
   // ---------- Inicio ----------
@@ -57,7 +61,7 @@ const es = {
   'plan.pro.i3': 'Créditos y cobranza en calle',
   'plan.enterprise.desc': 'Para empresas con varias sucursales',
   'plan.enterprise.i1': 'Todos los módulos',
-  'plan.enterprise.i2': 'Sucursales ilimitadas',
+  'plan.enterprise.i2': 'Hasta 10 sucursales',
   'plan.enterprise.i3': 'Soporte prioritario',
 
   // ---------- Ingresar ----------

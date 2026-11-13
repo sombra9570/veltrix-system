@@ -14,6 +14,10 @@ const hi: Record<DictKey, string> = {
   'common.wait': 'एक पल…',
   'common.goToPanel': 'मेरे डैशबोर्ड पर जाएँ',
   'common.perMonth': '/ माह',
+  'pwa.install': 'ऐप इंस्टॉल करें',
+  'pwa.iosTitle': 'iPhone पर इंस्टॉल करें',
+  'pwa.iosSteps': 'शेयर बटन (ऊपर तीर वाला चौकोर) दबाएँ, फिर “होम स्क्रीन में जोड़ें” चुनें।',
+  'pwa.close': 'समझ गया',
   'footer.text': 'Veltrix System © {year} · व्यवसायों के लिए वित्तीय नियंत्रण',
 
   'home.badge': 'आपके व्यवसाय के लिए वित्तीय नियंत्रण',
@@ -55,7 +59,7 @@ const hi: Record<DictKey, string> = {
   'plan.pro.i3': 'उधार और फ़ील्ड वसूली',
   'plan.enterprise.desc': 'कई शाखाओं वाली कंपनियों के लिए',
   'plan.enterprise.i1': 'सभी मॉड्यूल',
-  'plan.enterprise.i2': 'असीमित शाखाएँ',
+  'plan.enterprise.i2': '10 शाखाओं तक',
   'plan.enterprise.i3': 'प्राथमिकता सहायता',
 
   'login.title': 'लॉग इन',

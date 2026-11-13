@@ -14,6 +14,10 @@ const ar: Record<DictKey, string> = {
   'common.wait': 'لحظة من فضلك…',
   'common.goToPanel': 'الذهاب إلى لوحتي',
   'common.perMonth': '/ شهريًا',
+  'pwa.install': 'تثبيت التطبيق',
+  'pwa.iosTitle': 'التثبيت على iPhone',
+  'pwa.iosSteps': 'اضغط زر المشاركة (المربع ذو السهم للأعلى)، ثم «إضافة إلى الشاشة الرئيسية».',
+  'pwa.close': 'حسنًا',
   'footer.text': 'Veltrix System © {year} · إدارة مالية للأعمال',
 
   'home.badge': 'إدارة مالية لعملك',
@@ -55,7 +59,7 @@ const ar: Record<DictKey, string> = {
   'plan.pro.i3': 'الائتمان والتحصيل الميداني',
   'plan.enterprise.desc': 'للشركات ذات الفروع المتعددة',
   'plan.enterprise.i1': 'كل الوحدات',
-  'plan.enterprise.i2': 'فروع غير محدودة',
+  'plan.enterprise.i2': 'حتى 10 فروع',
   'plan.enterprise.i3': 'دعم ذو أولوية',
 
   'login.title': 'تسجيل الدخول',

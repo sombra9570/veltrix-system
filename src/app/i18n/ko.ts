@@ -14,6 +14,10 @@ const ko: Record<DictKey, string> = {
   'common.wait': '잠시만 기다려 주세요…',
   'common.goToPanel': '내 대시보드로 이동',
   'common.perMonth': '/ 월',
+  'pwa.install': '앱 설치',
+  'pwa.iosTitle': 'iPhone에 설치',
+  'pwa.iosSteps': '공유 버튼(위쪽 화살표가 있는 네모)을 누른 뒤 ‘홈 화면에 추가’를 선택하세요.',
+  'pwa.close': '확인',
   'footer.text': 'Veltrix System © {year} · 사업자를 위한 재무 관리',
 
   'home.badge': '내 사업을 위한 재무 관리',
@@ -55,7 +59,7 @@ const ko: Record<DictKey, string> = {
   'plan.pro.i3': '외상과 현장 수금',
   'plan.enterprise.desc': '여러 지점을 가진 기업에',
   'plan.enterprise.i1': '모든 모듈',
-  'plan.enterprise.i2': '지점 무제한',
+  'plan.enterprise.i2': '최대 10개 지점',
   'plan.enterprise.i3': '우선 지원',
 
   'login.title': '로그인',

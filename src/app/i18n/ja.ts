@@ -14,6 +14,10 @@ const ja: Record<DictKey, string> = {
   'common.wait': '少々お待ちください…',
   'common.goToPanel': 'マイパネルへ',
   'common.perMonth': '/ 月',
+  'pwa.install': 'アプリをインストール',
+  'pwa.iosTitle': 'iPhoneにインストール',
+  'pwa.iosSteps': '共有ボタン（上向き矢印の四角）をタップし、「ホーム画面に追加」を選んでください。',
+  'pwa.close': 'わかりました',
   'footer.text': 'Veltrix System © {year} · 事業者のための財務管理',
 
   'home.badge': 'あなたのビジネスの財務管理',
@@ -55,7 +59,7 @@ const ja: Record<DictKey, string> = {
   'plan.pro.i3': '掛け売りと訪問回収',
   'plan.enterprise.desc': '複数の支店を持つ企業に',
   'plan.enterprise.i1': 'すべてのモジュール',
-  'plan.enterprise.i2': '支店数無制限',
+  'plan.enterprise.i2': '最大10支店',
   'plan.enterprise.i3': '優先サポート',
 
   'login.title': 'ログイン',

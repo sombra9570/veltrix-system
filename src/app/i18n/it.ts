@@ -14,6 +14,10 @@ const it: Record<DictKey, string> = {
   'common.wait': 'Un momento…',
   'common.goToPanel': 'Vai al mio pannello',
   'common.perMonth': '/ mese',
+  'pwa.install': 'Installa app',
+  'pwa.iosTitle': 'Installa su iPhone',
+  'pwa.iosSteps': 'Tocca il pulsante Condividi (il quadrato con la freccia in su), poi «Aggiungi alla schermata Home».',
+  'pwa.close': 'Ho capito',
   'footer.text': 'Veltrix System © {year} · Controllo finanziario per aziende',
 
   'home.badge': 'Controllo finanziario per la tua attività',
@@ -55,7 +59,7 @@ const it: Record<DictKey, string> = {
   'plan.pro.i3': 'Crediti e riscossione sul campo',
   'plan.enterprise.desc': 'Per aziende con più filiali',
   'plan.enterprise.i1': 'Tutti i moduli',
-  'plan.enterprise.i2': 'Filiali illimitate',
+  'plan.enterprise.i2': 'Fino a 10 filiali',
   'plan.enterprise.i3': 'Assistenza prioritaria',
 
   'login.title': 'Accedi',

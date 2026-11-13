@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useLanguage, COUNTRIES, LANGUAGES, CountryCode, LangCode } from './language-selector';
 import { useT, countryName } from './i18n';
 import { ThemeToggle } from './theme';
+import { InstallAppButton } from './pwa';
 
 // Estilos compartidos por las pantallas públicas (inicio, ingresar, registro)
 export const ui = {
@@ -90,6 +91,7 @@ export function SiteHeader({ showAuthButtons = true }: { showAuthButtons?: boole
         <Logo />
         <div className="flex flex-wrap items-center gap-2">
           <RegionSelectors />
+          <InstallAppButton className={`${ui.btnGhost} !py-2`} />
           <ThemeToggle />
           {showAuthButtons && (
             <>

@@ -14,6 +14,10 @@ const zh: Record<DictKey, string> = {
   'common.wait': '请稍候…',
   'common.goToPanel': '进入我的面板',
   'common.perMonth': '/ 月',
+  'pwa.install': '安装应用',
+  'pwa.iosTitle': '在 iPhone 上安装',
+  'pwa.iosSteps': '点按“分享”按钮（带向上箭头的方框），然后选择“添加到主屏幕”。',
+  'pwa.close': '知道了',
   'footer.text': 'Veltrix System © {year} · 企业财务管理',
 
   'home.badge': '为您的企业提供财务管控',
@@ -55,7 +59,7 @@ const zh: Record<DictKey, string> = {
   'plan.pro.i3': '赊账与上门收款',
   'plan.enterprise.desc': '适合拥有多家分店的企业',
   'plan.enterprise.i1': '全部模块',
-  'plan.enterprise.i2': '不限分店数量',
+  'plan.enterprise.i2': '最多 10 家分店',
   'plan.enterprise.i3': '优先支持',
 
   'login.title': '登录',

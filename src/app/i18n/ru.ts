@@ -14,6 +14,10 @@ const ru: Record<DictKey, string> = {
   'common.wait': 'Минутку…',
   'common.goToPanel': 'В мою панель',
   'common.perMonth': '/ мес.',
+  'pwa.install': 'Установить приложение',
+  'pwa.iosTitle': 'Установка на iPhone',
+  'pwa.iosSteps': 'Нажмите «Поделиться» (квадрат со стрелкой вверх), затем «На экран „Домой“».',
+  'pwa.close': 'Понятно',
   'footer.text': 'Veltrix System © {year} · Финансовый контроль для бизнеса',
 
   'home.badge': 'Финансовый контроль для вашего бизнеса',
@@ -55,7 +59,7 @@ const ru: Record<DictKey, string> = {
   'plan.pro.i3': 'Кредиты и выездное взыскание',
   'plan.enterprise.desc': 'Для компаний с несколькими филиалами',
   'plan.enterprise.i1': 'Все модули',
-  'plan.enterprise.i2': 'Неограниченное число филиалов',
+  'plan.enterprise.i2': 'До 10 филиалов',
   'plan.enterprise.i3': 'Приоритетная поддержка',
 
   'login.title': 'Вход',

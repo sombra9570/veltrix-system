@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Veltrix · Sin conexión</title>
+<style>
+  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#020617;color:#e2e8f0;font-family:system-ui,Arial,sans-serif;text-align:center;padding:24px}
+  img{width:72px;height:72px;border-radius:18px}
+  h1{font-size:20px;margin:16px 0 6px} p{color:#94a3b8;font-size:14px;max-width:340px;margin:4px auto}
+  button{margin-top:18px;background:#2563eb;color:#fff;border:0;border-radius:12px;padding:10px 20px;font-weight:700;cursor:pointer}
+</style>
+</head>
+<body>
+  <div>
+    <img src="/icons/icon-192.png" alt="Veltrix" />
+    <h1>Sin conexión · Offline</h1>
+    <p>No hay internet en este momento. Veltrix se volverá a cargar cuando vuelva la conexión.</p>
+    <p>No internet right now. Veltrix will reload when you are back online.</p>
+    <button onclick="location.reload()">Reintentar · Retry</button>
+  </div>
+  <script>window.addEventListener('online',()=>location.reload())</script>
+</body>
+</html>
