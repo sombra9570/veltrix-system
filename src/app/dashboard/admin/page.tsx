@@ -40,10 +40,10 @@ function BarChart({
 }: { data: { label: string; value: number }[]; color: string; format: (n: number) => string }) {
   const max = Math.max(1, ...data.map((d) => d.value));
   return (
-    <div className="flex items-end gap-1.5 h-40 pt-4">
+    <div className="flex items-end gap-0.5 sm:gap-1.5 h-40 pt-4 min-w-0">
       {data.map((d) => (
-        <div key={d.label} className="flex-1 flex flex-col items-center justify-end h-full gap-1 group">
-          <span className="text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition">
+        <div key={d.label} className="flex-1 min-w-0 flex flex-col items-center justify-end h-full gap-1 group">
+          <span className="hidden sm:block text-[10px] text-slate-400 opacity-0 group-hover:opacity-100 transition truncate max-w-full">
             {format(d.value)}
           </span>
           <div
@@ -51,7 +51,9 @@ function BarChart({
             style={{ height: `${Math.max(d.value > 0 ? 4 : 1, (d.value / max) * 100)}%`, opacity: d.value > 0 ? 1 : 0.25 }}
             title={`${d.label}: ${format(d.value)}`}
           />
-          <span className="text-[10px] text-slate-500 whitespace-nowrap">{d.label}</span>
+          <span className="text-[9px] sm:text-[10px] leading-tight text-center text-slate-500">
+            {d.label.split(' ')[0]}<br />{d.label.split(' ')[1]}
+          </span>
         </div>
       ))}
     </div>
@@ -107,7 +109,7 @@ export default function GlobalCoreAdminPage() {
 
   return (
     <main className="min-h-dvh bg-slate-950 text-white px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:p-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="w-full max-w-[1600px] mx-auto space-y-6 min-w-0">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-6 gap-4">
           <div>
             <span className="text-xs font-semibold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">

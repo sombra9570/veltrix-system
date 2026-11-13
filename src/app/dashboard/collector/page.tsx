@@ -68,7 +68,7 @@ export default function FieldCollectorStationPage() {
 
   return (
     <main className="min-h-dvh bg-slate-950 text-white px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="w-full max-w-[1600px] mx-auto space-y-6 min-w-0">
         <header className="flex flex-wrap justify-between items-center border-b border-slate-800 pb-5 gap-4">
           <div>
             <span className="text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full">

@@ -43,9 +43,24 @@ html {
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
+/* Pantalla firme: nunca se desliza hacia los lados ni rebota mostrando espacios vacíos */
+html,
 body {
+  max-width: 100%;
   overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior: none;
+  background: var(--background);
+}
+body {
   overflow-wrap: break-word;
+}
+img, svg, video, canvas, iframe, table {
+  max-width: 100%;
+}
+/* Nada dentro de una fila o columna puede empujar el ancho de la pantalla */
+main, section, header, footer, nav, aside {
+  min-width: 0;
 }
 /* Respeta el notch y la barra inferior del iPhone / Android cuando se instala como app */
 .safe-top { padding-top: env(safe-area-inset-top); }

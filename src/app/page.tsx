@@ -37,7 +37,7 @@ export default function HomePage() {
       <SiteHeader showAuthButtons={!(loaded && session)} />
 
       {/* PORTADA */}
-      <section className="mx-auto w-full max-w-6xl px-4 pt-10 pb-10 text-center sm:pt-16 sm:pb-12">
+      <section className="mx-auto w-full max-w-7xl 2xl:max-w-[1440px] px-4 pt-10 pb-10 text-center sm:pt-16 sm:pb-12">
         <span className="rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
           {t('home.badge')}
         </span>
@@ -60,7 +60,7 @@ export default function HomePage() {
       </section>
 
       {/* PARA QUÉ NEGOCIOS */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-10">
+      <section className="mx-auto w-full max-w-7xl 2xl:max-w-[1440px] px-4 py-10">
         <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.forYourBusiness')}</h2>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
           {BUSINESS_KINDS.filter((kd) => kd.id !== 'mixed').map((kd) => (
@@ -80,7 +80,7 @@ export default function HomePage() {
       </section>
 
       {/* FUNCIONES */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-10">
+      <section className="mx-auto w-full max-w-7xl 2xl:max-w-[1440px] px-4 py-10">
         <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.featuresTitle')}</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
@@ -94,7 +94,7 @@ export default function HomePage() {
       </section>
 
       {/* PLANES */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-10">
+      <section className="mx-auto w-full max-w-7xl 2xl:max-w-[1440px] px-4 py-10">
         <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.plansTitle')}</h2>
         <p className={`mt-1 text-center text-sm ${ui.muted}`}>{t('home.plansSubtitle')}</p>
         <p className={`text-center text-xs ${ui.muted}`}>{t('home.pricesLocal')}</p>

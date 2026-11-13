@@ -88,11 +88,11 @@ export function SiteHeader({ showAuthButtons = true }: { showAuthButtons?: boole
   const [open, setOpen] = useState(false);
   return (
     <header className="safe-top sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur dark:border-slate-800/80 dark:bg-slate-950/90">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-7xl 2xl:max-w-[1440px] items-center justify-between gap-3 px-4 py-3">
         <Logo />
 
         {/* Computadora y tablet: todo a la vista */}
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden min-w-0 items-center gap-2 lg:flex">
           <RegionSelectors />
           <InstallAppButton className={`${ui.btnGhost} !py-2`} />
           <ThemeToggle />
@@ -105,7 +105,7 @@ export function SiteHeader({ showAuthButtons = true }: { showAuthButtons?: boole
         </div>
 
         {/* Celular: solo lo esencial + menú */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           <ThemeToggle />
           <button
             type="button"
@@ -120,8 +120,8 @@ export function SiteHeader({ showAuthButtons = true }: { showAuthButtons?: boole
       </div>
 
       {open && (
-        <div className="border-t border-slate-200 px-4 pb-4 pt-3 md:hidden dark:border-slate-800">
-          <div className="flex flex-col gap-3">
+        <div className="border-t border-slate-200 px-4 pb-4 pt-3 lg:hidden dark:border-slate-800">
+          <div className="mx-auto flex max-w-md flex-col gap-3">
             <RegionSelectors stacked />
             <InstallAppButton className={`${ui.btnGhost} w-full`} />
             {showAuthButtons && (
