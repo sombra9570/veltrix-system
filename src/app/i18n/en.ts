@@ -9,6 +9,8 @@ const en: Record<DictKey, string> = {
   'common.themeToDark': 'Switch to dark mode',
   'common.email': 'Email',
   'common.password': 'Password',
+  'common.showPassword': "Show password",
+  'common.hidePassword': "Hide password",
   'common.back': '← Back',
   'common.next': 'Next →',
   'common.wait': 'One moment…',

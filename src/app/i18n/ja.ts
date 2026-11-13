@@ -9,6 +9,8 @@ const ja: Record<DictKey, string> = {
   'common.themeToDark': 'ダークモードに切り替え',
   'common.email': 'メールアドレス',
   'common.password': 'パスワード',
+  'common.showPassword': "パスワードを表示",
+  'common.hidePassword': "パスワードを隠す",
   'common.back': '← 戻る',
   'common.next': '次へ →',
   'common.wait': '少々お待ちください…',

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useVeltrixAuth, homeForRole } from '../auth-system';
 import { supabase } from '../../lib/supabase';
-import { SiteHeader, SiteFooter, ui } from '../site-header';
+import { SiteHeader, SiteFooter, ui, PasswordInput } from '../site-header';
 import { useT } from '../i18n';
 
 export default function IngresarPage() {
@@ -96,14 +96,12 @@ export default function IngresarPage() {
                     {t('login.forgot')}
                   </button>
                 </div>
-                <input
-                  type="password"
+                <PasswordInput
                   required
                   autoComplete="current-password"
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={ui.input}
+                  onChange={setPassword}
                 />
               </div>
             )}

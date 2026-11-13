@@ -9,6 +9,8 @@ const ko: Record<DictKey, string> = {
   'common.themeToDark': '다크 모드로 전환',
   'common.email': '이메일',
   'common.password': '비밀번호',
+  'common.showPassword': "비밀번호 보기",
+  'common.hidePassword': "비밀번호 숨기기",
   'common.back': '← 이전',
   'common.next': '다음 →',
   'common.wait': '잠시만 기다려 주세요…',

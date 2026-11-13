@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabase';
-import { SiteHeader, SiteFooter, ui } from '../site-header';
+import { SiteHeader, SiteFooter, ui, PasswordInput } from '../site-header';
 import { useT } from '../i18n';
 
 // Aquí llega el enlace del correo "¿Olvidaste tu contraseña?"
@@ -68,13 +68,11 @@ export default function RestablecerPage() {
               )}
               <div>
                 <label className={ui.label}>{t('reset.newPassword')}</label>
-                <input type="password" autoComplete="new-password" value={pass1}
-                  onChange={(e) => setPass1(e.target.value)} className={ui.input} required />
+                <PasswordInput autoComplete="new-password" value={pass1} onChange={setPass1} required />
               </div>
               <div>
                 <label className={ui.label}>{t('reset.repeat')}</label>
-                <input type="password" autoComplete="new-password" value={pass2}
-                  onChange={(e) => setPass2(e.target.value)} className={ui.input} required />
+                <PasswordInput autoComplete="new-password" value={pass2} onChange={setPass2} required />
               </div>
               <button type="submit" disabled={busy} className={`${ui.btnPrimary} w-full`}>
                 {busy ? t('reset.saving') : t('reset.save')}

@@ -9,6 +9,8 @@ const ru: Record<DictKey, string> = {
   'common.themeToDark': 'Тёмная тема',
   'common.email': 'Эл. почта',
   'common.password': 'Пароль',
+  'common.showPassword': "Показать пароль",
+  'common.hidePassword': "Скрыть пароль",
   'common.back': '← Назад',
   'common.next': 'Далее →',
   'common.wait': 'Минутку…',

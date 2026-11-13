@@ -9,6 +9,8 @@ const zh: Record<DictKey, string> = {
   'common.themeToDark': '切换到深色模式',
   'common.email': '邮箱',
   'common.password': '密码',
+  'common.showPassword': "显示密码",
+  'common.hidePassword': "隐藏密码",
   'common.back': '← 返回',
   'common.next': '下一步 →',
   'common.wait': '请稍候…',

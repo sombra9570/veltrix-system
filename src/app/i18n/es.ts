@@ -10,6 +10,8 @@ const es = {
   'common.themeToDark': 'Cambiar a modo oscuro',
   'common.email': 'Correo',
   'common.password': 'Contraseña',
+  'common.showPassword': "Mostrar contraseña",
+  'common.hidePassword': "Ocultar contraseña",
   'common.back': '← Atrás',
   'common.next': 'Siguiente →',
   'common.wait': 'Un momento…',

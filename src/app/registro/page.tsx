@@ -8,7 +8,7 @@ import { useT, countryName } from '../i18n';
 import {
   BUSINESS_KINDS, BusinessKind, categoriesForKind, suggestedModules, kindKey, kindDescKey, catKey, modKey,
 } from '../business-catalog';
-import { SiteHeader, SiteFooter, ui, useCountryChange } from '../site-header';
+import { SiteHeader, SiteFooter, ui, useCountryChange, PasswordInput } from '../site-header';
 import type { DictKey } from '../i18n/es';
 
 const STEPS: DictKey[] = ['reg.step1', 'reg.step2', 'reg.step3', 'reg.step4'];
@@ -228,11 +228,11 @@ export default function RegistroPage() {
                 </div>
                 <div>
                   <label className={ui.label}>{t('reg.passMin')}</label>
-                  <input className={ui.input} type="password" value={pass1} onChange={(e) => setPass1(e.target.value)} autoComplete="new-password" />
+                  <PasswordInput value={pass1} onChange={setPass1} autoComplete="new-password" />
                 </div>
                 <div>
                   <label className={ui.label}>{t('reg.passRepeat')}</label>
-                  <input className={ui.input} type="password" value={pass2} onChange={(e) => setPass2(e.target.value)} autoComplete="new-password" />
+                  <PasswordInput value={pass2} onChange={setPass2} autoComplete="new-password" />
                 </div>
               </div>
             </>

@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useOwner, friendlyError } from '../owner-context';
 import { Card } from '../../shell';
-import { ui } from '../../../site-header';
+import { ui, PasswordInput } from '../../../site-header';
 import { supabase } from '../../../../lib/supabase';
 import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
@@ -155,8 +155,8 @@ export default function TeamPage() {
             </div>
             <div className="sm:col-span-2">
               <label className={ui.label}>{t('common.password')}</label>
-              <input required type="text" autoComplete="new-password" className={ui.input} value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })} />
+              <PasswordInput required autoComplete="new-password" value={form.password}
+                onChange={(v) => setForm({ ...form, password: v })} />
               <p className={`mt-1 text-xs ${ui.muted}`}>{t('team.passHint')}</p>
             </div>
             <div className="flex justify-end gap-2 sm:col-span-2">

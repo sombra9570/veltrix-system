@@ -9,6 +9,8 @@ const hi: Record<DictKey, string> = {
   'common.themeToDark': 'डार्क मोड पर जाएँ',
   'common.email': 'ईमेल',
   'common.password': 'पासवर्ड',
+  'common.showPassword': "पासवर्ड दिखाएँ",
+  'common.hidePassword': "पासवर्ड छिपाएँ",
   'common.back': '← पीछे',
   'common.next': 'आगे →',
   'common.wait': 'एक पल…',
