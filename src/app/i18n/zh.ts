@@ -885,7 +885,7 @@ const zh: Record<DictKey, string> = {
   "legal.langNote": "本文件提供西班牙语（正式版）和英语版本。",
   "legal.acceptPre": "创建账户即表示你同意",
   "legal.and": "以及",
-  "legal.creditNotice": "赊账条件（价格、附加费和期限）由你的企业自行决定，必须遵守你所在国家的法定最高利率。",
+  "legal.creditNotice": "赊账条件（价格、分期和期限）由你的企业自行决定。",
 };
 
 export default zh;

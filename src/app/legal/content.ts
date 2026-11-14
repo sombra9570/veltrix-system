@@ -38,13 +38,12 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'Si un pago no se completa, tendrás 7 días de gracia. Después, la cuenta pasa a modo de solo lectura: puedes ver y exportar tu información, pero no registrar operaciones nuevas, hasta regularizar el pago.',
           'Conservamos los datos de una cuenta suspendida o cancelada al menos 90 días. Después podemos eliminarlos, previo aviso al correo de facturación.',
         ] },
-        { h: '7. Uso legal y responsabilidad de cada empresa', p: [
-          'Veltrix fue construido exclusivamente para fines legales. Cada empresa que lo usa es la única y directa responsable de las operaciones que registra y de cómo las realiza.',
-          'Veltrix no fija, no sugiere ni verifica tasas de interés, recargos, multas ni plazos: el sistema solo registra lo que cada empresa decide. Cobrar intereses por encima de la tasa máxima permitida en su país, aplicar recargos no autorizados, prestar sin la licencia que exija la ley o cobrar de forma abusiva es responsabilidad exclusiva de la empresa y de sus empleados.',
-          'Está prohibido usar Veltrix para cualquier acto ilegal, incluidos fraude, usura, lavado de dinero, o para hostigar, amenazar o exponer públicamente a deudores. Tampoco puede usarse para guardar contenido ajeno a la gestión del negocio.',
-          'Las fotos de documentos de identidad de los clientes solo pueden subirse con su consentimiento y para fines legítimos del negocio.',
-          'La empresa se compromete a mantener indemne a Veltrix frente a cualquier reclamo de clientes, terceros o autoridades que se origine en el uso que ella o sus empleados hagan del sistema.',
-          'Si detectamos un uso ilegal o que afecte la seguridad del servicio, podemos suspender la cuenta y colaborar con las autoridades competentes conforme a la ley.',
+        { h: '7. Responsabilidad de cada empresa', p: [
+          'Veltrix es una herramienta de registro y gestión creada para fines legales. No presta dinero, no cobra deudas y no interviene en la relación entre cada empresa y sus clientes.',
+          'Cada empresa decide libremente sus condiciones comerciales: precios, plazos, cuotas, recargos, intereses y la forma de cobrar. Veltrix no fija, no sugiere ni revisa esas condiciones; el sistema solo registra lo que la empresa decide.',
+          'Cumplir las leyes de su país (tasas máximas, licencias, protección al consumidor y de datos personales) es responsabilidad exclusiva de cada empresa y de sus usuarios.',
+          'La empresa mantiene indemne a Veltrix frente a cualquier reclamo de clientes o terceros que se origine en el uso que ella o sus empleados hagan del sistema.',
+          'Las fotos de documentos de identidad de los clientes deben subirse con su consentimiento.',
         ] },
         { h: '8. Tus datos y los de tus clientes', p: [
           'La información que registras es tuya. Respecto de los datos de tus clientes y empleados, tú decides para qué se usan y nosotros los tratamos solo para prestarte el servicio, según nuestra Política de privacidad.',
@@ -54,7 +53,7 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'Veltrix IA es un complemento pagado con un cupo mensual. Sus respuestas se basan en un resumen de los datos de tu empresa y son orientativas: pueden contener errores y no constituyen asesoría legal, contable ni financiera.',
         ] },
         { h: '10. Disponibilidad', p: [
-          'Trabajamos para que Veltrix esté disponible y protegido, con copias de seguridad diarias, pero no garantizamos que funcione sin interrupciones. Las funciones sin conexión sincronizan cuando el dispositivo vuelve a tener internet.',
+          'Trabajamos para que Veltrix esté disponible y protegido, con copias de seguridad diarias, pero no garantizamos que funcione sin interrupciones. Las funciones sin conexión sincronizan cuando el dispositivo vuelve a tener internet. Podemos limitar temporalmente una cuenta solo si pone en riesgo técnico el servicio de los demás (por ejemplo, un ataque o un uso automatizado excesivo).',
         ] },
         { h: '11. Responsabilidad', p: [
           'En la medida que la ley lo permita, nuestra responsabilidad total por cualquier reclamo se limita al monto que pagaste a Veltrix en los 3 meses anteriores al hecho que lo origina. No respondemos por pérdidas indirectas, lucro cesante ni por decisiones tomadas con base en la información registrada.',
@@ -88,7 +87,7 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
         { h: '3. Con quién los compartimos', p: [
           'Con proveedores que nos ayudan a operar, bajo obligaciones de confidencialidad: Supabase (base de datos y archivos), Vercel (alojamiento de la app), Resend (envío de correos), Lemon Squeezy (procesamiento de pagos) y Anthropic (solo si tu empresa activa Veltrix IA: recibe un resumen de datos de tu negocio para responder, sin fotos ni documentos).',
           'Algunos de estos proveedores procesan datos fuera de tu país. Elegimos proveedores con medidas de seguridad reconocidas.',
-          'También podemos entregar datos si una autoridad competente lo exige conforme a la ley.',
+          'No entregamos datos a terceros por iniciativa propia; solo lo haríamos ante una orden judicial u obligación legal que no podamos rechazar, y en ese caso avisaríamos a la empresa si la ley lo permite.',
         ] },
         { h: '4. Seguridad', p: [
           'Usamos conexiones cifradas, control de acceso por empresa y por rol (cada usuario ve solo lo que le corresponde), archivos privados con enlaces temporales y copias de seguridad diarias.',
@@ -167,13 +166,12 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'If a payment fails you get a 7-day grace period. After that the account becomes read-only: you can view and export your information but not record new operations until payment is settled.',
           'We keep data from suspended or cancelled accounts for at least 90 days. After that we may delete it, with prior notice to the billing email.',
         ] },
-        { h: '7. Lawful use and each company\u2019s responsibility', p: [
-          'Veltrix was built exclusively for lawful purposes. Each company using it is solely and directly responsible for the operations it records and how it carries them out.',
-          'Veltrix does not set, suggest or verify interest rates, surcharges, penalties or terms: the system only records what each company decides. Charging interest above the maximum rate allowed in its country, applying unauthorized surcharges, lending without a license where the law requires one, or abusive collection is the sole responsibility of the company and its employees.',
-          'Using Veltrix for any illegal act is forbidden, including fraud, usury, money laundering, or harassing, threatening or publicly exposing debtors. It may not be used to store content unrelated to managing the business.',
-          'Photos of customers\u2019 ID documents may only be uploaded with their consent and for legitimate business purposes.',
-          'The company agrees to hold Veltrix harmless from any claim by customers, third parties or authorities arising from the use that it or its employees make of the system.',
-          'If we detect illegal use or use that affects the security of the service, we may suspend the account and cooperate with the competent authorities as required by law.',
+        { h: '7. Each company\u2019s responsibility', p: [
+          'Veltrix is a record-keeping and management tool built for lawful purposes. It does not lend money, does not collect debts and does not take part in the relationship between each company and its customers.',
+          'Each company freely sets its own commercial terms: prices, periods, installments, surcharges, interest and how it collects. Veltrix does not set, suggest or review those terms; the system only records what the company decides.',
+          'Complying with the laws of its country (maximum rates, licenses, consumer and personal data protection) is the sole responsibility of each company and its users.',
+          'The company holds Veltrix harmless from any claim by customers or third parties arising from the use that it or its employees make of the system.',
+          'Photos of customers\u2019 ID documents must be uploaded with their consent.',
         ] },
         { h: '8. Your data and your customers’ data', p: [
           'The information you enter is yours. For your customers’ and employees’ data, you decide how it is used and we process it only to provide the service, as described in our Privacy Policy.',
@@ -183,7 +181,7 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'Veltrix AI is a paid add-on with a monthly quota. Its answers are based on a summary of your company’s data and are for guidance only: they may contain errors and are not legal, accounting or financial advice.',
         ] },
         { h: '10. Availability', p: [
-          'We work to keep Veltrix available and secure, with daily backups, but we do not guarantee uninterrupted operation. Offline features sync when the device is back online.',
+          'We work to keep Veltrix available and secure, with daily backups, but we do not guarantee uninterrupted operation. Offline features sync when the device is back online. We may temporarily limit an account only if it puts the service at technical risk for others (for example, an attack or excessive automated use).',
         ] },
         { h: '11. Liability', p: [
           'To the extent permitted by law, our total liability for any claim is limited to the amount you paid Veltrix in the 3 months before the event giving rise to it. We are not liable for indirect losses, lost profits or decisions made based on recorded information.',
@@ -217,7 +215,7 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
         { h: '3. Who we share it with', p: [
           'Providers that help us operate, under confidentiality obligations: Supabase (database and files), Vercel (app hosting), Resend (email delivery), Lemon Squeezy (payment processing) and Anthropic (only if your company enables Veltrix AI: it receives a summary of your business data to answer, without photos or documents).',
           'Some of these providers process data outside your country. We choose providers with recognized security measures.',
-          'We may also disclose data when required by a competent authority under the law.',
+          'We do not hand over data to third parties on our own initiative; we would only do so under a court order or legal obligation we cannot refuse, and we would notify the company if the law allows it.',
         ] },
         { h: '4. Security', p: [
           'We use encrypted connections, access control per company and role (each user sees only what they should), private files with temporary links and daily backups.',

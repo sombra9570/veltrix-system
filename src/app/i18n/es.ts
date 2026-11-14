@@ -894,7 +894,7 @@ const es = {
   "legal.langNote": "Este documento está disponible en español (versión oficial) y en inglés.",
   "legal.acceptPre": "Al crear tu cuenta aceptas los",
   "legal.and": "y la",
-  "legal.creditNotice": "Las condiciones del crédito (precio, recargos y plazos) las define tu empresa y deben respetar la tasa máxima legal de tu país.",
+  "legal.creditNotice": "Las condiciones del crédito (precio, cuotas y plazos) las define tu empresa.",
 };
 
 export default es;
