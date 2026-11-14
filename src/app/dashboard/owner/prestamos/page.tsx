@@ -20,12 +20,17 @@ type Loan = {
 const FIELDS: [string, string][] = [
   ['interest_default', 'loan.p.interestDefault'], ['interest_min', 'loan.p.interestMin'], ['interest_max', 'loan.p.interestMax'],
   ['max_installments', 'loan.p.maxInstallments'], ['max_amount_customer', 'loan.p.maxAmount'], ['max_active_loans_customer', 'loan.p.maxActive'],
-  ['max_customers_collector', 'loan.p.maxCustomers'], ['max_daily_lent_collector', 'loan.p.maxDaily'], ['route_float', 'fund.p.float'],
+  ['max_customers_collector', 'loan.p.maxCustomers'], ['max_daily_lent_collector', 'loan.p.maxDaily'],
 ];
 const LATE: [string, string][] = [['late_daily', 'card.f.daily'], ['late_weekly', 'card.f.weekly'], ['late_biweekly', 'card.f.biweekly'], ['late_monthly', 'card.f.monthly']];
 type Fund = {
   id: string; name: string; branch: string; collector: string | null; currency: string; balance: number; invested: number;
-  delivered: number; lent_open: number; portfolio: number; moves: { at: string; type: string; amount: number; note: string | null }[];
+  delivered: number; lent_open: number; portfolio: number;
+  period: { since: string | null; opening: number; investments: number; withdrawals: number; collected_cash: number; collected_digital: number;
+    lent: number; collector_expenses: number; expected: number };
+  liquidations: { id: string; created_at: string; expected: number; counted: number; difference: number; closing: number;
+    op_expenses: number; payments_out: number; withdrawals: number }[];
+  moves: { at: string; type: string; amount: number; note: string | null }[];
 };
 const freqKey = (d: number) => (d <= 3 ? 'daily' : d <= 10 ? 'weekly' : d <= 20 ? 'biweekly' : 'monthly');
 
@@ -38,6 +43,7 @@ export default function LoansPage() {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState('');
   const [funds, setFunds] = useState<Fund[]>([]);
+  const [cut, setCut] = useState<string | null>(null);
   const [mv, setMv] = useState<{ route: string; type: 'investment' | 'withdrawal'; amount: string; note: string } | null>(null);
 
   const load = useCallback(async () => {
@@ -169,7 +175,16 @@ export default function LoansPage() {
                     <p><span className={ui.muted}>{t('fund.portfolio')}</span><br /><b>{m(f.portfolio)}</b></p>
                     <p><span className={ui.muted}>{t('fund.delivered')}</span><br /><b>{m(f.delivered)}</b></p>
                   </div>
-                  {mv?.route === f.id ? (
+                  {cut === f.id && (
+                    <CutForm f={f} m={m} onCancel={() => setCut(null)}
+                      onDone={async (text) => { setCut(null); await load(); setMsg({ ok: true, text }); }}
+                      onError={(text) => setMsg({ ok: false, text })} />
+                  )}
+                  {cut !== f.id && (f.liquidations ?? []).length > 0 && (
+                    <p className={`text-[11px] ${ui.muted}`}>✂️ {t('liq.last', { date: new Date(f.liquidations[0].created_at).toLocaleDateString(lang), amount: m(f.liquidations[0].closing) })}
+                      {Number(f.liquidations[0].difference) !== 0 && <b className={Number(f.liquidations[0].difference) < 0 ? ' text-red-600 dark:text-red-400' : ' text-emerald-600'}> · {t('liq.diff')} {m(f.liquidations[0].difference)}</b>}</p>
+                  )}
+                  {cut === f.id ? null : mv?.route === f.id ? (
                     <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
                       <input inputMode="decimal" autoFocus placeholder={t('cash.amount')} value={mv.amount} onChange={(e) => setMv({ ...mv, amount: e.target.value })} className={ui.input} />
                       <input placeholder={t('cust.notes')} value={mv.note} onChange={(e) => setMv({ ...mv, note: e.target.value })} className={ui.input} />
@@ -184,6 +199,7 @@ export default function LoansPage() {
                     <div className="flex gap-2">
                       <button type="button" onClick={() => setMv({ route: f.id, type: 'investment', amount: '', note: '' })} className={`${ui.btnGhost} !py-1.5 text-xs`}>➕ {t('fund.invest')}</button>
                       <button type="button" onClick={() => setMv({ route: f.id, type: 'withdrawal', amount: '', note: '' })} className={`${ui.btnGhost} !py-1.5 text-xs`}>➖ {t('fund.withdraw')}</button>
+                      <button type="button" onClick={() => { setMv(null); setCut(f.id); }} className={`${ui.btnPrimary} !py-1.5 text-xs`}>✂️ {t('liq.cut')}</button>
                     </div>
                   )}
                   {f.moves.length > 0 && (
@@ -246,6 +262,104 @@ export default function LoansPage() {
           </ul>
         )}
       </Card>
+    </div>
+  );
+}
+
+/* ---------- Corte de caja: se cuenta el efectivo, se registran las salidas por rubro y la caja queda cuadrada ---------- */
+const CATS: Record<'op_expense' | 'payment_out' | 'withdrawal', string[]> = {
+  op_expense: ['fuel', 'food', 'transport', 'phone', 'maintenance', 'stationery', 'other'],
+  payment_out: ['collector_pay', 'third_party', 'other'],
+  withdrawal: ['owner', 'bank', 'other'],
+};
+type Line = { kind: 'op_expense' | 'payment_out' | 'withdrawal'; category: string; amount: string; note: string };
+
+function CutForm({ f, m, onCancel, onDone, onError }: {
+  f: Fund; m: (n: number) => string; onCancel: () => void; onDone: (text: string) => void; onError: (text: string) => void;
+}) {
+  const { t } = useT();
+  const p = f.period;
+  const [counted, setCounted] = useState(String(Number(p.expected)));
+  const [lines, setLines] = useState<Line[]>([]);
+  const [notes, setNotes] = useState('');
+  const [busy, setBusy] = useState(false);
+  const num = (x: string) => { const n = Number(x.replace(',', '.')); return Number.isFinite(n) ? n : NaN; };
+  const c = num(counted);
+  const diff = Number.isNaN(c) ? 0 : Math.round((c - Number(p.expected)) * 100) / 100;
+  const out = lines.reduce((a, l) => a + (Number.isNaN(num(l.amount)) ? 0 : num(l.amount)), 0);
+  const closing = Number.isNaN(c) ? 0 : Math.round((c - out) * 100) / 100;
+  const bad = Number.isNaN(c) || c < 0 || out > c + 0.004 || lines.some((l) => !(num(l.amount) > 0));
+  const set = (i: number, patch: Partial<Line>) => setLines(lines.map((l, k) => (k === i ? { ...l, ...patch } : l)));
+
+  const save = async () => {
+    setBusy(true);
+    try {
+      const r = await rpc<{ closing: number; difference: number }>('liquidate_route', {
+        p_route: f.id, p_counted: c, p_notes: notes || null,
+        p_lines: lines.map((l) => ({ kind: l.kind, category: l.category, amount: num(l.amount), note: l.note || null })),
+      });
+      onDone(t('liq.done', { amount: m(r.closing) }));
+    } catch (e) {
+      const msg = (e as Error).message;
+      onError(msg.includes('LIQ_OUT_EXCEEDS') ? t('liq.outExceeds') : msg);
+    } finally { setBusy(false); }
+  };
+
+  const row = (label: string, v: number, cls = '') => (
+    <li className="flex justify-between"><span>{label}</span><b className={cls}>{m(v)}</b></li>
+  );
+  return (
+    <div className="space-y-3 rounded-xl border-2 border-blue-400 p-3">
+      <p className="font-bold">✂️ {t('liq.cut')} · {f.name}</p>
+      <ul className="space-y-1 text-sm">
+        {row(t('liq.opening'), Number(p.opening))}
+        {Number(p.investments) > 0 && row(`+ ${t('fund.t.investment')}`, Number(p.investments))}
+        {Number(p.withdrawals) > 0 && row(`− ${t('fund.t.withdrawal')}`, Number(p.withdrawals))}
+        {row(`+ ${t('col.cash')}`, Number(p.collected_cash))}
+        {row(`− ${t('loan.lent')}`, Number(p.lent), 'text-violet-600 dark:text-violet-400')}
+        {row(`− ${t('liq.collectorExp')}`, Number(p.collector_expenses), 'text-red-600 dark:text-red-400')}
+        <li className="flex justify-between border-t border-slate-200 pt-1 font-bold dark:border-slate-800"><span>{t('liq.expected')}</span><span>{m(Number(p.expected))}</span></li>
+        {Number(p.collected_digital) > 0 && <li className={`flex justify-between text-xs ${ui.muted}`}><span>{t('col.digital')}</span><span>{m(Number(p.collected_digital))}</span></li>}
+      </ul>
+      <label className="block">
+        <span className={ui.label}>{t('liq.counted')}</span>
+        <input inputMode="decimal" value={counted} onChange={(e) => setCounted(e.target.value)} className={`${ui.input} text-xl font-bold`} />
+      </label>
+      {diff !== 0 && !Number.isNaN(c) && (
+        <p className={`text-sm font-bold ${diff < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+          {diff < 0 ? t('liq.shortage', { amount: m(-diff) }) : t('liq.surplus', { amount: m(diff) })}
+        </p>
+      )}
+
+      <div className="space-y-2">
+        <p className="text-sm font-bold">{t('liq.outs')}</p>
+        {lines.map((l, i) => (
+          <div key={i} className="grid grid-cols-2 gap-2 rounded-lg bg-slate-50 p-2 sm:grid-cols-[9rem_1fr_7rem_1fr_auto] dark:bg-slate-800/50">
+            <select value={l.kind} onChange={(e) => { const kind = e.target.value as Line['kind']; set(i, { kind, category: CATS[kind][0] }); }} className={ui.input}>
+              {(Object.keys(CATS) as Line['kind'][]).map((k) => <option key={k} value={k}>{t(`liq.k.${k}` as DictKey)}</option>)}
+            </select>
+            <select value={l.category} onChange={(e) => set(i, { category: e.target.value })} className={ui.input}>
+              {CATS[l.kind].map((cat) => <option key={cat} value={cat}>{t(`liq.c.${cat}` as DictKey)}</option>)}
+            </select>
+            <input inputMode="decimal" placeholder={t('cash.amount')} value={l.amount} onChange={(e) => set(i, { amount: e.target.value })} className={ui.input} />
+            <input placeholder={t('cust.notes')} value={l.note} onChange={(e) => set(i, { note: e.target.value })} className={ui.input} />
+            <button type="button" onClick={() => setLines(lines.filter((_, k) => k !== i))} className="text-sm font-bold text-red-600 cursor-pointer" aria-label="✕">✕</button>
+          </div>
+        ))}
+        <button type="button" onClick={() => setLines([...lines, { kind: 'op_expense', category: 'fuel', amount: '', note: '' }])} className={`${ui.btnGhost} !py-1.5 text-xs`}>➕ {t('liq.addLine')}</button>
+      </div>
+
+      <input placeholder={t('liq.notes')} value={notes} onChange={(e) => setNotes(e.target.value)} className={ui.input} />
+      <ul className="space-y-1 rounded-lg bg-slate-50 p-2 text-sm dark:bg-slate-800/50">
+        {row(t('liq.counted'), Number.isNaN(c) ? 0 : c)}
+        {row(`− ${t('liq.outs')}`, out)}
+        <li className="flex justify-between border-t border-slate-200 pt-1 text-base font-extrabold dark:border-slate-700"><span>💼 {t('liq.closing')}</span><span>{m(closing)}</span></li>
+      </ul>
+      {out > c + 0.004 && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{t('liq.outExceeds')}</p>}
+      <div className="grid grid-cols-2 gap-2">
+        <button type="button" onClick={onCancel} className={ui.btnGhost}>{t('card.cancel')}</button>
+        <button type="button" disabled={bad || busy} onClick={save} className={ui.btnPrimary}>✂️ {t('liq.save')}</button>
+      </div>
     </div>
   );
 }

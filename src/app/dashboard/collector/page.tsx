@@ -30,9 +30,14 @@ type Route = {
   id: string; name: string; branch: string; currency: string; today: string;
   unsettled_cash: number; unsettled_digital: number; unsettled_expenses: number; unsettled_loans?: number;
   fund_balance?: number; fund_float?: number;
+  period?: Period; liquidations?: Liquidation[];
   policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_interest?: boolean;
   customers: Customer[]; settlements: Settlement[];
 };
+type Period = { since: string | null; opening: number; investments: number; withdrawals: number; collected_cash: number;
+  collected_digital: number; lent: number; collector_expenses: number; expected: number };
+type Liquidation = { id: string; created_at: string; expected: number; counted: number; difference: number; closing: number;
+  op_expenses: number; payments_out: number; withdrawals: number };
 type Day = { generated_at: string; routes: Route[] };
 type Op =
   | { kind: 'payment'; id: string; at: string; route: string; customer: string; method: Method; amount: number; order?: string }
@@ -271,13 +276,13 @@ export default function CollectorPage() {
             <p className={`text-xs font-bold uppercase ${ui.muted}`}>💼 {t('fund.title')}</p>
             <p className={`text-2xl font-extrabold ${fund < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>{fmt(fund)}</p>
           </div>
-          <p className={`mt-1 text-[11px] ${ui.muted}`}>{t('fund.formula')}</p>
+          <p className={`mt-1 text-[11px] ${ui.muted}`}>{t('liq.formula')}</p>
         </Card>
       )}
       <div className={`grid gap-2 text-center ${fund !== null ? 'grid-cols-2 sm:grid-cols-4' : loans !== 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
         {fund !== null && (
           <Card className="!p-3">
-            <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('fund.opening')}</p>
+            <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('liq.opening')}</p>
             <p className="font-extrabold">{fmt(opening)}</p>
           </Card>
         )}
@@ -310,7 +315,7 @@ export default function CollectorPage() {
       )}
       <div className="grid grid-cols-2 gap-2">
         <button type="button" onClick={() => { setSel(null); setPanel('expense'); }} className={ui.btnGhost}>⛽ {t('col.addExpense')}</button>
-        <button type="button" onClick={() => { setSel(null); setPanel('settle'); }} className={ui.btnGhost}>🏁 {t('col.settle')}</button>
+        <button type="button" onClick={() => { setSel(null); setPanel('settle'); }} className={ui.btnGhost}>{fund !== null ? `📋 ${t('liq.summary')}` : `🏁 ${t('col.settle')}`}</button>
       </div>
 
       {/* Vista: tarjetas o lista, y frecuencia de cobro */}
@@ -421,7 +426,8 @@ export default function CollectorPage() {
                 canCustomers={route.can_customers !== false} fmt={fmt}
                 onDone={async (text, ok) => { flash(ok, text); setPanel(null); await refresh(); }} />
             )}
-            {panel === 'settle' && (
+            {panel === 'settle' && fund !== null && <PeriodSheet route={route} fmt={fmt} fund={fund} />}
+            {panel === 'settle' && fund === null && (
               <SettleSheet route={route} fmt={fmt} online={online} pending={pendingRoute}
                 onClosed={async () => { await refresh(); flash(true, t('col.settled')); setPanel(null); }} />
             )}
@@ -633,6 +639,44 @@ function ExpenseForm({ onDone }: { onDone: (amount: number, description: string)
       <button type="button" disabled={invalid} onClick={() => onDone(Math.round(n * 100) / 100, desc.trim())} className={`${ui.btnPrimary} w-full py-3`}>
         {t('cash.addMovement')}
       </button>
+    </div>
+  );
+}
+
+/* ---------- Resumen desde el último corte (la caja la cuadra el administrador o supervisor) ---------- */
+function PeriodSheet({ route, fmt, fund }: { route: Route; fmt: (n: number) => string; fund: number }) {
+  const { t, lang } = useT();
+  const p = route.period;
+  const cash = Number(route.unsettled_cash), exp = Number(route.unsettled_expenses), lent = Number(route.unsettled_loans ?? 0);
+  const start = fund - (cash - exp - lent);
+  return (
+    <div className="space-y-4">
+      <h2 className="text-lg font-bold">📋 {t('liq.summary')}</h2>
+      <p className={`text-xs ${ui.muted}`}>{p?.since ? t('liq.since', { date: new Date(p.since).toLocaleString(lang, { dateStyle: 'medium', timeStyle: 'short' }) }) : t('liq.noCutYet')}</p>
+      <ul className="space-y-1 text-sm">
+        <li className="flex justify-between"><span>{t('liq.opening')}</span><b>{fmt(start)}</b></li>
+        <li className="flex justify-between"><span>+ {t('col.cash')}</span><b>{fmt(cash)}</b></li>
+        <li className="flex justify-between"><span>− {t('loan.lent')}</span><b className="text-violet-600 dark:text-violet-400">{fmt(lent)}</b></li>
+        <li className="flex justify-between"><span>− {t('col.expenses')}</span><b className="text-red-600 dark:text-red-400">{fmt(exp)}</b></li>
+        <li className="flex justify-between border-t border-slate-200 pt-2 text-base dark:border-slate-800"><span>💼 {t('fund.title')}</span><b>{fmt(fund)}</b></li>
+        {Number(route.unsettled_digital) > 0 && <li className={`flex justify-between text-xs ${ui.muted}`}><span>{t('col.digital')}</span><span>{fmt(route.unsettled_digital)}</span></li>}
+      </ul>
+      <p className="rounded-xl bg-slate-50 p-3 text-xs dark:bg-slate-800/50">✂️ {t('liq.collectorHint')}</p>
+      {(route.liquidations ?? []).length > 0 && (
+        <div>
+          <p className={ui.label}>{t('liq.history')}</p>
+          <ul className="divide-y divide-slate-100 text-sm dark:divide-slate-800">
+            {(route.liquidations ?? []).map((l) => (
+              <li key={l.id} className="py-1.5">
+                <div className="flex justify-between"><span className={ui.muted}>{new Date(l.created_at).toLocaleDateString(lang)}</span><b>{fmt(l.closing)}</b></div>
+                <p className={`text-[11px] ${Number(l.difference) < 0 ? 'text-red-600 dark:text-red-400' : ui.muted}`}>
+                  {t('liq.lineSummary', { expected: fmt(l.expected), counted: fmt(l.counted), diff: fmt(l.difference) })}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
