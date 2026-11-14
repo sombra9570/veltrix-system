@@ -442,7 +442,7 @@ export default function GlobalCoreAdminPage() {
           </div>
           {addons.length > 0 && (
             <div className="space-y-2 pt-2">
-              <h3 className="text-xs font-bold text-slate-300">➕ Extras que el dueño compra sin subir de plan (precio por unidad al mes)</h3>
+              <h3 className="text-xs font-bold text-slate-300">➕ Extras que el administrador compra sin subir de plan (precio por unidad al mes)</h3>
               <div className="grid gap-3 lg:grid-cols-3">
                 {addons.map((a) => (
                   <div key={a.code} className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-2 text-xs">

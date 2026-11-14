@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   const { data: company } = await asUser.from('companies').select('id, org_id').eq('id', companyId).maybeSingle();
   if (!company) return fail(403, 'Empresa no encontrada');
   const { data: isOwner } = await asUser.rpc('is_org_owner', { p_org: company.org_id });
-  if (!isOwner) return fail(403, 'Solo el dueño puede crear trabajadores');
+  if (!isOwner) return fail(403, 'Solo el administrador puede crear trabajadores');
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
 
