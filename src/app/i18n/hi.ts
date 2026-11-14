@@ -1278,6 +1278,16 @@ const hi: Record<DictKey, string> = {
   "perm.routes.liquidate.d": "रूट का कैश कट: नकदी गिनना और ख़र्च, भुगतान व निकासी दर्ज करना।",
   "perm.routes.invest": "रूट कैश में निवेश और निकासी",
   "perm.routes.invest.d": "रूट कैश में निवेश डालना या पैसा निकालना।",
+  "sup.navRoutes": "रूट और कैश",
+  "sup.title": "रूट और कैश",
+  "sup.subtitle": "आपकी शाखाओं में रूट कैश, दिन अनुसार वसूली और ऋण।",
+  "sup.noBranches": "आपको कोई शाखा नहीं सौंपी गई। प्रशासक से कहें।",
+  "sup.customers": "{n} ग्राहक",
+  "sup.late": "{n} बकाया",
+  "sup.noActions": "प्रशासक ने इस शाखा में कट या निवेश की अनुमति नहीं दी।",
+  "sup.noApprove": "प्रशासक ने ऋण मंज़ूर करने की अनुमति नहीं दी।",
+  "perm.routes.approve_loans": "ऋण मंज़ूर करना",
+  "perm.routes.approve_loans.d": "नियमों से बाहर होने के कारण लंबित ऋण मंज़ूर या अस्वीकार करना।",
 };
 
 export default hi;

@@ -1278,6 +1278,16 @@ const de: Record<DictKey, string> = {
   "perm.routes.liquidate.d": "Kassenabschluss der Tour: Bargeld zählen und Ausgaben, Zahlungen und Entnahmen erfassen.",
   "perm.routes.invest": "In der Tourkasse investieren und entnehmen",
   "perm.routes.invest.d": "Investition einlegen oder Geld aus der Tourkasse nehmen.",
+  "sup.navRoutes": "Touren und Kassen",
+  "sup.title": "Touren und Kassen",
+  "sup.subtitle": "Tourkassen, kassiert und verliehen pro Tag in deinen Filialen.",
+  "sup.noBranches": "Dir sind keine Filialen zugewiesen. Frag den Administrator.",
+  "sup.customers": "{n} Kunden",
+  "sup.late": "{n} im Verzug",
+  "sup.noActions": "Der Administrator hat dir keine Rechte für Abschlüsse oder Investitionen in dieser Filiale gegeben.",
+  "sup.noApprove": "Der Administrator hat dir nicht erlaubt, Darlehen zu genehmigen.",
+  "perm.routes.approve_loans": "Darlehen genehmigen",
+  "perm.routes.approve_loans.d": "Darlehen genehmigen oder ablehnen, die wegen Regelüberschreitung warten.",
 };
 
 export default de;

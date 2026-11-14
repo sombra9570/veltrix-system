@@ -179,7 +179,7 @@ const en: Record<DictKey, string> = {
   'shell.logout': "Log out",
   'shell.menu': "Menu",
   'owner.of': "{used} of {max}",
-  'owner.notOwner': "This section is only for the business administrator. The supervisor dashboard is coming soon.",
+  'owner.notOwner': "This section is only for the business administrator.",
   'owner.suspended': "Your account is read-only due to non-payment. Pay your plan to record sales and payments again.",
   'owner.grace': "Your payment is pending. You have until {date} to pay before your account is locked.",
   'owner.trialLeft': "You have {days} free trial days left with everything included.",
@@ -1278,6 +1278,16 @@ const en: Record<DictKey, string> = {
   "perm.routes.liquidate.d": "Route cash closing (settlement): count the cash and record expenses, payments and withdrawals.",
   "perm.routes.invest": "Invest and withdraw in route cash",
   "perm.routes.invest.d": "Put investment in or take money out of the route cash.",
+  "sup.navRoutes": "Routes and cash",
+  "sup.title": "Routes and cash",
+  "sup.subtitle": "Route cash, collected and lent by day in your branches.",
+  "sup.noBranches": "You have no branches assigned. Ask the administrator to assign one.",
+  "sup.customers": "{n} customers",
+  "sup.late": "{n} overdue",
+  "sup.noActions": "The administrator didn't give you permission for closings or investments in this branch.",
+  "sup.noApprove": "The administrator didn't give you permission to approve loans.",
+  "perm.routes.approve_loans": "Approve loans",
+  "perm.routes.approve_loans.d": "Approve or reject loans that wait for approval for going beyond the rules.",
 };
 
 export default en;

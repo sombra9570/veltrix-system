@@ -73,7 +73,7 @@ export default function LoansPage() {
   };
   const decide = async (l: Loan, ok: boolean) => {
     setBusy(l.order_id); setMsg(null);
-    try { await rpc('decide_credit', { p_order: l.order_id, p_approve: ok, p_reason: ok ? null : t('cust.rejected') }); await load();
+    try { await rpc('decide_street_loan', { p_order: l.order_id, p_approve: ok, p_reason: ok ? null : t('cust.rejected') }); await load();
       setMsg({ ok: true, text: ok ? t('loan.approved') : t('loan.rejected') });
     } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); } finally { setBusy(''); }
   };

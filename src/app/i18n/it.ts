@@ -1278,6 +1278,16 @@ const it: Record<DictKey, string> = {
   "perm.routes.liquidate.d": "Chiusura di cassa del giro: contare i contanti e registrare spese, pagamenti e prelievi.",
   "perm.routes.invest": "Investire e prelevare dalla cassa del giro",
   "perm.routes.invest.d": "Mettere investimento o prelevare denaro dalla cassa del giro.",
+  "sup.navRoutes": "Giri e casse",
+  "sup.title": "Giri e casse",
+  "sup.subtitle": "Casse dei giri, incassato e prestato per giorno nelle tue filiali.",
+  "sup.noBranches": "Non hai filiali assegnate. Chiedi all'amministratore.",
+  "sup.customers": "{n} clienti",
+  "sup.late": "{n} in ritardo",
+  "sup.noActions": "L'amministratore non ti ha dato il permesso per chiusure o investimenti in questa filiale.",
+  "sup.noApprove": "L'amministratore non ti ha dato il permesso di approvare prestiti.",
+  "perm.routes.approve_loans": "Approvare prestiti",
+  "perm.routes.approve_loans.d": "Approvare o rifiutare i prestiti in attesa perché superano le regole.",
 };
 
 export default it;

@@ -1278,6 +1278,16 @@ const zh: Record<DictKey, string> = {
   "perm.routes.liquidate.d": "路线结账：清点现金并登记支出、付款和取款。",
   "perm.routes.invest": "在路线资金中投资和取款",
   "perm.routes.invest.d": "向路线资金投入或从中取出资金。",
+  "sup.navRoutes": "路线与资金",
+  "sup.title": "路线与资金",
+  "sup.subtitle": "你负责分店的路线资金、每日收款和放款。",
+  "sup.noBranches": "你没有分配的分店，请联系管理员。",
+  "sup.customers": "{n} 位客户",
+  "sup.late": "{n} 位逾期",
+  "sup.noActions": "管理员未授予你在此分店结账或投资的权限。",
+  "sup.noApprove": "管理员未授予你审批贷款的权限。",
+  "perm.routes.approve_loans": "审批贷款",
+  "perm.routes.approve_loans.d": "审批或拒绝因超出规则而待审的贷款。",
 };
 
 export default zh;

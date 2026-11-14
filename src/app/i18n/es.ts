@@ -188,7 +188,7 @@ const es = {
   'shell.logout': "Cerrar sesión",
   'shell.menu': "Menú",
   'owner.of': "{used} de {max}",
-  'owner.notOwner': "Esta sección es solo para el administrador de la empresa. El panel de supervisor llega pronto.",
+  'owner.notOwner': "Esta sección es solo para el administrador de la empresa.",
   'owner.suspended': "Tu cuenta está en solo lectura por falta de pago. Paga tu plan para volver a registrar ventas y cobros.",
   'owner.grace': "Tu pago está pendiente. Tienes hasta el {date} para pagar sin que se bloquee tu cuenta.",
   'owner.trialLeft': "Te quedan {days} días de prueba gratis con todo incluido.",
@@ -1287,6 +1287,16 @@ const es = {
   "perm.routes.liquidate.d": "Cierre de caja (liquidación) de la ruta: contar el efectivo y registrar gastos, pagos y retiros.",
   "perm.routes.invest": "Invertir y retirar en la caja de ruta",
   "perm.routes.invest.d": "Meter inversión o sacar dinero de la caja de la ruta.",
+  "sup.navRoutes": "Rutas y cajas",
+  "sup.title": "Rutas y cajas",
+  "sup.subtitle": "Cajas de ruta, cobrado y prestado por día en tus sucursales.",
+  "sup.noBranches": "No tienes sucursales asignadas. Pídele al administrador que te asigne una.",
+  "sup.customers": "{n} clientes",
+  "sup.late": "{n} con atraso",
+  "sup.noActions": "El administrador no te dio permiso para cierres ni inversiones en esta sucursal.",
+  "sup.noApprove": "El administrador no te dio permiso para aprobar préstamos.",
+  "perm.routes.approve_loans": "Aprobar préstamos",
+  "perm.routes.approve_loans.d": "Aprobar o rechazar los préstamos que quedan pendientes por pasar las reglas.",
 };
 
 export default es;

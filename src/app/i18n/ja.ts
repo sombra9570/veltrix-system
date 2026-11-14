@@ -1278,6 +1278,16 @@ const ja: Record<DictKey, string> = {
   "perm.routes.liquidate.d": "ルートの資金締め：現金を数え、経費・支払・引き出しを記録。",
   "perm.routes.invest": "ルート資金の投資・引き出し",
   "perm.routes.invest.d": "ルート資金に投資を入れる、またはお金を引き出す。",
+  "sup.navRoutes": "ルートと資金",
+  "sup.title": "ルートと資金",
+  "sup.subtitle": "担当支店のルート資金と日別の回収・貸付。",
+  "sup.noBranches": "担当支店がありません。管理者に依頼してください。",
+  "sup.customers": "顧客 {n} 人",
+  "sup.late": "延滞 {n} 人",
+  "sup.noActions": "この支店での締めや投資の権限が付与されていません。",
+  "sup.noApprove": "貸付を承認する権限が付与されていません。",
+  "perm.routes.approve_loans": "貸付を承認",
+  "perm.routes.approve_loans.d": "ルール超過で承認待ちの貸付を承認・却下する。",
 };
 
 export default ja;

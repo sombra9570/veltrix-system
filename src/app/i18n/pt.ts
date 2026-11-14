@@ -1278,6 +1278,16 @@ const pt: Record<DictKey, string> = {
   "perm.routes.liquidate.d": "Fechamento de caixa (liquidação) da rota: contar o dinheiro e registrar despesas, pagamentos e retiradas.",
   "perm.routes.invest": "Investir e retirar na caixa da rota",
   "perm.routes.invest.d": "Colocar investimento ou tirar dinheiro da caixa da rota.",
+  "sup.navRoutes": "Rotas e caixas",
+  "sup.title": "Rotas e caixas",
+  "sup.subtitle": "Caixas de rota, cobrado e emprestado por dia nas suas filiais.",
+  "sup.noBranches": "Você não tem filiais atribuídas. Peça ao administrador.",
+  "sup.customers": "{n} clientes",
+  "sup.late": "{n} em atraso",
+  "sup.noActions": "O administrador não lhe deu permissão para fechamentos nem investimentos nesta filial.",
+  "sup.noApprove": "O administrador não lhe deu permissão para aprovar empréstimos.",
+  "perm.routes.approve_loans": "Aprovar empréstimos",
+  "perm.routes.approve_loans.d": "Aprovar ou rejeitar empréstimos pendentes por passar as regras.",
 };
 
 export default pt;

@@ -1278,6 +1278,16 @@ const ko: Record<DictKey, string> = {
   "perm.routes.liquidate.d": "노선 자금 정산: 현금을 세고 경비·지급·인출을 기록.",
   "perm.routes.invest": "노선 자금 투자·인출",
   "perm.routes.invest.d": "노선 자금에 투자하거나 돈을 인출.",
+  "sup.navRoutes": "노선과 자금",
+  "sup.title": "노선과 자금",
+  "sup.subtitle": "담당 지점의 노선 자금과 일별 수금·대출.",
+  "sup.noBranches": "배정된 지점이 없습니다. 총괄 관리자에게 요청하세요.",
+  "sup.customers": "고객 {n}명",
+  "sup.late": "연체 {n}명",
+  "sup.noActions": "이 지점에서 정산·투자 권한이 없습니다.",
+  "sup.noApprove": "대출 승인 권한이 없습니다.",
+  "perm.routes.approve_loans": "대출 승인",
+  "perm.routes.approve_loans.d": "규칙 초과로 대기 중인 대출을 승인·거절.",
 };
 
 export default ko;

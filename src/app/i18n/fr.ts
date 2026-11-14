@@ -1278,6 +1278,16 @@ const fr: Record<DictKey, string> = {
   "perm.routes.liquidate.d": "Clôture de caisse de la tournée : compter l'argent et enregistrer dépenses, paiements et retraits.",
   "perm.routes.invest": "Investir et retirer dans la caisse de tournée",
   "perm.routes.invest.d": "Ajouter un investissement ou retirer de l'argent de la caisse de la tournée.",
+  "sup.navRoutes": "Tournées et caisses",
+  "sup.title": "Tournées et caisses",
+  "sup.subtitle": "Caisses de tournée, encaissé et prêté par jour dans vos succursales.",
+  "sup.noBranches": "Aucune succursale assignée. Demandez à l'administrateur.",
+  "sup.customers": "{n} clients",
+  "sup.late": "{n} en retard",
+  "sup.noActions": "L'administrateur ne vous a pas autorisé aux clôtures ni aux investissements dans cette succursale.",
+  "sup.noApprove": "L'administrateur ne vous a pas autorisé à approuver les prêts.",
+  "perm.routes.approve_loans": "Approuver les prêts",
+  "perm.routes.approve_loans.d": "Approuver ou refuser les prêts en attente car hors règles.",
 };
 
 export default fr;

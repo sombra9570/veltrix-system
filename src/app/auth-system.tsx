@@ -18,7 +18,7 @@ export function homeForRole(role: UserRole): string {
   switch (role) {
     case 'superadmin': return '/dashboard/admin';
     case 'owner':
-    case 'supervisor': return '/dashboard/owner';
+    case 'supervisor': return '/dashboard/supervisor';
     case 'cashier': return '/dashboard/cashier';
     case 'collector': return '/dashboard/collector';
     case 'waiter': return '/dashboard/waiter';
