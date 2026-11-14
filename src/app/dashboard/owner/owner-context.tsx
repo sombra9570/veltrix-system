@@ -50,6 +50,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/caja', icon: '💵', label: 'nav.cash' },
   { href: '/dashboard/owner/clientes', icon: '🤝', label: 'nav.customers' },
   { href: '/dashboard/owner/rutas', icon: '🛵', label: 'nav.routes', module: 'field_collection' },
+  { href: '/dashboard/owner/prestamos', icon: '💸', label: 'nav.loans', module: 'field_collection' },
   { href: '/dashboard/owner/mesas', icon: '🍽️', label: 'nav.tables', module: 'restaurant' },
   { href: '/dashboard/owner/cocina', icon: '🔥', label: 'nav.kitchen', module: 'restaurant' },
   { href: '/dashboard/owner/taller', icon: '🔧', label: 'nav.workshop', module: 'workshop' },

@@ -8,6 +8,7 @@ import type { DictKey } from '../../i18n/es';
 import { money, parseAmount } from '../format';
 import { useStaff } from '../staff-context';
 import { CreditCard, applyPayment, freqOf, type Credit, type Freq, type Method } from './credit-card';
+import { LoanForm, RATING_DOT, type LoanPolicy } from './loan-form';
 
 /* ------------------------------------------------------------------
  * Cobrador de calle: trabaja SIN internet.
@@ -21,12 +22,14 @@ type Customer = {
   id: string; name: string; phone: string | null; address: string | null; lat: number | null; lng: number | null;
   balance: number; overdue: number; due_today: number; next_due: string | null; visited_today: boolean;
   credits?: Credit[];
+  rating?: string;
   last_visit?: { at: string; result: VisitResult; notes: string | null; promise_date: string | null; promise_amount: number | null } | null;
 };
 type Settlement = { id: string; at: string; status: string; cash: number; expenses: number; deliver: number };
 type Route = {
   id: string; name: string; branch: string; currency: string; today: string;
-  unsettled_cash: number; unsettled_digital: number; unsettled_expenses: number;
+  unsettled_cash: number; unsettled_digital: number; unsettled_expenses: number; unsettled_loans?: number;
+  policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_interest?: boolean;
   customers: Customer[]; settlements: Settlement[];
 };
 type Day = { generated_at: string; routes: Route[] };
@@ -66,7 +69,7 @@ export default function CollectorPage() {
   const [syncing, setSyncing] = useState(false);
   const [routeId, setRouteId] = useState('');
   const [sel, setSel] = useState<Customer | null>(null);
-  const [panel, setPanel] = useState<'pay' | 'visit' | 'expense' | 'settle' | null>(null);
+  const [panel, setPanel] = useState<'pay' | 'visit' | 'expense' | 'settle' | 'loan' | null>(null);
   const [view, setView] = useState<'cards' | 'list'>('list');
   const [freq, setFreq] = useState<Freq | 'all'>('all');
   useEffect(() => { const v = load<string>('vx_col_view', 'list'); if (v === 'cards' || v === 'list') setView(v); }, []);
@@ -222,7 +225,8 @@ export default function CollectorPage() {
 
   const pendingRoute = queue.filter((q) => q.route === route.id).length;
   const visited = route.customers.filter((c) => c.visited_today).length;
-  const inHand = Number(route.unsettled_cash) - Number(route.unsettled_expenses);
+  const loans = Number(route.unsettled_loans ?? 0);
+  const inHand = Number(route.unsettled_cash) - Number(route.unsettled_expenses) - loans;
   const shown = freq === 'all' ? route.customers : route.customers.filter((c) => c.credits?.some((k) => freqOf(k) === freq));
 
   return (
@@ -256,7 +260,7 @@ export default function CollectorPage() {
       </div>
 
       {/* Lo que llevo encima */}
-      <div className="grid grid-cols-3 gap-2 text-center">
+      <div className={`grid gap-2 text-center ${loans !== 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
         <Card className="!p-3">
           <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.cash')}</p>
           <p className="font-extrabold">{fmt(route.unsettled_cash)}</p>
@@ -265,12 +269,23 @@ export default function CollectorPage() {
           <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.expenses')}</p>
           <p className="font-extrabold text-red-600 dark:text-red-400">{fmt(route.unsettled_expenses)}</p>
         </Card>
+        {loans !== 0 && (
+          <Card className="!p-3">
+            <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('loan.lent')}</p>
+            <p className="font-extrabold text-violet-600 dark:text-violet-400">{fmt(loans)}</p>
+          </Card>
+        )}
         <Card className="!p-3">
           <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.toDeliver')}</p>
           <p className="font-extrabold text-emerald-600 dark:text-emerald-400">{fmt(inHand)}</p>
         </Card>
       </div>
 
+      {route.can_loan && route.policy && (
+        <button type="button" onClick={() => { setSel(null); setPanel('loan'); }} disabled={!online} className={`${ui.btnPrimary} w-full py-3`}>
+          💸 {t('loan.title')}{!online ? ` · ${t('loan.needsSignal')}` : ''}
+        </button>
+      )}
       <div className="grid grid-cols-2 gap-2">
         <button type="button" onClick={() => { setSel(null); setPanel('expense'); }} className={ui.btnGhost}>⛽ {t('col.addExpense')}</button>
         <button type="button" onClick={() => { setSel(null); setPanel('settle'); }} className={ui.btnGhost}>🏁 {t('col.settle')}</button>
@@ -309,13 +324,13 @@ export default function CollectorPage() {
               <div className="flex items-start gap-3">
                 <span className="text-xl">{c.visited_today ? '✅' : Number(c.overdue) > 0 ? '🔴' : Number(c.due_today) > 0 ? '🟡' : '⚪'}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-bold">{c.name}</p>
+                  <p className="flex items-center gap-1.5 truncate font-bold"><Dot r={c.rating} />{c.name}</p>
                   <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
                   {c.last_visit && <Note v={c.last_visit} />}
                 </div>
                 <button type="button" onClick={() => { setSel(c); setPanel(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>👤 {t('card.profile')}</button>
               </div>
-              <Credits c={c} filter={freq} today={route.today} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
+              <Credits c={c} filter={freq} today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
               {(c.credits ?? []).length === 0 && <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>}
             </Card>
           ))}
@@ -331,7 +346,7 @@ export default function CollectorPage() {
               className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer ${ui.card} ${c.visited_today ? 'opacity-60' : ''} ${sel?.id === c.id ? 'ring-2 ring-blue-500' : ''}`}>
               <span className="text-xl">{c.visited_today ? '✅' : Number(c.overdue) > 0 ? '🔴' : Number(c.due_today) > 0 ? '🟡' : '⚪'}</span>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-bold">{c.name}</p>
+                <p className="flex items-center gap-1.5 truncate font-bold"><Dot r={c.rating} />{c.name}</p>
                 <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
                 {c.last_visit && <Note v={c.last_visit} />}
               </div>
@@ -355,7 +370,7 @@ export default function CollectorPage() {
 
             {sel && !panel && (
               <CustomerSheet c={selNow ?? sel} fmt={fmt} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
-                cards={<Credits c={selNow ?? sel} filter="all" today={route.today} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />} />
+                cards={<Credits c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />} />
             )}
             {sel && panel === 'pay' && (
               <PayForm c={sel} fmt={fmt} onDone={(method, amount) => {
@@ -378,6 +393,11 @@ export default function CollectorPage() {
                 flash(true, online ? t('cash.movementSaved') : t('col.savedOffline'));
                 setPanel(null);
               }} />
+            )}
+            {panel === 'loan' && route.policy && (
+              <LoanForm routeId={route.id} today={route.today} policy={route.policy} canInterest={!!route.can_interest}
+                canCustomers={route.can_customers !== false} fmt={fmt}
+                onDone={async (text, ok) => { flash(ok, text); setPanel(null); await refresh(); }} />
             )}
             {panel === 'settle' && (
               <SettleSheet route={route} fmt={fmt} online={online} pending={pendingRoute}
@@ -405,8 +425,14 @@ function Note({ v }: { v: NonNullable<Customer['last_visit']> }) {
 
 /* ---------- Ficha rápida del cliente ---------- */
 /* ---------- Créditos del cliente: una tarjeta por crédito, todas dentro del mismo cliente ---------- */
-function Credits({ c, filter, today, fmt, onSave }: {
-  c: Customer; filter: Freq | 'all'; today: string; fmt: (n: number) => string;
+function Dot({ r }: { r?: string }) {
+  const { t } = useT();
+  if (!r) return null;
+  return <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${RATING_DOT[r] ?? RATING_DOT.new}`} title={t(`rating.${r}` as DictKey)} />;
+}
+
+function Credits({ c, filter, today, policy, fmt, onSave }: {
+  c: Customer; filter: Freq | 'all'; today: string; policy?: LoanPolicy; fmt: (n: number) => string;
   onSave: (order: string, amount: number, method: Method) => void;
 }) {
   const { t, lang } = useT();
@@ -415,8 +441,19 @@ function Credits({ c, filter, today, fmt, onSave }: {
   if (all.length === 0) return <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>;
   return (
     <div className="space-y-4">
-      {list.map((k) => (
-        <div key={k.id} className="space-y-2 rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+      {list.map((k) => {
+        // Atraso contado desde las fechas del crédito: borde rojo al llegar al tope de su frecuencia
+        const late = k.installments.filter((i) => i.due < today && Number(i.amount) - Number(i.paid) > 0.004).length;
+        const f = freqOf(k);
+        const limit = Number((policy as Record<string, number> | undefined)?.[`late_${f}`] ?? ({ daily: 10, weekly: 2, biweekly: 1, monthly: 1 })[f]);
+        const border = late >= limit && limit > 0 ? 'border-4 border-red-500' : late > 0 ? 'border-2 border-amber-400' : 'border border-slate-200 dark:border-slate-800';
+        return (
+        <div key={k.id} className={`space-y-2 rounded-xl p-3 ${border}`}>
+          {late > 0 && (
+            <p className={`text-xs font-bold ${late >= limit ? 'text-red-600 dark:text-red-400' : 'text-amber-700 dark:text-amber-300'}`}>
+              {late >= limit ? '🚨' : '⚠️'} {t('card.lateN', { n: late })}
+            </p>
+          )}
           {all.length > 1 && (
             <p className="text-xs font-bold">
               💳 {t('card.creditN', { n: all.indexOf(k) + 1, total: all.length })}
@@ -425,7 +462,8 @@ function Credits({ c, filter, today, fmt, onSave }: {
           )}
           <CreditCard credit={k} today={today} fmt={fmt} onSave={(amount, method) => onSave(k.id, amount, method)} />
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -583,8 +621,9 @@ function SettleSheet({ route, fmt, online, pending, onClosed }: {
   const { t, lang } = useT();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
-  const deliver = Number(route.unsettled_cash) - Number(route.unsettled_expenses);
-  const nothing = Number(route.unsettled_cash) === 0 && Number(route.unsettled_digital) === 0 && Number(route.unsettled_expenses) === 0;
+  const lent = Number(route.unsettled_loans ?? 0);
+  const deliver = Number(route.unsettled_cash) - Number(route.unsettled_expenses) - lent;
+  const nothing = Number(route.unsettled_cash) === 0 && Number(route.unsettled_digital) === 0 && Number(route.unsettled_expenses) === 0 && lent === 0;
 
   const close = async () => {
     setBusy(true);
@@ -606,6 +645,7 @@ function SettleSheet({ route, fmt, online, pending, onClosed }: {
         <li className="flex justify-between"><span>{t('col.cash')}</span><b>{fmt(route.unsettled_cash)}</b></li>
         <li className="flex justify-between"><span>{t('col.digital')}</span><b>{fmt(route.unsettled_digital)}</b></li>
         <li className="flex justify-between"><span>{t('col.expenses')}</span><b className="text-red-600 dark:text-red-400">− {fmt(route.unsettled_expenses)}</b></li>
+        {lent !== 0 && <li className="flex justify-between"><span>{t('loan.lent')}</span><b className="text-violet-600 dark:text-violet-400">− {fmt(lent)}</b></li>}
         <li className="flex justify-between border-t border-slate-200 pt-2 text-base dark:border-slate-800"><span>{t('col.toDeliver')}</span><b>{fmt(deliver)}</b></li>
       </ul>
       <p className={`text-xs ${ui.muted}`}>{t('col.settleHint')}</p>
