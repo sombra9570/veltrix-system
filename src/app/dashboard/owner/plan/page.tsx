@@ -19,19 +19,53 @@ type Billing = {
 
 const usd = (n: number) => `US$ ${Number(n).toFixed(2)}`;
 
+type Addons = {
+  items: { code: 'user' | 'branch' | 'storage'; price: number; unit_mb: number; max: number; qty: number }[];
+  monthly: number;
+  used: { users: number; branches: number; storage_mb: number };
+  limits: { users: number; branches: number; storage_mb: number };
+};
+
 export default function PlanPage() {
   const { t, lang } = useT();
   const { orgId, reload } = useOwner();
   const [b, setB] = useState<Billing | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [ad, setAd] = useState<Addons | null>(null);
+  const [qty, setQty] = useState<Record<string, number>>({});
+  const [adBusy, setAdBusy] = useState(false);
   const k = (key: string) => t(key as DictKey);
   const day = (d: string | null) => (d ? new Date(d.length === 10 ? `${d}T12:00:00` : d).toLocaleDateString(lang, { day: 'numeric', month: 'long', year: 'numeric' }) : '—');
 
   const load = useCallback(async () => {
     if (!orgId) return;
     try { setB(await rpc<Billing>('my_billing', { p_org: orgId })); } catch { /* */ }
+    try {
+      const a = await rpc<Addons>('my_addons', { p_org: orgId });
+      setAd(a); setQty(Object.fromEntries(a.items.map((i) => [i.code, i.qty])));
+    } catch { /* */ }
   }, [orgId]);
+
+  const saveAddons = async () => {
+    if (!ad) return;
+    setAdBusy(true); setMsg(null);
+    try {
+      await rpc('set_my_addons', { p_org: orgId, p_users: qty.user ?? 0, p_branches: qty.branch ?? 0, p_storage_units: qty.storage ?? 0 });
+      const { data: s } = await supabase.auth.getSession();
+      await fetch('/api/billing/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${s.session?.access_token ?? ''}` },
+        body: JSON.stringify({ org_id: orgId }),
+      }).catch(() => null);
+      setMsg({ ok: true, text: t('addon.saved') });
+      await Promise.all([load(), reload()]);
+    } catch (e) {
+      const m = (e as Error).message;
+      setMsg({ ok: false, text: m.includes('IN_USE_USERS') ? t('addon.inUseUsers') : m.includes('IN_USE_BRANCHES') ? t('addon.inUseBranches')
+        : m.includes('IN_USE_STORAGE') ? t('addon.inUseStorage') : t('bill.error') });
+    } finally { setAdBusy(false); }
+  };
   useEffect(() => { load(); }, [load]);
 
   // Al volver del pago: el aviso de la pasarela puede tardar unos segundos
@@ -59,7 +93,7 @@ export default function PlanPage() {
     setBusy(null);
   };
 
-  if (!b) return <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p>;
+  if (!b) return <p className={`text-sm ${ui.muted}`}>{t('addon.saving')}</p>;
 
   const current = b.plans.find((p) => p.code === b.plan_code);
   const trialLeft = b.trial_ends_at ? Math.ceil((new Date(b.trial_ends_at).getTime() - Date.now()) / 86_400_000) : 0;
@@ -107,13 +141,60 @@ export default function PlanPage() {
 
         <div className="flex flex-col gap-2 sm:flex-row">
           {b.subscribed ? (
-            <button type="button" disabled={!!busy} onClick={() => pay()} className={`${ui.btnPrimary} sm:flex-1`}>{busy ? t('common.wait') : t('bill.manage')}</button>
+            <button type="button" disabled={!!busy} onClick={() => pay()} className={`${ui.btnPrimary} sm:flex-1`}>{busy ? t('addon.saving') : t('bill.manage')}</button>
           ) : (
-            <button type="button" disabled={!!busy} onClick={() => pay()} className={`${ui.btnPrimary} sm:flex-1`}>{busy === 'current' ? t('common.wait') : t('bill.payCard')}</button>
+            <button type="button" disabled={!!busy} onClick={() => pay()} className={`${ui.btnPrimary} sm:flex-1`}>{busy === 'current' ? t('addon.saving') : t('bill.payCard')}</button>
           )}
         </div>
         <p className={`text-xs ${ui.muted}`}>{b.subscribed ? t('bill.manageHint') : t('bill.payHint')}</p>
       </Card>
+
+      {/* Extras */}
+      {ad && ad.items.length > 0 && (
+        <Card className="space-y-4">
+          <div>
+            <h2 className="font-bold">➕ {t('addon.title')}</h2>
+            <p className={`text-xs ${ui.muted}`}>{t('addon.hint')}</p>
+          </div>
+          <ul className="space-y-3">
+            {ad.items.map((it) => {
+              const q = qty[it.code] ?? 0;
+              const usage = it.code === 'user' ? t('addon.usageUsers', { used: ad.used.users, max: ad.limits.users })
+                : it.code === 'branch' ? t('addon.usageBranches', { used: ad.used.branches, max: ad.limits.branches })
+                : t('addon.usageStorage', { used: (ad.used.storage_mb / 1024).toFixed(1), max: (ad.limits.storage_mb / 1024).toFixed(1) });
+              return (
+                <li key={it.code} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="font-semibold">{t(`addon.${it.code}` as 'addon.user', { gb: Math.round(it.unit_mb / 1024) })}</p>
+                    <p className={`text-xs ${ui.muted}`}>{usd(it.price)} {t('addon.perUnit')} · {usage}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center rounded-xl border border-slate-300 dark:border-slate-700">
+                      <button type="button" disabled={q <= 0} onClick={() => setQty({ ...qty, [it.code]: q - 1 })} aria-label="−" className="h-10 w-10 text-lg font-bold cursor-pointer disabled:opacity-40">−</button>
+                      <span className="w-10 text-center font-extrabold">{q}</span>
+                      <button type="button" disabled={q >= it.max} onClick={() => setQty({ ...qty, [it.code]: q + 1 })} aria-label="+" className="h-10 w-10 text-lg font-bold cursor-pointer disabled:opacity-40">+</button>
+                    </div>
+                    <span className="w-24 text-end text-sm font-bold">{usd(q * Number(it.price))}</span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          {(() => {
+            const total = ad.items.reduce((sum, it) => sum + (qty[it.code] ?? 0) * Number(it.price), 0);
+            const changed = ad.items.some((it) => (qty[it.code] ?? 0) !== it.qty);
+            return (
+              <div className="flex flex-col gap-3 border-t border-slate-200 pt-3 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
+                <p className="font-extrabold">{t('addon.total', { amount: usd(total) })} <span className={`text-xs font-semibold ${ui.muted}`}>{t('bill.plusTax')}</span></p>
+                <button type="button" disabled={!changed || adBusy} onClick={saveAddons} className={`${ui.btnPrimary} max-sm:w-full`}>
+                  {adBusy ? t('addon.saving') : t('addon.save')}
+                </button>
+              </div>
+            );
+          })()}
+          <p className={`text-xs ${ui.muted}`}>{b.subscribed ? t('addon.billingCard') : t('addon.billingNext')}</p>
+        </Card>
+      )}
 
       {/* Planes */}
       <div>
@@ -138,7 +219,7 @@ export default function PlanPage() {
                 </ul>
                 {!isCurrent && (
                   <button type="button" disabled={!!busy} onClick={() => pay(p.code)} className={`${ui.btnGhost} mt-4 w-full`}>
-                    {busy === p.code ? t('common.wait') : t('bill.choose')}
+                    {busy === p.code ? t('addon.saving') : t('bill.choose')}
                   </button>
                 )}
               </Card>

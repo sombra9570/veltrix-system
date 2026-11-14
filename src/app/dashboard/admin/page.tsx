@@ -142,6 +142,27 @@ export default function GlobalCoreAdminPage() {
       setPlanMsg(m.includes('INVALID') ? '⚠️ Revisa los valores: precios desde 0 y límites desde 1.' : '⚠️ No se pudo guardar el plan.');
     }
   };
+  // Extras pagados (usuarios, sucursales, almacenamiento)
+  type AdminAddon = { code: string; price_usd: number; price_global_usd: number; max_units: number; unit_mb: number };
+  const [addons, setAddons] = useState<AdminAddon[]>([]);
+  const [adEdit, setAdEdit] = useState<Record<string, Record<string, string>>>({});
+  const loadAddons = useCallback(async () => { try { setAddons(await rpc<AdminAddon[]>('admin_addons') ?? []); } catch { /* */ } }, []);
+  useEffect(() => { if (loaded && session?.role === 'superadmin') loadAddons(); }, [loaded, session, loadAddons]);
+  const ADDON_NAME: Record<string, string> = { user: '👤 Usuario extra', branch: '🏪 Sucursal extra', storage: '💾 Almacenamiento extra' };
+  const adVal = (a: AdminAddon, k: keyof AdminAddon) => adEdit[a.code]?.[k as string] ?? String(a[k]);
+  const saveAddon = async (a: AdminAddon) => {
+    const v = (k: keyof AdminAddon) => Number(adVal(a, k).replace(',', '.'));
+    setPlanMsg('');
+    try {
+      await rpc('admin_save_addon', { p_code: a.code, p_price_usd: v('price_usd'), p_price_global_usd: v('price_global_usd'), p_max_units: v('max_units') });
+      setAdEdit((e) => { const c = { ...e }; delete c[a.code]; return c; });
+      setPlanMsg(`✅ ${ADDON_NAME[a.code] ?? a.code} guardado. Cambia también el precio en Paddle.`);
+      await loadAddons();
+    } catch (e) {
+      const m = e instanceof Error ? e.message : '';
+      setPlanMsg(m.includes('INVALID') ? '⚠️ Revisa los valores: precios desde 0 y máximo entre 0 y 500.' : '⚠️ No se pudo guardar el extra.');
+    }
+  };
   // Borrar empresas de prueba
   const purgeOrg = async (org: { org_id: string; name: string }) => {
     const typed = window.prompt(`Esto borra PARA SIEMPRE la empresa "${org.name}" con todas sus ventas, clientes, usuarios y archivos.\n\nPara confirmar, escribe su nombre exacto:`);
@@ -419,6 +440,34 @@ export default function GlobalCoreAdminPage() {
               </div>
             ))}
           </div>
+          {addons.length > 0 && (
+            <div className="space-y-2 pt-2">
+              <h3 className="text-xs font-bold text-slate-300">➕ Extras que el dueño compra sin subir de plan (precio por unidad al mes)</h3>
+              <div className="grid gap-3 lg:grid-cols-3">
+                {addons.map((a) => (
+                  <div key={a.code} className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-2 text-xs">
+                    <p className="text-sm font-bold">{ADDON_NAME[a.code] ?? a.code}{a.code === 'storage' && <span className="text-slate-400 font-normal"> · {Math.round(a.unit_mb / 1024)} GB por unidad</span>}</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {([['price_usd', 'Latam (USD)'], ['price_global_usd', 'Mundo (USD)'], ['max_units', 'Máximo']] as [keyof AdminAddon, string][]).map(([k, label]) => (
+                        <label key={k} className="block">
+                          <span className="block text-[11px] text-slate-400 mb-0.5">{label}</span>
+                          <input inputMode="decimal" value={adVal(a, k)}
+                            onChange={(e) => setAdEdit({ ...adEdit, [a.code]: { ...adEdit[a.code], [k]: e.target.value } })}
+                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
+                        </label>
+                      ))}
+                    </div>
+                    {adEdit[a.code] && (
+                      <div className="flex gap-2 pt-1">
+                        <button type="button" onClick={() => setAdEdit((e) => { const c = { ...e }; delete c[a.code]; return c; })} className="flex-1 border border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
+                        <button type="button" onClick={() => saveAddon(a)} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar</button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         {/* PILOTOS Y FUNDADORES */}

@@ -68,7 +68,9 @@ export default function HomePage() {
   const [cat, setCat] = useState('credit_sales');
   const [faq, setFaq] = useState<number | null>(0);
 
+  const [extras, setExtras] = useState<{ code: string; price_usd: number; price_global_usd: number; unit_mb: number }[]>([]);
   useEffect(() => { rpc<PublicPlan[]>('public_plans').then((p) => { if (p?.length) setPlans(p); }).catch(() => {}); }, []);
+  useEffect(() => { rpc<typeof extras>('public_addons').then((a) => setExtras(a ?? [])).catch(() => {}); }, []);
 
   const cats = BUSINESS_CATEGORIES.filter((c) => c.kind === kind);
   const selectedCat = BUSINESS_CATEGORIES.find((c) => c.id === cat) ?? cats[0];
@@ -224,6 +226,15 @@ export default function HomePage() {
             );
           })}
         </div>
+        {extras.length > 0 && (() => {
+          const px = (c: string) => { const a = extras.find((e) => e.code === c); return a ? formatMoney(Number(latam ? a.price_usd : a.price_global_usd)) : null; };
+          const st = extras.find((e) => e.code === 'storage');
+          return (
+            <p className={`mt-4 text-center text-xs ${ui.muted}`}>
+              ➕ {t('home.extras', { user: px('user') ?? '—', branch: px('branch') ?? '—', storage: px('storage') ?? '—', gb: st ? Math.round(st.unit_mb / 1024) : 5 })}
+            </p>
+          );
+        })()}
       </section>
 
       {/* PREGUNTAS FRECUENTES */}

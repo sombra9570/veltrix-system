@@ -14,12 +14,14 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [ ] **Vercel Pro** antes del primer cliente que pague (Hobby no permite uso comercial)
 - [ ] **Paddle** (Merchant of Record): cuenta y verificación (primero en modo sandbox para probar)
       - Catálogo: producto "Veltrix" con 6 precios mensuales (Starter, Pro, Enterprise × Latinoamérica e internacional)
+      - Extras: producto "Extras Veltrix" con 6 precios mensuales por unidad: usuario 3/4, sucursal 10/15,
+        +5 GB 3/4 USD (Latinoamérica/internacional). Si cambias precios en el panel, cámbialos también aquí
       - Descuentos: fundador 50 % recurrente 12 meses; referidos 15 %, 20 % y 30 % de UN solo cobro
       - Checkout → "Default payment link": `https://veltrixsystem.app/pagar`
       - Notificaciones → destino `https://veltrixsystem.app/api/billing/webhook` con eventos subscription.* y
         transaction.completed / transaction.payment_failed
 - [ ] **Vercel**: `PADDLE_API_KEY`, `PADDLE_WEBHOOK_SECRET`, `PADDLE_ENV` (sandbox al probar), `PADDLE_PRICES`,
-      `PADDLE_FOUNDER_DISCOUNTS`, `PADDLE_REFERRAL_DISCOUNTS`, `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`,
+      `PADDLE_FOUNDER_DISCOUNTS`, `PADDLE_REFERRAL_DISCOUNTS`, `PADDLE_ADDON_PRICES`, `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`,
       `SUPABASE_SERVICE_ROLE_KEY` (solo en Vercel)
 - [ ] **Abogado**: revisar Términos, Privacidad y Reembolsos (borrador publicado en la web)
 - [ ] **Contador en línea** en Bolivia (empresa formal, NIT, cómo declarar los pagos del Merchant of Record)

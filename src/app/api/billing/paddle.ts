@@ -5,6 +5,7 @@
 //   PADDLE_ENV                  "sandbox" para pruebas; vacío = producción
 //   PADDLE_PRICES               {"starter":{"latam":"pri_…","global":"pri_…"},"pro":{…},"enterprise":{…}}
 //   PADDLE_FOUNDER_DISCOUNTS    (opcional) {"50":"dsc_…"}: descuento recurrente de 12 meses por % de fundador
+//   PADDLE_ADDON_PRICES         {"user":{"latam":"pri_…","global":"pri_…"},"branch":{…},"storage":{…}}
 //   PADDLE_REFERRAL_DISCOUNTS   (opcional) {"15":"dsc_…","20":"dsc_…","30":"dsc_…"}: descuentos de UN solo cobro
 //   NEXT_PUBLIC_PADDLE_CLIENT_TOKEN  token público para abrir el pago en /pagar
 //   SUPABASE_SERVICE_ROLE_KEY   solo para los avisos y descuentos (nunca en el navegador)
@@ -23,9 +24,11 @@ export const paddle = {
   prices: json<Prices>(process.env.PADDLE_PRICES, {}),
   founderDiscounts: json<Record<string, string>>(process.env.PADDLE_FOUNDER_DISCOUNTS, {}),
   referralDiscounts: json<Record<string, string>>(process.env.PADDLE_REFERRAL_DISCOUNTS, {}),
+  addonPrices: json<Prices>(process.env.PADDLE_ADDON_PRICES, {}),
 };
 
 export const priceFor = (plan: string, region: Region) => paddle.prices[plan]?.[region];
+export const addonPriceFor = (code: string, region: Region) => paddle.addonPrices[code]?.[region];
 
 /** De un price_id de Paddle a su plan de Veltrix */
 export function planForPrice(priceId: string | null | undefined): string | null {

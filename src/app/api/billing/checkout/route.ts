@@ -3,7 +3,7 @@
 //  - Con suscripción y otro plan: cambia el plan en Paddle (se cobra la diferencia prorrateada).
 //  - Con suscripción y el mismo plan: abre el portal del cliente (tarjeta, facturas, cancelar).
 import { createClient } from '@supabase/supabase-js';
-import { paddle, paddleApi, priceFor, type Region } from '../paddle';
+import { paddle, paddleApi, priceFor, addonPriceFor, type Region } from '../paddle';
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -36,12 +36,18 @@ export async function POST(request: Request) {
   if (billing.subscribed) {
     const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
     const { data: org } = await admin.from('organizations')
-      .select('billing_subscription_id, billing_customer_id').eq('id', body.org_id).single();
+      .select('billing_subscription_id, billing_customer_id, addon_users, addon_branches, addon_storage_units').eq('id', body.org_id).single();
     if (!org?.billing_subscription_id) return fail(409, 'BILLING_PROVIDER_ERROR');
 
     if (plan !== billing.plan_code) {
+      // El plan nuevo + los extras que ya tenía
+      const items: { price_id: string; quantity: number }[] = [{ price_id: priceId, quantity: 1 }];
+      for (const [code, qty] of [['user', org.addon_users], ['branch', org.addon_branches], ['storage', org.addon_storage_units]] as const) {
+        const pid = addonPriceFor(code, billing.region);
+        if (Number(qty) > 0 && pid) items.push({ price_id: pid, quantity: Number(qty) });
+      }
       const r = await paddleApi(`/subscriptions/${org.billing_subscription_id}`, 'PATCH', {
-        items: [{ price_id: priceId, quantity: 1 }],
+        items,
         proration_billing_mode: 'prorated_immediately',
       });
       return r.ok ? Response.json({ changed: true }) : fail(502, 'BILLING_PROVIDER_ERROR');
@@ -53,8 +59,17 @@ export async function POST(request: Request) {
   }
 
   const discount = billing.founder_active ? paddle.founderDiscounts[String(billing.founder_discount_pct)] : undefined;
+  // Extras elegidos durante la prueba también entran en la suscripción
+  const adminNew = createClient(url, serviceKey, { auth: { persistSession: false } });
+  const { data: ad } = await adminNew.from('organizations')
+    .select('addon_users, addon_branches, addon_storage_units').eq('id', body.org_id).single();
+  const newItems: { price_id: string; quantity: number }[] = [{ price_id: priceId, quantity: 1 }];
+  for (const [code, qty] of [['user', ad?.addon_users], ['branch', ad?.addon_branches], ['storage', ad?.addon_storage_units]] as const) {
+    const pid = addonPriceFor(code, billing.region);
+    if (Number(qty) > 0 && pid) newItems.push({ price_id: pid, quantity: Number(qty) });
+  }
   const r = await paddleApi<{ checkout?: { url?: string } }>('/transactions', 'POST', {
-    items: [{ price_id: priceId, quantity: 1 }],
+    items: newItems,
     custom_data: { org_id: body.org_id },
     ...(discount ? { discount_id: discount } : {}),
   });

@@ -60,7 +60,8 @@ export async function POST(request: Request) {
       : cancelAt ? 'cancelled' : s.status;   // active, past_due, paused
     event = 'subscription_updated';
     orgId = s.custom_data?.org_id ?? null;
-    planCode = planForPrice(s.items?.[0]?.price?.id);
+    // Los extras van como ítems aparte: el plan es el ítem cuyo precio corresponde a un plan
+    planCode = (s.items ?? []).map((it) => planForPrice(it.price?.id)).find((x) => x) ?? null;
     data = { status, subscription_id: s.id, customer_id: s.customer_id, renews_at: s.next_billed_at, ends_at: cancelAt };
   } else if (type === 'transaction.completed' || type === 'transaction.payment_failed') {
     const t = d as Txn;
