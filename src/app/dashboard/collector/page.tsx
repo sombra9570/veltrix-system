@@ -8,6 +8,7 @@ import type { DictKey } from '../../i18n/es';
 import { money, parseAmount } from '../format';
 import { useStaff } from '../staff-context';
 import { useSync } from '../sync';
+import { ShowMore } from '../paged';
 import { CreditCard, applyPayment, freqOf, type Credit, type Freq, type Method } from './credit-card';
 import { LoanForm, RATING_DOT, type LoanPolicy } from './loan-form';
 import { DaysTable, type DayRow } from './days-table';
@@ -62,6 +63,24 @@ function bumpToday(r: { today: string; days?: DayRow[] }, add: Partial<Record<'c
   });
 }
 
+/** Las tarjetas llegan compactas ([n, vence, monto, pagado, último pago]); aquí se arman para la pantalla */
+type RawCredit = Credit & { i?: [number, string, number, number, string | null][] };
+function normalizeDay(d: Day): Day {
+  return {
+    ...d,
+    routes: d.routes.map((r) => ({
+      ...r,
+      customers: r.customers.map((c) => ({
+        ...c,
+        credits: (c.credits as RawCredit[] | undefined)?.map((k) => k.i
+          ? { id: k.id, created: k.created, total: k.total, every_days: k.every_days,
+              installments: k.i.map(([n, due, amount, paid, last_at]) => ({ id: `${k.id}:${n}`, n, due, amount: Number(amount), paid: Number(paid), last_at })) }
+          : k),
+      })),
+    })),
+  };
+}
+
 const load = <T,>(k: string, d: T): T => { try { return JSON.parse(localStorage.getItem(k) ?? 'null') ?? d; } catch { return d; } };
 const save = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* lleno */ } };
 
@@ -92,6 +111,9 @@ export default function CollectorPage() {
   const [panel, setPanel] = useState<'pay' | 'visit' | 'expense' | 'settle' | 'loan' | null>(null);
   const [view, setView] = useState<'cards' | 'list'>('list');
   const [freq, setFreq] = useState<Freq | 'all'>('all');
+  // Se dibujan de a 25 clientes (tarjetas pesan): "Ver más" agrega el resto
+  const [limit, setLimit] = useState(25);
+  useEffect(() => { setLimit(25); }, [freq, routeId, view]);
   useEffect(() => { const v = load<string>('vx_col_view', 'list'); if (v === 'cards' || v === 'list') setView(v); }, []);
   const pickView = (v: 'cards' | 'list') => { setView(v); save('vx_col_view', v); };
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -101,7 +123,8 @@ export default function CollectorPage() {
 
   // Lo guardado en el teléfono aparece al instante, aun sin señal
   useEffect(() => {
-    const d = load<Day | null>(DAY_KEY, null);
+    const d0 = load<Day | null>(DAY_KEY, null);
+    const d = d0 ? normalizeDay(d0) : null;
     if (d) { setDay(d); setRouteId((r) => r || d.routes[0]?.id || ''); }
     setQueue(load<Op[]>(QUEUE_KEY, []));
     setOnline(navigator.onLine);
@@ -114,7 +137,7 @@ export default function CollectorPage() {
 
   const refresh = useCallback(async () => {
     try {
-      const d = await rpc<Day>('collector_day');
+      const d = normalizeDay(await rpc<Day>('collector_day'));
       setDay(d);
       save(DAY_KEY, d);
       setRouteId((r) => (d.routes.some((x) => x.id === r) ? r : d.routes[0]?.id ?? ''));
@@ -261,7 +284,8 @@ export default function CollectorPage() {
   const fund = route.fund_balance === undefined ? null : Number(route.fund_balance);
   const opening = fund === null ? 0 : fund - inHand;
   const todayRow = route.days?.find((d) => d.day === route.today);
-  const shown = freq === 'all' ? route.customers : route.customers.filter((c) => c.credits?.some((k) => freqOf(k) === freq));
+  const shownAll = freq === 'all' ? route.customers : route.customers.filter((c) => c.credits?.some((k) => freqOf(k) === freq));
+  const shown = shownAll.slice(0, limit);
 
   return (
     <div className="space-y-4">
@@ -399,6 +423,7 @@ export default function CollectorPage() {
               {(c.credits ?? []).length === 0 && <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>}
             </Card>
           ))}
+          <ShowMore rest={shownAll.length - shown.length} onClick={() => setLimit((x) => x + 25)} />
         </div>
       )}
 
@@ -423,6 +448,7 @@ export default function CollectorPage() {
           </li>
         ))}
       </ul>}
+      {view === 'list' && <ShowMore rest={shownAll.length - shown.length} onClick={() => setLimit((x) => x + 25)} />}
 
       {/* Hoja inferior: cliente / gasto / rendición */}
       {(sel || panel) && (

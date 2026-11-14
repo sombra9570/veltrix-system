@@ -1296,6 +1296,7 @@ const hi: Record<DictKey, string> = {
   "sync.offline": "ऑफ़लाइन: सिग्नल आते ही अपने आप सिंक होगा।",
   "sync.running": "सिंक हो रहा है…",
   "sync.offlineShort": "ऑफ़लाइन",
+  "common.showMore": "{n} और देखें",
 };
 
 export default hi;

@@ -1296,6 +1296,7 @@ const fr: Record<DictKey, string> = {
   "sync.offline": "Hors ligne : se synchronise seul au retour du réseau.",
   "sync.running": "Synchronisation…",
   "sync.offlineShort": "Hors ligne",
+  "common.showMore": "Voir {n} de plus",
 };
 
 export default fr;

@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLanguage, LanguageDropdown, RegionalStatusBar } from '../../language-selector';
+import { useLanguage } from '../../language-selector';
+import { LanguageDropdown, RegionalStatusBar, translations } from './regional-tools';
 import { useVeltrixAuth } from '../../auth-system';
 import { rpc, supabase } from '../../../lib/supabase';
 
@@ -62,7 +63,8 @@ function BarChart({
 
 export default function GlobalCoreAdminPage() {
   const router = useRouter();
-  const { t, formatMoney } = useLanguage();
+  const { lang, formatMoney } = useLanguage();
+  const t = translations[lang] || translations.es;
   const { loaded, session, logout } = useVeltrixAuth();
   const [m, setM] = useState<Metrics | null>(null);
   const [error, setError] = useState('');

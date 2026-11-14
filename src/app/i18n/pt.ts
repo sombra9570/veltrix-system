@@ -1296,6 +1296,7 @@ const pt: Record<DictKey, string> = {
   "sync.offline": "Sem conexão: sincroniza sozinho quando o sinal voltar.",
   "sync.running": "Sincronizando…",
   "sync.offlineShort": "Sem sinal",
+  "common.showMore": "Ver mais {n}",
 };
 
 export default pt;

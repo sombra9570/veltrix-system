@@ -1296,6 +1296,7 @@ const ar: Record<DictKey, string> = {
   "sync.offline": "غير متصل: تتم المزامنة تلقائيًا عند عودة الإشارة.",
   "sync.running": "جارٍ المزامنة…",
   "sync.offlineShort": "بلا إشارة",
+  "common.showMore": "عرض {n} أخرى",
 };
 
 export default ar;

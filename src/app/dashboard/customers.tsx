@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { supabase, rpc } from '../../lib/supabase';
 import { Card } from './shell';
 import { ui } from '../site-header';
+import { usePaged, ShowMore } from './paged';
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 import { money, parseAmount } from './format';
@@ -156,6 +157,7 @@ export function CustomersScreen() {
     } catch { flash(false, t('err.generic')); }
   };
 
+  const paged = usePaged(rows, 30, rows);
   if (branches === null) return <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p>;
   if (branches.length === 0) return <Card><p className={`text-sm ${ui.muted}`}>{t('pos.noBranches')}</p></Card>;
 
@@ -285,7 +287,7 @@ export function CustomersScreen() {
               <p className={`p-5 text-sm ${ui.muted}`}>{t('cust.empty')}</p>
             ) : (
               <ul className="divide-y divide-slate-200 dark:divide-slate-800">
-                {rows.map((r) => (
+                {paged.visible.map((r) => (
                   <li key={r.id}>
                     <button type="button" onClick={() => open(r.id)}
                       className={`flex w-full items-center gap-3 p-4 text-left transition cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 ${detail?.customer.id === r.id ? 'bg-blue-50 dark:bg-blue-500/10' : ''}`}>
@@ -306,6 +308,7 @@ export function CustomersScreen() {
               </ul>
             )}
           </Card>
+          <ShowMore rest={paged.rest} onClick={paged.more} />
         </div>
 
         {/* Ficha */}

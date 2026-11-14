@@ -1296,6 +1296,7 @@ const ru: Record<DictKey, string> = {
   "sync.offline": "Нет связи: синхронизация пройдёт сама при появлении сети.",
   "sync.running": "Синхронизация…",
   "sync.offlineShort": "Нет сети",
+  "common.showMore": "Показать ещё {n}",
 };
 
 export default ru;

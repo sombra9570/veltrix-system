@@ -1296,6 +1296,7 @@ const ja: Record<DictKey, string> = {
   "sync.offline": "オフライン：電波が戻ると自動で同期します。",
   "sync.running": "同期中…",
   "sync.offlineShort": "オフライン",
+  "common.showMore": "さらに {n} 件表示",
 };
 
 export default ja;

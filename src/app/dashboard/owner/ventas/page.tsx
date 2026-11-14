@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
 import { ui } from '../../../site-header';
+import { usePaged, ShowMore } from '../../paged';
 import { useT } from '../../../i18n';
 import { money, shortTime } from '../../format';
 import { Sheet, BranchOpt, isoDay } from '../../sheet';
@@ -114,6 +115,7 @@ export default function SalesPage() {
     return { label: t('sales.st.unpaid'), cls: 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300' };
   };
 
+  const paged = usePaged(data?.orders ?? [], 30, data);
   const s = data?.summary;
   const periods: [Period, string][] = [['today', t('sales.p.today')], ['week', t('sales.p.week')], ['month', t('sales.p.month')], ['custom', t('sales.p.custom')]];
 
@@ -194,7 +196,7 @@ export default function SalesPage() {
           <p className={`p-5 text-sm ${ui.muted}`}>{t('sales.empty')}</p>
         ) : (
           <ul className="divide-y divide-slate-200 dark:divide-slate-800">
-            {data.orders.map((o) => {
+            {paged.visible.map((o) => {
               const st = state(o);
               return (
                 <li key={o.id}>
@@ -221,6 +223,7 @@ export default function SalesPage() {
         )}
         {data?.truncated && <p className={`border-t border-slate-200 p-3 text-center text-xs dark:border-slate-800 ${ui.muted}`}>{t('sales.truncated')}</p>}
       </Card>
+      <ShowMore rest={paged.rest} onClick={paged.more} />
 
       {detail && (
         <Sheet onClose={() => setDetail(null)} label={t('pos.close')}>

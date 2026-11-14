@@ -1305,6 +1305,7 @@ const es = {
   "sync.offline": "Sin conexión: se sincroniza solo al volver la señal.",
   "sync.running": "Sincronizando…",
   "sync.offlineShort": "Sin señal",
+  "common.showMore": "Ver {n} más",
 };
 
 export default es;

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase, rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
 import { ui } from '../../../site-header';
+import { usePaged, ShowMore } from '../../paged';
 import { useT } from '../../../i18n';
 import { money, parseAmount } from '../../format';
 import { friendlyError } from '../owner-context';
@@ -65,6 +66,7 @@ export default function ProductsPage() {
     const all = data?.products ?? [];
     return q ? all.filter((p) => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)) : all;
   }, [data, query]);
+  const paged = usePaged(list, 40, list);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -205,7 +207,7 @@ export default function ProductsPage() {
           <p className={`p-5 text-sm ${ui.muted}`}>{t('prod.empty')}</p>
         ) : (
           <ul className="divide-y divide-slate-200 dark:divide-slate-800">
-            {list.map((p) => {
+            {paged.visible.map((p) => {
               const qty = p.stock?.[branchId] ?? 0;
               const editing = stockEdit[p.id] !== undefined;
               return (
@@ -254,6 +256,7 @@ export default function ProductsPage() {
           </ul>
         )}
       </Card>
+      <ShowMore rest={paged.rest} onClick={paged.more} />
     </div>
   );
 }

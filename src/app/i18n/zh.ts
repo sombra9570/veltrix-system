@@ -1296,6 +1296,7 @@ const zh: Record<DictKey, string> = {
   "sync.offline": "离线：恢复网络后会自动同步。",
   "sync.running": "同步中…",
   "sync.offlineShort": "离线",
+  "common.showMore": "再显示 {n} 条",
 };
 
 export default zh;

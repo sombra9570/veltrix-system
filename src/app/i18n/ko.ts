@@ -1296,6 +1296,7 @@ const ko: Record<DictKey, string> = {
   "sync.offline": "오프라인: 신호가 돌아오면 자동 동기화됩니다.",
   "sync.running": "동기화 중…",
   "sync.offlineShort": "오프라인",
+  "common.showMore": "{n}개 더 보기",
 };
 
 export default ko;
