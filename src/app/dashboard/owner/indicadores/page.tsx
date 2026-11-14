@@ -39,7 +39,7 @@ export default function IndicatorsPage() {
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [now, setNow] = useState(() => new Date());
 
-  useEffect(() => { const id = setInterval(() => setNow(new Date()), 30000); return () => clearInterval(id); }, []);
+  useEffect(() => { const id = setInterval(() => setNow(new Date()), 60_000); return () => clearInterval(id); }, []);
 
   useEffect(() => {
     if (!orgId) return;

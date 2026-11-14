@@ -1167,7 +1167,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [currencyMode, setCurrencyModeState] = useState<CurrencyMode>('dual');
   const [taxRegime, setTaxRegimeState] = useState<TaxRegimeId>('general');
   const [businessSector, setBusinessSectorState] = useState<BusinessSectorId>('standard');
-  const [localTime, setLocalTime] = useState<string>('--:--:--');
+  const localTime = ''; // el reloj vive solo en la pantalla que lo muestra (useDeviceClock)
 
   const rawCountry = COUNTRIES.find((c) => c.code === countryCode) || COUNTRIES[0];
   const officialRate = liveRates[rawCountry.currency] || rawCountry.rate;
@@ -1282,26 +1282,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, [syncOfficialRatesNow]);
 
-  useEffect(() => {
-    const updateClock = () => {
-      try {
-        const now = new Date();
-        const formatted = new Intl.DateTimeFormat(rawCountry.locale, {
-          timeZone: selectedTimezone.tz,
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        }).format(now);
-        setLocalTime(formatted);
-      } catch {
-        setLocalTime(new Date().toLocaleTimeString());
-      }
-    };
-    updateClock();
-    // Una vez por minuto (antes cada segundo redibujaba toda la app)
-    const timer = setInterval(updateClock, 60_000);
-    return () => clearInterval(timer);
-  }, [rawCountry.locale, selectedTimezone]);
 
   const setLanguage = (newLang: LangCode) => {
     localStorage.setItem('veltrix_lang', newLang);
@@ -1458,9 +1438,9 @@ export function RegionalStatusBar() {
     businessSector,
     setBusinessSector,
     effectiveTaxRate,
-    localTime,
     t,
   } = useLanguage();
+  const localTime = useDeviceClock(COUNTRIES.find((c) => c.code === country.code)?.locale ?? 'es', selectedTimezone.tz);
 
   const rawCountry = COUNTRIES.find((c) => c.code === country.code) || COUNTRIES[0];
 
@@ -1582,4 +1562,21 @@ export function RegionalStatusBar() {
       </div>
     </div>
   );
+}
+/** Reloj del propio dispositivo para una zona horaria; se actualiza 1 vez por minuto y solo donde se muestra */
+export function useDeviceClock(locale: string, tz: string): string {
+  const fmt = () => {
+    try { return new Intl.DateTimeFormat(locale, { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date()); }
+    catch { return new Date().toLocaleTimeString(); }
+  };
+  const [now, setNow] = useState(fmt);
+  useEffect(() => {
+    setNow(fmt());
+    const msToMinute = 60_000 - (Date.now() % 60_000);
+    let iv: ReturnType<typeof setInterval> | undefined;
+    const to = setTimeout(() => { setNow(fmt()); iv = setInterval(() => setNow(fmt()), 60_000); }, msToMinute);
+    return () => { clearTimeout(to); if (iv) clearInterval(iv); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale, tz]);
+  return now;
 }
