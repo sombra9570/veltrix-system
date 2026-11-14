@@ -415,8 +415,8 @@ function QueueTab({
 /* ---------------- Cobro de cuotas (cliente que viene a pagar) ---------------- */
 type Debtor = { id: string; name: string; doc: string | null; balance: number; overdue: number };
 function DebtsTab({
-  shiftId, expected, fmt, busy, setBusy, onDone, flash,
-}: Common & { shiftId: string; expected: number | null; fmt: (n: number) => string }) {
+  shiftId, fmt, busy, setBusy, onDone, flash,
+}: Common & { shiftId: string; fmt: (n: number) => string }) {
   const { t } = useT();
   const [q, setQ] = useState('');
   const [list, setList] = useState<Debtor[]>([]);

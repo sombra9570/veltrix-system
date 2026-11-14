@@ -63,7 +63,7 @@ begin
   foreach f in array array['forbid_change', 'guard_draft_children', 'audit_row'] loop
     d := pg_get_functiondef(f::regproc);
     if position('veltrix.purge' in d) = 0 then
-      d := regexp_replace(d, E'\\nbegin\\n',
+      d := regexp_replace(d, E'\\nbegin\\r?\\n',
              E'\nbegin\n  if current_setting(''veltrix.purge'', true) = ''on'' then return coalesce(new, old); end if;\n');
       if position('veltrix.purge' in d) = 0 then raise exception 'No se pudo preparar %', f; end if;
       execute d;
