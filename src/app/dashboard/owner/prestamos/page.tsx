@@ -20,9 +20,13 @@ type Loan = {
 const FIELDS: [string, string][] = [
   ['interest_default', 'loan.p.interestDefault'], ['interest_min', 'loan.p.interestMin'], ['interest_max', 'loan.p.interestMax'],
   ['max_installments', 'loan.p.maxInstallments'], ['max_amount_customer', 'loan.p.maxAmount'], ['max_active_loans_customer', 'loan.p.maxActive'],
-  ['max_customers_collector', 'loan.p.maxCustomers'], ['max_daily_lent_collector', 'loan.p.maxDaily'],
+  ['max_customers_collector', 'loan.p.maxCustomers'], ['max_daily_lent_collector', 'loan.p.maxDaily'], ['route_float', 'fund.p.float'],
 ];
 const LATE: [string, string][] = [['late_daily', 'card.f.daily'], ['late_weekly', 'card.f.weekly'], ['late_biweekly', 'card.f.biweekly'], ['late_monthly', 'card.f.monthly']];
+type Fund = {
+  id: string; name: string; branch: string; collector: string | null; currency: string; balance: number; invested: number;
+  delivered: number; lent_open: number; portfolio: number; moves: { at: string; type: string; amount: number; note: string | null }[];
+};
 const freqKey = (d: number) => (d <= 3 ? 'daily' : d <= 10 ? 'weekly' : d <= 20 ? 'biweekly' : 'monthly');
 
 export default function LoansPage() {
@@ -33,12 +37,15 @@ export default function LoansPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState('');
+  const [funds, setFunds] = useState<Fund[]>([]);
+  const [mv, setMv] = useState<{ route: string; type: 'investment' | 'withdrawal'; amount: string; note: string } | null>(null);
 
   const load = useCallback(async () => {
     if (!orgId) return;
     try {
       const r = await rpc<{ policy: Policy; loans: Loan[] }>('loans_admin', { p_org: orgId });
       setPolicy(r.policy); setLoans(r.loans ?? []);
+      setFunds(await rpc<Fund[]>('route_funds_admin', { p_org: orgId }) ?? []);
     } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
   }, [orgId, t]);
   useEffect(() => { load(); }, [load]);
@@ -67,6 +74,20 @@ export default function LoansPage() {
     setBusy(l.order_id); setMsg(null);
     try { await rpc('cancel_street_loan', { p_order: l.order_id }); await load(); setMsg({ ok: true, text: t('loan.cancelled') }); }
     catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); } finally { setBusy(''); }
+  };
+
+  const moveFund = async () => {
+    if (!mv) return;
+    const n = Number(mv.amount.replace(',', '.'));
+    if (!(n > 0)) return;
+    setBusy('fund'); setMsg(null);
+    try {
+      await rpc('route_fund_move', { p_route: mv.route, p_type: mv.type, p_amount: n, p_note: mv.note || null });
+      setMv(null); await load(); setMsg({ ok: true, text: t('fund.saved') });
+    } catch (e) {
+      const m = (e as Error).message;
+      setMsg({ ok: false, text: m.includes('ROUTE_FUND_LOW') ? t('fund.low') : friendlyError(m, t) });
+    } finally { setBusy(''); }
   };
 
   const pending = loans.filter((l) => l.approval === 'pending_supervisor' && l.status === 'confirmed');
@@ -120,6 +141,67 @@ export default function LoansPage() {
           </ul>
         </Card>
       )}
+
+      <Card className="space-y-3">
+        <div>
+          <h2 className="font-bold">💼 {t('fund.routesTitle')}</h2>
+          <p className={`text-xs ${ui.muted}`}>{t('fund.routesHint')}</p>
+        </div>
+        {funds.length === 0 ? <p className={`text-sm ${ui.muted}`}>{t('fund.noRoutes')}</p> : (
+          <ul className="space-y-2">
+            {funds.map((f) => {
+              const m = (n: number) => money(Number(n), f.currency, lang);
+              return (
+                <li key={f.id} className="space-y-2 rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-bold">🛵 {f.name}</p>
+                      <p className={`text-xs ${ui.muted}`}>{f.collector ?? '—'} · {f.branch}</p>
+                    </div>
+                    <div className="text-end">
+                      <p className={`text-xl font-extrabold ${Number(f.balance) < 0 ? 'text-red-600 dark:text-red-400' : ''}`}>{m(f.balance)}</p>
+                      <p className={`text-[11px] ${ui.muted}`}>{t('fund.inRoute')}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                    <p><span className={ui.muted}>{t('fund.invested')}</span><br /><b>{m(f.invested)}</b></p>
+                    <p><span className={ui.muted}>{t('fund.lentOpen')}</span><br /><b>{m(f.lent_open)}</b></p>
+                    <p><span className={ui.muted}>{t('fund.portfolio')}</span><br /><b>{m(f.portfolio)}</b></p>
+                    <p><span className={ui.muted}>{t('fund.delivered')}</span><br /><b>{m(f.delivered)}</b></p>
+                  </div>
+                  {mv?.route === f.id ? (
+                    <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+                      <input inputMode="decimal" autoFocus placeholder={t('cash.amount')} value={mv.amount} onChange={(e) => setMv({ ...mv, amount: e.target.value })} className={ui.input} />
+                      <input placeholder={t('cust.notes')} value={mv.note} onChange={(e) => setMv({ ...mv, note: e.target.value })} className={ui.input} />
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => setMv(null)} className={`${ui.btnGhost} !py-2 text-sm`}>✕</button>
+                        <button type="button" disabled={busy === 'fund'} onClick={moveFund} className={`${ui.btnPrimary} !py-2 text-sm`}>
+                          {mv.type === 'investment' ? `➕ ${t('fund.invest')}` : `➖ ${t('fund.withdraw')}`}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => setMv({ route: f.id, type: 'investment', amount: '', note: '' })} className={`${ui.btnGhost} !py-1.5 text-xs`}>➕ {t('fund.invest')}</button>
+                      <button type="button" onClick={() => setMv({ route: f.id, type: 'withdrawal', amount: '', note: '' })} className={`${ui.btnGhost} !py-1.5 text-xs`}>➖ {t('fund.withdraw')}</button>
+                    </div>
+                  )}
+                  {f.moves.length > 0 && (
+                    <ul className={`divide-y divide-slate-100 text-[11px] dark:divide-slate-800 ${ui.muted}`}>
+                      {f.moves.slice(0, 4).map((x, k) => (
+                        <li key={k} className="flex justify-between gap-2 py-1">
+                          <span>{new Date(x.at).toLocaleDateString(lang)} · {t(`fund.t.${x.type}` as DictKey)}{x.note ? ` · ${x.note}` : ''}</span>
+                          <b>{x.type === 'investment' ? '+' : '−'}{m(x.amount)}</b>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </Card>
 
       {policy && (
         <Card className="space-y-4">

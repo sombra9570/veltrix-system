@@ -29,6 +29,7 @@ type Settlement = { id: string; at: string; status: string; cash: number; expens
 type Route = {
   id: string; name: string; branch: string; currency: string; today: string;
   unsettled_cash: number; unsettled_digital: number; unsettled_expenses: number; unsettled_loans?: number;
+  fund_balance?: number; fund_float?: number;
   policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_interest?: boolean;
   customers: Customer[]; settlements: Settlement[];
 };
@@ -162,7 +163,8 @@ export default function CollectorPage() {
         ...d,
         routes: d.routes.map((r) => {
           if (r.id !== op.route) return r;
-          if (op.kind === 'expense') return { ...r, unsettled_expenses: Number(r.unsettled_expenses) + op.amount };
+          if (op.kind === 'expense') return { ...r, unsettled_expenses: Number(r.unsettled_expenses) + op.amount,
+            fund_balance: r.fund_balance === undefined ? undefined : Number(r.fund_balance) - op.amount };
           const customers = r.customers.map((c) => {
             if (c.id !== op.customer) return c;
             if (op.kind === 'payment') {
@@ -194,6 +196,7 @@ export default function CollectorPage() {
           return {
             ...r, customers,
             unsettled_cash: Number(r.unsettled_cash) + cashAdd,
+            fund_balance: r.fund_balance === undefined ? undefined : Number(r.fund_balance) + cashAdd,
             unsettled_digital: Number(r.unsettled_digital) + digAdd,
           };
         }),
@@ -227,6 +230,8 @@ export default function CollectorPage() {
   const visited = route.customers.filter((c) => c.visited_today).length;
   const loans = Number(route.unsettled_loans ?? 0);
   const inHand = Number(route.unsettled_cash) - Number(route.unsettled_expenses) - loans;
+  const fund = route.fund_balance === undefined ? null : Number(route.fund_balance);
+  const opening = fund === null ? 0 : fund - inHand;
   const shown = freq === 'all' ? route.customers : route.customers.filter((c) => c.credits?.some((k) => freqOf(k) === freq));
 
   return (
@@ -259,26 +264,43 @@ export default function CollectorPage() {
         )}
       </div>
 
-      {/* Lo que llevo encima */}
-      <div className={`grid gap-2 text-center ${loans !== 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
+      {/* Caja de la ruta: lo que hay para prestar y lo que llevo encima */}
+      {fund !== null && (
+        <Card className="!p-4">
+          <div className="flex items-baseline justify-between gap-2">
+            <p className={`text-xs font-bold uppercase ${ui.muted}`}>💼 {t('fund.title')}</p>
+            <p className={`text-2xl font-extrabold ${fund < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>{fmt(fund)}</p>
+          </div>
+          <p className={`mt-1 text-[11px] ${ui.muted}`}>{t('fund.formula')}</p>
+        </Card>
+      )}
+      <div className={`grid gap-2 text-center ${fund !== null ? 'grid-cols-2 sm:grid-cols-4' : loans !== 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
+        {fund !== null && (
+          <Card className="!p-3">
+            <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('fund.opening')}</p>
+            <p className="font-extrabold">{fmt(opening)}</p>
+          </Card>
+        )}
         <Card className="!p-3">
           <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.cash')}</p>
           <p className="font-extrabold">{fmt(route.unsettled_cash)}</p>
         </Card>
-        <Card className="!p-3">
-          <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.expenses')}</p>
-          <p className="font-extrabold text-red-600 dark:text-red-400">{fmt(route.unsettled_expenses)}</p>
-        </Card>
-        {loans !== 0 && (
+        {(fund !== null || loans !== 0) && (
           <Card className="!p-3">
             <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('loan.lent')}</p>
             <p className="font-extrabold text-violet-600 dark:text-violet-400">{fmt(loans)}</p>
           </Card>
         )}
         <Card className="!p-3">
-          <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.toDeliver')}</p>
-          <p className="font-extrabold text-emerald-600 dark:text-emerald-400">{fmt(inHand)}</p>
+          <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.expenses')}</p>
+          <p className="font-extrabold text-red-600 dark:text-red-400">{fmt(route.unsettled_expenses)}</p>
         </Card>
+        {fund === null && (
+          <Card className="!p-3">
+            <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.toDeliver')}</p>
+            <p className="font-extrabold text-emerald-600 dark:text-emerald-400">{fmt(inHand)}</p>
+          </Card>
+        )}
       </div>
 
       {route.can_loan && route.policy && (
@@ -622,14 +644,21 @@ function SettleSheet({ route, fmt, online, pending, onClosed }: {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const lent = Number(route.unsettled_loans ?? 0);
-  const deliver = Number(route.unsettled_cash) - Number(route.unsettled_expenses) - lent;
-  const nothing = Number(route.unsettled_cash) === 0 && Number(route.unsettled_digital) === 0 && Number(route.unsettled_expenses) === 0 && lent === 0;
+  const fund = route.fund_balance === undefined ? null : Number(route.fund_balance);
+  const suggested = fund === null ? Number(route.unsettled_cash) - Number(route.unsettled_expenses) - lent
+    : Math.max(0, fund - Number(route.fund_float ?? 0));
+  const [give, setGive] = useState(String(Math.round(suggested * 100) / 100));
+  const g = parseAmount(give);
+  const deliver = fund === null ? suggested : (Number.isNaN(g) ? 0 : g);
+  const badGive = fund !== null && (Number.isNaN(g) || g < 0 || g > Math.max(fund, 0) + 0.004);
+  const nothing = Number(route.unsettled_cash) === 0 && Number(route.unsettled_digital) === 0 && Number(route.unsettled_expenses) === 0 && lent === 0
+    && !(fund !== null && deliver > 0);
 
   const close = async () => {
     setBusy(true);
     setErr('');
     try {
-      await rpc('close_route', { p_route: route.id });
+      await rpc('close_route', fund === null ? { p_route: route.id } : { p_route: route.id, p_deliver: Math.round(deliver * 100) / 100 });
       await onClosed();
     } catch {
       setErr(t('err.generic'));
@@ -646,13 +675,22 @@ function SettleSheet({ route, fmt, online, pending, onClosed }: {
         <li className="flex justify-between"><span>{t('col.digital')}</span><b>{fmt(route.unsettled_digital)}</b></li>
         <li className="flex justify-between"><span>{t('col.expenses')}</span><b className="text-red-600 dark:text-red-400">− {fmt(route.unsettled_expenses)}</b></li>
         {lent !== 0 && <li className="flex justify-between"><span>{t('loan.lent')}</span><b className="text-violet-600 dark:text-violet-400">− {fmt(lent)}</b></li>}
-        <li className="flex justify-between border-t border-slate-200 pt-2 text-base dark:border-slate-800"><span>{t('col.toDeliver')}</span><b>{fmt(deliver)}</b></li>
+        {fund === null && <li className="flex justify-between border-t border-slate-200 pt-2 text-base dark:border-slate-800"><span>{t('col.toDeliver')}</span><b>{fmt(deliver)}</b></li>}
+        {fund !== null && <li className="flex justify-between border-t border-slate-200 pt-2 text-base dark:border-slate-800"><span>💼 {t('fund.title')}</span><b>{fmt(fund)}</b></li>}
       </ul>
+      {fund !== null && (
+        <div className="space-y-1">
+          <label className={ui.label}>{t('fund.deliver')}</label>
+          <input inputMode="decimal" value={give} onChange={(e) => setGive(e.target.value)} className={`${ui.input} text-xl font-bold`} />
+          {badGive ? <p className="text-sm font-semibold text-red-600 dark:text-red-400">{t('fund.deliverBad')}</p>
+            : <p className={`text-xs ${ui.muted}`}>{t('fund.stays', { amount: fmt(Math.max(0, fund - deliver)) })}</p>}
+        </div>
+      )}
       <p className={`text-xs ${ui.muted}`}>{t('col.settleHint')}</p>
       {!online && <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">{t('col.settleNeedsSignal')}</p>}
       {online && pending > 0 && <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">{t('col.settleSyncFirst')}</p>}
       {err && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{err}</p>}
-      <button type="button" disabled={busy || !online || pending > 0 || nothing} onClick={close} className={`${ui.btnPrimary} w-full py-3`}>
+      <button type="button" disabled={busy || !online || pending > 0 || nothing || badGive} onClick={close} className={`${ui.btnPrimary} w-full py-3`}>
         {busy ? t('common.wait') : t('col.settleBtn')}
       </button>
 
