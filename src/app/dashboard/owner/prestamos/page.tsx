@@ -98,6 +98,15 @@ export default function LoansPage() {
     } finally { setBusy(''); }
   };
 
+  const reschedule = async (order: string) => {
+    const d = Number(window.prompt(t('loan.reschedulePrompt'), '7'));
+    if (!Number.isInteger(d) || d < 1) return;
+    setBusy(order); setMsg(null);
+    try { const n = await rpc<number>('reschedule_loan', { p_order: order, p_days: d }); await load(); setMsg({ ok: true, text: t('loan.rescheduled', { n, days: d }) }); }
+    catch (e) { const m = (e as Error).message; setMsg({ ok: false, text: m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : friendlyError(m, t) }); }
+    finally { setBusy(''); }
+  };
+
   const pending = loans.filter((l) => l.approval === 'pending_supervisor' && l.status === 'confirmed');
   const others = loans.filter((l) => !(l.approval === 'pending_supervisor' && l.status === 'confirmed'));
   const fmt = (l: Loan, n: number) => money(Number(n), l.currency, lang);
@@ -269,8 +278,11 @@ export default function LoansPage() {
         <h2 className="font-bold">📒 {t('loan.list')}</h2>
         {others.length === 0 ? <p className={`text-sm ${ui.muted}`}>{t('loan.none')}</p> : (
           <ul className="space-y-2">
-            {others.map((l) => row(l, l.status === 'confirmed' && l.approval !== 'rejected' && !l.paid_any ? (
-              <button type="button" disabled={busy === l.order_id} onClick={() => cancel(l)} className="text-xs font-bold text-red-600 cursor-pointer dark:text-red-400">🗑️ {t('loan.cancel')}</button>
+            {others.map((l) => row(l, l.status === 'confirmed' && l.approval !== 'rejected' ? (
+              <div className="flex flex-wrap gap-4">
+                {Number(l.balance) > 0 && <button type="button" disabled={busy === l.order_id} onClick={() => reschedule(l.order_id)} className="text-xs font-bold text-blue-600 cursor-pointer dark:text-blue-400">📅 {t('loan.reschedule')}</button>}
+                {!l.paid_any && <button type="button" disabled={busy === l.order_id} onClick={() => cancel(l)} className="text-xs font-bold text-red-600 cursor-pointer dark:text-red-400">🗑️ {t('loan.cancel')}</button>}
+              </div>
             ) : null))}
           </ul>
         )}

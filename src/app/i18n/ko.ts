@@ -1297,6 +1297,11 @@ const ko: Record<DictKey, string> = {
   "sync.running": "동기화 중…",
   "sync.offlineShort": "오프라인",
   "common.showMore": "{n}개 더 보기",
+  "loan.reschedule": "일정 변경",
+  "loan.reschedulePrompt": "미납 회차를 며칠 미룰까요?",
+  "loan.rescheduled": "✅ 미납 {n}회차를 {days}일 미뤘습니다.",
+  "perm.loans.reschedule": "회차 일정 변경",
+  "perm.loans.reschedule.d": "대출의 미납 회차 만기일을 미룸 (금액은 그대로).",
 };
 
 export default ko;

@@ -1306,6 +1306,11 @@ const es = {
   "sync.running": "Sincronizando…",
   "sync.offlineShort": "Sin señal",
   "common.showMore": "Ver {n} más",
+  "loan.reschedule": "Reprogramar",
+  "loan.reschedulePrompt": "¿Cuántos días se corren las cuotas pendientes?",
+  "loan.rescheduled": "✅ {n} cuotas pendientes corridas {days} días.",
+  "perm.loans.reschedule": "Reprogramar cuotas",
+  "perm.loans.reschedule.d": "Correr las fechas de las cuotas pendientes de un préstamo (no cambia montos).",
 };
 
 export default es;

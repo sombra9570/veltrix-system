@@ -1297,6 +1297,11 @@ const it: Record<DictKey, string> = {
   "sync.running": "Sincronizzazione…",
   "sync.offlineShort": "Offline",
   "common.showMore": "Mostra altri {n}",
+  "loan.reschedule": "Riprogramma",
+  "loan.reschedulePrompt": "Di quanti giorni spostare le rate in sospeso?",
+  "loan.rescheduled": "✅ {n} rate spostate di {days} giorni.",
+  "perm.loans.reschedule": "Riprogrammare rate",
+  "perm.loans.reschedule.d": "Spostare le scadenze delle rate in sospeso (gli importi non cambiano).",
 };
 
 export default it;

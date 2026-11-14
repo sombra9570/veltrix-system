@@ -1297,6 +1297,11 @@ const hi: Record<DictKey, string> = {
   "sync.running": "सिंक हो रहा है…",
   "sync.offlineShort": "ऑफ़लाइन",
   "common.showMore": "{n} और देखें",
+  "loan.reschedule": "तारीख़ बदलें",
+  "loan.reschedulePrompt": "बकाया किस्तें कितने दिन आगे करें?",
+  "loan.rescheduled": "✅ {n} बकाया किस्तें {days} दिन आगे की गईं।",
+  "perm.loans.reschedule": "किस्तें आगे करना",
+  "perm.loans.reschedule.d": "ऋण की बकाया किस्तों की तारीख़ आगे करना (राशि नहीं बदलती)।",
 };
 
 export default hi;

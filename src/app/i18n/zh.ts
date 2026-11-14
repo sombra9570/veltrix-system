@@ -1297,6 +1297,11 @@ const zh: Record<DictKey, string> = {
   "sync.running": "同步中…",
   "sync.offlineShort": "离线",
   "common.showMore": "再显示 {n} 条",
+  "loan.reschedule": "改期",
+  "loan.reschedulePrompt": "待付分期顺延几天？",
+  "loan.rescheduled": "✅ 已将 {n} 期待付分期顺延 {days} 天。",
+  "perm.loans.reschedule": "分期改期",
+  "perm.loans.reschedule.d": "顺延贷款待付分期的到期日（金额不变）。",
 };
 
 export default zh;

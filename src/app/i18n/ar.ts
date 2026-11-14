@@ -1297,6 +1297,11 @@ const ar: Record<DictKey, string> = {
   "sync.running": "جارٍ المزامنة…",
   "sync.offlineShort": "بلا إشارة",
   "common.showMore": "عرض {n} أخرى",
+  "loan.reschedule": "إعادة جدولة",
+  "loan.reschedulePrompt": "كم يومًا تُؤجَّل الأقساط المعلقة؟",
+  "loan.rescheduled": "✅ تم تأجيل {n} أقساط {days} أيام.",
+  "perm.loans.reschedule": "إعادة جدولة الأقساط",
+  "perm.loans.reschedule.d": "تأجيل مواعيد الأقساط المعلقة (المبالغ لا تتغير).",
 };
 
 export default ar;

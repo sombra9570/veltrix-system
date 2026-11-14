@@ -30,7 +30,7 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 ## B. Construcción pendiente
 - [x] **Panel del supervisor**: rutas y cajas, cobrado/prestado por día, cierres, inversión y aprobación de préstamos según permisos
 - [ ] **Notificaciones push en vivo** (préstamo por aprobar, pago recibido, tarjeta en rojo) — requiere llaves VAPID en Vercel
-- [ ] **Borrar o reprogramar cuotas** de un préstamo con permiso (hoy se puede anular el préstamo completo sin cobros)
+- [x] **Reprogramar cuotas** pendientes con permiso (anular préstamo sin cobros ya existía)
 
 ### Cobros y legal
 - [x] Conexión de pagos con Paddle (pago, avisos, cambio de plan, descuentos de fundador y referidos automáticos) — faltan las claves

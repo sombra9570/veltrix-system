@@ -34,6 +34,15 @@ export default function SupervisorLoans() {
     } finally { setBusy(''); }
   };
 
+  const reschedule = async (order: string) => {
+    const d = Number(window.prompt(t('loan.reschedulePrompt'), '7'));
+    if (!Number.isInteger(d) || d < 1) return;
+    setBusy(order); setMsg(null);
+    try { const n = await rpc<number>('reschedule_loan', { p_order: order, p_days: d }); setMsg({ ok: true, text: t('loan.rescheduled', { n, days: d }) }); await load(); }
+    catch (e) { const m = (e as Error).message; setMsg({ ok: false, text: m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic') }); }
+    finally { setBusy(''); }
+  };
+
   const row = (l: SLoan, actions?: ReactNode) => {
     const fmt = (n: number) => money(Number(n), l.currency, lang);
     return (
@@ -80,7 +89,10 @@ export default function SupervisorLoans() {
       )}
       <Card className="space-y-3">
         <h2 className="font-bold">📒 {t('loan.list')}</h2>
-        {others.length === 0 ? <p className={`text-sm ${ui.muted}`}>{t('loan.none')}</p> : <ul className="space-y-2">{others.map((l) => row(l))}</ul>}
+        {others.length === 0 ? <p className={`text-sm ${ui.muted}`}>{t('loan.none')}</p> : <ul className="space-y-2">{others.map((l) => row(l,
+          l.status === 'confirmed' && l.approval !== 'rejected' && Number(l.balance) > 0 ? (
+            <button type="button" disabled={busy === l.order_id} onClick={() => reschedule(l.order_id)} className="text-xs font-bold text-blue-600 cursor-pointer dark:text-blue-400">📅 {t('loan.reschedule')}</button>
+          ) : undefined))}</ul>}
       </Card>
     </div>
   );

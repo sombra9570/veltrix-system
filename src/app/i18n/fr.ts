@@ -1297,6 +1297,11 @@ const fr: Record<DictKey, string> = {
   "sync.running": "Synchronisation…",
   "sync.offlineShort": "Hors ligne",
   "common.showMore": "Voir {n} de plus",
+  "loan.reschedule": "Reprogrammer",
+  "loan.reschedulePrompt": "De combien de jours décaler les échéances en attente ?",
+  "loan.rescheduled": "✅ {n} échéances décalées de {days} jours.",
+  "perm.loans.reschedule": "Reprogrammer les échéances",
+  "perm.loans.reschedule.d": "Décaler les dates des échéances en attente (les montants ne changent pas).",
 };
 
 export default fr;

@@ -1297,6 +1297,11 @@ const ja: Record<DictKey, string> = {
   "sync.running": "同期中…",
   "sync.offlineShort": "オフライン",
   "common.showMore": "さらに {n} 件表示",
+  "loan.reschedule": "期日変更",
+  "loan.reschedulePrompt": "未払い分を何日延ばしますか？",
+  "loan.rescheduled": "✅ 未払い {n} 回分を {days} 日延ばしました。",
+  "perm.loans.reschedule": "分割の期日変更",
+  "perm.loans.reschedule.d": "未払い分の期日を延ばす（金額は変わりません）。",
 };
 
 export default ja;

@@ -1297,6 +1297,11 @@ const pt: Record<DictKey, string> = {
   "sync.running": "Sincronizando…",
   "sync.offlineShort": "Sem sinal",
   "common.showMore": "Ver mais {n}",
+  "loan.reschedule": "Reprogramar",
+  "loan.reschedulePrompt": "Quantos dias mover as parcelas pendentes?",
+  "loan.rescheduled": "✅ {n} parcelas pendentes movidas {days} dias.",
+  "perm.loans.reschedule": "Reprogramar parcelas",
+  "perm.loans.reschedule.d": "Mover as datas das parcelas pendentes (os valores não mudam).",
 };
 
 export default pt;

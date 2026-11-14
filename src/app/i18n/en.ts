@@ -1297,6 +1297,11 @@ const en: Record<DictKey, string> = {
   "sync.running": "Syncing…",
   "sync.offlineShort": "Offline",
   "common.showMore": "Show {n} more",
+  "loan.reschedule": "Reschedule",
+  "loan.reschedulePrompt": "How many days should pending installments move?",
+  "loan.rescheduled": "✅ {n} pending installments moved {days} days.",
+  "perm.loans.reschedule": "Reschedule installments",
+  "perm.loans.reschedule.d": "Move the due dates of a loan's pending installments (amounts don't change).",
 };
 
 export default en;

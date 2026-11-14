@@ -1297,6 +1297,11 @@ const ru: Record<DictKey, string> = {
   "sync.running": "Синхронизация…",
   "sync.offlineShort": "Нет сети",
   "common.showMore": "Показать ещё {n}",
+  "loan.reschedule": "Перенести",
+  "loan.reschedulePrompt": "На сколько дней перенести неоплаченные платежи?",
+  "loan.rescheduled": "✅ Перенесено платежей: {n}, на {days} дн.",
+  "perm.loans.reschedule": "Переносить платежи",
+  "perm.loans.reschedule.d": "Сдвигать даты неоплаченных платежей (суммы не меняются).",
 };
 
 export default ru;
