@@ -1302,6 +1302,23 @@ const en: Record<DictKey, string> = {
   "loan.rescheduled": "✅ {n} pending installments moved {days} days.",
   "perm.loans.reschedule": "Reschedule installments",
   "perm.loans.reschedule.d": "Move the due dates of a loan's pending installments (amounts don't change).",
+  "rcpt.title": "Payment receipt",
+  "rcpt.customer": "Customer",
+  "rcpt.amount": "Amount",
+  "rcpt.date": "Date",
+  "rcpt.balance": "Remaining balance",
+  "rcpt.collector": "Collector",
+  "rcpt.code": "Code",
+  "rcpt.offer": "Payment saved. Send the receipt to the customer?",
+  "rcpt.send": "Send via WhatsApp",
+  "trail.title": "Day's route",
+  "trail.error": "Could not load the route",
+  "trail.openMap": "Open route on map",
+  "trail.empty": "No payments or visits that day",
+  "trail.summary": "{n} records · {g} with location",
+  "trail.noGps": "no GPS",
+  "home.faq.q6": "What if the collector has no internet or loses the phone?",
+  "home.faq.a6": "They can keep collecting offline: each payment is saved on the phone with its time and sent automatically when the connection returns, without duplicates. If the phone is lost before reconnecting, only the payments not yet sent are lost; the pending counter reminds them to sync. On another phone they continue with everything already sent.",
 };
 
 export default en;

@@ -1302,6 +1302,23 @@ const ko: Record<DictKey, string> = {
   "loan.rescheduled": "✅ 미납 {n}회차를 {days}일 미뤘습니다.",
   "perm.loans.reschedule": "회차 일정 변경",
   "perm.loans.reschedule.d": "대출의 미납 회차 만기일을 미룸 (금액은 그대로).",
+  "rcpt.title": "결제 영수증",
+  "rcpt.customer": "고객",
+  "rcpt.amount": "금액",
+  "rcpt.date": "날짜",
+  "rcpt.balance": "남은 잔액",
+  "rcpt.collector": "수금원",
+  "rcpt.code": "코드",
+  "rcpt.offer": "수금이 저장되었습니다. 고객에게 영수증을 보낼까요?",
+  "rcpt.send": "WhatsApp으로 보내기",
+  "trail.title": "오늘의 경로",
+  "trail.error": "경로를 불러오지 못했습니다",
+  "trail.openMap": "지도에서 경로 보기",
+  "trail.empty": "그날 수금이나 방문이 없습니다",
+  "trail.summary": "{n}건 · 위치 있음 {g}건",
+  "trail.noGps": "GPS 없음",
+  "home.faq.q6": "수금원이 인터넷이 없거나 휴대폰을 잃어버리면?",
+  "home.faq.a6": "신호가 없어도 계속 수금할 수 있습니다. 각 수금은 시간과 함께 휴대폰에 저장되고 연결이 돌아오면 중복 없이 자동 전송됩니다. 연결 전에 휴대폰을 잃어버리면 아직 보내지 않은 수금만 잃게 되며, 대기 건수 표시가 동기화를 알려줍니다. 다른 휴대폰에서는 이미 보낸 모든 내용을 이어서 사용할 수 있습니다.",
 };
 
 export default ko;

@@ -7,6 +7,7 @@ import { useT } from '../../i18n';
 import { money, parseAmount } from '../format';
 import { DaysTable } from '../collector/days-table';
 import { CutForm } from '../collector/cut-form';
+import { RouteTrail } from '../route-trail';
 import { useBoard, type SRoute, type SBranch } from './board';
 
 // Panel del supervisor: cajas de ruta de sus sucursales, cobrado y prestado por día,
@@ -114,6 +115,7 @@ function RouteCard({ r, b, onChanged, onError }: { r: SRoute; b: SBranch; onChan
           {b.can_invest && <button type="button" onClick={() => setMv({ type: 'withdrawal', amount: '', note: '' })} className={`${ui.btnGhost} !py-1.5 text-xs`}>➖ {t('fund.withdraw')}</button>}
         </div>
       ) : <p className={`text-[11px] ${ui.muted}`}>🔒 {t('sup.noActions')}</p>}
+      <RouteTrail routeId={r.id} currency={r.currency} />
     </Card>
   );
 }

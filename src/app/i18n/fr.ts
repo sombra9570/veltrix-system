@@ -1302,6 +1302,23 @@ const fr: Record<DictKey, string> = {
   "loan.rescheduled": "✅ {n} échéances décalées de {days} jours.",
   "perm.loans.reschedule": "Reprogrammer les échéances",
   "perm.loans.reschedule.d": "Décaler les dates des échéances en attente (les montants ne changent pas).",
+  "rcpt.title": "Reçu de paiement",
+  "rcpt.customer": "Client",
+  "rcpt.amount": "Montant",
+  "rcpt.date": "Date",
+  "rcpt.balance": "Solde restant",
+  "rcpt.collector": "Encaisseur",
+  "rcpt.code": "Code",
+  "rcpt.offer": "Paiement enregistré. Envoyer le reçu au client ?",
+  "rcpt.send": "Envoyer par WhatsApp",
+  "trail.title": "Parcours du jour",
+  "trail.error": "Impossible de charger le parcours",
+  "trail.openMap": "Voir le parcours sur la carte",
+  "trail.empty": "Aucun encaissement ni visite ce jour-là",
+  "trail.summary": "{n} enregistrements · {g} avec position",
+  "trail.noGps": "sans GPS",
+  "home.faq.q6": "Que se passe-t-il si l'encaisseur n'a pas internet ou perd son téléphone ?",
+  "home.faq.a6": "Il continue d'encaisser hors ligne : chaque paiement est enregistré sur le téléphone avec l'heure et envoyé automatiquement au retour de la connexion, sans doublon. S'il perd le téléphone avant de se reconnecter, seuls les paiements non envoyés sont perdus ; le compteur d'attente lui rappelle de synchroniser. Sur un autre téléphone, il retrouve tout ce qui a déjà été envoyé.",
 };
 
 export default fr;

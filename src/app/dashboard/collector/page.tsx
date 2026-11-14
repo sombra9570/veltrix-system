@@ -44,7 +44,7 @@ type Liquidation = { id: string; created_at: string; expected: number; counted: 
   op_expenses: number; payments_out: number; withdrawals: number };
 type Day = { generated_at: string; routes: Route[] };
 type Op =
-  | { kind: 'payment'; id: string; at: string; route: string; customer: string; method: Method; amount: number; order?: string }
+  | { kind: 'payment'; id: string; at: string; route: string; customer: string; method: Method; amount: number; order?: string; lat?: number; lng?: number }
   | { kind: 'visit'; id: string; at: string; route: string; customer: string; result: VisitResult; promise_date?: string; promise_amount?: number; notes?: string; lat?: number; lng?: number }
   | { kind: 'expense'; id: string; at: string; route: string; amount: number; description: string };
 
@@ -98,7 +98,7 @@ function getPosition(): Promise<{ lat: number; lng: number } | null> {
 
 export default function CollectorPage() {
   const { t, lang } = useT();
-  const { userId } = useStaff();
+  const { userId, userName } = useStaff();
   const DAY_KEY = `vx_collector_day_${userId}`;
   const QUEUE_KEY = `vx_collector_queue_${userId}`;
 
@@ -117,6 +117,8 @@ export default function CollectorPage() {
   useEffect(() => { const v = load<string>('vx_col_view', 'list'); if (v === 'cards' || v === 'list') setView(v); }, []);
   const pickView = (v: 'cards' | 'list') => { setView(v); save('vx_col_view', v); };
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  // Último cobro, para ofrecer el comprobante por WhatsApp
+  const [receipt, setReceipt] = useState<{ phone: string; text: string } | null>(null);
   const flushing = useRef(false);
 
   const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 5000); };
@@ -160,6 +162,9 @@ export default function CollectorPage() {
               p_customer: op.customer, p_origin: 'field_route', p_method: op.method, p_amount: op.amount,
               p_route: op.route, p_offline_uuid: op.id, p_collected_at: op.at, p_order: op.order ?? null,
             });
+            if (op.lat != null && op.lng != null) {
+              await rpc('set_payment_geo', { p_offline_uuid: op.id, p_lat: op.lat, p_lng: op.lng }).catch(() => undefined);
+            }
           } else if (op.kind === 'visit') {
             await rpc('collector_visit', {
               p_route: op.route, p_customer: op.customer, p_result: op.result,
@@ -178,7 +183,7 @@ export default function CollectorPage() {
           if (/fetch|network|Failed|Load failed/i.test(m) || !navigator.onLine) break;
           flash(false, `${t('col.rejected')}: ${m}`);
         }
-        pending = pending.slice(1);
+        pending = load<Op[]>(QUEUE_KEY, []).filter((o) => o.id !== op.id);
         save(QUEUE_KEY, pending);
         setQueue(pending);
       }
@@ -259,11 +264,41 @@ export default function CollectorPage() {
   };
 
   const route = day?.routes.find((r) => r.id === routeId);
-  const cardPay = (customer: string, order: string, amount: number, method: Method) => {
+  // Registra el cobro al instante; la ubicación se adjunta apenas el teléfono la da (sin hacer esperar)
+  const pay = (customer: string, method: Method, amount: number, order?: string) => {
     if (!route) return;
-    enqueue({ kind: 'payment', id: crypto.randomUUID(), at: new Date().toISOString(), route: route.id, customer, method, amount, order });
+    const id = crypto.randomUUID();
+    const at = new Date().toISOString();
+    enqueue({ kind: 'payment', id, at, route: route.id, customer, method, amount, order });
     flash(true, online ? t('col.paySaved') : t('col.savedOffline'));
+    getPosition().then((pos) => {
+      if (!pos) return;
+      const q = load<Op[]>(QUEUE_KEY, []);
+      if (q.some((o) => o.id === id)) {
+        const next = q.map((o) => (o.id === id ? { ...o, ...pos } : o));
+        save(QUEUE_KEY, next);
+        setQueue(next);
+      } else {
+        rpc('set_payment_geo', { p_offline_uuid: id, p_lat: pos.lat, p_lng: pos.lng }).catch(() => undefined);
+      }
+    });
+    const c = route.customers.find((x) => x.id === customer);
+    const phone = c?.phone?.replace(/[^\d]/g, '') ?? '';
+    if (c && phone.length >= 7) {
+      const left = Math.max(0, Number(c.balance) - amount);
+      const when = new Date(at).toLocaleString(lang, { dateStyle: 'short', timeStyle: 'short' });
+      setReceipt({ phone, text: [
+        `🧾 ${t('rcpt.title')} · ${route.branch}`,
+        `${t('rcpt.customer')}: ${c.name}`,
+        `${t('rcpt.amount')}: ${money(amount, route.currency, lang)} (${t(`cash.m.${method}` as DictKey)})`,
+        `${t('rcpt.date')}: ${when}`,
+        `${t('rcpt.balance')}: ${money(left, route.currency, lang)}`,
+        `${t('rcpt.collector')}: ${userName}`,
+        `${t('rcpt.code')}: ${id.slice(0, 8).toUpperCase()}`,
+      ].join('\n') });
+    }
   };
+  const cardPay = (customer: string, order: string, amount: number, method: Method) => pay(customer, method, amount, order);
   // La ficha abierta se mantiene al día con lo guardado (tarjetas marcadas)
   const selNow = sel ? route?.customers.find((x) => x.id === sel.id) ?? sel : null;
   const fmt = (n: number) => money(Number(n), route?.currency ?? 'USD', lang);
@@ -304,6 +339,16 @@ export default function CollectorPage() {
       </div>
 
       {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? okBox : errBox}`}>{msg.text}</p>}
+      {receipt && (
+        <div className={`flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3 text-sm ${okBox}`}>
+          <span className="font-semibold">{t('rcpt.offer')}</span>
+          <span className="flex gap-2">
+            <a href={`https://wa.me/${receipt.phone}?text=${encodeURIComponent(receipt.text)}`} target="_blank" rel="noopener noreferrer"
+              onClick={() => setReceipt(null)} className={ui.btnPrimary}>📲 {t('rcpt.send')}</a>
+            <button type="button" onClick={() => setReceipt(null)} className={`${ui.btnGhost} cursor-pointer`}>{t('pos.close')}</button>
+          </span>
+        </div>
+      )}
 
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
@@ -465,8 +510,7 @@ export default function CollectorPage() {
             )}
             {sel && panel === 'pay' && (
               <PayForm c={sel} fmt={fmt} onDone={(method, amount) => {
-                enqueue({ kind: 'payment', id: crypto.randomUUID(), at: new Date().toISOString(), route: route.id, customer: sel.id, method, amount });
-                flash(true, online ? t('col.paySaved') : t('col.savedOffline'));
+                pay(sel.id, method, amount);
                 setSel(null); setPanel(null);
               }} />
             )}

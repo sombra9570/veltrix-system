@@ -227,7 +227,7 @@ export default function HomePage() {
       <section className="mx-auto w-full max-w-3xl px-4 py-10">
         <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.faq.title')}</h2>
         <ul className="mt-6 space-y-2">
-          {[1, 2, 3, 4, 5].map((i) => (
+          {[1, 2, 3, 4, 5, 6].map((i) => (
             <li key={i} className={`overflow-hidden rounded-2xl ${ui.card}`}>
               <button type="button" onClick={() => setFaq(faq === i ? null : i)} aria-expanded={faq === i}
                 className="flex w-full items-center justify-between gap-3 p-4 text-start font-semibold cursor-pointer">

@@ -1302,6 +1302,23 @@ const pt: Record<DictKey, string> = {
   "loan.rescheduled": "✅ {n} parcelas pendentes movidas {days} dias.",
   "perm.loans.reschedule": "Reprogramar parcelas",
   "perm.loans.reschedule.d": "Mover as datas das parcelas pendentes (os valores não mudam).",
+  "rcpt.title": "Comprovante de pagamento",
+  "rcpt.customer": "Cliente",
+  "rcpt.amount": "Valor",
+  "rcpt.date": "Data",
+  "rcpt.balance": "Saldo pendente",
+  "rcpt.collector": "Cobrador",
+  "rcpt.code": "Código",
+  "rcpt.offer": "Recebimento salvo. Enviar o comprovante ao cliente?",
+  "rcpt.send": "Enviar pelo WhatsApp",
+  "trail.title": "Percurso do dia",
+  "trail.error": "Não foi possível carregar o percurso",
+  "trail.openMap": "Ver percurso no mapa",
+  "trail.empty": "Sem recebimentos nem visitas nesse dia",
+  "trail.summary": "{n} registros · {g} com localização",
+  "trail.noGps": "sem GPS",
+  "home.faq.q6": "E se o cobrador ficar sem internet ou perder o celular?",
+  "home.faq.a6": "Ele continua cobrando sem sinal: cada recebimento fica salvo no telefone com o horário e é enviado sozinho quando a conexão volta, sem duplicar. Se perder o celular antes de conectar, só se perdem os recebimentos ainda não enviados; o contador de pendentes lembra de sincronizar. Em outro telefone ele continua com tudo o que já foi enviado.",
 };
 
 export default pt;

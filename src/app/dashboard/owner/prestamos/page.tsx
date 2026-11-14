@@ -6,6 +6,7 @@ import { Card } from '../../shell';
 import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
+import { RouteTrail } from '../../route-trail';
 import { money } from '../../format';
 import { useOwner, friendlyError } from '../owner-context';
 import { RATING_DOT } from '../../collector/loan-form';
@@ -234,6 +235,7 @@ export default function LoansPage() {
                       ))}
                     </ul>
                   )}
+                  <RouteTrail routeId={f.id} currency={f.currency} />
                 </li>
               );
             })}

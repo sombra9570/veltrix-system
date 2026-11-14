@@ -1311,6 +1311,23 @@ const es = {
   "loan.rescheduled": "✅ {n} cuotas pendientes corridas {days} días.",
   "perm.loans.reschedule": "Reprogramar cuotas",
   "perm.loans.reschedule.d": "Correr las fechas de las cuotas pendientes de un préstamo (no cambia montos).",
+  "rcpt.title": "Comprobante de pago",
+  "rcpt.customer": "Cliente",
+  "rcpt.amount": "Monto",
+  "rcpt.date": "Fecha",
+  "rcpt.balance": "Saldo pendiente",
+  "rcpt.collector": "Cobrador",
+  "rcpt.code": "Código",
+  "rcpt.offer": "Cobro guardado. ¿Enviar el comprobante al cliente?",
+  "rcpt.send": "Enviar por WhatsApp",
+  "trail.title": "Recorrido del día",
+  "trail.error": "No se pudo cargar el recorrido",
+  "trail.openMap": "Ver recorrido en el mapa",
+  "trail.empty": "Sin cobros ni visitas ese día",
+  "trail.summary": "{n} registros · {g} con ubicación",
+  "trail.noGps": "sin GPS",
+  "home.faq.q6": "¿Qué pasa si el cobrador se queda sin internet o pierde el celular?",
+  "home.faq.a6": "Puede seguir cobrando sin señal: cada cobro queda guardado en el teléfono con su hora y se envía solo al volver la conexión, sin duplicarse. Si pierde el celular antes de conectarse, solo se pierden los cobros todavía no enviados; el contador de pendientes le recuerda sincronizar. En otro teléfono sigue con todo lo ya enviado.",
 };
 
 export default es;

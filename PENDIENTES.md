@@ -31,6 +31,16 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [x] **Panel del supervisor**: rutas y cajas, cobrado/prestado por día, cierres, inversión y aprobación de préstamos según permisos
 - [ ] **Notificaciones push en vivo** (préstamo por aprobar, pago recibido, tarjeta en rojo) — requiere llaves VAPID en Vercel
 - [x] **Reprogramar cuotas** pendientes con permiso (anular préstamo sin cobros ya existía)
+- [x] **Comprobante por WhatsApp** al cobrar en calle (botón con el recibo listo; versión automática requiere API de WhatsApp Business, de pago)
+- [x] **GPS en cada cobro** + recorrido del día con mapa (supervisor y administrador)
+- [ ] Comprobante por WhatsApp también en caja (POS) y en taller
+- [ ] Orden de despacho: vendedor → caja → almacenero ve qué entregar
+- [ ] Taller: fotos de recepción, firma del cliente y estado por WhatsApp
+- [ ] QR del negocio en pantalla al cobrar + foto del comprobante (QR Simple dinámico requiere convenio bancario)
+- [ ] Demo pública que se reinicia cada noche (no usar las cuentas de auditoría)
+- [ ] Sección de seguridad y 4 rubros en la portada; más roles en la vitrina; video de 60–120 s
+- [ ] Cuentas financieras: pantalla para crear banco/caja general (pago a proveedores las necesita)
+- [ ] Copias de seguridad diarias garantizadas al pasar a Supabase Pro (recién ahí prometerlas)
 
 ### Cobros y legal
 - [x] Conexión de pagos con Paddle (pago, avisos, cambio de plan, descuentos de fundador y referidos automáticos) — faltan las claves
@@ -44,7 +54,6 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 ### App
 - [ ] **APK Android** (TWA desde la app web + `/.well-known/assetlinks.json`)
 - [x] Programa de referidos (30 días al invitado, 1 mes gratis al que invita cuando paga)
-- [ ] Panel del **supervisor** (hoy usa pantallas del dueño)
 - [ ] Pantallas del **almacenero** y del **contador** (roles existen, sin panel propio)
 - [ ] Pagos a proveedores / cuentas por pagar
 - [ ] Transferencias de stock entre sucursales (la función existe, falta pantalla)
@@ -69,4 +78,4 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 ## Hecho
 Panel del dueño · Caja · POS · Clientes y crédito · Cobrador offline · Restaurante · Taller ·
 Tienda online · Mensajes del equipo · Ayuda · Veltrix IA (falta la clave) · Ventas · Caja del dueño ·
-Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar empresas de prueba · Permisos por rol/usuario · Nueva portada · Mi plan y cobros (falta conectar claves) · Páginas legales
+Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar empresas de prueba · Permisos por rol/usuario · Nueva portada · Mi plan y cobros (falta conectar claves) · Páginas legales · Panel supervisor · Préstamos en calle y caja de ruta · Demo Dfg coorp cargada · Roles filtrados por módulos

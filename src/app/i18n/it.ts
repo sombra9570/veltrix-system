@@ -1302,6 +1302,23 @@ const it: Record<DictKey, string> = {
   "loan.rescheduled": "✅ {n} rate spostate di {days} giorni.",
   "perm.loans.reschedule": "Riprogrammare rate",
   "perm.loans.reschedule.d": "Spostare le scadenze delle rate in sospeso (gli importi non cambiano).",
+  "rcpt.title": "Ricevuta di pagamento",
+  "rcpt.customer": "Cliente",
+  "rcpt.amount": "Importo",
+  "rcpt.date": "Data",
+  "rcpt.balance": "Saldo residuo",
+  "rcpt.collector": "Esattore",
+  "rcpt.code": "Codice",
+  "rcpt.offer": "Incasso salvato. Inviare la ricevuta al cliente?",
+  "rcpt.send": "Invia su WhatsApp",
+  "trail.title": "Percorso del giorno",
+  "trail.error": "Impossibile caricare il percorso",
+  "trail.openMap": "Vedi percorso sulla mappa",
+  "trail.empty": "Nessun incasso o visita quel giorno",
+  "trail.summary": "{n} registrazioni · {g} con posizione",
+  "trail.noGps": "senza GPS",
+  "home.faq.q6": "Cosa succede se l'esattore resta senza internet o perde il telefono?",
+  "home.faq.a6": "Può continuare a incassare offline: ogni incasso resta salvato sul telefono con l'ora e viene inviato da solo al ritorno della connessione, senza duplicati. Se perde il telefono prima di collegarsi, si perdono solo gli incassi non ancora inviati; il contatore dei pendenti ricorda di sincronizzare. Su un altro telefono ritrova tutto ciò che è già stato inviato.",
 };
 
 export default it;

@@ -1302,6 +1302,23 @@ const ja: Record<DictKey, string> = {
   "loan.rescheduled": "✅ 未払い {n} 回分を {days} 日延ばしました。",
   "perm.loans.reschedule": "分割の期日変更",
   "perm.loans.reschedule.d": "未払い分の期日を延ばす（金額は変わりません）。",
+  "rcpt.title": "支払い領収書",
+  "rcpt.customer": "顧客",
+  "rcpt.amount": "金額",
+  "rcpt.date": "日付",
+  "rcpt.balance": "残高",
+  "rcpt.collector": "集金担当",
+  "rcpt.code": "コード",
+  "rcpt.offer": "集金を保存しました。顧客に領収書を送りますか？",
+  "rcpt.send": "WhatsAppで送信",
+  "trail.title": "当日のルート",
+  "trail.error": "ルートを読み込めませんでした",
+  "trail.openMap": "地図でルートを見る",
+  "trail.empty": "その日の集金・訪問はありません",
+  "trail.summary": "{n}件 · 位置情報あり{g}件",
+  "trail.noGps": "GPSなし",
+  "home.faq.q6": "集金担当がネットにつながらない、または携帯をなくしたら？",
+  "home.faq.a6": "電波がなくても集金を続けられます。各集金は時刻付きで端末に保存され、接続が戻ると重複なく自動送信されます。接続前に携帯をなくした場合、失われるのは未送信の集金だけで、未送信件数の表示が同期を促します。別の端末では送信済みのデータがすべて使えます。",
 };
 
 export default ja;

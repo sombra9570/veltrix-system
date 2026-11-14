@@ -1302,6 +1302,23 @@ const de: Record<DictKey, string> = {
   "loan.rescheduled": "✅ {n} offene Raten um {days} Tage verschoben.",
   "perm.loans.reschedule": "Raten verschieben",
   "perm.loans.reschedule.d": "Fälligkeiten offener Raten verschieben (Beträge bleiben gleich).",
+  "rcpt.title": "Zahlungsbeleg",
+  "rcpt.customer": "Kunde",
+  "rcpt.amount": "Betrag",
+  "rcpt.date": "Datum",
+  "rcpt.balance": "Restbetrag",
+  "rcpt.collector": "Kassierer",
+  "rcpt.code": "Code",
+  "rcpt.offer": "Zahlung gespeichert. Beleg an den Kunden senden?",
+  "rcpt.send": "Per WhatsApp senden",
+  "trail.title": "Tagesroute",
+  "trail.error": "Route konnte nicht geladen werden",
+  "trail.openMap": "Route auf der Karte zeigen",
+  "trail.empty": "Keine Zahlungen oder Besuche an diesem Tag",
+  "trail.summary": "{n} Einträge · {g} mit Standort",
+  "trail.noGps": "kein GPS",
+  "home.faq.q6": "Was passiert, wenn der Kassierer kein Internet hat oder das Handy verliert?",
+  "home.faq.a6": "Er kann offline weiter kassieren: Jede Zahlung wird mit Uhrzeit im Handy gespeichert und automatisch gesendet, sobald die Verbindung zurück ist – ohne Doppelungen. Geht das Handy vorher verloren, fehlen nur die noch nicht gesendeten Zahlungen; der Zähler für Ausstehendes erinnert ans Synchronisieren. Auf einem anderen Handy ist alles bereits Gesendete da.",
 };
 
 export default de;

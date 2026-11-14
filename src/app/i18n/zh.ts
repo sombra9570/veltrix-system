@@ -1302,6 +1302,23 @@ const zh: Record<DictKey, string> = {
   "loan.rescheduled": "✅ 已将 {n} 期待付分期顺延 {days} 天。",
   "perm.loans.reschedule": "分期改期",
   "perm.loans.reschedule.d": "顺延贷款待付分期的到期日（金额不变）。",
+  "rcpt.title": "付款收据",
+  "rcpt.customer": "客户",
+  "rcpt.amount": "金额",
+  "rcpt.date": "日期",
+  "rcpt.balance": "剩余欠款",
+  "rcpt.collector": "收款员",
+  "rcpt.code": "编号",
+  "rcpt.offer": "收款已保存。要把收据发给客户吗？",
+  "rcpt.send": "通过 WhatsApp 发送",
+  "trail.title": "当日路线",
+  "trail.error": "无法加载路线",
+  "trail.openMap": "在地图上查看路线",
+  "trail.empty": "当天没有收款或拜访",
+  "trail.summary": "{n} 条记录 · {g} 条有位置",
+  "trail.noGps": "无 GPS",
+  "home.faq.q6": "收款员没有网络或丢了手机怎么办？",
+  "home.faq.a6": "没有信号也能继续收款：每笔收款连同时间保存在手机上，网络恢复后自动发送，不会重复。如果在联网前丢了手机，只会丢失尚未发送的收款；待发送计数会提醒同步。换一部手机登录即可继续使用已发送的全部数据。",
 };
 
 export default zh;
