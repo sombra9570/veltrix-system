@@ -995,6 +995,11 @@ const ja: Record<DictKey, string> = {
   "bill.refDiscount": "紹介割引：次回支払い −{pct}%。",
   "ref.rulePlan": "紹介先があなたと同等以上のプランを選んだ場合のみ特典が付きます。",
   "ref.noReward": "支払い済み · 下位プランのため特典なし",
+  "pay.opening": "安全な決済を開いています…",
+  "pay.error": "決済を開けませんでした",
+  "pay.secure": "決済は公式販売代理店Paddleが処理します。Veltrixがカード情報を見ることはありません。",
+  "pay.back": "マイプランに戻る",
+  "bill.planChanged": "✅ プランを変更しました。Paddleは今月の差額のみ請求します。まもなく反映されます。",
 };
 
 export default ja;

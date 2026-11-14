@@ -995,6 +995,11 @@ const pt: Record<DictKey, string> = {
   "bill.refDiscount": "Desconto por indicação: −{pct}% no próximo pagamento.",
   "ref.rulePlan": "O prêmio só vale se o negócio convidado escolher um plano igual ou superior ao seu.",
   "ref.noReward": "Pagou · plano menor, sem prêmio",
+  "pay.opening": "Abrindo o pagamento seguro…",
+  "pay.error": "Não foi possível abrir o pagamento",
+  "pay.secure": "O pagamento é processado pela Paddle, nossa revendedora oficial. O Veltrix nunca vê os dados do seu cartão.",
+  "pay.back": "Voltar a Meu plano",
+  "bill.planChanged": "✅ Plano alterado. A Paddle cobra só a diferença deste mês; seu painel atualiza em instantes.",
 };
 
 export default pt;

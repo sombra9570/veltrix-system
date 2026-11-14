@@ -995,6 +995,11 @@ const de: Record<DictKey, string> = {
   "bill.refDiscount": "Empfehlungsrabatt: −{pct} % auf Ihre nächste Zahlung.",
   "ref.rulePlan": "Die Prämie zählt nur, wenn das eingeladene Geschäft einen gleichen oder höheren Tarif wählt.",
   "ref.noReward": "Bezahlt · kleinerer Tarif, keine Prämie",
+  "pay.opening": "Sichere Zahlung wird geöffnet…",
+  "pay.error": "Zahlung konnte nicht geöffnet werden",
+  "pay.secure": "Die Zahlung wickelt Paddle ab, unser offizieller Wiederverkäufer. Veltrix sieht Ihre Kartendaten nie.",
+  "pay.back": "Zurück zu Mein Tarif",
+  "bill.planChanged": "✅ Tarif geändert. Paddle berechnet nur die Differenz dieses Monats; Ihr Panel aktualisiert sich gleich.",
 };
 
 export default de;

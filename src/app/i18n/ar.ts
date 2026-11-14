@@ -995,6 +995,11 @@ const ar: Record<DictKey, string> = {
   "bill.refDiscount": "خصم الدعوة: −{pct}% على دفعتك القادمة.",
   "ref.rulePlan": "تُحتسب المكافأة فقط إذا اختار العمل المدعو خطة مساوية لخطتك أو أعلى.",
   "ref.noReward": "دفع · خطة أقل، بلا مكافأة",
+  "pay.opening": "جارٍ فتح الدفع الآمن…",
+  "pay.error": "تعذّر فتح الدفع",
+  "pay.secure": "يعالج الدفع Paddle، موزعنا الرسمي. لا يرى Veltrix بيانات بطاقتك أبداً.",
+  "pay.back": "العودة إلى خطتي",
+  "bill.planChanged": "✅ تم تغيير الخطة. يحصّل Paddle فرق هذا الشهر فقط، وستتحدّث لوحتك بعد لحظات.",
 };
 
 export default ar;

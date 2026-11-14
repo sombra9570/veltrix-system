@@ -52,6 +52,7 @@ export default function PlanPage() {
         body: JSON.stringify({ org_id: orgId, plan_code: plan }),
       });
       const j = await res.json().catch(() => ({}));
+      if (res.ok && j.changed) { setMsg({ ok: true, text: t('bill.planChanged') }); setTimeout(() => { load(); reload(); }, 5000); setBusy(null); return; }
       if (res.ok && j.url) { window.location.href = j.url; return; }
       setMsg({ ok: false, text: j.error === 'BILLING_NOT_CONFIGURED' ? t('bill.notConfigured') : t('bill.error') });
     } catch { setMsg({ ok: false, text: t('bill.error') }); }

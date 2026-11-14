@@ -995,6 +995,11 @@ const ko: Record<DictKey, string> = {
   "bill.refDiscount": "초대 할인: 다음 결제 −{pct}%.",
   "ref.rulePlan": "초대한 사업자가 당신과 같거나 높은 요금제를 선택해야 보상이 적용됩니다.",
   "ref.noReward": "결제 · 하위 요금제, 보상 없음",
+  "pay.opening": "안전 결제를 여는 중…",
+  "pay.error": "결제를 열 수 없습니다",
+  "pay.secure": "결제는 공식 리셀러 Paddle이 처리하며 Veltrix는 카드 정보를 보지 않습니다.",
+  "pay.back": "내 요금제로 돌아가기",
+  "bill.planChanged": "✅ 요금제가 변경되었습니다. 이번 달 차액만 청구되며 곧 반영됩니다.",
 };
 
 export default ko;

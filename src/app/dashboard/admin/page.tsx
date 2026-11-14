@@ -389,7 +389,7 @@ export default function GlobalCoreAdminPage() {
         <section className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
           <div>
             <h2 className="text-sm font-bold">💲 Planes y precios</h2>
-            <p className="text-[11px] text-slate-500">Cambia precios y límites cuando quieras. Se aplican al instante en la portada, en "Mi plan" y en los límites de cada empresa. Si usas Lemon Squeezy, cambia también el precio del producto allá.</p>
+            <p className="text-[11px] text-slate-500">Cambia precios y límites cuando quieras. Se aplican al instante en la portada, en "Mi plan" y en los límites de cada empresa. Si cambias un precio, cámbialo también en Paddle (Catálogo → Precios).</p>
           </div>
           {planMsg && <p className="text-xs font-semibold text-slate-200">{planMsg}</p>}
           <div className="grid gap-3 lg:grid-cols-3">
@@ -440,7 +440,7 @@ export default function GlobalCoreAdminPage() {
                     <p className="text-slate-400">
                       {o.is_pilot && o.pilot_ends ? `Gratis hasta ${fmtDate(o.pilot_ends)} · ` : ''}
                       {o.founder_until ? `Fundador −${o.founder_discount_pct}% hasta ${fmtDate(o.founder_until)} · ` : ''}
-                      {Number(o.referral_credit_pct ?? 0) > 0 ? `🎁 Descuento por invitar −${o.referral_credit_pct}% en su próximo pago (si paga con tarjeta, aplícalo en Lemon Squeezy) · ` : ''}
+                      {Number(o.referral_credit_pct ?? 0) > 0 ? `🎁 Descuento por invitar −${o.referral_credit_pct}% en su próximo pago (con tarjeta se aplica solo en Paddle) · ` : ''}
                       Próximo cobro {fmtDate(o.next_billing_date)}
                       {o.last_payment ? ` · Último pago ${fmtDate(o.last_payment)}` : ''}
                     </p>

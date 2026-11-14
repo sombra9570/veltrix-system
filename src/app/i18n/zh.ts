@@ -995,6 +995,11 @@ const zh: Record<DictKey, string> = {
   "bill.refDiscount": "邀请折扣：下次付款 −{pct}%。",
   "ref.rulePlan": "只有受邀商家选择与你相同或更高的套餐，奖励才生效。",
   "ref.noReward": "已付费 · 套餐较低，无奖励",
+  "pay.opening": "正在打开安全支付…",
+  "pay.error": "无法打开支付页面",
+  "pay.secure": "支付由我们的官方经销商 Paddle 处理，Veltrix 不会看到你的银行卡信息。",
+  "pay.back": "返回我的套餐",
+  "bill.planChanged": "✅ 套餐已更改。Paddle 只收取本月差额，面板稍后更新。",
 };
 
 export default zh;

@@ -85,7 +85,7 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'Respecto de los datos de tus clientes y empleados, actuamos por cuenta tuya: solo los usamos para prestarte el servicio.',
         ] },
         { h: '3. Con quién los compartimos', p: [
-          'Con proveedores que nos ayudan a operar, bajo obligaciones de confidencialidad: Supabase (base de datos y archivos), Vercel (alojamiento de la app), Resend (envío de correos), Lemon Squeezy (procesamiento de pagos) y Anthropic (solo si tu empresa activa Veltrix IA: recibe un resumen de datos de tu negocio para responder, sin fotos ni documentos).',
+          'Con proveedores que nos ayudan a operar, bajo obligaciones de confidencialidad: Supabase (base de datos y archivos), Vercel (alojamiento de la app), Resend (envío de correos), Paddle (procesamiento de pagos) y Anthropic (solo si tu empresa activa Veltrix IA: recibe un resumen de datos de tu negocio para responder, sin fotos ni documentos).',
           'Algunos de estos proveedores procesan datos fuera de tu país. Elegimos proveedores con medidas de seguridad reconocidas.',
           'No entregamos datos a terceros por iniciativa propia; solo lo haríamos ante una orden judicial u obligación legal que no podamos rechazar, y en ese caso avisaríamos a la empresa si la ley lo permite.',
         ] },
@@ -213,7 +213,7 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'For your customers’ and employees’ data, we act on your behalf and only use it to provide the service to you.',
         ] },
         { h: '3. Who we share it with', p: [
-          'Providers that help us operate, under confidentiality obligations: Supabase (database and files), Vercel (app hosting), Resend (email delivery), Lemon Squeezy (payment processing) and Anthropic (only if your company enables Veltrix AI: it receives a summary of your business data to answer, without photos or documents).',
+          'Providers that help us operate, under confidentiality obligations: Supabase (database and files), Vercel (app hosting), Resend (email delivery), Paddle (payment processing) and Anthropic (only if your company enables Veltrix AI: it receives a summary of your business data to answer, without photos or documents).',
           'Some of these providers process data outside your country. We choose providers with recognized security measures.',
           'We do not hand over data to third parties on our own initiative; we would only do so under a court order or legal obligation we cannot refuse, and we would notify the company if the law allows it.',
         ] },

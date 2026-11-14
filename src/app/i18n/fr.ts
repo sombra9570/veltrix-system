@@ -995,6 +995,11 @@ const fr: Record<DictKey, string> = {
   "bill.refDiscount": "Remise parrainage : −{pct} % sur votre prochain paiement.",
   "ref.rulePlan": "La récompense ne compte que si l'entreprise invitée choisit une offre égale ou supérieure à la vôtre.",
   "ref.noReward": "A payé · offre inférieure, sans récompense",
+  "pay.opening": "Ouverture du paiement sécurisé…",
+  "pay.error": "Impossible d'ouvrir le paiement",
+  "pay.secure": "Le paiement est traité par Paddle, notre revendeur officiel. Veltrix ne voit jamais vos données de carte.",
+  "pay.back": "Retour à Mon offre",
+  "bill.planChanged": "✅ Offre modifiée. Paddle facture seulement la différence du mois ; votre tableau se met à jour.",
 };
 
 export default fr;

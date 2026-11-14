@@ -12,11 +12,15 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [ ] **Anthropic**: cuenta, crédito y `ANTHROPIC_API_KEY` en Vercel (enciende Veltrix IA)
 - [ ] **Supabase**: activar protección de contraseñas filtradas
 - [ ] **Vercel Pro** antes del primer cliente que pague (Hobby no permite uso comercial)
-- [ ] **Lemon Squeezy** (Merchant of Record): cuenta, verificación de identidad, tienda y 6 productos/variantes
-      (Starter, Pro, Enterprise × precio Latinoamérica y precio internacional), códigos de descuento de fundador
-      (ej. FUNDADOR50, 12 meses) y webhook a `https://veltrixsystem.app/api/billing/webhook`
-- [ ] **Vercel**: `LEMONSQUEEZY_API_KEY`, `LEMONSQUEEZY_STORE_ID`, `LEMONSQUEEZY_WEBHOOK_SECRET`,
-      `LEMONSQUEEZY_VARIANTS`, `LEMONSQUEEZY_FOUNDER_CODES`, `SUPABASE_SERVICE_ROLE_KEY` (solo en Vercel)
+- [ ] **Paddle** (Merchant of Record): cuenta y verificación (primero en modo sandbox para probar)
+      - Catálogo: producto "Veltrix" con 6 precios mensuales (Starter, Pro, Enterprise × Latinoamérica e internacional)
+      - Descuentos: fundador 50 % recurrente 12 meses; referidos 15 %, 20 % y 30 % de UN solo cobro
+      - Checkout → "Default payment link": `https://veltrixsystem.app/pagar`
+      - Notificaciones → destino `https://veltrixsystem.app/api/billing/webhook` con eventos subscription.* y
+        transaction.completed / transaction.payment_failed
+- [ ] **Vercel**: `PADDLE_API_KEY`, `PADDLE_WEBHOOK_SECRET`, `PADDLE_ENV` (sandbox al probar), `PADDLE_PRICES`,
+      `PADDLE_FOUNDER_DISCOUNTS`, `PADDLE_REFERRAL_DISCOUNTS`, `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`,
+      `SUPABASE_SERVICE_ROLE_KEY` (solo en Vercel)
 - [ ] **Abogado**: revisar Términos, Privacidad y Reembolsos (borrador publicado en la web)
 - [ ] **Contador en línea** en Bolivia (empresa formal, NIT, cómo declarar los pagos del Merchant of Record)
 - [ ] **Google Play**: cuenta de desarrollador (25 USD, pago único) para el APK
@@ -24,7 +28,7 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 ## B. Construcción pendiente
 
 ### Cobros y legal
-- [x] Conexión de pagos con Lemon Squeezy (checkout + webhook) — falta conectar las claves
+- [x] Conexión de pagos con Paddle (pago, avisos, cambio de plan, descuentos de fundador y referidos automáticos) — faltan las claves
 - [x] Precios con "+ impuestos" y precio regional (Latinoamérica / internacional)
 - [x] Páginas legales: Términos, Privacidad, Reembolsos (español oficial + inglés)
 - [ ] Pantalla "Mi plan" para el dueño — hecha; probar con un pago real

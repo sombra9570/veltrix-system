@@ -1004,6 +1004,11 @@ const es = {
   "bill.refDiscount": "Descuento por invitar: −{pct} % en tu próximo pago.",
   "ref.rulePlan": "El premio solo cuenta si el negocio invitado elige un plan igual o superior al tuyo.",
   "ref.noReward": "Pagó · plan menor, sin premio",
+  "pay.opening": "Abriendo el pago seguro…",
+  "pay.error": "No se pudo abrir el pago",
+  "pay.secure": "El pago lo procesa Paddle, nuestro revendedor oficial. Veltrix nunca ve los datos de tu tarjeta.",
+  "pay.back": "Volver a Mi plan",
+  "bill.planChanged": "✅ Plan cambiado. Paddle cobra solo la diferencia de este mes; en un momento se actualiza tu panel.",
 };
 
 export default es;
