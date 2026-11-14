@@ -4,11 +4,11 @@ import { useOwner, friendlyError } from '../owner-context';
 import { Card } from '../../shell';
 import { ui } from '../../../site-header';
 import { supabase, rpc } from '../../../../lib/supabase';
-import { COUNTRIES, CountryCode } from '../../../language-selector';
+import { COUNTRIES, CountryCode, LANGUAGES } from '../../../language-selector';
 import { useT, countryName } from '../../../i18n';
 
 type Company = { id: string; legal_name: string; country_code: string; base_currency: string; tax_id: string | null };
-type Branch = { id: string; company_id: string; code: string; name: string; timezone: string; address: string | null; is_active: boolean };
+type Branch = { id: string; company_id: string; code: string; name: string; timezone: string; address: string | null; is_active: boolean; lang: string | null };
 
 export default function BranchesPage() {
   const { orgId, reload, overview } = useOwner();
@@ -20,8 +20,8 @@ export default function BranchesPage() {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const [branchForm, setBranchForm] = useState<{ open: boolean; companyId: string; name: string; address: string; tz: string }>(
-    { open: false, companyId: '', name: '', address: '', tz: '' });
+  const [branchForm, setBranchForm] = useState<{ open: boolean; companyId: string; name: string; address: string; tz: string; lang: string }>(
+    { open: false, companyId: '', name: '', address: '', tz: '', lang: '' });
   const [compForm, setCompForm] = useState<{ open: boolean; name: string; country: CountryCode; taxId: string }>(
     { open: false, name: '', country: 'PE', taxId: '' });
 
@@ -30,7 +30,7 @@ export default function BranchesPage() {
     setLoading(true);
     const [c, b] = await Promise.all([
       supabase.from('companies').select('id, legal_name, country_code, base_currency, tax_id').eq('org_id', orgId).is('deleted_at', null).order('created_at'),
-      supabase.from('branches').select('id, company_id, code, name, timezone, address, is_active').eq('org_id', orgId).is('deleted_at', null).order('created_at'),
+      supabase.from('branches').select('id, company_id, code, name, timezone, address, is_active, lang').eq('org_id', orgId).is('deleted_at', null).order('created_at'),
     ]);
     setCompanies((c.data ?? []) as Company[]);
     setBranches((b.data ?? []) as Branch[]);
@@ -44,7 +44,7 @@ export default function BranchesPage() {
 
   const openBranchForm = (companyId: string) => {
     const tz = tzOptions(companyId)[0]?.tz ?? '';
-    setBranchForm({ open: true, companyId, name: '', address: '', tz });
+    setBranchForm({ open: true, companyId, name: '', address: '', tz, lang: '' });
     setMsg(null);
   };
 
@@ -66,9 +66,12 @@ export default function BranchesPage() {
 
   const createBranch = async (e: React.FormEvent) => {
     e.preventDefault();
-    const ok = await run(() => rpc('create_branch', {
-      p_company: branchForm.companyId, p_name: branchForm.name, p_timezone: branchForm.tz || null, p_address: branchForm.address || null,
-    }), t('branches.created'));
+    const ok = await run(async () => {
+      const id = await rpc<string>('create_branch', {
+        p_company: branchForm.companyId, p_name: branchForm.name, p_timezone: branchForm.tz || null, p_address: branchForm.address || null,
+      });
+      if (branchForm.lang && id) await rpc('set_branch_lang', { p_branch: id, p_lang: branchForm.lang });
+    }, t('branches.created'));
     if (ok) setBranchForm((f) => ({ ...f, open: false }));
   };
 
@@ -132,6 +135,14 @@ export default function BranchesPage() {
                 <li key={b.id} className="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
                   <p className="font-semibold">🏬 {b.name} <span className={`text-xs font-normal ${ui.muted}`}>· {b.code}</span></p>
                   <p className={`mt-0.5 text-xs ${ui.muted}`}>🕒 {b.timezone}{b.address ? ` · 📍 ${b.address}` : ''}</p>
+                  <label className={`mt-2 flex items-center gap-2 text-xs ${ui.muted}`}>
+                    🗣️ {t('branches.lang')}
+                    <select className="rounded-lg border border-slate-300 bg-transparent px-2 py-1 text-xs dark:border-slate-700" value={b.lang ?? ''}
+                      onChange={(e) => run(() => rpc('set_branch_lang', { p_branch: b.id, p_lang: e.target.value || null }), t('branches.langSaved'))}>
+                      <option value="">{t('branches.langAny')}</option>
+                      {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.flag} {l.name}</option>)}
+                    </select>
+                  </label>
                 </li>
               ))}
             </ul>
@@ -148,7 +159,14 @@ export default function BranchesPage() {
                     {tzOptions(c.id).map((z) => <option key={z.tz} value={z.tz}>{z.label} ({z.utcOffset})</option>)}
                   </select>
                 </div>
-                <div className="sm:col-span-2">
+                <div>
+                  <label className={ui.label}>{t('branches.lang')}</label>
+                  <select className={ui.input} value={branchForm.lang} onChange={(e) => setBranchForm({ ...branchForm, lang: e.target.value })}>
+                    <option value="">{t('branches.langAny')}</option>
+                    {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.flag} {l.name}</option>)}
+                  </select>
+                </div>
+                <div>
                   <label className={ui.label}>{t('branches.address')}</label>
                   <input className={ui.input} value={branchForm.address} onChange={(e) => setBranchForm({ ...branchForm, address: e.target.value })} />
                 </div>

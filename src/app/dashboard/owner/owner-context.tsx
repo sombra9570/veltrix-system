@@ -55,6 +55,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/taller', icon: '🔧', label: 'nav.workshop', module: 'workshop' },
   { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory' },
   { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports' },
+  { href: '/dashboard/owner/indicadores', icon: '🌎', label: 'nav.indicators' },
   { href: '/dashboard/owner/plan', icon: '💳', label: 'nav.plan' },
   { href: '/dashboard/owner/invitar', icon: '🎁', label: 'nav.invite' },
 ];
