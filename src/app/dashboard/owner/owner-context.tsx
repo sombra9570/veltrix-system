@@ -174,6 +174,13 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
         banner={banner}
       >
         {children}
+        {o && (
+          <Link href="/dashboard/owner/plan"
+            className="mt-8 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-xs text-slate-500 hover:border-blue-300 dark:border-slate-800">
+            <span>💳 {t('owner.planStrip', { plan: o.plan_name })}{o.next_billing_date ? ` · ${t('owner.renews', { date: new Date(o.next_billing_date.slice(0, 10) + 'T12:00:00').toLocaleDateString() })}` : ''}</span>
+            <span className="font-bold text-blue-600 dark:text-blue-400">{t('owner.changePlan')} →</span>
+          </Link>
+        )}
       </AppShell>
     </OwnerContext.Provider>
   );

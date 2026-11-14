@@ -1288,6 +1288,10 @@ const hi: Record<DictKey, string> = {
   "sup.noApprove": "प्रशासक ने ऋण मंज़ूर करने की अनुमति नहीं दी।",
   "perm.routes.approve_loans": "ऋण मंज़ूर करना",
   "perm.routes.approve_loans.d": "नियमों से बाहर होने के कारण लंबित ऋण मंज़ूर या अस्वीकार करना।",
+  "login.newCompany": "नया व्यवसाय? खाता बनाएँ",
+  "owner.planStrip": "{plan} प्लान",
+  "owner.renews": "{date} को नवीनीकरण",
+  "owner.changePlan": "नवीनीकरण या प्लान बदलें",
 };
 
 export default hi;

@@ -1297,6 +1297,10 @@ const es = {
   "sup.noApprove": "El administrador no te dio permiso para aprobar préstamos.",
   "perm.routes.approve_loans": "Aprobar préstamos",
   "perm.routes.approve_loans.d": "Aprobar o rechazar los préstamos que quedan pendientes por pasar las reglas.",
+  "login.newCompany": "¿Empresa nueva? Crear cuenta",
+  "owner.planStrip": "Plan {plan}",
+  "owner.renews": "se renueva el {date}",
+  "owner.changePlan": "Renovar o cambiar de plan",
 };
 
 export default es;

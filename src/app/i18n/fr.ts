@@ -1288,6 +1288,10 @@ const fr: Record<DictKey, string> = {
   "sup.noApprove": "L'administrateur ne vous a pas autorisé à approuver les prêts.",
   "perm.routes.approve_loans": "Approuver les prêts",
   "perm.routes.approve_loans.d": "Approuver ou refuser les prêts en attente car hors règles.",
+  "login.newCompany": "Nouvelle entreprise ? Créer un compte",
+  "owner.planStrip": "Forfait {plan}",
+  "owner.renews": "renouvellement le {date}",
+  "owner.changePlan": "Renouveler ou changer de forfait",
 };
 
 export default fr;

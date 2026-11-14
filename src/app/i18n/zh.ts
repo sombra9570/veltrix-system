@@ -1288,6 +1288,10 @@ const zh: Record<DictKey, string> = {
   "sup.noApprove": "管理员未授予你审批贷款的权限。",
   "perm.routes.approve_loans": "审批贷款",
   "perm.routes.approve_loans.d": "审批或拒绝因超出规则而待审的贷款。",
+  "login.newCompany": "新企业？创建账户",
+  "owner.planStrip": "{plan} 套餐",
+  "owner.renews": "{date} 续费",
+  "owner.changePlan": "续费或更换套餐",
 };
 
 export default zh;

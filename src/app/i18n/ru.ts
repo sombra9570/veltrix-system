@@ -1288,6 +1288,10 @@ const ru: Record<DictKey, string> = {
   "sup.noApprove": "Администратор не дал вам права одобрять займы.",
   "perm.routes.approve_loans": "Одобрять займы",
   "perm.routes.approve_loans.d": "Одобрять или отклонять займы, ожидающие решения из-за превышения правил.",
+  "login.newCompany": "Новая компания? Создать аккаунт",
+  "owner.planStrip": "Тариф {plan}",
+  "owner.renews": "продлевается {date}",
+  "owner.changePlan": "Продлить или сменить тариф",
 };
 
 export default ru;

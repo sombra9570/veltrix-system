@@ -1288,6 +1288,10 @@ const ar: Record<DictKey, string> = {
   "sup.noApprove": "لم يمنحك المدير صلاحية الموافقة على القروض.",
   "perm.routes.approve_loans": "الموافقة على القروض",
   "perm.routes.approve_loans.d": "الموافقة على القروض المعلّقة لتجاوزها القواعد أو رفضها.",
+  "login.newCompany": "شركة جديدة؟ أنشئ حسابًا",
+  "owner.planStrip": "خطة {plan}",
+  "owner.renews": "تتجدد في {date}",
+  "owner.changePlan": "تجديد أو تغيير الخطة",
 };
 
 export default ar;

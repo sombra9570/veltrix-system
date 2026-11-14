@@ -1288,6 +1288,10 @@ const de: Record<DictKey, string> = {
   "sup.noApprove": "Der Administrator hat dir nicht erlaubt, Darlehen zu genehmigen.",
   "perm.routes.approve_loans": "Darlehen genehmigen",
   "perm.routes.approve_loans.d": "Darlehen genehmigen oder ablehnen, die wegen Regelüberschreitung warten.",
+  "login.newCompany": "Neues Unternehmen? Konto erstellen",
+  "owner.planStrip": "Tarif {plan}",
+  "owner.renews": "verlängert sich am {date}",
+  "owner.changePlan": "Verlängern oder Tarif wechseln",
 };
 
 export default de;

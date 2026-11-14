@@ -1288,6 +1288,10 @@ const pt: Record<DictKey, string> = {
   "sup.noApprove": "O administrador não lhe deu permissão para aprovar empréstimos.",
   "perm.routes.approve_loans": "Aprovar empréstimos",
   "perm.routes.approve_loans.d": "Aprovar ou rejeitar empréstimos pendentes por passar as regras.",
+  "login.newCompany": "Empresa nova? Criar conta",
+  "owner.planStrip": "Plano {plan}",
+  "owner.renews": "renova em {date}",
+  "owner.changePlan": "Renovar ou mudar de plano",
 };
 
 export default pt;

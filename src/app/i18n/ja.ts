@@ -1288,6 +1288,10 @@ const ja: Record<DictKey, string> = {
   "sup.noApprove": "貸付を承認する権限が付与されていません。",
   "perm.routes.approve_loans": "貸付を承認",
   "perm.routes.approve_loans.d": "ルール超過で承認待ちの貸付を承認・却下する。",
+  "login.newCompany": "新しい事業者ですか？アカウント作成",
+  "owner.planStrip": "{plan} プラン",
+  "owner.renews": "{date} に更新",
+  "owner.changePlan": "更新またはプラン変更",
 };
 
 export default ja;

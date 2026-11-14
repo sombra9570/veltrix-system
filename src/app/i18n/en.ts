@@ -1288,6 +1288,10 @@ const en: Record<DictKey, string> = {
   "sup.noApprove": "The administrator didn't give you permission to approve loans.",
   "perm.routes.approve_loans": "Approve loans",
   "perm.routes.approve_loans.d": "Approve or reject loans that wait for approval for going beyond the rules.",
+  "login.newCompany": "New business? Create account",
+  "owner.planStrip": "{plan} plan",
+  "owner.renews": "renews on {date}",
+  "owner.changePlan": "Renew or change plan",
 };
 
 export default en;

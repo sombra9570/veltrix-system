@@ -6,6 +6,7 @@ import { useVeltrixAuth, homeForRole } from '../auth-system';
 import { supabase } from '../../lib/supabase';
 import { SiteHeader, SiteFooter, ui, PasswordInput } from '../site-header';
 import { useT } from '../i18n';
+import { isInstalledApp } from '../../lib/standalone';
 
 export default function IngresarPage() {
   const router = useRouter();
@@ -17,6 +18,8 @@ export default function IngresarPage() {
   const [busy, setBusy] = useState(false);
   const [mode, setMode] = useState<'login' | 'forgot'>('login');
   const { t } = useT();
+  const [installed, setInstalled] = useState(false);
+  useEffect(() => { setInstalled(isInstalledApp()); }, []);
 
   // Si ya tiene sesión, directo a su panel
   useEffect(() => {
@@ -48,7 +51,9 @@ export default function IngresarPage() {
 
   return (
     <main className="flex min-h-dvh flex-col">
-      <SiteHeader showAuthButtons={false} />
+      {installed ? (
+        <div className="px-4 pt-[calc(1rem+env(safe-area-inset-top))] text-center text-xl font-extrabold tracking-tight">Veltrix <span className="text-blue-600 dark:text-blue-500">System</span></div>
+      ) : <SiteHeader showAuthButtons={false} />}
 
       <div className="flex flex-1 items-center justify-center px-4 py-8 sm:py-12">
         <div className={`w-full max-w-sm rounded-2xl p-5 sm:p-7 ${ui.card}`}>
@@ -114,10 +119,16 @@ export default function IngresarPage() {
           <div className={`mt-6 text-center text-xs ${ui.muted}`}>
             {mode === 'login' ? (
               <>
-                {t('login.noAccount')}{' '}
-                <Link href="/registro" className="font-semibold text-blue-600 hover:underline dark:text-blue-400">
-                  {t('login.tryFree')}
-                </Link>
+                {installed ? (
+                  <Link href="/registro" className="opacity-80 hover:underline">{t('login.newCompany')}</Link>
+                ) : (
+                  <>
+                    {t('login.noAccount')}{' '}
+                    <Link href="/registro" className="font-semibold text-blue-600 hover:underline dark:text-blue-400">
+                      {t('login.tryFree')}
+                    </Link>
+                  </>
+                )}
               </>
             ) : (
               <button
@@ -132,7 +143,7 @@ export default function IngresarPage() {
         </div>
       </div>
 
-      <SiteFooter />
+      {!installed && <SiteFooter />}
     </main>
   );
 }

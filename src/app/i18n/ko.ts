@@ -1288,6 +1288,10 @@ const ko: Record<DictKey, string> = {
   "sup.noApprove": "대출 승인 권한이 없습니다.",
   "perm.routes.approve_loans": "대출 승인",
   "perm.routes.approve_loans.d": "규칙 초과로 대기 중인 대출을 승인·거절.",
+  "login.newCompany": "새 사업체인가요? 계정 만들기",
+  "owner.planStrip": "{plan} 요금제",
+  "owner.renews": "{date} 갱신",
+  "owner.changePlan": "갱신 또는 요금제 변경",
 };
 
 export default ko;

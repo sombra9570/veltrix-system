@@ -9,6 +9,8 @@ import { useT } from './i18n';
 import { rpc } from '../lib/supabase';
 import type { DictKey } from './i18n/es';
 import { HomeShowcase } from './home-showcase';
+import { useRouter } from 'next/navigation';
+import { isInstalledApp } from '../lib/standalone';
 
 // Funciones en orden de prioridad: lo que más buscan cobradores y vendedores a plazos va primero
 const FEATURES: { icon: string; n: number }[] = [
@@ -37,6 +39,11 @@ export default function HomePage() {
   const [cat, setCat] = useState('credit_sales');
   const [faq, setFaq] = useState<number | null>(0);
 
+  const router = useRouter();
+  // En la app instalada (PWA / APK) se entra directo al panel o a ingresar, sin la portada comercial
+  useEffect(() => {
+    if (loaded && isInstalledApp()) router.replace(session ? homeForRole(session.role) : '/ingresar');
+  }, [loaded, session, router]);
   const [extras, setExtras] = useState<{ code: string; price_usd: number; price_global_usd: number; unit_mb: number }[]>([]);
   useEffect(() => { rpc<PublicPlan[]>('public_plans').then((p) => { if (p?.length) setPlans(p); }).catch(() => {}); }, []);
   useEffect(() => { rpc<typeof extras>('public_addons').then((a) => setExtras(a ?? [])).catch(() => {}); }, []);
