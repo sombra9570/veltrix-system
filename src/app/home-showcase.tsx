@@ -16,7 +16,7 @@ export function HomeShowcase() {
   const { formatMoney } = useLanguage();
   const [tab, setTab] = useState<Tab>('owner');
   const [auto, setAuto] = useState(true);
-  const m = (usd: number) => formatMoney(usd).replace(/\s*\(\$[\d.,]+\)$/, '').replace(/ USD$/, '').replace(/[.,]00$/, '');
+  const m = (usd: number) => formatMoney(usd).replace(/\s*\(\$[\d.,]+\)$/, '').replace(/ USD$/, '').replace(/[.,]\d{2}$/, '');
 
   useEffect(() => {
     if (!auto) return;
@@ -62,7 +62,7 @@ export function HomeShowcase() {
                 {([['collectedToday', m(2650), '+12 %'], ['salesToday', m(1398), '+8 %'], ['portfolio', m(59300), null], ['overdue', '4,2 %', null]] as const).map(([k, v, d]) => (
                   <div key={k} className={card}>
                     <p className={lbl}>{t(`home.sc.${k}`)}</p>
-                    <p className={`mt-1 text-base font-extrabold sm:text-lg ${k === 'overdue' ? 'text-amber-600 dark:text-amber-400' : ''}`}>{v}</p>
+                    <p className={`mt-1 whitespace-nowrap text-[15px] font-extrabold sm:text-lg ${k === 'overdue' ? 'text-amber-600 dark:text-amber-400' : ''}`}>{v}</p>
                     {d && <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">▲ {d}</p>}
                   </div>
                 ))}
