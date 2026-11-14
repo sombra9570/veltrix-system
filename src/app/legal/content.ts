@@ -26,9 +26,9 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'Cada plan tiene límites de empresas, sucursales, usuarios, almacenamiento, productos en la tienda en línea, historial del chat y otros recursos. Ningún plan es ilimitado. Al alcanzar un límite, Veltrix no permitirá agregar más hasta que cambies de plan o contrates extras.',
           'Los precios se publican en dólares estadounidenses, más los impuestos que correspondan en tu país. Pueden existir precios regionales.',
         ] },
-        { h: '4. Pruebas, pilotos y precio de fundador', p: [
-          'Las pruebas gratuitas y los periodos piloto no generan cobro. Al terminar, para seguir usando Veltrix debes contratar un plan.',
-          'El precio de fundador es un descuento temporal por el plazo indicado al otorgarlo (por ejemplo, 12 meses). No es de por vida: al vencer se aplica el precio vigente del plan.',
+        { h: '4. Pruebas y descuentos', p: [
+          'Las pruebas gratuitas no generan cobro. Al terminar, para seguir usando Veltrix debes contratar un plan.',
+          'Cualquier descuento o condición especial que Veltrix otorgue de forma individual dura solo el plazo indicado al concederlo. Al vencer se aplica el precio vigente del plan.',
         ] },
         { h: '5. Pagos', p: [
           'Los pagos con tarjeta se procesan a través de nuestro revendedor autorizado (Merchant of Record), que actúa como vendedor ante ti, cobra los impuestos de tu país y emite el comprobante. También podemos aceptar pagos por QR o transferencia.',
@@ -115,7 +115,7 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
       intro: 'Queremos que pagues solo por algo que te sirve. Estas son nuestras reglas de reembolso.',
       sections: [
         { h: '1. Prueba gratis', p: [
-          'Puedes probar Veltrix gratis antes de pagar. Durante la prueba o el periodo piloto no se cobra nada.',
+          'Puedes probar Veltrix gratis antes de pagar. Durante la prueba no se cobra nada.',
         ] },
         { h: '2. Primer pago', p: [
           'Si es el primer pago de tu suscripción y nos pides el reembolso dentro de los 7 días siguientes, te devolvemos el 100 %.',
@@ -154,9 +154,9 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'Each plan has limits on companies, branches, users, storage, online store products, chat history and other resources. No plan is unlimited. When you reach a limit, Veltrix will not allow adding more until you upgrade or buy extras.',
           'Prices are published in US dollars, plus any taxes that apply in your country. Regional prices may apply.',
         ] },
-        { h: '4. Trials, pilots and founder pricing', p: [
-          'Free trials and pilot periods are not charged. When they end, you must subscribe to keep using Veltrix.',
-          'Founder pricing is a temporary discount for the period stated when granted (for example, 12 months). It is not lifetime: afterwards the current plan price applies.',
+        { h: '4. Trials and discounts', p: [
+          'Free trials are not charged. When they end, you must subscribe to keep using Veltrix.',
+          'Any discount or special condition Veltrix grants individually lasts only for the period stated when granted. Afterwards the current plan price applies.',
         ] },
         { h: '5. Payments', p: [
           'Card payments are processed by our authorized reseller (Merchant of Record), which acts as the seller to you, charges your local taxes and issues the receipt. We may also accept QR or bank transfer payments.',
@@ -242,7 +242,7 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
       updated: UPDATED_EN,
       intro: 'We want you to pay only for something that works for you. These are our refund rules. The Spanish version is the official one.',
       sections: [
-        { h: '1. Free trial', p: ['You can try Veltrix for free before paying. Nothing is charged during the trial or pilot period.'] },
+        { h: '1. Free trial', p: ['You can try Veltrix for free before paying. Nothing is charged during the trial.'] },
         { h: '2. First payment', p: ['If it is the first payment of your subscription and you ask for a refund within 7 days, we refund 100%.'] },
         { h: '3. Renewals', p: ['You can cancel anytime from "My plan" and you will not be charged again. You keep access until the end of the paid period. We do not give partial refunds for unused days of a month already started, unless required by your local law.'] },
         { h: '4. Charges made in error', p: ['If you were charged twice, charged after cancelling, or we made a mistake, we refund the full amount.'] },
