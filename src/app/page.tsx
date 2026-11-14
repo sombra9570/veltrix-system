@@ -197,15 +197,15 @@ export default function HomePage() {
                 <p className="text-lg font-bold">{p.name}</p>
                 <p className={`text-xs ${ui.muted}`}>{k(`plan.${p.code}.desc`)}</p>
                 <p className="mt-4 text-2xl font-extrabold sm:text-3xl">
-                  {formatMoney(Number(latam ? p.price_usd : p.price_global_usd))}
+                  {formatMoney(Number(latam ? p.price_usd : p.price_global_usd), false, true)}
                   <span className={`text-sm font-semibold ${ui.muted}`}> {t('common.perMonth')}</span>
                 </p>
                 <ul className="mt-4 flex-1 space-y-1.5 text-sm">
-                  <li>✓ {t('bill.limBranches', { n: p.max_branches })}</li>
+                  <li>✓ {p.max_branches === 1 ? k('plan.starter.i3') : t('bill.limBranches', { n: p.max_branches })}</li>
                   <li>✓ {t('bill.limUsers', { n: p.max_users })}</li>
                   {p.max_companies > 1 && <li>✓ {t('bill.limCompanies', { n: p.max_companies })}</li>}
                   <li>✓ {t('bill.limStorage', { n: Math.round(p.max_storage_mb / 1024) })}</li>
-                  {[1, 2, 3].map((i) => <li key={i}>✓ {k(`plan.${p.code}.i${i}`)}</li>)}
+                  {[1, 2, 3].filter((i) => !(p.code === 'starter' && i === 3) && !(p.code === 'enterprise' && i === 2)).map((i) => <li key={i}>✓ {k(`plan.${p.code}.i${i}`)}</li>)}
                 </ul>
                 <Link href="/registro" className={`${best ? ui.btnPrimary : ui.btnGhost} mt-6 w-full`}>{t('home.startFree')}</Link>
               </div>
@@ -213,7 +213,7 @@ export default function HomePage() {
           })}
         </div>
         {extras.length > 0 && (() => {
-          const px = (c: string) => { const a = extras.find((e) => e.code === c); return a ? formatMoney(Number(latam ? a.price_usd : a.price_global_usd)) : null; };
+          const px = (c: string) => { const a = extras.find((e) => e.code === c); return a ? formatMoney(Number(latam ? a.price_usd : a.price_global_usd), false, true) : null; };
           const st = extras.find((e) => e.code === 'storage');
           return (
             <p className={`mt-4 text-center text-xs ${ui.muted}`}>

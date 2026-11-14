@@ -50,7 +50,7 @@ const ar: Record<DictKey, string> = {
   'home.bestPlan': 'الأكثر اختيارًا',
   'home.startFree': 'ابدأ مجانًا',
   'home.extraBranch': 'فرع إضافي: {price} / شهريًا',
-  'home.pricesLocal': 'الأسعار بعملة بلدك وفق سعر الصرف الرسمي لليوم.',
+  'home.pricesLocal': "أسعار تقريبية بعملة بلدك وفق سعر الصرف المرجعي لليوم.",
   'plan.starter.desc': 'لعمل في بدايته',
   'plan.starter.i1': 'نقطة البيع',
   'plan.starter.i2': 'المخزون',

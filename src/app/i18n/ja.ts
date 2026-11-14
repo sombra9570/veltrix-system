@@ -50,7 +50,7 @@ const ja: Record<DictKey, string> = {
   'home.bestPlan': '一番人気',
   'home.startFree': '無料で始める',
   'home.extraBranch': '追加支店：{price} / 月',
-  'home.pricesLocal': '価格はお住まいの国の通貨で、当日の公式為替レートで表示しています。',
+  'home.pricesLocal': "当日の参考レートに基づく、あなたの国の通貨での概算価格です。",
   'plan.starter.desc': '始めたばかりのビジネスに',
   'plan.starter.i1': 'POSレジ',
   'plan.starter.i2': '在庫',

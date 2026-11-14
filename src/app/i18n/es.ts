@@ -52,7 +52,7 @@ const es = {
   'home.bestPlan': 'Más elegido',
   'home.startFree': 'Empezar gratis',
   'home.extraBranch': 'Sucursal extra: {price} / mes',
-  'home.pricesLocal': 'Precios en la moneda de tu país, con el tipo de cambio oficial del día.',
+  'home.pricesLocal': "Precios aproximados en la moneda de tu país, según la tasa de referencia del día.",
   'plan.starter.desc': 'Para un negocio que empieza',
   'plan.starter.i1': 'Punto de venta',
   'plan.starter.i2': 'Inventario',

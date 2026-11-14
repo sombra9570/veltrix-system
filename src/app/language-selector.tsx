@@ -751,7 +751,7 @@ interface LangContextType {
   businessSector: BusinessSectorId;
   setBusinessSector: (sector: BusinessSectorId) => void;
   effectiveTaxRate: number;
-  formatMoney: (amountInUsd: number, applyTax?: boolean) => string;
+  formatMoney: (amountInUsd: number, applyTax?: boolean, whole?: boolean) => string;
   localTime: string;
 }
 
@@ -958,13 +958,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('veltrix_sector', sector);
   };
 
-  const formatMoney = (amountInUsd: number, applyTax = false) => {
+  const formatMoney = (amountInUsd: number, applyTax = false, whole = false) => {
     const finalUsd = applyTax ? amountInUsd * (1 + effectiveTaxRate / 100) : amountInUsd;
     if (currencyMode === 'anchor' || rawCountry.currency === 'USD') {
-      return `$${finalUsd.toFixed(2)} USD`;
+      return `$${finalUsd.toFixed(whole ? 0 : 2)} USD`;
     }
-    const converted = finalUsd * activeRate;
-    const decimals = activeRate >= 100 ? 0 : 2;
+    const converted = whole ? Math.round(finalUsd * activeRate) : finalUsd * activeRate;
+    const decimals = whole || activeRate >= 100 ? 0 : 2;
     const formattedLocal = `${rawCountry.symbol} ${new Intl.NumberFormat(rawCountry.locale, {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,

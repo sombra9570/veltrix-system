@@ -50,7 +50,7 @@ const hi: Record<DictKey, string> = {
   'home.bestPlan': 'सबसे लोकप्रिय',
   'home.startFree': 'मुफ़्त शुरू करें',
   'home.extraBranch': 'अतिरिक्त शाखा: {price} / माह',
-  'home.pricesLocal': 'कीमतें आपके देश की मुद्रा में, आज की आधिकारिक विनिमय दर पर।',
+  'home.pricesLocal': "दिन की संदर्भ दर के अनुसार आपके देश की मुद्रा में अनुमानित कीमतें।",
   'plan.starter.desc': 'शुरुआत कर रहे व्यवसाय के लिए',
   'plan.starter.i1': 'पॉइंट ऑफ़ सेल',
   'plan.starter.i2': 'स्टॉक',

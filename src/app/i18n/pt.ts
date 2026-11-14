@@ -50,7 +50,7 @@ const pt: Record<DictKey, string> = {
   'home.bestPlan': 'Mais escolhido',
   'home.startFree': 'Começar grátis',
   'home.extraBranch': 'Filial extra: {price} / mês',
-  'home.pricesLocal': 'Preços na moeda do seu país, com o câmbio oficial do dia.',
+  'home.pricesLocal': "Preços aproximados na moeda do seu país, segundo a taxa de referência do dia.",
   'plan.starter.desc': 'Para um negócio que está começando',
   'plan.starter.i1': 'Ponto de venda',
   'plan.starter.i2': 'Estoque',

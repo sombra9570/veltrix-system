@@ -50,7 +50,7 @@ const zh: Record<DictKey, string> = {
   'home.bestPlan': '最受欢迎',
   'home.startFree': '免费开始',
   'home.extraBranch': '额外分店：{price} / 月',
-  'home.pricesLocal': '价格以您所在国家的货币显示，按当日官方汇率换算。',
+  'home.pricesLocal': "按当日参考汇率换算的本国货币参考价格。",
   'plan.starter.desc': '适合刚起步的企业',
   'plan.starter.i1': '收银台',
   'plan.starter.i2': '库存',

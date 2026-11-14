@@ -50,7 +50,7 @@ const ko: Record<DictKey, string> = {
   'home.bestPlan': '가장 인기',
   'home.startFree': '무료로 시작',
   'home.extraBranch': '추가 지점: {price} / 월',
-  'home.pricesLocal': '가격은 해당 국가 통화로, 당일 공식 환율로 표시됩니다.',
+  'home.pricesLocal': "당일 기준 환율에 따른 현지 통화 기준 대략적인 가격입니다.",
   'plan.starter.desc': '이제 막 시작하는 사업에',
   'plan.starter.i1': 'POS',
   'plan.starter.i2': '재고',

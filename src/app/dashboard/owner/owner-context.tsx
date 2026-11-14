@@ -27,6 +27,7 @@ type Ctx = {
   overview: Overview | null;
   reload: () => Promise<void>;
   userName: string;
+  modules: string[];
 };
 
 const OwnerContext = createContext<Ctx | null>(null);
@@ -164,7 +165,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   if (banner) banner = <Link href="/dashboard/owner/plan" className="block hover:opacity-95">{banner}</Link>;
 
   return (
-    <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name }}>
+    <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name, modules }}>
       <AppShell
         nav={NAV.filter((n) => !n.module || modules.includes(n.module))}
         orgName={o?.name ?? ''}

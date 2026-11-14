@@ -8,6 +8,8 @@ import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 
 const ROLES = ['supervisor', 'cashier', 'vendor', 'collector', 'waiter', 'kitchen', 'technician', 'storekeeper', 'accountant'] as const;
+// Roles que solo tienen sentido si el módulo de su rubro está activo
+const ROLE_MODULE: Partial<Record<(typeof ROLES)[number], string>> = { collector: 'field_collection', waiter: 'restaurant', kitchen: 'restaurant', technician: 'workshop', storekeeper: 'inventory' };
 
 type Branch = { id: string; name: string; company_id: string };
 type Member = { user_id: string; role: string; branch_id: string | null; is_active: boolean };
@@ -15,7 +17,8 @@ type Person = { id: string; full_name: string | null; email: string | null };
 type Row = { userId: string; name: string; email: string; roles: string[]; branchIds: string[]; active: boolean };
 
 export default function TeamPage() {
-  const { orgId, reload, overview } = useOwner();
+  const { orgId, reload, overview, modules } = useOwner();
+  const roles = ROLES.filter((r) => !ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!));
   const { t } = useT();
   const roleLabel = (r: string) => t(`role.${r}` as DictKey);
 
@@ -144,7 +147,7 @@ export default function TeamPage() {
             <div>
               <label className={ui.label}>{t('team.role')}</label>
               <select className={ui.input} value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
-                {ROLES.map((r) => <option key={r} value={r}>{roleLabel(r)}</option>)}
+                {roles.map((r) => <option key={r} value={r}>{roleLabel(r)}</option>)}
               </select>
             </div>
             <div>

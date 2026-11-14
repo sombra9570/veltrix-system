@@ -50,7 +50,7 @@ const en: Record<DictKey, string> = {
   'home.bestPlan': 'Most popular',
   'home.startFree': 'Start free',
   'home.extraBranch': 'Extra branch: {price} / month',
-  'home.pricesLocal': 'Prices in your country’s currency, at today’s official exchange rate.',
+  'home.pricesLocal': "Approximate prices in your country's currency, based on the day's reference rate.",
   'plan.starter.desc': 'For a business that is just starting',
   'plan.starter.i1': 'Point of sale',
   'plan.starter.i2': 'Inventory',

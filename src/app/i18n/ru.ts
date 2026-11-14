@@ -50,7 +50,7 @@ const ru: Record<DictKey, string> = {
   'home.bestPlan': 'Самый популярный',
   'home.startFree': 'Начать бесплатно',
   'home.extraBranch': 'Доп. филиал: {price} / мес.',
-  'home.pricesLocal': 'Цены в валюте вашей страны по официальному курсу дня.',
+  'home.pricesLocal': "Ориентировочные цены в валюте вашей страны по справочному курсу дня.",
   'plan.starter.desc': 'Для начинающего бизнеса',
   'plan.starter.i1': 'Касса',
   'plan.starter.i2': 'Склад',
