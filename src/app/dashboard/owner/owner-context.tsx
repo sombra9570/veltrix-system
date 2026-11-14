@@ -51,8 +51,8 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/mesas', icon: '🍽️', label: 'nav.tables', module: 'restaurant' },
   { href: '/dashboard/owner/cocina', icon: '🔥', label: 'nav.kitchen', module: 'restaurant' },
   { href: '/dashboard/owner/taller', icon: '🔧', label: 'nav.workshop', module: 'workshop' },
-  { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory', soon: true },
-  { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports', soon: true },
+  { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory' },
+  { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports' },
 ];
 
 const DAY = 86_400_000;
