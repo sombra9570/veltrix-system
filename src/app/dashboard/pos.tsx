@@ -47,6 +47,7 @@ export function PosScreen() {
   const [sheet, setSheet] = useState(false);   // pedido abierto en celular
   // Venta a crédito
   const [mode, setMode] = useState<'cash' | 'credit'>('cash');
+  const [canCredit, setCanCredit] = useState(true);   // permiso que da el dueño
   const [custQuery, setCustQuery] = useState('');
   const [custs, setCusts] = useState<Cust[]>([]);
   const [customer, setCustomer] = useState<Cust | null>(null);
@@ -74,6 +75,14 @@ export function PosScreen() {
       setCatalog(c ?? []);
       setSales(s ?? []);
     } catch { /* sin conexión */ }
+  }, [branchId]);
+
+  // Permisos del usuario en esta sucursal (el dueño puede quitar la venta a crédito)
+  useEffect(() => {
+    if (!branchId) return;
+    rpc<Record<string, boolean>>('my_permissions', { p_branch: branchId })
+      .then((p) => { const ok = p?.['sales.credit'] !== false; setCanCredit(ok); if (!ok) setMode('cash'); })
+      .catch(() => {});
   }, [branchId]);
 
   useEffect(() => {
@@ -193,8 +202,8 @@ export function PosScreen() {
         </ul>
       )}
       {/* Contado o crédito */}
-      <div className="grid grid-cols-2 gap-2">
-        {(['cash', 'credit'] as const).map((m) => (
+      <div className={`grid gap-2 ${canCredit ? 'grid-cols-2' : 'grid-cols-1'}`}>
+        {(canCredit ? (['cash', 'credit'] as const) : (['cash'] as const)).map((m) => (
           <button key={m} type="button" onClick={() => setMode(m)}
             className={`rounded-xl px-3 py-2 text-sm font-semibold transition cursor-pointer ${mode === m ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
             {m === 'cash' ? `💵 ${t('pos.cashSale')}` : `📅 ${t('pos.creditSale')}`}

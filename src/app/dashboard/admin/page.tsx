@@ -111,6 +111,51 @@ export default function GlobalCoreAdminPage() {
     if (!window.confirm('¿Quitar el descuento de fundador a esta empresa? Pagará el precio normal.')) return;
     try { await rpc('admin_clear_pilot', { p_org: org }); await loadPilots(); } catch { /* */ }
   };
+  // Planes y precios (editables por el superadmin)
+  type AdminPlan = { code: string; name: string; price_usd: number; price_global_usd: number; max_companies: number; max_branches: number;
+    max_users: number; max_storage_mb: number; max_store_products: number; chat_retention_days: number; orgs: number };
+  const [plans, setPlans] = useState<AdminPlan[]>([]);
+  const [planEdit, setPlanEdit] = useState<Record<string, Record<string, string>>>({});
+  const [planMsg, setPlanMsg] = useState('');
+  const loadPlans = useCallback(async () => { try { setPlans(await rpc<AdminPlan[]>('admin_plans') ?? []); } catch { /* */ } }, []);
+  useEffect(() => { if (loaded && session?.role === 'superadmin') loadPlans(); }, [loaded, session, loadPlans]);
+  const PLAN_FIELDS: [keyof AdminPlan, string][] = [
+    ['price_usd', 'Precio Latam (USD)'], ['price_global_usd', 'Precio resto del mundo (USD)'], ['max_companies', 'Empresas'],
+    ['max_branches', 'Sucursales'], ['max_users', 'Usuarios'], ['max_storage_mb', 'Almacenamiento (MB)'],
+    ['max_store_products', 'Productos en tienda'], ['chat_retention_days', 'Días de chat'],
+  ];
+  const planVal = (p: AdminPlan, k: keyof AdminPlan) => planEdit[p.code]?.[k as string] ?? String(p[k]);
+  const savePlan = async (p: AdminPlan) => {
+    const v = (k: keyof AdminPlan) => Number(planVal(p, k).replace(',', '.'));
+    setPlanMsg('');
+    try {
+      await rpc('admin_save_plan', {
+        p_code: p.code, p_name: planVal(p, 'name'), p_price_usd: v('price_usd'), p_price_global_usd: v('price_global_usd'),
+        p_max_companies: v('max_companies'), p_max_branches: v('max_branches'), p_max_users: v('max_users'),
+        p_max_storage_mb: v('max_storage_mb'), p_max_store_products: v('max_store_products'), p_chat_retention_days: v('chat_retention_days'),
+      });
+      setPlanEdit((e) => { const c = { ...e }; delete c[p.code]; return c; });
+      setPlanMsg(`✅ Plan ${planVal(p, 'name')} guardado. La portada y "Mi plan" ya muestran los nuevos valores.`);
+      await loadPlans();
+    } catch (e) {
+      const m = e instanceof Error ? e.message : '';
+      setPlanMsg(m.includes('INVALID') ? '⚠️ Revisa los valores: precios desde 0 y límites desde 1.' : '⚠️ No se pudo guardar el plan.');
+    }
+  };
+  // Borrar empresas de prueba
+  const purgeOrg = async (org: { org_id: string; name: string }) => {
+    const typed = window.prompt(`Esto borra PARA SIEMPRE la empresa "${org.name}" con todas sus ventas, clientes, usuarios y archivos.\n\nPara confirmar, escribe su nombre exacto:`);
+    if (typed === null) return;
+    if (typed.trim() !== org.name) { window.alert('El nombre no coincide. No se borró nada.'); return; }
+    try {
+      const r = await rpc<{ rows: number; users: number; files_left: number }>('admin_purge_org', { p_org: org.org_id, p_confirm: typed.trim() });
+      window.alert(`Empresa borrada: ${r.rows} registros y ${r.users} usuarios eliminados.` + (r.files_left > 0 ? `\n\nQuedaron ${r.files_left} archivos: bórralos en Supabase → Storage (carpeta ${org.org_id}).` : ''));
+      await Promise.all([refresh(), loadPlans(), loadAi(), loadPilots()]);
+    } catch (e) {
+      const m = e instanceof Error ? e.message : '';
+      window.alert(m.includes('propia') ? 'No puedes borrar tu propia organización.' : 'No se pudo borrar la empresa. Inténtalo otra vez.');
+    }
+  };
   const [mailMsg, setMailMsg] = useState('');
   const [sending, setSending] = useState(false);
   const sendMail = async () => {
@@ -340,6 +385,42 @@ export default function GlobalCoreAdminPage() {
           </div>
         </section>
 
+        {/* PLANES Y PRECIOS */}
+        <section className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
+          <div>
+            <h2 className="text-sm font-bold">💲 Planes y precios</h2>
+            <p className="text-[11px] text-slate-500">Cambia precios y límites cuando quieras. Se aplican al instante en la portada, en "Mi plan" y en los límites de cada empresa. Si usas Lemon Squeezy, cambia también el precio del producto allá.</p>
+          </div>
+          {planMsg && <p className="text-xs font-semibold text-slate-200">{planMsg}</p>}
+          <div className="grid gap-3 lg:grid-cols-3">
+            {plans.map((p) => (
+              <div key={p.code} className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-2 text-xs">
+                <div className="flex items-center justify-between gap-2">
+                  <input value={planVal(p, 'name')} onChange={(e) => setPlanEdit({ ...planEdit, [p.code]: { ...planEdit[p.code], name: e.target.value } })}
+                    className="min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm font-bold" />
+                  <span className="shrink-0 text-slate-400">{p.orgs} empresas</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {PLAN_FIELDS.map(([k, label]) => (
+                    <label key={k} className="block">
+                      <span className="block text-[11px] text-slate-400 mb-0.5">{label}</span>
+                      <input inputMode="decimal" value={planVal(p, k)}
+                        onChange={(e) => setPlanEdit({ ...planEdit, [p.code]: { ...planEdit[p.code], [k]: e.target.value } })}
+                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
+                    </label>
+                  ))}
+                </div>
+                {planEdit[p.code] && (
+                  <div className="flex gap-2 pt-1">
+                    <button type="button" onClick={() => setPlanEdit((e) => { const c = { ...e }; delete c[p.code]; return c; })} className="flex-1 border border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
+                    <button type="button" onClick={() => savePlan(p)} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* PILOTOS Y FUNDADORES */}
         <section className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
           <div>
@@ -426,6 +507,7 @@ export default function GlobalCoreAdminPage() {
               <div className="text-right self-end md:self-center">
                 <p className="text-[11px] text-slate-400">Mensualidad</p>
                 <p className="text-lg font-bold text-emerald-400">{formatMoney(Number(o.price_usd))}</p>
+                <button type="button" onClick={() => purgeOrg(o)} className="mt-2 text-[11px] font-bold text-red-300 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 px-2.5 py-1 rounded-lg cursor-pointer">🗑️ Borrar empresa de prueba</button>
               </div>
             </div>
           ))}

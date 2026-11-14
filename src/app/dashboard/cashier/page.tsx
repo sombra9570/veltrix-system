@@ -13,6 +13,7 @@ type MovType = 'expense' | 'withdrawal' | 'deposit' | 'change_fund';
 type Home = {
   shift: null | {
     id: string; opened_at: string; opening_cash: number; register: string; branch: string; currency: string;
+    expected?: number | null; // solo si el dueño le dio permiso de ver el efectivo esperado
     payments: { id: string; at: string; customer: string; method: Method; amount: number }[];
     movements: { id: string; at: string; type: MovType; amount: number; description: string }[];
   };
@@ -172,7 +173,7 @@ export default function CashierPage() {
             </Card>
           )}
           {tab === 'close' && (
-            <CloseTab shiftId={s.id} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
+            <CloseTab shiftId={s.id} expected={s.expected ?? null} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
           )}
         </>
       )}
@@ -414,8 +415,8 @@ function QueueTab({
 /* ---------------- Cobro de cuotas (cliente que viene a pagar) ---------------- */
 type Debtor = { id: string; name: string; doc: string | null; balance: number; overdue: number };
 function DebtsTab({
-  shiftId, fmt, busy, setBusy, onDone, flash,
-}: Common & { shiftId: string; fmt: (n: number) => string }) {
+  shiftId, expected, fmt, busy, setBusy, onDone, flash,
+}: Common & { shiftId: string; expected: number | null; fmt: (n: number) => string }) {
   const { t } = useT();
   const [q, setQ] = useState('');
   const [list, setList] = useState<Debtor[]>([]);
@@ -661,8 +662,8 @@ function MovementsTab({
 
 /* ---------------- Cierre ciego ---------------- */
 function CloseTab({
-  shiftId, fmt, busy, setBusy, onDone, flash,
-}: Common & { shiftId: string; fmt: (n: number) => string }) {
+  shiftId, expected, fmt, busy, setBusy, onDone, flash,
+}: Common & { shiftId: string; expected: number | null; fmt: (n: number) => string }) {
   const { t } = useT();
   const [declared, setDeclared] = useState('');
   const [confirming, setConfirming] = useState(false);
@@ -686,7 +687,19 @@ function CloseTab({
   return (
     <div className="mx-auto w-full max-w-lg">
       <Card className="space-y-4">
-        <p className={`text-sm ${ui.muted}`}>{t('cash.closeHint')}</p>
+        {expected === null ? (
+          <p className={`text-sm ${ui.muted}`}>{t('cash.closeHint')}</p>
+        ) : (
+          <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 dark:border-blue-500/30 dark:bg-blue-500/10">
+            <p className={`text-xs font-semibold ${ui.muted}`}>{t('cash.expectedNow')}</p>
+            <p className="text-2xl font-extrabold">{fmt(expected)}</p>
+            {valid && Number(n) !== Number(expected) && (
+              <p className={`text-xs font-bold ${n < expected ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                {t('cash.diffNow', { amount: fmt(n - expected) })}
+              </p>
+            )}
+          </div>
+        )}
         <div>
           <label className={ui.label}>{t('cash.counted')}</label>
           <input

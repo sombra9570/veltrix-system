@@ -60,4 +60,4 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 ## Hecho
 Panel del dueño · Caja · POS · Clientes y crédito · Cobrador offline · Restaurante · Taller ·
 Tienda online · Mensajes del equipo · Ayuda · Veltrix IA (falta la clave) · Ventas · Caja del dueño ·
-Plan Piloto/Fundador · Inventario · Reportes · Mi plan y cobros (falta conectar claves) · Páginas legales
+Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar empresas de prueba · Permisos por rol/usuario · Nueva portada · Mi plan y cobros (falta conectar claves) · Páginas legales

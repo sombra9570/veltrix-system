@@ -41,6 +41,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/mensajes', icon: '💬', label: 'nav.messages' },
   { href: '/dashboard/owner/ia', icon: '✨', label: 'nav.ai' },
   { href: '/dashboard/owner/equipo', icon: '👥', label: 'nav.team' },
+  { href: '/dashboard/owner/permisos', icon: '🔐', label: 'nav.permissions' },
   { href: '/dashboard/owner/sucursales', icon: '🏢', label: 'nav.branches' },
   { href: '/dashboard/owner/vender', icon: '🛒', label: 'nav.pos' },
   { href: '/dashboard/owner/productos', icon: '📦', label: 'nav.products' },
