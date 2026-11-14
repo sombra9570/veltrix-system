@@ -28,6 +28,9 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [ ] **Google Play**: cuenta de desarrollador (25 USD, pago único) para el APK
 
 ## B. Construcción pendiente
+- [ ] **Panel del supervisor** con sus propios permisos, deberes y aprobaciones (préstamos, reversos, límites)
+- [ ] **Notificaciones push en vivo** (préstamo por aprobar, pago recibido, tarjeta en rojo) — requiere llaves VAPID en Vercel
+- [ ] **Borrar o reprogramar cuotas** de un préstamo con permiso (hoy se puede anular el préstamo completo sin cobros)
 
 ### Cobros y legal
 - [x] Conexión de pagos con Paddle (pago, avisos, cambio de plan, descuentos de fundador y referidos automáticos) — faltan las claves
