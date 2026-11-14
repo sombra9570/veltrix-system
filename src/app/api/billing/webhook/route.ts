@@ -2,8 +2,6 @@
 // Verifica la firma, aplica el cambio con billing_apply y, si alguien ganó un descuento
 // por invitar, se lo pone en Paddle para su próximo cobro (una sola vez).
 import { createClient } from '@supabase/supabase-js';
-
-type SupabaseClient = ReturnType<typeof createClient>;
 import { paddle, paddleApi, planForPrice, validPaddleSignature } from '../paddle';
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -22,7 +20,8 @@ type Txn = {
 };
 
 /** Descuentos por invitar pendientes → se aplican en Paddle al próximo cobro */
-async function applyReferralDiscounts(admin: SupabaseClient) {
+async function applyReferralDiscounts() {
+  const admin = createClient(url, serviceKey!, { auth: { persistSession: false } });
   const { data: rows } = await admin.from('organizations')
     .select('id, referral_credit_pct, billing_subscription_id')
     .eq('billing_provider', 'paddle').gt('referral_credit_pct', 0).not('billing_subscription_id', 'is', null);
@@ -83,6 +82,6 @@ export async function POST(request: Request) {
     if (error.message.includes('BILLING_ORG_NOT_FOUND')) return Response.json({ ignored: true });
     return Response.json({ error: 'No se pudo aplicar' }, { status: 500 });   // Paddle reintenta
   }
-  if (event === 'subscription_payment_success') await applyReferralDiscounts(admin);
+  if (event === 'subscription_payment_success') await applyReferralDiscounts();
   return Response.json({ ok: true });
 }
