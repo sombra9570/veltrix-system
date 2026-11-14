@@ -1319,6 +1319,7 @@ const it: Record<DictKey, string> = {
   "trail.noGps": "senza GPS",
   "home.faq.q6": "Cosa succede se l'esattore resta senza internet o perde il telefono?",
   "home.faq.a6": "Può continuare a incassare offline: ogni incasso resta salvato sul telefono con l'ora e viene inviato da solo al ritorno della connessione, senza duplicati. Se perde il telefono prima di collegarsi, si perdono solo gli incassi non ancora inviati; il contatore dei pendenti ricorda di sincronizzare. Su un altro telefono ritrova tutto ciò che è già stato inviato.",
+  "login.noAccess": "Il tuo utente non ha accesso attivo a nessuna azienda. Chiedi all'amministratore di attivarlo.",
 };
 
 export default it;

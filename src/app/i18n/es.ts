@@ -1328,6 +1328,7 @@ const es = {
   "trail.noGps": "sin GPS",
   "home.faq.q6": "¿Qué pasa si el cobrador se queda sin internet o pierde el celular?",
   "home.faq.a6": "Puede seguir cobrando sin señal: cada cobro queda guardado en el teléfono con su hora y se envía solo al volver la conexión, sin duplicarse. Si pierde el celular antes de conectarse, solo se pierden los cobros todavía no enviados; el contador de pendientes le recuerda sincronizar. En otro teléfono sigue con todo lo ya enviado.",
+  "login.noAccess": "Tu usuario no tiene acceso activo a ninguna empresa. Pide al administrador que lo active.",
 };
 
 export default es;

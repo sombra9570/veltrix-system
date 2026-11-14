@@ -63,7 +63,7 @@ export default function ReportsPage() {
   useEffect(() => {
     const [f, tt] = range('month');
     setFrom(f); setTo(tt);
-    rpc<MBranch[]>('manager_branches').then((b) => {
+    rpc<MBranch[]>('reader_branches').catch(() => rpc<MBranch[]>('manager_branches')).then((b) => {
       const list = b ?? [];
       setBranches(list);
       if (list.length) setScope(list[0].company_wide && list.filter((x) => x.company_id === list[0].company_id).length > 1 ? `company:${list[0].company_id}` : `branch:${list[0].id}`);

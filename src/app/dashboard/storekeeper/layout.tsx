@@ -1,0 +1,5 @@
+import { StorekeeperLayout } from './staff-shell';
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return <StorekeeperLayout>{children}</StorekeeperLayout>;
+}

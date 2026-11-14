@@ -6,6 +6,7 @@ import { useT } from '../../i18n';
 import { ThemeToggle } from '../../theme';
 import { ui } from '../../site-header';
 import { storeImageUrl } from '../../dashboard/image';
+import { Spinner } from '../../spinner';
 
 type Product = { id: string; name: string; price: number; type: string; description: string | null; photo: string | null; unit: string; available: boolean };
 type Store = { slug: string; name: string; description: string | null; whatsapp: string | null; logo: string | null; currency: string; products: Product[] };
@@ -71,7 +72,7 @@ export function StoreView({ slug }: { slug: string }) {
     } catch { /* cancelado */ }
   };
 
-  if (store === undefined) return <div className="min-h-dvh bg-slate-50 dark:bg-slate-950" />;
+  if (store === undefined) return <div className="grid min-h-dvh place-items-center bg-slate-50 dark:bg-slate-950"><Spinner /></div>;
   if (store === null) {
     return (
       <main className="grid min-h-dvh place-items-center bg-slate-50 p-6 text-center dark:bg-slate-950">

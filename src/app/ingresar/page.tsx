@@ -10,7 +10,7 @@ import { isInstalledApp } from '../../lib/standalone';
 
 export default function IngresarPage() {
   const router = useRouter();
-  const { loaded, session, login } = useVeltrixAuth();
+  const { loaded, session, login, logout } = useVeltrixAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -23,8 +23,9 @@ export default function IngresarPage() {
 
   // Si ya tiene sesión, directo a su panel
   useEffect(() => {
-    if (loaded && session) router.replace(homeForRole(session.role));
+    if (loaded && session && session.role !== 'none') router.replace(homeForRole(session.role));
   }, [loaded, session, router]);
+  const noAccess = loaded && session?.role === 'none';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,8 +33,9 @@ export default function IngresarPage() {
     setBusy(true);
     const res = await login(email, password);
     setBusy(false);
-    if (res.ok && res.session) router.push(homeForRole(res.session.role));
-    else setError(t('login.error'));
+    if (res.ok && res.session) {
+      if (res.session.role !== 'none') router.push(homeForRole(res.session.role));
+    } else setError(t('login.error'));
   };
 
   const handleForgot = async (e: React.FormEvent) => {
@@ -64,6 +66,12 @@ export default function IngresarPage() {
               : t('forgot.subtitle')}
           </p>
 
+          {noAccess && (
+            <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
+              ⚠️ {t('login.noAccess')}{' '}
+              <button type="button" onClick={logout} className="underline cursor-pointer">{t('shell.logout')}</button>
+            </div>
+          )}
           {error && (
             <div className="mt-4 rounded-xl border border-red-300 bg-red-50 p-3 text-xs font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">
               ⚠️ {error}

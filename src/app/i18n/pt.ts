@@ -1319,6 +1319,7 @@ const pt: Record<DictKey, string> = {
   "trail.noGps": "sem GPS",
   "home.faq.q6": "E se o cobrador ficar sem internet ou perder o celular?",
   "home.faq.a6": "Ele continua cobrando sem sinal: cada recebimento fica salvo no telefone com o horário e é enviado sozinho quando a conexão volta, sem duplicar. Se perder o celular antes de conectar, só se perdem os recebimentos ainda não enviados; o contador de pendentes lembra de sincronizar. Em outro telefone ele continua com tudo o que já foi enviado.",
+  "login.noAccess": "Seu usuário não tem acesso ativo a nenhuma empresa. Peça ao administrador para ativá-lo.",
 };
 
 export default pt;

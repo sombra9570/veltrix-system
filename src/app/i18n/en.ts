@@ -1319,6 +1319,7 @@ const en: Record<DictKey, string> = {
   "trail.noGps": "no GPS",
   "home.faq.q6": "What if the collector has no internet or loses the phone?",
   "home.faq.a6": "They can keep collecting offline: each payment is saved on the phone with its time and sent automatically when the connection returns, without duplicates. If the phone is lost before reconnecting, only the payments not yet sent are lost; the pending counter reminds them to sync. On another phone they continue with everything already sent.",
+  "login.noAccess": "Your user has no active access to any company. Ask the administrator to activate it.",
 };
 
 export default en;

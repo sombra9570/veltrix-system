@@ -58,7 +58,7 @@ export default function SalesPage() {
   useEffect(() => {
     const [f, tt] = range('today');
     setFrom(f); setTo(tt);
-    rpc<BranchOpt[]>('seller_branches').then((b) => {
+    rpc<BranchOpt[]>('reader_branches').catch(() => rpc<BranchOpt[]>('seller_branches')).then((b) => {
       setBranches(b ?? []);
       if (b?.length) setBranchId(b[0].id);
     }).catch(() => {});

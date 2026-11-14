@@ -1,8 +1,10 @@
 'use client';
 import { createContext, useContext, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useVeltrixAuth, homeForRole, UserRole } from '../auth-system';
 import { AppShell, NavItem } from './shell';
+import { Spinner, NoAccess } from '../spinner';
+export { Spinner, NoAccess };
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 
@@ -22,17 +24,22 @@ export function StaffProvider({
   role, nav, children,
 }: { role: UserRole; nav: NavItem[]; children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { t } = useT();
   const { loaded, session, companies, logout } = useVeltrixAuth();
+  // Panel al que pertenece este usuario; si apunta aquí mismo (o a ingresar con sesión) no se redirige: evita bucles
+  const target = session ? homeForRole(session.role) : '/ingresar';
+  const loop = !!session && session.role !== role && (pathname.startsWith(target) || target === '/ingresar');
 
   useEffect(() => {
     if (!loaded) return;
     if (!session) router.replace('/ingresar');
-    else if (session.role !== role) router.replace(homeForRole(session.role));
-  }, [loaded, session, role, router]);
+    else if (session.role !== role && !loop) router.replace(target);
+  }, [loaded, session, role, router, target, loop]);
 
+  if (loop) return <NoAccess onLogout={logout} text={t('owner.notOwner')} button={t('shell.logout')} />;
   if (!loaded || !session || session.role !== role) {
-    return <div className="min-h-dvh bg-slate-50 dark:bg-slate-950" />;
+    return <div className="grid min-h-dvh place-items-center bg-slate-50 dark:bg-slate-950"><Spinner /></div>;
   }
 
   const company = companies.find((c) => c.id === session.companyId);
@@ -50,3 +57,4 @@ export function StaffProvider({
     </StaffContext.Provider>
   );
 }
+

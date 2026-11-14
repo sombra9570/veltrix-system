@@ -11,7 +11,8 @@ import { useEffect, useState } from 'react';
 import { supabase, rpc } from '../lib/supabase';
 import { COUNTRIES, CountryCode, TaxRegimeId, BusinessSectorId } from './language-selector';
 
-export type UserRole = 'superadmin' | 'owner' | 'cashier' | 'vendor' | 'collector' | 'supervisor' | 'waiter' | 'kitchen' | 'technician';
+export type UserRole = 'superadmin' | 'owner' | 'cashier' | 'vendor' | 'collector' | 'supervisor' | 'waiter' | 'kitchen' | 'technician'
+  | 'storekeeper' | 'accountant' | 'none'; // none: sin acceso activo (usuario desactivado o empresa sin terminar)
 
 // Panel de inicio de cada rol (un solo botón "Ingresar" para todos)
 export function homeForRole(role: UserRole): string {
@@ -24,7 +25,10 @@ export function homeForRole(role: UserRole): string {
     case 'waiter': return '/dashboard/waiter';
     case 'kitchen': return '/dashboard/kitchen';
     case 'technician': return '/dashboard/workshop';
-    default: return '/dashboard/vendor';
+    case 'storekeeper': return '/dashboard/storekeeper';
+    case 'accountant': return '/dashboard/accountant';
+    case 'vendor': return '/dashboard/vendor';
+    default: return '/ingresar';
   }
 }
 
@@ -221,7 +225,7 @@ async function loadAuthImpl(): Promise<ActiveSession | null> {
     const roles = (myMems ?? []).map((m) => m.role as string);
     const role: UserRole = admin ? 'superadmin'
       : roles.includes('owner') ? 'owner'
-      : ((roles[0] ?? 'vendor') as UserRole);
+      : ((roles[0] ?? 'none') as UserRole);
 
     // ----- Empresas visibles -----
     const { data: orgs } = await supabase.from('organizations')

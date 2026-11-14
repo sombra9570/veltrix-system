@@ -1319,6 +1319,7 @@ const de: Record<DictKey, string> = {
   "trail.noGps": "kein GPS",
   "home.faq.q6": "Was passiert, wenn der Kassierer kein Internet hat oder das Handy verliert?",
   "home.faq.a6": "Er kann offline weiter kassieren: Jede Zahlung wird mit Uhrzeit im Handy gespeichert und automatisch gesendet, sobald die Verbindung zurück ist – ohne Doppelungen. Geht das Handy vorher verloren, fehlen nur die noch nicht gesendeten Zahlungen; der Zähler für Ausstehendes erinnert ans Synchronisieren. Auf einem anderen Handy ist alles bereits Gesendete da.",
+  "login.noAccess": "Ihr Benutzer hat keinen aktiven Zugang zu einem Unternehmen. Bitten Sie den Administrator, ihn zu aktivieren.",
 };
 
 export default de;

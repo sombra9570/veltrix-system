@@ -5,6 +5,7 @@ import { useLanguage } from '../../language-selector';
 import { LanguageDropdown, RegionalStatusBar, translations } from './regional-tools';
 import { useVeltrixAuth } from '../../auth-system';
 import { rpc, supabase } from '../../../lib/supabase';
+import { Spinner } from '../../spinner';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -225,7 +226,7 @@ export default function GlobalCoreAdminPage() {
   }, [loaded, session, refresh]);
 
   if (!loaded || !session || session.role !== 'superadmin') {
-    return <div className="min-h-dvh bg-slate-950" />;
+    return <div className="grid min-h-dvh place-items-center bg-slate-950"><Spinner /></div>;
   }
 
   const f = m?.funnel ?? { total: 0, trial: 0, paying: 0, grace: 0, suspended: 0 };

@@ -7,6 +7,7 @@ import { supabase, rpc } from '../../../lib/supabase';
 import { AppShell, NavItem } from '../shell';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
+import { Spinner } from '../../spinner';
 
 export type Overview = {
   org: {
@@ -114,7 +115,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => { reload(); }, [reload]);
 
-  if (!loaded || !session) return <div className="min-h-dvh bg-slate-50 dark:bg-slate-950" />;
+  if (!loaded || !session) return <div className="grid min-h-dvh place-items-center bg-slate-50 dark:bg-slate-950"><Spinner /></div>;
 
   if (denied) {
     return (

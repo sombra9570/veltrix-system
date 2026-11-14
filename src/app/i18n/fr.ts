@@ -1319,6 +1319,7 @@ const fr: Record<DictKey, string> = {
   "trail.noGps": "sans GPS",
   "home.faq.q6": "Que se passe-t-il si l'encaisseur n'a pas internet ou perd son téléphone ?",
   "home.faq.a6": "Il continue d'encaisser hors ligne : chaque paiement est enregistré sur le téléphone avec l'heure et envoyé automatiquement au retour de la connexion, sans doublon. S'il perd le téléphone avant de se reconnecter, seuls les paiements non envoyés sont perdus ; le compteur d'attente lui rappelle de synchroniser. Sur un autre téléphone, il retrouve tout ce qui a déjà été envoyé.",
+  "login.noAccess": "Votre utilisateur n'a accès à aucune entreprise. Demandez à l'administrateur de l'activer.",
 };
 
 export default fr;
