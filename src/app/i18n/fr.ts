@@ -885,6 +885,7 @@ const fr: Record<DictKey, string> = {
   "legal.langNote": "Ce document est disponible en espagnol (version officielle) et en anglais.",
   "legal.acceptPre": "En créant votre compte, vous acceptez les",
   "legal.and": "et la",
+  "legal.creditNotice": "Les conditions du crédit (prix, majorations et délais) sont fixées par votre entreprise et doivent respecter le taux maximal légal de votre pays.",
 };
 
 export default fr;

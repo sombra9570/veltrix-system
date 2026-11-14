@@ -885,6 +885,7 @@ const ja: Record<DictKey, string> = {
   "legal.langNote": "この文書はスペイン語（正式版）と英語で提供しています。",
   "legal.acceptPre": "アカウントを作成すると、次に同意したことになります：",
   "legal.and": "および",
+  "legal.creditNotice": "掛売りの条件（価格・追加料金・期間）は貴社が決めるもので、国の法定上限金利を守る必要があります。",
 };
 
 export default ja;

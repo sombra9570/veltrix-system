@@ -3,8 +3,8 @@
 export type LegalDoc = { title: string; updated: string; intro: string; sections: { h: string; p: string[] }[] };
 export type LegalKind = 'terms' | 'privacy' | 'refunds';
 
-const UPDATED_ES = '13 de noviembre de 2026';
-const UPDATED_EN = 'November 13, 2026';
+const UPDATED_ES = '14 de noviembre de 2026';
+const UPDATED_EN = 'November 14, 2026';
 const CONTACT = 'hola@veltrixsystem.app';
 
 export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
@@ -38,11 +38,13 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'Si un pago no se completa, tendrás 7 días de gracia. Después, la cuenta pasa a modo de solo lectura: puedes ver y exportar tu información, pero no registrar operaciones nuevas, hasta regularizar el pago.',
           'Conservamos los datos de una cuenta suspendida o cancelada al menos 90 días. Después podemos eliminarlos, previo aviso al correo de facturación.',
         ] },
-        { h: '7. Uso aceptable', p: [
-          'No puedes usar Veltrix para actividades ilegales, fraude, lavado de dinero, ni para almacenar contenido ajeno a la gestión de tu negocio.',
-          'Si registras créditos, préstamos o cobranzas, eres el único responsable de cumplir las leyes de tu país (tasas de interés, protección al consumidor, cobranza respetuosa y protección de datos). Está prohibido usar Veltrix para hostigar, amenazar o exponer a deudores.',
-          'Puedes subir fotos de documentos de identidad de tus clientes solo con su consentimiento y para fines legítimos de tu negocio.',
-          'Podemos limitar o suspender una cuenta que afecte la seguridad o el funcionamiento del servicio para los demás clientes.',
+        { h: '7. Uso legal y responsabilidad de cada empresa', p: [
+          'Veltrix fue construido exclusivamente para fines legales. Cada empresa que lo usa es la única y directa responsable de las operaciones que registra y de cómo las realiza.',
+          'Veltrix no fija, no sugiere ni verifica tasas de interés, recargos, multas ni plazos: el sistema solo registra lo que cada empresa decide. Cobrar intereses por encima de la tasa máxima permitida en su país, aplicar recargos no autorizados, prestar sin la licencia que exija la ley o cobrar de forma abusiva es responsabilidad exclusiva de la empresa y de sus empleados.',
+          'Está prohibido usar Veltrix para cualquier acto ilegal, incluidos fraude, usura, lavado de dinero, o para hostigar, amenazar o exponer públicamente a deudores. Tampoco puede usarse para guardar contenido ajeno a la gestión del negocio.',
+          'Las fotos de documentos de identidad de los clientes solo pueden subirse con su consentimiento y para fines legítimos del negocio.',
+          'La empresa se compromete a mantener indemne a Veltrix frente a cualquier reclamo de clientes, terceros o autoridades que se origine en el uso que ella o sus empleados hagan del sistema.',
+          'Si detectamos un uso ilegal o que afecte la seguridad del servicio, podemos suspender la cuenta y colaborar con las autoridades competentes conforme a la ley.',
         ] },
         { h: '8. Tus datos y los de tus clientes', p: [
           'La información que registras es tuya. Respecto de los datos de tus clientes y empleados, tú decides para qué se usan y nosotros los tratamos solo para prestarte el servicio, según nuestra Política de privacidad.',
@@ -165,11 +167,13 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'If a payment fails you get a 7-day grace period. After that the account becomes read-only: you can view and export your information but not record new operations until payment is settled.',
           'We keep data from suspended or cancelled accounts for at least 90 days. After that we may delete it, with prior notice to the billing email.',
         ] },
-        { h: '7. Acceptable use', p: [
-          'You may not use Veltrix for illegal activities, fraud, money laundering, or to store content unrelated to managing your business.',
-          'If you record credit, loans or collections, you alone are responsible for complying with your local laws (interest rates, consumer protection, respectful collection and data protection). Using Veltrix to harass, threaten or expose debtors is forbidden.',
-          'You may upload photos of your customers’ ID documents only with their consent and for legitimate business purposes.',
-          'We may limit or suspend an account that affects the security or operation of the service for other customers.',
+        { h: '7. Lawful use and each company\u2019s responsibility', p: [
+          'Veltrix was built exclusively for lawful purposes. Each company using it is solely and directly responsible for the operations it records and how it carries them out.',
+          'Veltrix does not set, suggest or verify interest rates, surcharges, penalties or terms: the system only records what each company decides. Charging interest above the maximum rate allowed in its country, applying unauthorized surcharges, lending without a license where the law requires one, or abusive collection is the sole responsibility of the company and its employees.',
+          'Using Veltrix for any illegal act is forbidden, including fraud, usury, money laundering, or harassing, threatening or publicly exposing debtors. It may not be used to store content unrelated to managing the business.',
+          'Photos of customers\u2019 ID documents may only be uploaded with their consent and for legitimate business purposes.',
+          'The company agrees to hold Veltrix harmless from any claim by customers, third parties or authorities arising from the use that it or its employees make of the system.',
+          'If we detect illegal use or use that affects the security of the service, we may suspend the account and cooperate with the competent authorities as required by law.',
         ] },
         { h: '8. Your data and your customers’ data', p: [
           'The information you enter is yours. For your customers’ and employees’ data, you decide how it is used and we process it only to provide the service, as described in our Privacy Policy.',

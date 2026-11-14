@@ -247,6 +247,7 @@ export function PosScreen() {
           {cart.length > 0 && (
             <p className={`text-xs ${ui.muted}`}>{t('pos.installmentOf', { n: nInst, amount: fmt(total / nInst) })}</p>
           )}
+          <p className={`text-[11px] ${ui.muted}`}>⚖️ {t('legal.creditNotice')}</p>
         </div>
       )}
       <div>

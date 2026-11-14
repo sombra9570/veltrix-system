@@ -885,6 +885,7 @@ const ko: Record<DictKey, string> = {
   "legal.langNote": "이 문서는 스페인어(공식본)와 영어로 제공됩니다.",
   "legal.acceptPre": "계정을 만들면 다음에 동의하게 됩니다:",
   "legal.and": "및",
+  "legal.creditNotice": "외상 조건(가격, 추가 요금, 기간)은 귀사가 정하며 국가의 법정 최고 이자율을 지켜야 합니다.",
 };
 
 export default ko;
