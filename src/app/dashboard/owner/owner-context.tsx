@@ -56,6 +56,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory' },
   { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports' },
   { href: '/dashboard/owner/plan', icon: '💳', label: 'nav.plan' },
+  { href: '/dashboard/owner/invitar', icon: '🎁', label: 'nav.invite' },
 ];
 
 const DAY = 86_400_000;

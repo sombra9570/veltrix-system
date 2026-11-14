@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { rpc } from '../../lib/supabase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useVeltrixAuth, homeForRole } from '../auth-system';
@@ -31,6 +32,20 @@ export default function RegistroPage() {
   const [pass2, setPass2] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  // Invitación de otro negocio (?ref=CODIGO): 30 días gratis en vez de 14
+  const [referred, setReferred] = useState(false);
+  useEffect(() => {
+    try {
+      const code = new URLSearchParams(window.location.search).get('ref')?.trim().toUpperCase();
+      if (code && /^[A-Z0-9]{6}$/.test(code)) {
+        rpc<boolean>('referral_valid', { p_code: code }).then((ok) => {
+          if (ok) { localStorage.setItem('vx_ref', code); setReferred(true); }
+        }).catch(() => {});
+      } else if (localStorage.getItem('vx_ref')) {
+        setReferred(true);
+      }
+    } catch { /* */ }
+  }, []);
 
   const chooseKind = (k: BusinessKind) => {
     setKind(k);
@@ -106,6 +121,11 @@ export default function RegistroPage() {
             {t('reg.badge')}
           </span>
           <h1 className="mt-4 text-2xl font-extrabold sm:text-3xl">{t('reg.title')}</h1>
+          {referred && (
+            <p className="mx-auto mt-3 max-w-md rounded-xl border border-blue-300 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
+              🎁 {t('ref.invitedBanner')}
+            </p>
+          )}
         </div>
 
         {/* Barra de progreso */}

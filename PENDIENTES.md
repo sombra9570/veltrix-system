@@ -34,7 +34,7 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 
 ### App
 - [ ] **APK Android** (TWA desde la app web + `/.well-known/assetlinks.json`)
-- [ ] Programa de referidos ("invita un negocio, gana 1 mes")
+- [x] Programa de referidos (30 días al invitado, 1 mes gratis al que invita cuando paga)
 - [ ] Panel del **supervisor** (hoy usa pantallas del dueño)
 - [ ] Pantallas del **almacenero** y del **contador** (roles existen, sin panel propio)
 - [ ] Pagos a proveedores / cuentas por pagar

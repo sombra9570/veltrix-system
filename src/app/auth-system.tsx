@@ -129,6 +129,11 @@ async function finishRegistration(details: NewCompany, email: string) {
       .eq('id', comp.id);
     await rpc('bootstrap_company', { p_company: comp.id });
   }
+  // Si lo invitó otro negocio: 30 días de prueba y premio para quien invitó cuando pague
+  try {
+    const ref = localStorage.getItem('vx_ref');
+    if (ref) { await rpc('apply_referral', { p_code: ref }); localStorage.removeItem('vx_ref'); }
+  } catch { /* la invitación es opcional */ }
 }
 
 // ---------- hook principal ----------
