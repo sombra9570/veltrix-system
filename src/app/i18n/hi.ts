@@ -1113,6 +1113,7 @@ const hi: Record<DictKey, string> = {
   "card.profile": "ग्राहक प्रोफ़ाइल",
   "card.noCards": "कोई बकाया किस्त नहीं।",
   "card.promise": "{date} का वादा",
+  "card.creditN": "{total} में से उधार {n}",
 };
 
 export default hi;

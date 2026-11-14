@@ -1113,6 +1113,7 @@ const ko: Record<DictKey, string> = {
   "card.profile": "고객 정보",
   "card.noCards": "미납 할부가 없습니다.",
   "card.promise": "{date} 납부 약속",
+  "card.creditN": "{total}건 중 {n}번째 외상",
 };
 
 export default ko;

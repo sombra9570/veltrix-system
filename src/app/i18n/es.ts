@@ -1122,6 +1122,7 @@ const es = {
   "card.profile": "Ficha",
   "card.noCards": "Sin cuotas pendientes.",
   "card.promise": "promete {date}",
+  "card.creditN": "Crédito {n} de {total}",
 };
 
 export default es;

@@ -1113,6 +1113,7 @@ const zh: Record<DictKey, string> = {
   "card.profile": "客户资料",
   "card.noCards": "没有待付分期。",
   "card.promise": "承诺 {date}",
+  "card.creditN": "第 {n}/{total} 笔赊账",
 };
 
 export default zh;

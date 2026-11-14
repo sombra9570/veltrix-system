@@ -1113,6 +1113,7 @@ const de: Record<DictKey, string> = {
   "card.profile": "Profil",
   "card.noCards": "Keine offenen Raten.",
   "card.promise": "verspricht {date}",
+  "card.creditN": "Kredit {n} von {total}",
 };
 
 export default de;

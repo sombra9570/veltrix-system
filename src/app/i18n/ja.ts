@@ -1113,6 +1113,7 @@ const ja: Record<DictKey, string> = {
   "card.profile": "顧客情報",
   "card.noCards": "未払いの分割はありません。",
   "card.promise": "{date} に支払い約束",
+  "card.creditN": "{total} 件中 {n} 件目の掛け",
 };
 
 export default ja;

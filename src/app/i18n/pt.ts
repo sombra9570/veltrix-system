@@ -1113,6 +1113,7 @@ const pt: Record<DictKey, string> = {
   "card.profile": "Ficha",
   "card.noCards": "Sem parcelas pendentes.",
   "card.promise": "promete {date}",
+  "card.creditN": "Crédito {n} de {total}",
 };
 
 export default pt;

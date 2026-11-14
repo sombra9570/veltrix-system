@@ -1113,6 +1113,7 @@ const ar: Record<DictKey, string> = {
   "card.profile": "ملف العميل",
   "card.noCards": "لا توجد أقساط معلقة.",
   "card.promise": "وعد بتاريخ {date}",
+  "card.creditN": "الائتمان {n} من {total}",
 };
 
 export default ar;

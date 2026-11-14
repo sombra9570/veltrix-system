@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { rpc } from '../../../lib/supabase';
 import { Card } from '../shell';
 import { ui } from '../../site-header';
@@ -7,7 +7,7 @@ import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
 import { money, parseAmount } from '../format';
 import { useStaff } from '../staff-context';
-import { CreditCard, applyPayment, freqOf, type Credit, type Freq } from './credit-card';
+import { CreditCard, applyPayment, freqOf, type Credit, type Freq, type Method } from './credit-card';
 
 /* ------------------------------------------------------------------
  * Cobrador de calle: trabaja SIN internet.
@@ -16,7 +16,6 @@ import { CreditCard, applyPayment, freqOf, type Credit, type Freq } from './cred
  *  - Cuando hay señal, la cola se envía sola; repetir un envío no duplica nada.
  * ------------------------------------------------------------------ */
 
-type Method = 'cash' | 'qr_transfer' | 'card';
 type VisitResult = 'no_one_home' | 'promise' | 'refused' | 'other';
 type Customer = {
   id: string; name: string; phone: string | null; address: string | null; lat: number | null; lng: number | null;
@@ -203,6 +202,13 @@ export default function CollectorPage() {
   };
 
   const route = day?.routes.find((r) => r.id === routeId);
+  const cardPay = (customer: string, order: string, amount: number, method: Method) => {
+    if (!route) return;
+    enqueue({ kind: 'payment', id: crypto.randomUUID(), at: new Date().toISOString(), route: route.id, customer, method, amount, order });
+    flash(true, online ? t('col.paySaved') : t('col.savedOffline'));
+  };
+  // La ficha abierta se mantiene al día con lo guardado (tarjetas marcadas)
+  const selNow = sel ? route?.customers.find((x) => x.id === sel.id) ?? sel : null;
   const fmt = (n: number) => money(Number(n), route?.currency ?? 'USD', lang);
 
   /* ---------- Pantallas ---------- */
@@ -309,13 +315,7 @@ export default function CollectorPage() {
                 </div>
                 <button type="button" onClick={() => { setSel(c); setPanel(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>👤 {t('card.profile')}</button>
               </div>
-              {(c.credits ?? []).filter((k) => freq === 'all' || freqOf(k) === freq).map((k) => (
-                <CreditCard key={k.id} credit={k} today={route.today} fmt={fmt}
-                  onSave={(amount, method) => {
-                    enqueue({ kind: 'payment', id: crypto.randomUUID(), at: new Date().toISOString(), route: route.id, customer: c.id, method, amount, order: k.id });
-                    flash(true, online ? t('col.paySaved') : t('col.savedOffline'));
-                  }} />
-              ))}
+              <Credits c={c} filter={freq} today={route.today} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
               {(c.credits ?? []).length === 0 && <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>}
             </Card>
           ))}
@@ -354,7 +354,8 @@ export default function CollectorPage() {
             </div>
 
             {sel && !panel && (
-              <CustomerSheet c={sel} fmt={fmt} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')} />
+              <CustomerSheet c={selNow ?? sel} fmt={fmt} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
+                cards={<Credits c={selNow ?? sel} filter="all" today={route.today} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />} />
             )}
             {sel && panel === 'pay' && (
               <PayForm c={sel} fmt={fmt} onDone={(method, amount) => {
@@ -403,7 +404,33 @@ function Note({ v }: { v: NonNullable<Customer['last_visit']> }) {
 }
 
 /* ---------- Ficha rápida del cliente ---------- */
-function CustomerSheet({ c, fmt, onPay, onVisit }: { c: Customer; fmt: (n: number) => string; onPay: () => void; onVisit: () => void }) {
+/* ---------- Créditos del cliente: una tarjeta por crédito, todas dentro del mismo cliente ---------- */
+function Credits({ c, filter, today, fmt, onSave }: {
+  c: Customer; filter: Freq | 'all'; today: string; fmt: (n: number) => string;
+  onSave: (order: string, amount: number, method: Method) => void;
+}) {
+  const { t, lang } = useT();
+  const all = c.credits ?? [];
+  const list = all.filter((k) => filter === 'all' || freqOf(k) === filter);
+  if (all.length === 0) return <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>;
+  return (
+    <div className="space-y-4">
+      {list.map((k) => (
+        <div key={k.id} className="space-y-2 rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+          {all.length > 1 && (
+            <p className="text-xs font-bold">
+              💳 {t('card.creditN', { n: all.indexOf(k) + 1, total: all.length })}
+              <span className={`font-normal ${ui.muted}`}> · {new Date(k.created).toLocaleDateString(lang)} · {fmt(Number(k.total))}</span>
+            </p>
+          )}
+          <CreditCard credit={k} today={today} fmt={fmt} onSave={(amount, method) => onSave(k.id, amount, method)} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CustomerSheet({ c, fmt, onPay, onVisit, cards }: { c: Customer; fmt: (n: number) => string; onPay: () => void; onVisit: () => void; cards: ReactNode }) {
   const { t, lang } = useT();
   const map = c.lat != null && c.lng != null
     ? `https://maps.google.com/?q=${c.lat},${c.lng}`
@@ -437,6 +464,12 @@ function CustomerSheet({ c, fmt, onPay, onVisit }: { c: Customer; fmt: (n: numbe
         <button type="button" onClick={onVisit} className={ui.btnGhost}>📝 {t('col.visit')}</button>
         <button type="button" onClick={onPay} className={`${ui.btnPrimary} py-3`}>💵 {t('col.collect')}</button>
       </div>
+      {(c.credits ?? []).length > 0 && (
+        <div className="space-y-2 border-t border-slate-200 pt-4 dark:border-slate-800">
+          <p className="font-bold">🗂️ {t('card.viewCards')}</p>
+          {cards}
+        </div>
+      )}
     </div>
   );
 }

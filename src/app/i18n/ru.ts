@@ -1113,6 +1113,7 @@ const ru: Record<DictKey, string> = {
   "card.profile": "Карточка клиента",
   "card.noCards": "Нет ожидающих платежей.",
   "card.promise": "обещает {date}",
+  "card.creditN": "Кредит {n} из {total}",
 };
 
 export default ru;
