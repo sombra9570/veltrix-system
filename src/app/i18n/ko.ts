@@ -743,6 +743,8 @@ const ko: Record<DictKey, string> = {
   "register.declared": "계산원 집계액",
   "register.difference": "차액",
   "register.nothing": "이 교대에 수금이 없습니다.",
+  "owner.pilotFounder": "파일럿 기간: 무료 {days}일 남았습니다. 이후 {date}까지 창립자 가격(−{pct}%)으로 월 {price}를 냅니다.",
+  "owner.pilotLeft": "파일럿 기간: 무료 {days}일 남았습니다. 이후 월 {price}를 냅니다.",
 };
 
 export default ko;

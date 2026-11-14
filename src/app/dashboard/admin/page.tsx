@@ -33,7 +33,7 @@ const STAGE_INFO: Record<Stage, { label: string; badge: string }> = {
 
 const MONTHS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 const monthLabel = (ym: string) => MONTHS[Number(ym.slice(5, 7)) - 1] + ' ' + ym.slice(2, 4);
-const fmtDate = (d: string | null) => (d ? new Date(d).toLocaleDateString('es-BO') : '—');
+const fmtDate = (d: string | null) => (d ? new Date(d.length === 10 ? `${d}T12:00:00` : d).toLocaleDateString('es-BO') : '—');
 
 function BarChart({
   data, color, format,
@@ -79,6 +79,37 @@ export default function GlobalCoreAdminPage() {
     const n = parseInt(aiEdit[org] ?? '', 10);
     if (Number.isNaN(n) || n < 0) return;
     try { await rpc('ai_set_quota', { p_org: org, p_quota: n }); setAiEdit((e) => { const c = { ...e }; delete c[org]; return c; }); await loadAi(); } catch { /* */ }
+  };
+  // Plan Piloto / Fundador
+  type Pilot = { org_id: string; name: string; plan: string; price_usd: number; price_now: number; is_pilot: boolean;
+    pilot_ends: string | null; founder_discount_pct: number; founder_until: string | null; next_billing_date: string | null;
+    status: string; last_payment: string | null };
+  const [pilots, setPilots] = useState<Pilot[]>([]);
+  const [pForm, setPForm] = useState<{ org: string; kind: 'pilot' | 'pay'; a: string; b: string; c: string } | null>(null);
+  const [pMsg, setPMsg] = useState('');
+  const loadPilots = useCallback(async () => { try { setPilots(await rpc<Pilot[]>('admin_pilots') ?? []); } catch { /* */ } }, []);
+  useEffect(() => { if (loaded && session?.role === 'superadmin') loadPilots(); }, [loaded, session, loadPilots]);
+  const savePilot = async () => {
+    if (!pForm) return;
+    setPMsg('');
+    try {
+      if (pForm.kind === 'pilot') {
+        await rpc('admin_set_pilot', { p_org: pForm.org, p_days: parseInt(pForm.a, 10), p_discount_pct: parseInt(pForm.b || '0', 10), p_founder_months: parseInt(pForm.c || '0', 10) });
+        setPMsg('✅ Piloto activado.');
+      } else {
+        const until = await rpc<string>('admin_record_payment', { p_org: pForm.org, p_amount: parseFloat(pForm.a.replace(',', '.')), p_months: parseInt(pForm.b || '1', 10), p_ref: pForm.c || null });
+        setPMsg(`✅ Pago registrado. Pagado hasta ${fmtDate(until)}.`);
+      }
+      setPForm(null);
+      await Promise.all([loadPilots(), refresh()]);
+    } catch (e) {
+      const m = e instanceof Error ? e.message : '';
+      setPMsg(m.includes('INVALID') ? '⚠️ Revisa los números: días 1–180, descuento 0–90 %, meses 0–24.' : '⚠️ No se pudo guardar.');
+    }
+  };
+  const clearPilot = async (org: string) => {
+    if (!window.confirm('¿Quitar el descuento de fundador a esta empresa? Pagará el precio normal.')) return;
+    try { await rpc('admin_clear_pilot', { p_org: org }); await loadPilots(); } catch { /* */ }
   };
   const [mailMsg, setMailMsg] = useState('');
   const [sending, setSending] = useState(false);
@@ -304,6 +335,63 @@ export default function GlobalCoreAdminPage() {
                 <input inputMode="numeric" value={aiEdit[o.org_id] ?? String(o.quota)} onChange={(e) => setAiEdit({ ...aiEdit, [o.org_id]: e.target.value.replace(/\D/g, '') })}
                   className="w-20 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
                 <button type="button" onClick={() => saveQuota(o.org_id)} className="bg-violet-600/20 hover:bg-violet-600/30 text-violet-200 border border-violet-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar cupo</button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* PILOTOS Y FUNDADORES */}
+        <section className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
+          <div>
+            <h2 className="text-sm font-bold">🤝 Pilotos y precio fundador</h2>
+            <p className="text-[11px] text-slate-500">Días gratis con todo el plan. Al terminar paga con descuento de fundador durante los meses que elijas (no es de por vida) y luego el precio normal. Registra aquí los pagos por QR o transferencia.</p>
+          </div>
+          {pMsg && <p className="text-xs font-semibold text-slate-200">{pMsg}</p>}
+          <div className="space-y-2">
+            {pilots.map((o) => (
+              <div key={o.org_id} className="bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-xs space-y-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-sm truncate">
+                      {o.name} <span className="text-slate-500 font-normal">· {o.plan}</span>
+                      {o.is_pilot && <span className="ms-2 text-[11px] px-2 py-0.5 rounded-full font-bold border bg-sky-500/10 text-sky-300 border-sky-500/30">Piloto</span>}
+                    </p>
+                    <p className="text-slate-400">
+                      {o.is_pilot && o.pilot_ends ? `Gratis hasta ${fmtDate(o.pilot_ends)} · ` : ''}
+                      {o.founder_until ? `Fundador −${o.founder_discount_pct}% hasta ${fmtDate(o.founder_until)} · ` : ''}
+                      Próximo cobro {fmtDate(o.next_billing_date)}
+                      {o.last_payment ? ` · Último pago ${fmtDate(o.last_payment)}` : ''}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-emerald-400 text-sm">{formatMoney(Number(o.price_now))}/mes</p>
+                    {Number(o.price_now) !== Number(o.price_usd) && <p className="text-slate-500 line-through">{formatMoney(Number(o.price_usd))}</p>}
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" onClick={() => setPForm({ org: o.org_id, kind: 'pilot', a: '60', b: '50', c: '12' })} className="bg-sky-600/20 hover:bg-sky-600/30 text-sky-200 border border-sky-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">🧪 Dar piloto</button>
+                  <button type="button" onClick={() => setPForm({ org: o.org_id, kind: 'pay', a: String(o.price_now), b: '1', c: '' })} className="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-200 border border-emerald-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">💵 Registrar pago</button>
+                  {o.founder_until && <button type="button" onClick={() => clearPilot(o.org_id)} className="border border-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Quitar descuento</button>}
+                </div>
+                {pForm?.org === o.org_id && (
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end border-t border-slate-800 pt-2">
+                    {(pForm.kind === 'pilot'
+                      ? [['a', 'Días gratis'], ['b', 'Descuento fundador %'], ['c', 'Meses con descuento']]
+                      : [['a', 'Monto USD'], ['b', 'Meses que paga'], ['c', 'Referencia (n.º de QR o transferencia)']]
+                    ).map(([k, label]) => (
+                      <label key={k} className="block">
+                        <span className="block text-[11px] text-slate-400 mb-1">{label}</span>
+                        <input value={pForm[k as 'a' | 'b' | 'c']} inputMode={k === 'c' && pForm.kind === 'pay' ? 'text' : 'decimal'}
+                          onChange={(e) => setPForm({ ...pForm, [k]: e.target.value })}
+                          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
+                      </label>
+                    ))}
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => setPForm(null)} className="flex-1 border border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
+                      <button type="button" onClick={savePilot} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar</button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

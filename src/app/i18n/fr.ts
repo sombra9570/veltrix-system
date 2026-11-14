@@ -743,6 +743,8 @@ const fr: Record<DictKey, string> = {
   "register.declared": "Compté par le caissier",
   "register.difference": "Écart",
   "register.nothing": "Aucun encaissement pendant ce service.",
+  "owner.pilotFounder": "Période pilote : il vous reste {days} jours gratuits. Ensuite, vous payez {price}/mois au prix fondateur (−{pct} %) jusqu'au {date}.",
+  "owner.pilotLeft": "Période pilote : il vous reste {days} jours gratuits. Ensuite, vous payez {price}/mois.",
 };
 
 export default fr;

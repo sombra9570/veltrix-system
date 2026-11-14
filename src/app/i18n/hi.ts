@@ -743,6 +743,8 @@ const hi: Record<DictKey, string> = {
   "register.declared": "कैशियर द्वारा गिना गया",
   "register.difference": "अंतर",
   "register.nothing": "इस शिफ्ट में कोई भुगतान नहीं।",
+  "owner.pilotFounder": "पायलट अवधि: {days} दिन मुफ़्त बाकी हैं। उसके बाद {date} तक संस्थापक कीमत (−{pct}%) पर {price}/माह देंगे।",
+  "owner.pilotLeft": "पायलट अवधि: {days} दिन मुफ़्त बाकी हैं। उसके बाद {price}/माह।",
 };
 
 export default hi;

@@ -743,6 +743,8 @@ const ru: Record<DictKey, string> = {
   "register.declared": "Подсчитано кассиром",
   "register.difference": "Разница",
   "register.nothing": "В этой смене оплат нет.",
+  "owner.pilotFounder": "Пилотный период: осталось {days} бесплатных дней. Затем вы платите {price}/мес по цене основателя (−{pct}%) до {date}.",
+  "owner.pilotLeft": "Пилотный период: осталось {days} бесплатных дней. Затем {price}/мес.",
 };
 
 export default ru;

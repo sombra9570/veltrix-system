@@ -752,6 +752,8 @@ const es = {
   "register.declared": "Contado por el cajero",
   "register.difference": "Diferencia",
   "register.nothing": "Sin cobros en este turno.",
+  "owner.pilotFounder": "Período piloto: te quedan {days} días gratis. Luego pagas {price}/mes con tu precio de fundador (−{pct} %) hasta el {date}.",
+  "owner.pilotLeft": "Período piloto: te quedan {days} días gratis. Luego pagas {price}/mes.",
 };
 
 export default es;

@@ -743,6 +743,8 @@ const ar: Record<DictKey, string> = {
   "register.declared": "عدّه أمين الصندوق",
   "register.difference": "الفرق",
   "register.nothing": "لا مدفوعات في هذه الوردية.",
+  "owner.pilotFounder": "الفترة التجريبية: بقي لك {days} يوماً مجاناً. بعدها تدفع {price} شهرياً بسعر المؤسس (−{pct}%) حتى {date}.",
+  "owner.pilotLeft": "الفترة التجريبية: بقي لك {days} يوماً مجاناً. بعدها تدفع {price} شهرياً.",
 };
 
 export default ar;

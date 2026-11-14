@@ -12,6 +12,7 @@ export type Overview = {
     name: string; plan_code: string; plan_name: string; price_usd: number;
     status: 'active' | 'past_due_grace' | 'suspended';
     trial_ends_at: string | null; next_billing_date: string | null; grace_ends_at: string | null;
+    is_pilot?: boolean; founder_discount_pct?: number; founder_until?: string | null; price_now?: number;
   };
   usage: Record<'companies' | 'branches' | 'users' | 'storage_mb', { used: number; max: number | null }>;
   today: { currency: string; amount: number; count: number }[];
@@ -132,6 +133,16 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
       banner = (
         <div className="bg-amber-500 px-4 py-2.5 text-center text-sm font-semibold text-white">
           {t('owner.grace', { date: o.grace_ends_at ? new Date(o.grace_ends_at).toLocaleDateString() : '' })}
+        </div>
+      );
+    } else if (trialDays > 0 && o.is_pilot) {
+      const after = `US$ ${Number(o.price_now ?? o.price_usd).toFixed(2)}`;
+      banner = (
+        <div className="bg-blue-600 px-4 py-2.5 text-center text-sm font-semibold text-white">
+          {o.founder_until && Number(o.founder_discount_pct) > 0
+            ? t('owner.pilotFounder', { days: trialDays, price: after, pct: Number(o.founder_discount_pct),
+                date: new Date(o.founder_until + 'T12:00:00').toLocaleDateString() })
+            : t('owner.pilotLeft', { days: trialDays, price: after })}
         </div>
       );
     } else if (trialDays > 0) {

@@ -743,6 +743,8 @@ const de: Record<DictKey, string> = {
   "register.declared": "Vom Kassierer gezählt",
   "register.difference": "Differenz",
   "register.nothing": "Keine Zahlungen in dieser Schicht.",
+  "owner.pilotFounder": "Pilotphase: noch {days} Tage kostenlos. Danach zahlen Sie {price}/Monat zum Gründerpreis (−{pct} %) bis {date}.",
+  "owner.pilotLeft": "Pilotphase: noch {days} Tage kostenlos. Danach zahlen Sie {price}/Monat.",
 };
 
 export default de;

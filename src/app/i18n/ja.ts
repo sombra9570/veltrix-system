@@ -743,6 +743,8 @@ const ja: Record<DictKey, string> = {
   "register.declared": "レジ担当の申告額",
   "register.difference": "差額",
   "register.nothing": "このシフトの入金はありません。",
+  "owner.pilotFounder": "パイロット期間：無料期間は残り {days} 日です。その後 {date} まで創業者価格（−{pct}%）の月額 {price} です。",
+  "owner.pilotLeft": "パイロット期間：無料期間は残り {days} 日です。その後は月額 {price} です。",
 };
 
 export default ja;

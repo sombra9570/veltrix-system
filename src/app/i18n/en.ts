@@ -743,6 +743,8 @@ const en: Record<DictKey, string> = {
   "register.declared": "Counted by cashier",
   "register.difference": "Difference",
   "register.nothing": "No payments in this shift.",
+  "owner.pilotFounder": "Pilot period: {days} free days left. Then you pay {price}/month at your founder price (−{pct}%) until {date}.",
+  "owner.pilotLeft": "Pilot period: {days} free days left. Then you pay {price}/month.",
 };
 
 export default en;

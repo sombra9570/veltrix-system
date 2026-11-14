@@ -743,6 +743,8 @@ const zh: Record<DictKey, string> = {
   "register.declared": "收银员清点",
   "register.difference": "差额",
   "register.nothing": "本班没有收款。",
+  "owner.pilotFounder": "试用期：还剩 {days} 天免费。之后按创始价（−{pct}%）每月支付 {price}，直到 {date}。",
+  "owner.pilotLeft": "试用期：还剩 {days} 天免费。之后每月支付 {price}。",
 };
 
 export default zh;

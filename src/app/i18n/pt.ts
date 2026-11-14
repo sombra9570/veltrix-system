@@ -743,6 +743,8 @@ const pt: Record<DictKey, string> = {
   "register.declared": "Contado pelo operador",
   "register.difference": "Diferença",
   "register.nothing": "Sem pagamentos neste turno.",
+  "owner.pilotFounder": "Período piloto: restam {days} dias grátis. Depois você paga {price}/mês com seu preço de fundador (−{pct}%) até {date}.",
+  "owner.pilotLeft": "Período piloto: restam {days} dias grátis. Depois você paga {price}/mês.",
 };
 
 export default pt;
