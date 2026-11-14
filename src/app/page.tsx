@@ -8,6 +8,7 @@ import { SiteHeader, SiteFooter, ui } from './site-header';
 import { useT } from './i18n';
 import { rpc } from '../lib/supabase';
 import type { DictKey } from './i18n/es';
+import { HomeShowcase } from './home-showcase';
 
 // Funciones en orden de prioridad: lo que más buscan cobradores y vendedores a plazos va primero
 const FEATURES: { icon: string; n: number }[] = [
@@ -23,38 +24,6 @@ const FALLBACK: PublicPlan[] = [
   { code: 'pro', name: 'Pro', price_usd: 40, price_global_usd: 59, max_companies: 1, max_branches: 3, max_users: 15, max_storage_mb: 5120 },
   { code: 'enterprise', name: 'Enterprise', price_usd: 115, price_global_usd: 199, max_companies: 3, max_branches: 10, max_users: 50, max_storage_mb: 20480 },
 ];
-
-/** Vista de celular de la ruta del cobrador (ilustración hecha con la propia interfaz) */
-function PhoneMock() {
-  const { t } = useT();
-  const rows: [number, string, boolean][] = [[1, '150', true], [2, '80', true], [3, '200', false], [4, '120', false]];
-  return (
-    <div className="mx-auto w-full max-w-[19rem] rounded-[2.2rem] border-[10px] border-slate-900 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-950">
-      <div className="rounded-[1.6rem] p-4">
-        <div className="mx-auto mb-3 h-1.5 w-16 rounded-full bg-slate-200 dark:bg-slate-800" />
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-extrabold">🛵 {t('home.mock.route')}</p>
-          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">{t('home.mock.offline')}</span>
-        </div>
-        <div className="mt-3 rounded-xl bg-blue-600 p-3 text-white">
-          <p className="text-[11px] opacity-80">{t('home.mock.collected')}</p>
-          <p className="text-2xl font-extrabold">Bs 230</p>
-        </div>
-        <ul className="mt-3 space-y-2">
-          {rows.map(([n, amount, paid]) => (
-            <li key={n} className="flex items-center justify-between rounded-xl border border-slate-200 px-3 py-2 dark:border-slate-800">
-              <div>
-                <p className="text-xs font-bold">{t('home.mock.client', { n })}</p>
-                <p className="text-[10px] text-slate-500">{paid ? t('home.mock.paid') : t('home.mock.pending')}</p>
-              </div>
-              <span className={`text-sm font-extrabold ${paid ? 'text-emerald-600 dark:text-emerald-400' : ''}`}>Bs {amount}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-}
 
 export default function HomePage() {
   const { loaded, session } = useVeltrixAuth();
@@ -85,7 +54,7 @@ export default function HomePage() {
       <SiteHeader showAuthButtons={!(loaded && session)} />
 
       {/* PORTADA: resultado claro + prueba visual + confianza, todo en la primera pantalla */}
-      <section className={`${wrap} grid items-center gap-10 pt-8 pb-12 sm:pt-12 lg:grid-cols-[1.15fr_1fr] lg:pt-16`}>
+      <section className={`${wrap} grid items-center gap-12 pt-8 pb-10 sm:pt-12 lg:grid-cols-[1fr_1.2fr] lg:pt-16`}>
         <div className="text-center lg:text-start">
           <span className="rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
             {t('home.badge')}
@@ -104,7 +73,17 @@ export default function HomePage() {
             ))}
           </ul>
         </div>
-        <PhoneMock />
+        <HomeShowcase />
+      </section>
+
+      {/* TODO EN UNO: módulos incluidos */}
+      <section className={`${wrap} pb-6`}>
+        <p className={`text-center text-xs font-bold uppercase tracking-wide ${ui.muted}`}>{t('home.sc.allInOne')}</p>
+        <ul className="mt-3 flex flex-wrap justify-center gap-2 text-sm font-semibold">
+          {(['🛵', '🧾', '🛒', '💵', '📦', '📊', '🔐'] as const).map((ic, i) => (
+            <li key={i} className={`rounded-xl px-3 py-2 ${ui.card}`}>{ic} {k(`home.sc.mod${i + 1}`)}</li>
+          ))}
+        </ul>
       </section>
 
       {/* PROBLEMAS QUE RESUELVE */}
