@@ -7,6 +7,7 @@ import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
 import { money, parseAmount } from '../format';
 import { useStaff } from '../staff-context';
+import { CreditCard, applyPayment, freqOf, type Credit, type Freq } from './credit-card';
 
 /* ------------------------------------------------------------------
  * Cobrador de calle: trabaja SIN internet.
@@ -20,6 +21,8 @@ type VisitResult = 'no_one_home' | 'promise' | 'refused' | 'other';
 type Customer = {
   id: string; name: string; phone: string | null; address: string | null; lat: number | null; lng: number | null;
   balance: number; overdue: number; due_today: number; next_due: string | null; visited_today: boolean;
+  credits?: Credit[];
+  last_visit?: { at: string; result: VisitResult; notes: string | null; promise_date: string | null; promise_amount: number | null } | null;
 };
 type Settlement = { id: string; at: string; status: string; cash: number; expenses: number; deliver: number };
 type Route = {
@@ -29,7 +32,7 @@ type Route = {
 };
 type Day = { generated_at: string; routes: Route[] };
 type Op =
-  | { kind: 'payment'; id: string; at: string; route: string; customer: string; method: Method; amount: number }
+  | { kind: 'payment'; id: string; at: string; route: string; customer: string; method: Method; amount: number; order?: string }
   | { kind: 'visit'; id: string; at: string; route: string; customer: string; result: VisitResult; promise_date?: string; promise_amount?: number; notes?: string; lat?: number; lng?: number }
   | { kind: 'expense'; id: string; at: string; route: string; amount: number; description: string };
 
@@ -65,6 +68,10 @@ export default function CollectorPage() {
   const [routeId, setRouteId] = useState('');
   const [sel, setSel] = useState<Customer | null>(null);
   const [panel, setPanel] = useState<'pay' | 'visit' | 'expense' | 'settle' | null>(null);
+  const [view, setView] = useState<'cards' | 'list'>('list');
+  const [freq, setFreq] = useState<Freq | 'all'>('all');
+  useEffect(() => { const v = load<string>('vx_col_view', 'list'); if (v === 'cards' || v === 'list') setView(v); }, []);
+  const pickView = (v: 'cards' | 'list') => { setView(v); save('vx_col_view', v); };
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const flushing = useRef(false);
 
@@ -105,7 +112,7 @@ export default function CollectorPage() {
           if (op.kind === 'payment') {
             await rpc('register_payment', {
               p_customer: op.customer, p_origin: 'field_route', p_method: op.method, p_amount: op.amount,
-              p_route: op.route, p_offline_uuid: op.id, p_collected_at: op.at,
+              p_route: op.route, p_offline_uuid: op.id, p_collected_at: op.at, p_order: op.order ?? null,
             });
           } else if (op.kind === 'visit') {
             await rpc('collector_visit', {
@@ -158,8 +165,21 @@ export default function CollectorPage() {
             if (c.id !== op.customer) return c;
             if (op.kind === 'payment') {
               const paid = op.amount;
+              let credits = c.credits;
+              if (credits) {
+                if (op.order) credits = credits.map((k) => (k.id === op.order ? applyPayment(k, paid, op.at) : k));
+                else {
+                  let left = paid;
+                  credits = credits.map((k) => {
+                    const open = k.installments.reduce((s, i) => s + Math.max(0, Number(i.amount) - Number(i.paid)), 0);
+                    const take = Math.min(left, open);
+                    left -= take;
+                    return take > 0 ? applyPayment(k, take, op.at) : k;
+                  });
+                }
+              }
               return {
-                ...c, visited_today: true,
+                ...c, visited_today: true, credits,
                 balance: Math.max(0, Number(c.balance) - paid),
                 overdue: Math.max(0, Number(c.overdue) - paid),
                 due_today: Math.max(0, Number(c.due_today) - Math.max(0, paid - Number(c.overdue))),
@@ -197,6 +217,7 @@ export default function CollectorPage() {
   const pendingRoute = queue.filter((q) => q.route === route.id).length;
   const visited = route.customers.filter((c) => c.visited_today).length;
   const inHand = Number(route.unsettled_cash) - Number(route.unsettled_expenses);
+  const shown = freq === 'all' ? route.customers : route.customers.filter((c) => c.credits?.some((k) => freqOf(k) === freq));
 
   return (
     <div className="space-y-4">
@@ -249,10 +270,62 @@ export default function CollectorPage() {
         <button type="button" onClick={() => { setSel(null); setPanel('settle'); }} className={ui.btnGhost}>🏁 {t('col.settle')}</button>
       </div>
 
+      {/* Vista: tarjetas o lista, y frecuencia de cobro */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex rounded-xl border border-slate-300 p-0.5 dark:border-slate-700" role="tablist">
+          {(['cards', 'list'] as const).map((v) => (
+            <button key={v} type="button" role="tab" aria-selected={view === v} onClick={() => pickView(v)}
+              className={`rounded-lg px-3 py-1.5 text-sm font-bold cursor-pointer ${view === v ? 'bg-blue-600 text-white' : ''}`}>
+              {v === 'cards' ? `🗂️ ${t('card.viewCards')}` : `📋 ${t('card.viewList')}`}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-1">
+          {(['all', 'daily', 'weekly', 'biweekly', 'monthly'] as const).map((f) => {
+            const n = f === 'all' ? route.customers.length : route.customers.filter((c) => c.credits?.some((k) => freqOf(k) === f)).length;
+            if (f !== 'all' && n === 0) return null;
+            return (
+              <button key={f} type="button" onClick={() => setFreq(f)}
+                className={`rounded-full px-3 py-1 text-xs font-bold cursor-pointer ${freq === f ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'border border-slate-300 dark:border-slate-700'}`}>
+                {f === 'all' ? t('card.all') : t(`card.f.${f}` as DictKey)} · {n}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Tarjetas de cobro */}
+      {view === 'cards' && (
+        <div className="space-y-3">
+          {shown.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('col.noCustomers')}</p></Card>}
+          {shown.map((c) => (
+            <Card key={c.id} className={`space-y-3 ${c.visited_today ? 'opacity-80' : ''}`}>
+              <div className="flex items-start gap-3">
+                <span className="text-xl">{c.visited_today ? '✅' : Number(c.overdue) > 0 ? '🔴' : Number(c.due_today) > 0 ? '🟡' : '⚪'}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-bold">{c.name}</p>
+                  <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
+                  {c.last_visit && <Note v={c.last_visit} />}
+                </div>
+                <button type="button" onClick={() => { setSel(c); setPanel(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>👤 {t('card.profile')}</button>
+              </div>
+              {(c.credits ?? []).filter((k) => freq === 'all' || freqOf(k) === freq).map((k) => (
+                <CreditCard key={k.id} credit={k} today={route.today} fmt={fmt}
+                  onSave={(amount, method) => {
+                    enqueue({ kind: 'payment', id: crypto.randomUUID(), at: new Date().toISOString(), route: route.id, customer: c.id, method, amount, order: k.id });
+                    flash(true, online ? t('col.paySaved') : t('col.savedOffline'));
+                  }} />
+              ))}
+              {(c.credits ?? []).length === 0 && <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>}
+            </Card>
+          ))}
+        </div>
+      )}
+
       {/* Clientes del día: primero los vencidos */}
-      <ul className="space-y-2">
-        {route.customers.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('col.noCustomers')}</p></Card>}
-        {route.customers.map((c) => (
+      {view === 'list' && <ul className="space-y-2">
+        {shown.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('col.noCustomers')}</p></Card>}
+        {shown.map((c) => (
           <li key={c.id}>
             <button type="button" onClick={() => { setSel(c); setPanel(null); }}
               className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer ${ui.card} ${c.visited_today ? 'opacity-60' : ''} ${sel?.id === c.id ? 'ring-2 ring-blue-500' : ''}`}>
@@ -260,6 +333,7 @@ export default function CollectorPage() {
               <div className="min-w-0 flex-1">
                 <p className="truncate font-bold">{c.name}</p>
                 <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
+                {c.last_visit && <Note v={c.last_visit} />}
               </div>
               <div className="text-right">
                 <p className="text-sm font-extrabold">{fmt(Number(c.overdue) + Number(c.due_today))}</p>
@@ -268,7 +342,7 @@ export default function CollectorPage() {
             </button>
           </li>
         ))}
-      </ul>
+      </ul>}
 
       {/* Hoja inferior: cliente / gasto / rendición */}
       {(sel || panel) && (
@@ -312,6 +386,19 @@ export default function CollectorPage() {
         </div>
       )}
     </div>
+  );
+}
+
+/* ---------- Última anotación de visita ---------- */
+function Note({ v }: { v: NonNullable<Customer['last_visit']> }) {
+  const { t, lang } = useT();
+  const when = new Date(v.at).toLocaleDateString(lang, { day: '2-digit', month: '2-digit' });
+  return (
+    <p className="mt-1 line-clamp-2 rounded-lg bg-slate-50 px-2 py-1 text-[11px] text-slate-600 dark:bg-slate-800/60 dark:text-slate-300">
+      📝 {when} · {t(`col.v.${v.result}` as DictKey)}
+      {v.promise_date ? ` · ${t('card.promise', { date: new Date(v.promise_date + 'T12:00:00').toLocaleDateString(lang, { day: '2-digit', month: '2-digit' }) })}` : ''}
+      {v.notes ? ` · ${v.notes}` : ''}
+    </p>
   );
 }
 
