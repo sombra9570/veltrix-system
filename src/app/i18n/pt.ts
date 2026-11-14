@@ -1272,6 +1272,12 @@ const pt: Record<DictKey, string> = {
   "day.week": "Últimos 7 dias",
   "day.sinceLiqShort": "Desde o fechamento",
   "day.title": "Cobrado e emprestado por dia",
+  "day.auto": "Reinicia sozinho às 00:00",
+  "liq.delegated": "Permissões dadas pelo administrador",
+  "perm.routes.liquidate": "Fazer o fechamento de caixa",
+  "perm.routes.liquidate.d": "Fechamento de caixa (liquidação) da rota: contar o dinheiro e registrar despesas, pagamentos e retiradas.",
+  "perm.routes.invest": "Investir e retirar na caixa da rota",
+  "perm.routes.invest.d": "Colocar investimento ou tirar dinheiro da caixa da rota.",
 };
 
 export default pt;

@@ -1233,7 +1233,7 @@ const es = {
   "liq.opening": "Caja al último cierre",
   "liq.since": "Desde el último cierre de caja: {date}",
   "liq.noCutYet": "Todavía no hubo cierre de caja en esta ruta.",
-  "liq.collectorHint": "La caja se mantiene completa. Cada día haces el corte del día (cobrado y prestado). El cierre de caja o liquidación lo hace tu administrador o supervisor: cuentan el efectivo, registran gastos, pagos y retiros, y la caja queda cuadrada.",
+  "liq.collectorHint": "La caja se mantiene completa. Lo cobrado y prestado de cada día se corta solo a las 00:00. El cierre de caja (liquidación) lo hace quien tenga permiso del administrador: se cuenta el efectivo, se registran gastos, pagos y retiros, y la caja queda cuadrada.",
   "liq.history": "Últimos cierres de caja",
   "liq.lineSummary": "Esperado {expected} · contado {counted} · diferencia {diff}",
   "liq.cut": "Cierre de caja (liquidación)",
@@ -1281,6 +1281,12 @@ const es = {
   "day.week": "Últimos 7 días",
   "day.sinceLiqShort": "Desde el cierre",
   "day.title": "Cobrado y prestado por día",
+  "day.auto": "Se reinicia solo a las 00:00",
+  "liq.delegated": "Permisos que te dio el administrador",
+  "perm.routes.liquidate": "Hacer el cierre de caja",
+  "perm.routes.liquidate.d": "Cierre de caja (liquidación) de la ruta: contar el efectivo y registrar gastos, pagos y retiros.",
+  "perm.routes.invest": "Invertir y retirar en la caja de ruta",
+  "perm.routes.invest.d": "Meter inversión o sacar dinero de la caja de la ruta.",
 };
 
 export default es;

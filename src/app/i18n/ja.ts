@@ -1272,6 +1272,12 @@ const ja: Record<DictKey, string> = {
   "day.week": "直近7日",
   "day.sinceLiqShort": "締め以降",
   "day.title": "日別の回収と貸付",
+  "day.auto": "毎日 00:00 に自動リセット",
+  "liq.delegated": "管理者から付与された権限",
+  "perm.routes.liquidate": "資金の締めを行う",
+  "perm.routes.liquidate.d": "ルートの資金締め：現金を数え、経費・支払・引き出しを記録。",
+  "perm.routes.invest": "ルート資金の投資・引き出し",
+  "perm.routes.invest.d": "ルート資金に投資を入れる、またはお金を引き出す。",
 };
 
 export default ja;

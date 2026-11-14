@@ -10,6 +10,7 @@ import { useStaff } from '../staff-context';
 import { CreditCard, applyPayment, freqOf, type Credit, type Freq, type Method } from './credit-card';
 import { LoanForm, RATING_DOT, type LoanPolicy } from './loan-form';
 import { DaysTable, type DayRow } from './days-table';
+import { CutForm } from './cut-form';
 
 /* ------------------------------------------------------------------
  * Cobrador de calle: trabaja SIN internet.
@@ -31,7 +32,7 @@ type Route = {
   id: string; name: string; branch: string; currency: string; today: string;
   unsettled_cash: number; unsettled_digital: number; unsettled_expenses: number; unsettled_loans?: number;
   fund_balance?: number; fund_float?: number;
-  period?: Period; liquidations?: Liquidation[]; days?: DayRow[];
+  period?: Period; liquidations?: Liquidation[]; days?: DayRow[]; can_liquidate?: boolean; can_invest?: boolean;
   policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_interest?: boolean;
   customers: Customer[]; settlements: Settlement[];
 };
@@ -232,16 +233,6 @@ export default function CollectorPage() {
     enqueue({ kind: 'payment', id: crypto.randomUUID(), at: new Date().toISOString(), route: route.id, customer, method, amount, order });
     flash(true, online ? t('col.paySaved') : t('col.savedOffline'));
   };
-  const [dayBusy, setDayBusy] = useState(false);
-  const dayCut = async () => {
-    if (!route) return;
-    setDayBusy(true);
-    try {
-      const r = await rpc<{ cash: number; lent: number }>('route_day_cut', { p_route: route.id });
-      flash(true, t('day.done', { cash: fmt(r.cash), lent: fmt(r.lent) }));
-      await refresh();
-    } catch { flash(false, t('err.generic')); } finally { setDayBusy(false); }
-  };
   // La ficha abierta se mantiene al día con lo guardado (tarjetas marcadas)
   const selNow = sel ? route?.customers.find((x) => x.id === sel.id) ?? sel : null;
   const fmt = (n: number) => money(Number(n), route?.currency ?? 'USD', lang);
@@ -308,18 +299,13 @@ export default function CollectorPage() {
         <Card className="!p-3">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-bold">📅 {t('day.today')}</p>
-            {todayRow?.cut_at
-              ? <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">✓ {t('day.cutAt', { time: new Date(todayRow.cut_at).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' }) })}</span>
-              : <span className={`text-[11px] ${ui.muted}`}>{t('day.open')}</span>}
+            <span className={`text-[11px] ${ui.muted}`}>{t('day.auto')}</span>
           </div>
           <div className="mt-2 grid grid-cols-3 gap-2 text-center">
             <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.cash')}</p><p className="font-extrabold">{fmt(todayRow?.cash ?? 0)}</p></div>
             <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('loan.lent')}</p><p className="font-extrabold text-violet-600 dark:text-violet-400">{fmt(todayRow?.lent ?? 0)}</p></div>
             <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.expenses')}</p><p className="font-extrabold text-red-600 dark:text-red-400">{fmt(todayRow?.expenses ?? 0)}</p></div>
           </div>
-          <button type="button" disabled={!online || dayBusy || queue.length > 0} onClick={dayCut} className={`${ui.btnGhost} mt-3 w-full !py-2 text-sm`}>
-            ✂️ {todayRow?.cut_at ? t('day.recut') : t('day.cut')}{!online ? ` · ${t('loan.needsSignal')}` : queue.length > 0 ? ` · ${t('day.syncFirst')}` : ''}
-          </button>
         </Card>
       )}
       {fund !== null && <p className={`text-xs font-bold uppercase ${ui.muted}`}>{t('day.sinceLiq')}</p>}
@@ -470,7 +456,8 @@ export default function CollectorPage() {
                 canCustomers={route.can_customers !== false} fmt={fmt}
                 onDone={async (text, ok) => { flash(ok, text); setPanel(null); await refresh(); }} />
             )}
-            {panel === 'settle' && fund !== null && <PeriodSheet route={route} fmt={fmt} fund={fund} />}
+            {panel === 'settle' && fund !== null && <PeriodSheet route={route} fmt={fmt} fund={fund} online={online}
+              onChanged={async (text) => { flash(true, text); await refresh(); }} onError={(text) => flash(false, text)} />}
             {panel === 'settle' && fund === null && (
               <SettleSheet route={route} fmt={fmt} online={online} pending={pendingRoute}
                 onClosed={async () => { await refresh(); flash(true, t('col.settled')); setPanel(null); }} />
@@ -688,8 +675,25 @@ function ExpenseForm({ onDone }: { onDone: (amount: number, description: string)
 }
 
 /* ---------- Resumen desde el último corte (la caja la cuadra el administrador o supervisor) ---------- */
-function PeriodSheet({ route, fmt, fund }: { route: Route; fmt: (n: number) => string; fund: number }) {
+function PeriodSheet({ route, fmt, fund, online, onChanged, onError }: {
+  route: Route; fmt: (n: number) => string; fund: number; online: boolean;
+  onChanged: (text: string) => Promise<void>; onError: (text: string) => void;
+}) {
   const { t, lang } = useT();
+  const [cutting, setCutting] = useState(false);
+  const [mv, setMv] = useState<{ type: 'investment' | 'withdrawal'; amount: string; note: string } | null>(null);
+  const moveFund = async () => {
+    if (!mv) return;
+    const n = parseAmount(mv.amount);
+    if (Number.isNaN(n) || n <= 0) return;
+    try {
+      await rpc('route_fund_move', { p_route: route.id, p_type: mv.type, p_amount: n, p_note: mv.note || null });
+      setMv(null); await onChanged(t('fund.saved'));
+    } catch (e) {
+      const m = (e as Error).message;
+      onError(m.includes('ROUTE_FUND_LOW') ? t('fund.low') : m.includes('ROUTE_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic'));
+    }
+  };
   const p = route.period;
   const cash = Number(route.unsettled_cash), exp = Number(route.unsettled_expenses), lent = Number(route.unsettled_loans ?? 0);
   const start = fund - (cash - exp - lent);
@@ -707,6 +711,31 @@ function PeriodSheet({ route, fmt, fund }: { route: Route; fmt: (n: number) => s
       </ul>
       {(route.days ?? []).length > 0 && <DaysTable days={route.days ?? []} fmt={fmt} />}
       <p className="rounded-xl bg-slate-50 p-3 text-xs dark:bg-slate-800/50">✂️ {t('liq.collectorHint')}</p>
+      {(route.can_liquidate || route.can_invest) && route.period && (
+        <div className="space-y-2 rounded-xl border border-blue-200 p-3 dark:border-blue-500/30">
+          <p className="text-xs font-bold">🔑 {t('liq.delegated')}</p>
+          {!online && <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">{t('loan.e.offline')}</p>}
+          {cutting ? (
+            <CutForm routeId={route.id} routeName={route.name} period={route.period} m={fmt} onCancel={() => setCutting(false)}
+              onDone={async (text) => { setCutting(false); await onChanged(text); }} onError={onError} />
+          ) : mv ? (
+            <div className="grid gap-2">
+              <input inputMode="decimal" autoFocus placeholder={t('cash.amount')} value={mv.amount} onChange={(e) => setMv({ ...mv, amount: e.target.value })} className={ui.input} />
+              <input placeholder={t('cust.notes')} value={mv.note} onChange={(e) => setMv({ ...mv, note: e.target.value })} className={ui.input} />
+              <div className="grid grid-cols-2 gap-2">
+                <button type="button" onClick={() => setMv(null)} className={ui.btnGhost}>{t('card.cancel')}</button>
+                <button type="button" disabled={!online} onClick={moveFund} className={ui.btnPrimary}>{mv.type === 'investment' ? `➕ ${t('fund.invest')}` : `➖ ${t('fund.withdraw')}`}</button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {route.can_liquidate && <button type="button" disabled={!online} onClick={() => setCutting(true)} className={`${ui.btnPrimary} !py-2 text-sm`}>✂️ {t('liq.cut')}</button>}
+              {route.can_invest && <button type="button" disabled={!online} onClick={() => setMv({ type: 'investment', amount: '', note: '' })} className={`${ui.btnGhost} !py-2 text-sm`}>➕ {t('fund.invest')}</button>}
+              {route.can_invest && <button type="button" disabled={!online} onClick={() => setMv({ type: 'withdrawal', amount: '', note: '' })} className={`${ui.btnGhost} !py-2 text-sm`}>➖ {t('fund.withdraw')}</button>}
+            </div>
+          )}
+        </div>
+      )}
       {(route.liquidations ?? []).length > 0 && (
         <div>
           <p className={ui.label}>{t('liq.history')}</p>

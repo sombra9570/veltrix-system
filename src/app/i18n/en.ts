@@ -1224,7 +1224,7 @@ const en: Record<DictKey, string> = {
   "liq.opening": "Cash at last cut",
   "liq.since": "Since the last cut: {date}",
   "liq.noCutYet": "No cash cut on this route yet.",
-  "liq.collectorHint": "The cash stays whole. Each day you do the day cut (collected and lent). Your administrator or supervisor does the cash closing: they count the cash, record expenses, payments and withdrawals, and the cash is squared.",
+  "liq.collectorHint": "The cash stays whole. Each day's collected and lent amounts cut automatically at 00:00. The cash closing (settlement) is done by whoever the administrator allows: the cash is counted, expenses, payments and withdrawals are recorded, and the cash is squared.",
   "liq.history": "Last cash closings",
   "liq.lineSummary": "Expected {expected} · counted {counted} · difference {diff}",
   "liq.cut": "Cash closing (settlement)",
@@ -1272,6 +1272,12 @@ const en: Record<DictKey, string> = {
   "day.week": "Last 7 days",
   "day.sinceLiqShort": "Since closing",
   "day.title": "Collected and lent by day",
+  "day.auto": "Resets by itself at 00:00",
+  "liq.delegated": "Permissions given by your administrator",
+  "perm.routes.liquidate": "Do the cash closing",
+  "perm.routes.liquidate.d": "Route cash closing (settlement): count the cash and record expenses, payments and withdrawals.",
+  "perm.routes.invest": "Invest and withdraw in route cash",
+  "perm.routes.invest.d": "Put investment in or take money out of the route cash.",
 };
 
 export default en;

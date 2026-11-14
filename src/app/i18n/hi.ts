@@ -1272,6 +1272,12 @@ const hi: Record<DictKey, string> = {
   "day.week": "पिछले 7 दिन",
   "day.sinceLiqShort": "कट से",
   "day.title": "दिन अनुसार वसूली और ऋण",
+  "day.auto": "00:00 पर अपने आप रीसेट",
+  "liq.delegated": "प्रशासक द्वारा दी गई अनुमतियाँ",
+  "perm.routes.liquidate": "कैश कट करना",
+  "perm.routes.liquidate.d": "रूट का कैश कट: नकदी गिनना और ख़र्च, भुगतान व निकासी दर्ज करना।",
+  "perm.routes.invest": "रूट कैश में निवेश और निकासी",
+  "perm.routes.invest.d": "रूट कैश में निवेश डालना या पैसा निकालना।",
 };
 
 export default hi;

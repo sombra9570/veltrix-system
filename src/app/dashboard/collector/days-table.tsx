@@ -13,7 +13,7 @@ export function DaysTable({ days, fmt }: { days: DayRow[]; fmt: (n: number) => s
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead><tr className={`text-left text-[11px] uppercase ${ui.muted}`}>
-          <th className="py-1">{t('day.date')}</th><th className="py-1 text-end">{t('col.cash')}</th><th className="py-1 text-end">{t('loan.lent')}</th><th className="py-1 text-end">{t('col.expenses')}</th><th />
+          <th className="py-1">{t('day.date')}</th><th className="py-1 text-end">{t('col.cash')}</th><th className="py-1 text-end">{t('loan.lent')}</th><th className="py-1 text-end">{t('col.expenses')}</th>
         </tr></thead>
         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
           {days.map((d) => (
@@ -22,13 +22,12 @@ export function DaysTable({ days, fmt }: { days: DayRow[]; fmt: (n: number) => s
               <td className="py-1 text-end font-semibold">{fmt(d.cash)}</td>
               <td className="py-1 text-end font-semibold text-violet-600 dark:text-violet-400">{fmt(d.lent)}</td>
               <td className="py-1 text-end text-red-600 dark:text-red-400">{fmt(d.expenses)}</td>
-              <td className="py-1 text-end text-xs">{d.cut_at ? '✂️' : ''}</td>
             </tr>
           ))}
         </tbody>
         <tfoot className="text-sm font-extrabold">
-          <tr className="border-t border-slate-300 dark:border-slate-700"><td className="py-1">{t('day.week')}</td><td className="py-1 text-end">{fmt(week.cash)}</td><td className="py-1 text-end">{fmt(week.lent)}</td><td /><td /></tr>
-          <tr><td className="py-1">{t('day.sinceLiqShort')}</td><td className="py-1 text-end">{fmt(tot.cash)}</td><td className="py-1 text-end">{fmt(tot.lent)}</td><td className="py-1 text-end">{fmt(tot.exp)}</td><td /></tr>
+          <tr className="border-t border-slate-300 dark:border-slate-700"><td className="py-1">{t('day.week')}</td><td className="py-1 text-end">{fmt(week.cash)}</td><td className="py-1 text-end">{fmt(week.lent)}</td><td /></tr>
+          <tr><td className="py-1">{t('day.sinceLiqShort')}</td><td className="py-1 text-end">{fmt(tot.cash)}</td><td className="py-1 text-end">{fmt(tot.lent)}</td><td className="py-1 text-end">{fmt(tot.exp)}</td></tr>
         </tfoot>
       </table>
     </div>

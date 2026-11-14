@@ -1272,6 +1272,12 @@ const zh: Record<DictKey, string> = {
   "day.week": "近 7 天",
   "day.sinceLiqShort": "自结账",
   "day.title": "每日收款与放款",
+  "day.auto": "每天 00:00 自动重置",
+  "liq.delegated": "管理员授予你的权限",
+  "perm.routes.liquidate": "进行结账",
+  "perm.routes.liquidate.d": "路线结账：清点现金并登记支出、付款和取款。",
+  "perm.routes.invest": "在路线资金中投资和取款",
+  "perm.routes.invest.d": "向路线资金投入或从中取出资金。",
 };
 
 export default zh;

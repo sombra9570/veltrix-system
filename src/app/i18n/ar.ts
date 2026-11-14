@@ -1272,6 +1272,12 @@ const ar: Record<DictKey, string> = {
   "day.week": "آخر 7 أيام",
   "day.sinceLiqShort": "منذ التسوية",
   "day.title": "المحصَّل والمُقرض يوميًا",
+  "day.auto": "يُصفَّر تلقائيًا عند 00:00",
+  "liq.delegated": "صلاحيات منحها لك المدير",
+  "perm.routes.liquidate": "إجراء تسوية الصندوق",
+  "perm.routes.liquidate.d": "تسوية صندوق الجولة: عدّ النقد وتسجيل المصروفات والمدفوعات والسحوبات.",
+  "perm.routes.invest": "الاستثمار والسحب من صندوق الجولة",
+  "perm.routes.invest.d": "إضافة استثمار أو سحب مال من صندوق الجولة.",
 };
 
 export default ar;

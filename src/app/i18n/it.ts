@@ -1272,6 +1272,12 @@ const it: Record<DictKey, string> = {
   "day.week": "Ultimi 7 giorni",
   "day.sinceLiqShort": "Dalla chiusura",
   "day.title": "Incassato e prestato per giorno",
+  "day.auto": "Si azzera da solo alle 00:00",
+  "liq.delegated": "Permessi dati dall'amministratore",
+  "perm.routes.liquidate": "Fare la chiusura di cassa",
+  "perm.routes.liquidate.d": "Chiusura di cassa del giro: contare i contanti e registrare spese, pagamenti e prelievi.",
+  "perm.routes.invest": "Investire e prelevare dalla cassa del giro",
+  "perm.routes.invest.d": "Mettere investimento o prelevare denaro dalla cassa del giro.",
 };
 
 export default it;

@@ -1272,6 +1272,12 @@ const de: Record<DictKey, string> = {
   "day.week": "Letzte 7 Tage",
   "day.sinceLiqShort": "Seit Abschluss",
   "day.title": "Kassiert und verliehen pro Tag",
+  "day.auto": "Setzt sich um 00:00 selbst zurück",
+  "liq.delegated": "Vom Administrator erteilte Rechte",
+  "perm.routes.liquidate": "Kassenabschluss durchführen",
+  "perm.routes.liquidate.d": "Kassenabschluss der Tour: Bargeld zählen und Ausgaben, Zahlungen und Entnahmen erfassen.",
+  "perm.routes.invest": "In der Tourkasse investieren und entnehmen",
+  "perm.routes.invest.d": "Investition einlegen oder Geld aus der Tourkasse nehmen.",
 };
 
 export default de;

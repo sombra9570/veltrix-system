@@ -1272,6 +1272,12 @@ const fr: Record<DictKey, string> = {
   "day.week": "7 derniers jours",
   "day.sinceLiqShort": "Depuis la clôture",
   "day.title": "Encaissé et prêté par jour",
+  "day.auto": "Se remet à zéro seul à 00:00",
+  "liq.delegated": "Autorisations données par l'administrateur",
+  "perm.routes.liquidate": "Faire la clôture de caisse",
+  "perm.routes.liquidate.d": "Clôture de caisse de la tournée : compter l'argent et enregistrer dépenses, paiements et retraits.",
+  "perm.routes.invest": "Investir et retirer dans la caisse de tournée",
+  "perm.routes.invest.d": "Ajouter un investissement ou retirer de l'argent de la caisse de la tournée.",
 };
 
 export default fr;

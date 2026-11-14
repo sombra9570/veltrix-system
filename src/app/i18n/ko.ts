@@ -1272,6 +1272,12 @@ const ko: Record<DictKey, string> = {
   "day.week": "최근 7일",
   "day.sinceLiqShort": "정산 이후",
   "day.title": "일별 수금과 대출",
+  "day.auto": "매일 00:00에 자동 초기화",
+  "liq.delegated": "총괄 관리자가 준 권한",
+  "perm.routes.liquidate": "자금 정산 하기",
+  "perm.routes.liquidate.d": "노선 자금 정산: 현금을 세고 경비·지급·인출을 기록.",
+  "perm.routes.invest": "노선 자금 투자·인출",
+  "perm.routes.invest.d": "노선 자금에 투자하거나 돈을 인출.",
 };
 
 export default ko;

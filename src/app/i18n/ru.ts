@@ -1272,6 +1272,12 @@ const ru: Record<DictKey, string> = {
   "day.week": "Последние 7 дней",
   "day.sinceLiqShort": "С инкассации",
   "day.title": "Собрано и выдано по дням",
+  "day.auto": "Сбрасывается сам в 00:00",
+  "liq.delegated": "Права, выданные администратором",
+  "perm.routes.liquidate": "Проводить инкассацию",
+  "perm.routes.liquidate.d": "Инкассация маршрута: пересчитать наличные и записать расходы, выплаты и изъятия.",
+  "perm.routes.invest": "Вкладывать и изымать из кассы маршрута",
+  "perm.routes.invest.d": "Вносить инвестиции или забирать деньги из кассы маршрута.",
 };
 
 export default ru;
