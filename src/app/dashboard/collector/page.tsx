@@ -7,6 +7,7 @@ import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
 import { money, parseAmount } from '../format';
 import { useStaff } from '../staff-context';
+import { useSync } from '../sync';
 import { CreditCard, applyPayment, freqOf, type Credit, type Freq, type Method } from './credit-card';
 import { LoanForm, RATING_DOT, type LoanPolicy } from './loan-form';
 import { DaysTable, type DayRow } from './days-table';
@@ -121,7 +122,8 @@ export default function CollectorPage() {
   }, [DAY_KEY]);
 
   // Envía la cola, de a uno y en orden
-  const flush = useCallback(async () => {
+  const flush = useCallback(async (force = false) => {
+    let sent = 0;
     if (flushing.current) return;
     flushing.current = true;
     setSyncing(true);
@@ -145,6 +147,8 @@ export default function CollectorPage() {
           } else {
             await rpc('collector_expense', { p_route: op.route, p_amount: op.amount, p_description: op.description, p_offline_uuid: op.id });
           }
+          sent++;
+          await new Promise((r) => setTimeout(r, 150)); // de a uno, sin saturar la señal
         } catch (err) {
           const m = (err as Error).message;
           // Sin señal: se reintenta más tarde. Rechazo real (p. ej. monto mayor a la deuda): se descarta y se avisa.
@@ -159,16 +163,20 @@ export default function CollectorPage() {
       flushing.current = false;
       setSyncing(false);
     }
-    await refresh();
+    // Solo vuelve a descargar el día si se envió algo o si se pidió
+    if (sent > 0 || force) await refresh();
   }, [QUEUE_KEY, refresh, t]);
 
-  // Al abrir y cada vez que vuelve la señal: sincroniza; además cada 60 s
+  // Al abrir y al volver la señal: envía lo pendiente y actualiza el día.
+  // Si quedó algo sin enviar, reintenta cada 5 min (solo si hay pendientes).
   useEffect(() => {
     if (!online) return;
-    flush();
-    const id = setInterval(flush, 60_000);
+    flush(true);
+    const id = setInterval(() => { if (load<Op[]>(QUEUE_KEY, []).length > 0) flush(); }, 5 * 60_000);
     return () => clearInterval(id);
-  }, [online, flush]);
+  }, [online, flush, QUEUE_KEY]);
+  // El día completo se vuelve a descargar unas 5 veces al día o con el botón ↻
+  useSync(refresh);
 
   const enqueue = (op: Op) => {
     const next = [...load<Op[]>(QUEUE_KEY, []), op];
@@ -265,7 +273,7 @@ export default function CollectorPage() {
           {' · '}{t('col.updated', { time: new Date(day.generated_at).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' }) })}
         </span>
         {online && (
-          <button type="button" onClick={flush} disabled={syncing} className="rounded-lg border border-current px-2.5 py-1 text-xs cursor-pointer disabled:opacity-50">
+          <button type="button" onClick={() => flush(true)} disabled={syncing} className="rounded-lg border border-current px-2.5 py-1 text-xs cursor-pointer disabled:opacity-50">
             {syncing ? '…' : `↻ ${t('col.sync')}`}
           </button>
         )}

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { rpc } from '../../../lib/supabase';
 import { Card } from '../shell';
 import { ui } from '../../site-header';
+import { useSync } from '../sync';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
 import { money, shortTime, parseAmount } from '../format';
@@ -75,12 +76,8 @@ export default function CashierPage() {
     } catch { /* sin conexión: se reintenta en el próximo ciclo */ }
   }, []);
 
-  // Carga inicial y actualización automática cada 20 s
-  useEffect(() => {
-    load();
-    const id = setInterval(load, 20_000);
-    return () => clearInterval(id);
-  }, [load]);
+  useEffect(() => { load(); }, [load]);
+  useSync(load);
 
   const flash = (ok: boolean, text: string) => {
     setMsg({ ok, text });

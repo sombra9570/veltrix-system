@@ -1292,6 +1292,10 @@ const pt: Record<DictKey, string> = {
   "owner.planStrip": "Plano {plan}",
   "owner.renews": "renova em {date}",
   "owner.changePlan": "Renovar ou mudar de plano",
+  "sync.last": "Última sincronização {time}. Toque para sincronizar agora.",
+  "sync.offline": "Sem conexão: sincroniza sozinho quando o sinal voltar.",
+  "sync.running": "Sincronizando…",
+  "sync.offlineShort": "Sem sinal",
 };
 
 export default pt;

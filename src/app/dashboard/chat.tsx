@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase, rpc } from '../../lib/supabase';
 import { Card } from './shell';
 import { ui } from '../site-header';
+import { useSync } from './sync';
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 import { compressImage, extFor } from './image';
@@ -47,9 +48,8 @@ export function ChatScreen() {
   }, []);
   useEffect(() => {
     loadChannels();
-    const id = setInterval(loadChannels, 30_000);
-    return () => clearInterval(id);
   }, [loadChannels]);
+  useSync(loadChannels, 5 * 60_000);
 
   // Enlaces temporales para ver fotos privadas
   const signPhotos = useCallback(async (list: Msg[]) => {

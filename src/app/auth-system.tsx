@@ -7,7 +7,7 @@
 //  pero ahora los datos viven en la base de datos real, no en el navegador.
 //  La versión anterior (demo con localStorage) quedó en /respaldo.
 // =====================================================================
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase, rpc } from '../lib/supabase';
 import { COUNTRIES, CountryCode, TaxRegimeId, BusinessSectorId } from './language-selector';
 
@@ -150,13 +150,51 @@ function isOfflineError(e: { message?: string; name?: string }) {
     || /fetch|network|Retryable/i.test(`${e.name ?? ''} ${e.message ?? ''}`);
 }
 
-export function useVeltrixAuth() {
-  const [companies, setCompanies] = useState<TenantCompany[]>([]);
-  const [workers, setWorkers] = useState<WorkerAccount[]>([]);
-  const [session, setSession] = useState<ActiveSession | null>(null);
-  const [loaded, setLoaded] = useState(false);
+// ----- Sesión compartida por toda la app: se carga UNA vez y la usan todos los paneles -----
+// Antes cada pantalla volvía a pedir la sesión y los datos al servidor; ahora hay un solo estado
+// en memoria, que se valida en segundo plano y se refresca solo al entrar/salir o al sincronizar.
+type AuthState = { companies: TenantCompany[]; workers: WorkerAccount[]; session: ActiveSession | null; loaded: boolean };
+let authState: AuthState = { companies: [], workers: [], session: null, loaded: false };
+const authListeners = new Set<(s: AuthState) => void>();
+const emitAuth = (patch: Partial<AuthState>) => { authState = { ...authState, ...patch }; authListeners.forEach((l) => l(authState)); };
+const setCompanies = (v: TenantCompany[]) => { emitAuth({ companies: v }); try { localStorage.setItem(COMPANIES_KEY, JSON.stringify(v)); } catch { /* */ } };
+const setWorkers = (v: WorkerAccount[]) => emitAuth({ workers: v });
+const setSession = (v: ActiveSession | null) => emitAuth({ session: v });
+const setLoaded = (v: boolean) => emitAuth({ loaded: v });
+const COMPANIES_KEY = 'vx_last_companies';
+let authInflight: Promise<ActiveSession | null> | null = null;
+let authStarted = false;
 
-  const load = useCallback(async (): Promise<ActiveSession | null> => {
+/** Carga (o recarga) la sesión; si ya hay una carga en curso, se reutiliza */
+export function loadAuth(): Promise<ActiveSession | null> {
+  if (!authInflight) authInflight = loadAuthImpl().finally(() => { authInflight = null; });
+  return authInflight;
+}
+
+/** Primera vez: muestra al instante la sesión guardada en el teléfono y la valida en segundo plano */
+async function startAuth() {
+  if (authStarted) return;
+  authStarted = true;
+  try {
+    const { data: local } = await supabase.auth.getSession();
+    const cached = readCachedSession();
+    if (local.session && cached && cached.userId === local.session.user.id) {
+      let comps: TenantCompany[] = [];
+      try { comps = JSON.parse(localStorage.getItem(COMPANIES_KEY) ?? '[]'); } catch { /* */ }
+      emitAuth({ session: cached, companies: comps, loaded: true });
+    }
+  } catch { /* */ }
+  loadAuth();
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') {
+      emitAuth({ session: null, companies: [], workers: [] });
+      writeCachedSession(null);
+      try { localStorage.removeItem(COMPANIES_KEY); } catch { /* */ }
+    }
+  });
+}
+
+async function loadAuthImpl(): Promise<ActiveSession | null> {
     const { data: auth, error: authError } = await supabase.auth.getUser();
     // Sin internet (cobrador en la calle): se usa la última sesión guardada en el teléfono
     if (authError && isOfflineError(authError)) {
@@ -260,15 +298,18 @@ export function useVeltrixAuth() {
     setLoaded(true);
     writeCachedSession(s);
     return s;
-  }, []);
+}
 
+export function useVeltrixAuth() {
+  const [snap, setSnap] = useState<AuthState>(authState);
   useEffect(() => {
-    load();
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') { setSession(null); setCompanies([]); setWorkers([]); writeCachedSession(null); }
-    });
-    return () => sub.subscription.unsubscribe();
-  }, [load]);
+    authListeners.add(setSnap);
+    setSnap(authState);
+    startAuth();
+    return () => { authListeners.delete(setSnap); };
+  }, []);
+  const { companies, workers, session, loaded } = snap;
+  const load = loadAuth;
 
   const login = async (
     emailInput: string,

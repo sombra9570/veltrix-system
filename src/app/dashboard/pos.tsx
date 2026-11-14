@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { rpc } from '../../lib/supabase';
 import { Card } from './shell';
 import { ui } from '../site-header';
+import { useSync } from './sync';
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 import { money, shortTime } from './format';
@@ -87,9 +88,8 @@ export function PosScreen() {
 
   useEffect(() => {
     load();
-    const id = setInterval(load, 30_000);
-    return () => clearInterval(id);
   }, [load]);
+  useSync(load);
 
   const flash = (ok: boolean, text: string) => {
     setMsg({ ok, text });

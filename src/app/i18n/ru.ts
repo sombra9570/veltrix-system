@@ -1292,6 +1292,10 @@ const ru: Record<DictKey, string> = {
   "owner.planStrip": "Тариф {plan}",
   "owner.renews": "продлевается {date}",
   "owner.changePlan": "Продлить или сменить тариф",
+  "sync.last": "Последняя синхронизация {time}. Нажмите, чтобы синхронизировать.",
+  "sync.offline": "Нет связи: синхронизация пройдёт сама при появлении сети.",
+  "sync.running": "Синхронизация…",
+  "sync.offlineShort": "Нет сети",
 };
 
 export default ru;

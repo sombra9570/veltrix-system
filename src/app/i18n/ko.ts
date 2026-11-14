@@ -1292,6 +1292,10 @@ const ko: Record<DictKey, string> = {
   "owner.planStrip": "{plan} 요금제",
   "owner.renews": "{date} 갱신",
   "owner.changePlan": "갱신 또는 요금제 변경",
+  "sync.last": "마지막 동기화 {time}. 눌러서 지금 동기화.",
+  "sync.offline": "오프라인: 신호가 돌아오면 자동 동기화됩니다.",
+  "sync.running": "동기화 중…",
+  "sync.offlineShort": "오프라인",
 };
 
 export default ko;

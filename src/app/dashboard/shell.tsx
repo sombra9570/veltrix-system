@@ -7,6 +7,8 @@ import { ThemeToggle } from '../theme';
 import { HelpButton } from './help';
 import { RegionSelectors, ui } from '../site-header';
 import { useT } from '../i18n';
+import { useSync, SyncButton } from './sync';
+import { loadAuth } from '../auth-system';
 import type { DictKey } from '../i18n/es';
 
 export type NavItem = { href: string; icon: string; label: DictKey; soon?: boolean; module?: string };
@@ -32,12 +34,10 @@ export function AppShell({
   const [unread, setUnread] = useState(0);
 
   // Mensajes sin leer del equipo (insignia en "Mensajes")
-  useEffect(() => {
-    const load = () => rpc<number>('chat_unread_total').then((n) => setUnread(n ?? 0)).catch(() => {});
-    load();
-    const id = setInterval(load, 45_000);
-    return () => clearInterval(id);
-  }, [pathname]);
+  const loadUnread = () => rpc<number>('chat_unread_total').then((n) => setUnread(n ?? 0)).catch(() => {});
+  useEffect(() => { loadUnread(); }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+  useSync(loadUnread, 5 * 60_000);
+  useSync(loadAuth);
 
   // Menú móvil: se cierra con Escape y no deja mover la página de fondo
   useEffect(() => {
@@ -144,6 +144,7 @@ export function AppShell({
           <p className="truncate text-sm font-bold text-slate-900 lg:hidden dark:text-white">{orgName}</p>
           <div className="ml-auto flex items-center gap-2 rtl:ml-0 rtl:mr-auto">
             <div className="hidden sm:block"><RegionSelectors /></div>
+            <SyncButton />
             <HelpButton />
             <ThemeToggle />
           </div>

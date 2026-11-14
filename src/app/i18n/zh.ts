@@ -1292,6 +1292,10 @@ const zh: Record<DictKey, string> = {
   "owner.planStrip": "{plan} 套餐",
   "owner.renews": "{date} 续费",
   "owner.changePlan": "续费或更换套餐",
+  "sync.last": "上次同步 {time}，点击立即同步。",
+  "sync.offline": "离线：恢复网络后会自动同步。",
+  "sync.running": "同步中…",
+  "sync.offlineShort": "离线",
 };
 
 export default zh;

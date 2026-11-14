@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase, rpc } from '../../lib/supabase';
 import { Card } from './shell';
 import { ui } from '../site-header';
+import { useSync } from './sync';
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 import { money, parseAmount } from './format';
@@ -54,9 +55,9 @@ export function TablesScreen({ manage = false }: { manage?: boolean }) {
 
   useEffect(() => {
     loadBoard();
-    const id = setInterval(() => { loadBoard(); if (order?.id) loadOrder(order.id); }, 15_000);
-    return () => clearInterval(id);
-  }, [loadBoard, loadOrder, order?.id]);
+  }, [loadBoard]);
+  // Mesas en vivo, pero solo con la pantalla visible
+  useSync(() => { loadBoard(); if (order?.id) loadOrder(order.id); }, 20_000);
 
   const openTable = async (tb: Table) => {
     try {
@@ -407,9 +408,8 @@ export function KitchenScreen() {
   }, [branchId]);
   useEffect(() => {
     load();
-    const id = setInterval(load, 10_000);
-    return () => clearInterval(id);
   }, [load]);
+  useSync(load, 15_000);
 
   const move = async (it: KItem) => {
     const next = it.kitchen_status === 'pending' ? 'preparing' : it.kitchen_status === 'preparing' ? 'ready' : 'served';

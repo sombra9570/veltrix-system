@@ -1292,6 +1292,10 @@ const ar: Record<DictKey, string> = {
   "owner.planStrip": "خطة {plan}",
   "owner.renews": "تتجدد في {date}",
   "owner.changePlan": "تجديد أو تغيير الخطة",
+  "sync.last": "آخر مزامنة {time}. اضغط للمزامنة الآن.",
+  "sync.offline": "غير متصل: تتم المزامنة تلقائيًا عند عودة الإشارة.",
+  "sync.running": "جارٍ المزامنة…",
+  "sync.offlineShort": "بلا إشارة",
 };
 
 export default ar;

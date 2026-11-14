@@ -1290,7 +1290,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
           timeZone: selectedTimezone.tz,
           hour: '2-digit',
           minute: '2-digit',
-          second: '2-digit',
           hour12: false,
         }).format(now);
         setLocalTime(formatted);
@@ -1299,7 +1298,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       }
     };
     updateClock();
-    const timer = setInterval(updateClock, 1000);
+    // Una vez por minuto (antes cada segundo redibujaba toda la app)
+    const timer = setInterval(updateClock, 60_000);
     return () => clearInterval(timer);
   }, [rawCountry.locale, selectedTimezone]);
 

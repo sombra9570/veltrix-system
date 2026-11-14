@@ -1301,6 +1301,10 @@ const es = {
   "owner.planStrip": "Plan {plan}",
   "owner.renews": "se renueva el {date}",
   "owner.changePlan": "Renovar o cambiar de plan",
+  "sync.last": "Última sincronización {time}. Toca para sincronizar ahora.",
+  "sync.offline": "Sin conexión: se sincroniza solo al volver la señal.",
+  "sync.running": "Sincronizando…",
+  "sync.offlineShort": "Sin señal",
 };
 
 export default es;

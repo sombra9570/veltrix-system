@@ -1292,6 +1292,10 @@ const fr: Record<DictKey, string> = {
   "owner.planStrip": "Forfait {plan}",
   "owner.renews": "renouvellement le {date}",
   "owner.changePlan": "Renouveler ou changer de forfait",
+  "sync.last": "Dernière synchro {time}. Touchez pour synchroniser.",
+  "sync.offline": "Hors ligne : se synchronise seul au retour du réseau.",
+  "sync.running": "Synchronisation…",
+  "sync.offlineShort": "Hors ligne",
 };
 
 export default fr;

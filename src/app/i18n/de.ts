@@ -1292,6 +1292,10 @@ const de: Record<DictKey, string> = {
   "owner.planStrip": "Tarif {plan}",
   "owner.renews": "verlängert sich am {date}",
   "owner.changePlan": "Verlängern oder Tarif wechseln",
+  "sync.last": "Letzte Synchronisierung {time}. Tippen zum Synchronisieren.",
+  "sync.offline": "Offline: synchronisiert sich bei Empfang von selbst.",
+  "sync.running": "Synchronisiere…",
+  "sync.offlineShort": "Offline",
 };
 
 export default de;

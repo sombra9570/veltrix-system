@@ -1,24 +1,31 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { supabase, rpc } from '../../lib/supabase';
 import { useLanguage, LangCode } from '../language-selector';
 import es, { DictKey } from './es';
-import en from './en';
-import pt from './pt';
-import it from './it';
-import fr from './fr';
-import de from './de';
-import zh from './zh';
-import ja from './ja';
-import ru from './ru';
-import ar from './ar';
-import ko from './ko';
-import hi from './hi';
 
 // Cada idioma debe tener TODAS las claves del español; si falta una, TypeScript no deja publicar.
 export type Dict = Record<DictKey, string>;
 
-const DICTS: Record<LangCode, Dict> = { es, en, pt, it, fr, de, zh, ja, ru, ar, ko, hi };
+// Solo el español viaja en el paquete; cada otro idioma se descarga una vez, cuando alguien lo elige.
+const DICTS: Partial<Record<LangCode, Dict>> = { es };
+const LOADERS: Record<Exclude<LangCode, 'es'>, () => Promise<{ default: Dict }>> = {
+  en: () => import('./en'), pt: () => import('./pt'), it: () => import('./it'), fr: () => import('./fr'),
+  de: () => import('./de'), zh: () => import('./zh'), ja: () => import('./ja'), ru: () => import('./ru'),
+  ar: () => import('./ar'), ko: () => import('./ko'), hi: () => import('./hi'),
+};
+const pendingDicts = new Map<LangCode, Promise<void>>();
+const dictListeners = new Set<() => void>();
+function ensureDict(lang: LangCode): Promise<void> {
+  if (DICTS[lang]) return Promise.resolve();
+  let p = pendingDicts.get(lang);
+  if (!p) {
+    p = LOADERS[lang as Exclude<LangCode, 'es'>]().then((m) => { DICTS[lang] = m.default; dictListeners.forEach((f) => f()); })
+      .catch(() => { pendingDicts.delete(lang); });
+    pendingDicts.set(lang, p);
+  }
+  return p;
+}
 
 export type TFunction = (key: DictKey, vars?: Record<string, string | number>) => string;
 
@@ -30,6 +37,14 @@ export function translate(lang: LangCode, key: DictKey, vars?: Record<string, st
 
 export function useT() {
   const { lang } = useLanguage();
+  const [, rerender] = useState(0);
+  useEffect(() => {
+    if (DICTS[lang]) return;
+    const f = () => rerender((x) => x + 1);
+    dictListeners.add(f);
+    ensureDict(lang);
+    return () => { dictListeners.delete(f); };
+  }, [lang]);
   const t: TFunction = (key, vars) => translate(lang, key, vars);
   return { t, lang };
 }
@@ -50,6 +65,7 @@ export function LangSync() {
   const synced = useRef<string | null>(null); // idioma guardado en la cuenta (null = sin sesión)
 
   useEffect(() => {
+    ensureDict(lang); // se adelanta la descarga del idioma elegido
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   }, [lang]);
@@ -61,7 +77,7 @@ export function LangSync() {
       if (!data.session) { synced.current = null; return; }
       try {
         const l = await rpc<string | null>('my_lang');
-        if (l && l in DICTS) {
+        if (l && (l === 'es' || l in LOADERS)) {
           synced.current = l;
           if (l !== current.current) setLanguage(l as LangCode);
         } else synced.current = current.current;

@@ -1292,6 +1292,10 @@ const ja: Record<DictKey, string> = {
   "owner.planStrip": "{plan} プラン",
   "owner.renews": "{date} に更新",
   "owner.changePlan": "更新またはプラン変更",
+  "sync.last": "最終同期 {time}。タップで今すぐ同期。",
+  "sync.offline": "オフライン：電波が戻ると自動で同期します。",
+  "sync.running": "同期中…",
+  "sync.offlineShort": "オフライン",
 };
 
 export default ja;

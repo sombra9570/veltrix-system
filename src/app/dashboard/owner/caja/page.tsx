@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
 import { ui } from '../../../site-header';
+import { useSync } from '../../sync';
 import { useT } from '../../../i18n';
 import { money, shortTime } from '../../format';
 import { Sheet, BranchOpt } from '../../sheet';
@@ -48,12 +49,8 @@ export default function CashPage() {
     catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
   }, [branchId, t]);
 
-  // Se actualiza sola cada 30 s mientras la pantalla está abierta
-  useEffect(() => {
-    load();
-    const h = setInterval(load, 30_000);
-    return () => clearInterval(h);
-  }, [load]);
+  useEffect(() => { load(); }, [load]);
+  useSync(load);
 
   const fmt = (n: number) => money(Number(n), data?.currency ?? 'USD', lang);
   const when = (iso: string) => `${new Date(iso).toLocaleDateString(lang, { day: '2-digit', month: 'short' })} ${shortTime(iso, lang)}`;

@@ -1292,6 +1292,10 @@ const hi: Record<DictKey, string> = {
   "owner.planStrip": "{plan} प्लान",
   "owner.renews": "{date} को नवीनीकरण",
   "owner.changePlan": "नवीनीकरण या प्लान बदलें",
+  "sync.last": "पिछला सिंक {time}। अभी सिंक करने के लिए टैप करें।",
+  "sync.offline": "ऑफ़लाइन: सिग्नल आते ही अपने आप सिंक होगा।",
+  "sync.running": "सिंक हो रहा है…",
+  "sync.offlineShort": "ऑफ़लाइन",
 };
 
 export default hi;
