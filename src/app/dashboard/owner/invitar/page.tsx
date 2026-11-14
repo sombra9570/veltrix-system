@@ -8,7 +8,7 @@ import { useOwner } from '../owner-context';
 
 type Data = {
   code: string; invited: number; paying: number; pending_pct: number; bonus_users: number; next: number;
-  list: { joined: string; paying: boolean; kind: 'discount' | 'user' | 'month' | null; value: number | null }[];
+  list: { joined: string; paying: boolean; kind: 'discount' | 'user' | 'month' | 'none' | null; value: number | null }[];
 };
 
 export default function InvitePage() {
@@ -53,6 +53,7 @@ export default function InvitePage() {
               </li>
             ))}
           </ol>
+          <p className="rounded-xl bg-amber-50 p-3 text-xs font-semibold text-amber-800 dark:bg-amber-500/10 dark:text-amber-300">⚠️ {t('ref.rulePlan')}</p>
           {d && (
             <>
               <div>
@@ -102,14 +103,14 @@ export default function InvitePage() {
               {d.list.map((r, i) => (
                 <li key={i} className="flex items-center justify-between gap-3">
                   <span>{t('ref.business', { n: d.list.length - i })} · {new Date(r.joined).toLocaleDateString(lang)}</span>
-                  <span className={`rounded-md px-2 py-0.5 text-[11px] font-bold ${r.paying ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400'}`}>
-                    {!r.paying ? t('ref.trying') : r.kind === 'user' ? t('ref.earnedUser') : t('ref.earnedPct', { pct: r.value ?? 0 })}
+                  <span className={`rounded-md px-2 py-0.5 text-[11px] font-bold ${r.paying && r.kind !== 'none' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300' : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400'}`}>
+                    {!r.paying ? t('ref.trying') : r.kind === 'none' ? t('ref.noReward') : r.kind === 'user' ? t('ref.earnedUser') : t('ref.earnedPct', { pct: r.value ?? 0 })}
                   </span>
                 </li>
               ))}
             </ul>
           )}
-          <p className={`mt-4 text-xs ${ui.muted}`}>{t('ref.rules2')}</p>
+          <p className={`mt-4 text-xs ${ui.muted}`}>{t('ref.rulePlan')} {t('ref.rules2')}</p>
         </Card>
       </div>
     </div>

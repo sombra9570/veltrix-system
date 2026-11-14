@@ -993,6 +993,8 @@ const it: Record<DictKey, string> = {
   "ref.earnedUser": "Ha pagato · 1 utente per te",
   "ref.rules2": "Lo sconto si usa sul prossimo pagamento e non si somma: se ne hai diversi, vale il maggiore. Inviti illimitati.",
   "bill.refDiscount": "Sconto inviti: −{pct}% sul prossimo pagamento.",
+  "ref.rulePlan": "Il premio vale solo se l'attività invitata sceglie un piano uguale o superiore al tuo.",
+  "ref.noReward": "Ha pagato · piano inferiore, nessun premio",
 };
 
 export default it;

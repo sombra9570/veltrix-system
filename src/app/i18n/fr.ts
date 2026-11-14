@@ -993,6 +993,8 @@ const fr: Record<DictKey, string> = {
   "ref.earnedUser": "A payé · 1 utilisateur gagné",
   "ref.rules2": "La remise s'applique au prochain paiement et ne se cumule pas : la plus élevée l'emporte. Parrainages illimités.",
   "bill.refDiscount": "Remise parrainage : −{pct} % sur votre prochain paiement.",
+  "ref.rulePlan": "La récompense ne compte que si l'entreprise invitée choisit une offre égale ou supérieure à la vôtre.",
+  "ref.noReward": "A payé · offre inférieure, sans récompense",
 };
 
 export default fr;

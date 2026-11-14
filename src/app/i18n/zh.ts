@@ -993,6 +993,8 @@ const zh: Record<DictKey, string> = {
   "ref.earnedUser": "已付费 · 你获得 1 个用户",
   "ref.rules2": "折扣用于下次付款，不可叠加：多个待用时取最高。邀请数量不限。",
   "bill.refDiscount": "邀请折扣：下次付款 −{pct}%。",
+  "ref.rulePlan": "只有受邀商家选择与你相同或更高的套餐，奖励才生效。",
+  "ref.noReward": "已付费 · 套餐较低，无奖励",
 };
 
 export default zh;

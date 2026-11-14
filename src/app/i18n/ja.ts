@@ -993,6 +993,8 @@ const ja: Record<DictKey, string> = {
   "ref.earnedUser": "支払い済み · ユーザー1人獲得",
   "ref.rules2": "割引は次回支払いに適用、重複不可（最大のものを適用）。紹介数は無制限。",
   "bill.refDiscount": "紹介割引：次回支払い −{pct}%。",
+  "ref.rulePlan": "紹介先があなたと同等以上のプランを選んだ場合のみ特典が付きます。",
+  "ref.noReward": "支払い済み · 下位プランのため特典なし",
 };
 
 export default ja;

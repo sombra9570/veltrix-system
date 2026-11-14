@@ -993,6 +993,8 @@ const pt: Record<DictKey, string> = {
   "ref.earnedUser": "Pagou · você ganhou 1 usuário",
   "ref.rules2": "O desconto é usado no próximo pagamento e não acumula: se houver vários, vale o maior. Sem limite de convidados.",
   "bill.refDiscount": "Desconto por indicação: −{pct}% no próximo pagamento.",
+  "ref.rulePlan": "O prêmio só vale se o negócio convidado escolher um plano igual ou superior ao seu.",
+  "ref.noReward": "Pagou · plano menor, sem prêmio",
 };
 
 export default pt;

@@ -1002,6 +1002,8 @@ const es = {
   "ref.earnedUser": "Pagó · ganaste 1 usuario",
   "ref.rules2": "El descuento se usa en tu siguiente pago y no se acumula: si tienes varios pendientes, se aplica el mayor. No hay límite de invitados.",
   "bill.refDiscount": "Descuento por invitar: −{pct} % en tu próximo pago.",
+  "ref.rulePlan": "El premio solo cuenta si el negocio invitado elige un plan igual o superior al tuyo.",
+  "ref.noReward": "Pagó · plan menor, sin premio",
 };
 
 export default es;

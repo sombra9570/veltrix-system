@@ -993,6 +993,8 @@ const en: Record<DictKey, string> = {
   "ref.earnedUser": "Paid · you earned 1 user",
   "ref.rules2": "The discount is used on your next payment and doesn't stack: if several are pending, the largest applies. No limit on referrals.",
   "bill.refDiscount": "Referral discount: −{pct}% on your next payment.",
+  "ref.rulePlan": "The reward only counts if the invited business picks a plan equal to or higher than yours.",
+  "ref.noReward": "Paid · lower plan, no reward",
 };
 
 export default en;

@@ -993,6 +993,8 @@ const de: Record<DictKey, string> = {
   "ref.earnedUser": "Bezahlt · 1 Benutzer für Sie",
   "ref.rules2": "Der Rabatt gilt für die nächste Zahlung und ist nicht kumulierbar: Es zählt der höchste. Unbegrenzte Einladungen.",
   "bill.refDiscount": "Empfehlungsrabatt: −{pct} % auf Ihre nächste Zahlung.",
+  "ref.rulePlan": "Die Prämie zählt nur, wenn das eingeladene Geschäft einen gleichen oder höheren Tarif wählt.",
+  "ref.noReward": "Bezahlt · kleinerer Tarif, keine Prämie",
 };
 
 export default de;

@@ -993,6 +993,8 @@ const ko: Record<DictKey, string> = {
   "ref.earnedUser": "결제 · 사용자 1명 획득",
   "ref.rules2": "할인은 다음 결제에 적용되며 중복되지 않습니다(가장 큰 할인 적용). 초대 수 제한 없음.",
   "bill.refDiscount": "초대 할인: 다음 결제 −{pct}%.",
+  "ref.rulePlan": "초대한 사업자가 당신과 같거나 높은 요금제를 선택해야 보상이 적용됩니다.",
+  "ref.noReward": "결제 · 하위 요금제, 보상 없음",
 };
 
 export default ko;
