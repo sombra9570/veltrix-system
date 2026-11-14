@@ -980,6 +980,19 @@ const fr: Record<DictKey, string> = {
   "ref.trying": "En essai",
   "ref.rules": "Le mois offert s'ajoute au premier paiement de l'entreprise invitée. Parrainages illimités.",
   "ref.invitedBanner": "Une autre entreprise vous a invité : 30 jours gratuits au lieu de 14.",
+  "ref.subtitle2": "Recommandez Veltrix : l'entreprise invitée essaie 30 jours gratuits et vous gagnez des remises à chaque nouveau client payant.",
+  "ref.step3b": "Dès qu'elle paie, vous obtenez une remise sur votre prochain paiement : 15 %, 20 % puis 30 %. À partir du 4e, un utilisateur supplémentaire.",
+  "ref.pending": "Remise en attente",
+  "ref.tiersTitle": "Vos récompenses",
+  "ref.tierN": "{n}e filleul payant",
+  "ref.tierMore": "À partir du 4e",
+  "ref.tierOff": "{pct} de remise",
+  "ref.tier4": "+1 utilisateur (jusqu'à 5)",
+  "ref.bonusUsers": "Vous avez gagné {n} utilisateurs supplémentaires.",
+  "ref.earnedPct": "A payé · {pct} % gagnés",
+  "ref.earnedUser": "A payé · 1 utilisateur gagné",
+  "ref.rules2": "La remise s'applique au prochain paiement et ne se cumule pas : la plus élevée l'emporte. Parrainages illimités.",
+  "bill.refDiscount": "Remise parrainage : −{pct} % sur votre prochain paiement.",
 };
 
 export default fr;

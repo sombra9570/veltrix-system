@@ -82,7 +82,7 @@ export default function GlobalCoreAdminPage() {
   };
   // Plan Piloto / Fundador
   type Pilot = { org_id: string; name: string; plan: string; price_usd: number; price_now: number; is_pilot: boolean;
-    pilot_ends: string | null; founder_discount_pct: number; founder_until: string | null; next_billing_date: string | null;
+    pilot_ends: string | null; founder_discount_pct: number; founder_until: string | null; referral_credit_pct?: number; next_billing_date: string | null;
     status: string; last_payment: string | null };
   const [pilots, setPilots] = useState<Pilot[]>([]);
   const [pForm, setPForm] = useState<{ org: string; kind: 'pilot' | 'pay'; a: string; b: string; c: string } | null>(null);
@@ -440,6 +440,7 @@ export default function GlobalCoreAdminPage() {
                     <p className="text-slate-400">
                       {o.is_pilot && o.pilot_ends ? `Gratis hasta ${fmtDate(o.pilot_ends)} · ` : ''}
                       {o.founder_until ? `Fundador −${o.founder_discount_pct}% hasta ${fmtDate(o.founder_until)} · ` : ''}
+                      {Number(o.referral_credit_pct ?? 0) > 0 ? `🎁 Descuento por invitar −${o.referral_credit_pct}% en su próximo pago (si paga con tarjeta, aplícalo en Lemon Squeezy) · ` : ''}
                       Próximo cobro {fmtDate(o.next_billing_date)}
                       {o.last_payment ? ` · Último pago ${fmtDate(o.last_payment)}` : ''}
                     </p>

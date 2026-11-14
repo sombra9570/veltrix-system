@@ -980,6 +980,19 @@ const zh: Record<DictKey, string> = {
   "ref.trying": "试用中",
   "ref.rules": "受邀商家首次付款时即获得免费月，邀请数量不限。",
   "ref.invitedBanner": "另一家商家邀请了你：免费 30 天（而非 14 天）。",
+  "ref.subtitle2": "推荐 Veltrix：受邀商家免费试用 30 天，每有一家开始付费，你就获得折扣。",
+  "ref.step3b": "对方开始付费后，你的下次付款享受折扣：15%、20%、30%。从第 4 家起，增加 1 个用户名额。",
+  "ref.pending": "待用折扣",
+  "ref.tiersTitle": "你的奖励",
+  "ref.tierN": "第 {n} 家付费",
+  "ref.tierMore": "第 4 家起",
+  "ref.tierOff": "{pct} 折扣",
+  "ref.tier4": "+1 用户（最多 5）",
+  "ref.bonusUsers": "你已获得 {n} 个额外用户名额。",
+  "ref.earnedPct": "已付费 · 你获得 {pct}%",
+  "ref.earnedUser": "已付费 · 你获得 1 个用户",
+  "ref.rules2": "折扣用于下次付款，不可叠加：多个待用时取最高。邀请数量不限。",
+  "bill.refDiscount": "邀请折扣：下次付款 −{pct}%。",
 };
 
 export default zh;

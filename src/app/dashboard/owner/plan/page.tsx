@@ -11,7 +11,7 @@ type PlanOpt = { code: string; name: string; price: number; max_branches: number
 type Billing = {
   plan_code: string; status: 'active' | 'past_due_grace' | 'suspended'; region: 'latam' | 'global'; price_now: number;
   trial_ends_at: string | null; next_billing_date: string | null; grace_ends_at: string | null;
-  is_pilot: boolean; founder_discount_pct: number; founder_until: string | null; founder_active: boolean;
+  is_pilot: boolean; founder_discount_pct: number; founder_until: string | null; founder_active: boolean; referral_credit_pct?: number;
   subscribed: boolean; portal_url: string | null; cancel_at: string | null;
   plans: PlanOpt[];
   history: { at: string; amount: number; status: string; gateway: string; period_end: string | null }[];
@@ -98,6 +98,7 @@ export default function PlanPage() {
 
         <ul className={`space-y-1 text-sm ${ui.muted}`}>
           {b.founder_active && <li>🏅 {t('bill.founder', { pct: b.founder_discount_pct, date: day(b.founder_until) })}</li>}
+          {Number(b.referral_credit_pct ?? 0) > 0 && <li>🎁 {t('bill.refDiscount', { pct: b.referral_credit_pct ?? 0 })}</li>}
           {inTrial && <li>🧪 {t('bill.trialEnds', { date: day(b.trial_ends_at) })}</li>}
           {b.subscribed && !b.cancel_at && b.next_billing_date && <li>🔁 {t('bill.renews', { date: day(b.next_billing_date) })}</li>}
           {b.cancel_at && <li>⏹️ {t('bill.cancelAt', { date: day(b.cancel_at) })}</li>}

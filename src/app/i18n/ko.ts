@@ -980,6 +980,19 @@ const ko: Record<DictKey, string> = {
   "ref.trying": "체험 중",
   "ref.rules": "무료 개월은 초대한 사업자의 첫 결제 시 추가됩니다. 초대 수 제한 없음.",
   "ref.invitedBanner": "다른 사업자의 초대: 14일 대신 30일 무료.",
+  "ref.subtitle2": "Veltrix를 추천하세요: 초대한 사업자는 30일 무료, 결제를 시작할 때마다 할인을 받습니다.",
+  "ref.step3b": "결제를 시작하면 다음 결제가 할인됩니다: 15%, 20%, 30%. 4번째부터는 사용자 1명 추가.",
+  "ref.pending": "대기 중 할인",
+  "ref.tiersTitle": "내 보상",
+  "ref.tierN": "{n}번째 결제 사업자",
+  "ref.tierMore": "4번째부터",
+  "ref.tierOff": "{pct} 할인",
+  "ref.tier4": "사용자 +1(최대 5)",
+  "ref.bonusUsers": "팀 사용자 {n}명을 추가로 받았습니다.",
+  "ref.earnedPct": "결제 · {pct}% 획득",
+  "ref.earnedUser": "결제 · 사용자 1명 획득",
+  "ref.rules2": "할인은 다음 결제에 적용되며 중복되지 않습니다(가장 큰 할인 적용). 초대 수 제한 없음.",
+  "bill.refDiscount": "초대 할인: 다음 결제 −{pct}%.",
 };
 
 export default ko;

@@ -980,6 +980,19 @@ const ja: Record<DictKey, string> = {
   "ref.trying": "お試し中",
   "ref.rules": "紹介先の初回支払いで無料月が加算されます。紹介数に上限はありません。",
   "ref.invitedBanner": "他の事業者からの紹介：無料期間が14日から30日に。",
+  "ref.subtitle2": "Veltrixを紹介：紹介先は30日間無料、有料化するたびにあなたに割引。",
+  "ref.step3b": "相手が支払いを始めると次回支払いが割引：15%、20%、30%。4社目からはユーザー1人追加。",
+  "ref.pending": "未使用の割引",
+  "ref.tiersTitle": "あなたの特典",
+  "ref.tierN": "{n}社目の有料化",
+  "ref.tierMore": "4社目以降",
+  "ref.tierOff": "{pct} 割引",
+  "ref.tier4": "ユーザー+1（最大5）",
+  "ref.bonusUsers": "チーム用にユーザー{n}人分を獲得済み。",
+  "ref.earnedPct": "支払い済み · {pct}% 獲得",
+  "ref.earnedUser": "支払い済み · ユーザー1人獲得",
+  "ref.rules2": "割引は次回支払いに適用、重複不可（最大のものを適用）。紹介数は無制限。",
+  "bill.refDiscount": "紹介割引：次回支払い −{pct}%。",
 };
 
 export default ja;

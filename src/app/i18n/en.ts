@@ -980,6 +980,19 @@ const en: Record<DictKey, string> = {
   "ref.trying": "On trial",
   "ref.rules": "The free month is added when the invited business makes its first payment. No limit on referrals.",
   "ref.invitedBanner": "Another business invited you: you get 30 free days instead of 14.",
+  "ref.subtitle2": "Recommend Veltrix: the business you invite tries it free for 30 days and you earn discounts every time one starts paying.",
+  "ref.step3b": "When they start paying, you get a discount on your next payment: 15%, 20% and 30%. From the 4th on, an extra user.",
+  "ref.pending": "Pending discount",
+  "ref.tiersTitle": "Your rewards",
+  "ref.tierN": "Paying referral #{n}",
+  "ref.tierMore": "4th onwards",
+  "ref.tierOff": "{pct} off",
+  "ref.tier4": "+1 user (up to 5)",
+  "ref.bonusUsers": "You've earned {n} extra users for your team.",
+  "ref.earnedPct": "Paid · you earned {pct}%",
+  "ref.earnedUser": "Paid · you earned 1 user",
+  "ref.rules2": "The discount is used on your next payment and doesn't stack: if several are pending, the largest applies. No limit on referrals.",
+  "bill.refDiscount": "Referral discount: −{pct}% on your next payment.",
 };
 
 export default en;

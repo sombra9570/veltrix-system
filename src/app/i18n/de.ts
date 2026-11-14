@@ -980,6 +980,19 @@ const de: Record<DictKey, string> = {
   "ref.trying": "Im Test",
   "ref.rules": "Der Gratismonat kommt mit der ersten Zahlung des eingeladenen Geschäfts. Unbegrenzt viele Einladungen.",
   "ref.invitedBanner": "Ein anderes Geschäft hat Sie eingeladen: 30 statt 14 Tage gratis.",
+  "ref.subtitle2": "Empfehlen Sie Veltrix: Eingeladene testen 30 Tage gratis, Sie erhalten Rabatte, sobald jemand zahlt.",
+  "ref.step3b": "Sobald sie zahlen, erhalten Sie Rabatt auf Ihre nächste Zahlung: 15 %, 20 %, 30 %. Ab dem 4. einen zusätzlichen Benutzer.",
+  "ref.pending": "Offener Rabatt",
+  "ref.tiersTitle": "Ihre Prämien",
+  "ref.tierN": "{n}. zahlender Kunde",
+  "ref.tierMore": "Ab dem 4.",
+  "ref.tierOff": "{pct} Rabatt",
+  "ref.tier4": "+1 Benutzer (bis 5)",
+  "ref.bonusUsers": "Sie haben bereits {n} zusätzliche Benutzer gewonnen.",
+  "ref.earnedPct": "Bezahlt · {pct} % für Sie",
+  "ref.earnedUser": "Bezahlt · 1 Benutzer für Sie",
+  "ref.rules2": "Der Rabatt gilt für die nächste Zahlung und ist nicht kumulierbar: Es zählt der höchste. Unbegrenzte Einladungen.",
+  "bill.refDiscount": "Empfehlungsrabatt: −{pct} % auf Ihre nächste Zahlung.",
 };
 
 export default de;
