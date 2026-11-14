@@ -244,6 +244,15 @@ export default function RegistroPage() {
             </div>
           )}
 
+          {step === STEPS.length - 1 && (
+            <p className={`mt-5 text-xs ${ui.muted}`}>
+              {t('legal.acceptPre')}{' '}
+              <Link href="/terminos" target="_blank" className="font-semibold underline">{t('legal.terms')}</Link>{' '}
+              {t('legal.and')}{' '}
+              <Link href="/privacidad" target="_blank" className="font-semibold underline">{t('legal.privacy')}</Link>.
+            </p>
+          )}
+
           <div className="mt-6 flex items-center justify-between gap-3">
             {step > 0 ? (
               <button type="button" onClick={back} className={ui.btnGhost}>{t('common.back')}</button>

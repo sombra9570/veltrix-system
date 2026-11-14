@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useVeltrixAuth, homeForRole } from '../../auth-system';
@@ -53,6 +54,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/taller', icon: '🔧', label: 'nav.workshop', module: 'workshop' },
   { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory' },
   { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports' },
+  { href: '/dashboard/owner/plan', icon: '💳', label: 'nav.plan' },
 ];
 
 const DAY = 86_400_000;
@@ -153,6 +155,9 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
       );
     }
   }
+
+  // Cualquier aviso de suscripción lleva directo a "Mi plan"
+  if (banner) banner = <Link href="/dashboard/owner/plan" className="block hover:opacity-95">{banner}</Link>;
 
   return (
     <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name }}>

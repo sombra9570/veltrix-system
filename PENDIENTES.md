@@ -12,16 +12,22 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [ ] **Anthropic**: cuenta, crédito y `ANTHROPIC_API_KEY` en Vercel (enciende Veltrix IA)
 - [ ] **Supabase**: activar protección de contraseñas filtradas
 - [ ] **Vercel Pro** antes del primer cliente que pague (Hobby no permite uso comercial)
-- [ ] **Merchant of Record** (Lemon Squeezy o Paddle): cuenta y verificación de identidad
+- [ ] **Lemon Squeezy** (Merchant of Record): cuenta, verificación de identidad, tienda y 6 productos/variantes
+      (Starter, Pro, Enterprise × precio Latinoamérica y precio internacional), códigos de descuento de fundador
+      (ej. FUNDADOR50, 12 meses) y webhook a `https://veltrixsystem.app/api/billing/webhook`
+- [ ] **Vercel**: `LEMONSQUEEZY_API_KEY`, `LEMONSQUEEZY_STORE_ID`, `LEMONSQUEEZY_WEBHOOK_SECRET`,
+      `LEMONSQUEEZY_VARIANTS`, `LEMONSQUEEZY_FOUNDER_CODES`, `SUPABASE_SERVICE_ROLE_KEY` (solo en Vercel)
+- [ ] **Abogado**: revisar Términos, Privacidad y Reembolsos (borrador publicado en la web)
 - [ ] **Contador en línea** en Bolivia (empresa formal, NIT, cómo declarar los pagos del Merchant of Record)
 - [ ] **Google Play**: cuenta de desarrollador (25 USD, pago único) para el APK
 
 ## B. Construcción pendiente
 
 ### Cobros y legal
-- [ ] Conexión de pagos con el Merchant of Record (checkout + webhooks: activar, renovar y suspender solos)
-- [ ] Página de precios pública con "+ impuestos"
-- [ ] Páginas legales en 12 idiomas: Términos, Privacidad, Reembolsos (las exige el Merchant of Record)
+- [x] Conexión de pagos con Lemon Squeezy (checkout + webhook) — falta conectar las claves
+- [x] Precios con "+ impuestos" y precio regional (Latinoamérica / internacional)
+- [x] Páginas legales: Términos, Privacidad, Reembolsos (español oficial + inglés)
+- [ ] Pantalla "Mi plan" para el dueño — hecha; probar con un pago real
 - [ ] Venta de extras: usuarios, sucursales y almacenamiento extra (columnas ya existen, falta precio y pantalla)
 - [ ] Paquetes de Veltrix IA con precio (cuando haya consumo real medido)
 - [ ] Exportar datos del cliente al cancelar la cuenta
@@ -54,4 +60,4 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 ## Hecho
 Panel del dueño · Caja · POS · Clientes y crédito · Cobrador offline · Restaurante · Taller ·
 Tienda online · Mensajes del equipo · Ayuda · Veltrix IA (falta la clave) · Ventas · Caja del dueño ·
-Plan Piloto/Fundador · Inventario · Reportes
+Plan Piloto/Fundador · Inventario · Reportes · Mi plan y cobros (falta conectar claves) · Páginas legales

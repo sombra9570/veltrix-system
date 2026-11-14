@@ -97,7 +97,7 @@ export default function HomePage() {
       <section className="mx-auto w-full max-w-7xl 2xl:max-w-[1440px] px-4 py-10">
         <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.plansTitle')}</h2>
         <p className={`mt-1 text-center text-sm ${ui.muted}`}>{t('home.plansSubtitle')}</p>
-        <p className={`text-center text-xs ${ui.muted}`}>{t('home.pricesLocal')}</p>
+        <p className={`text-center text-xs ${ui.muted}`}>{t('home.pricesLocal')} {t('home.plusTax')}</p>
         <div className="mt-8 grid gap-6 md:grid-cols-3 md:gap-4">
           {PLANS.map((p) => (
             <div key={p.id} className={`relative rounded-2xl p-6 ${ui.card} ${p.best ? 'ring-2 ring-blue-500' : ''}`}>

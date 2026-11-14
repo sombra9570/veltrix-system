@@ -144,6 +144,12 @@ export function SiteFooter() {
   const { t } = useT();
   return (
     <footer className="mt-auto border-t border-slate-200 px-4 pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-500">
+      <nav className="mb-2 flex flex-wrap justify-center gap-x-4 gap-y-1 font-semibold">
+        <Link href="/terminos" className="hover:underline">{t('legal.terms')}</Link>
+        <Link href="/privacidad" className="hover:underline">{t('legal.privacy')}</Link>
+        <Link href="/reembolsos" className="hover:underline">{t('legal.refunds')}</Link>
+        <a href="mailto:hola@veltrixsystem.app" className="hover:underline">hola@veltrixsystem.app</a>
+      </nav>
       {t('footer.text', { year })}
     </footer>
   );
