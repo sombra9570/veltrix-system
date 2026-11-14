@@ -9,6 +9,7 @@ import type { DictKey } from '../../../i18n/es';
 import { money } from '../../format';
 import { useOwner, friendlyError } from '../owner-context';
 import { RATING_DOT } from '../../collector/loan-form';
+import { DaysTable, type DayRow } from '../../collector/days-table';
 
 // Préstamos en calle: reglas que fija el administrador, aprobaciones pendientes y préstamos de las rutas.
 type Policy = Record<string, number>;
@@ -25,7 +26,7 @@ const FIELDS: [string, string][] = [
 const LATE: [string, string][] = [['late_daily', 'card.f.daily'], ['late_weekly', 'card.f.weekly'], ['late_biweekly', 'card.f.biweekly'], ['late_monthly', 'card.f.monthly']];
 type Fund = {
   id: string; name: string; branch: string; collector: string | null; currency: string; balance: number; invested: number;
-  delivered: number; lent_open: number; portfolio: number;
+  delivered: number; lent_open: number; portfolio: number; days?: DayRow[];
   period: { since: string | null; opening: number; investments: number; withdrawals: number; collected_cash: number; collected_digital: number;
     lent: number; collector_expenses: number; expected: number };
   liquidations: { id: string; created_at: string; expected: number; counted: number; difference: number; closing: number;
@@ -175,6 +176,17 @@ export default function LoansPage() {
                     <p><span className={ui.muted}>{t('fund.portfolio')}</span><br /><b>{m(f.portfolio)}</b></p>
                     <p><span className={ui.muted}>{t('fund.delivered')}</span><br /><b>{m(f.delivered)}</b></p>
                   </div>
+                  {f.days && f.days.length > 0 && (() => {
+                    const td = f.days[0];
+                    return (
+                      <details className="rounded-lg bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800/50">
+                        <summary className="cursor-pointer font-semibold">
+                          📅 {t('day.today')}: {t('col.cash')} <b>{m(td.cash)}</b> · {t('loan.lent')} <b>{m(td.lent)}</b>{td.cut_at ? ' · ✂️' : ''} — {t('day.title')}
+                        </summary>
+                        <div className="mt-2"><DaysTable days={f.days} fmt={m} /></div>
+                      </details>
+                    );
+                  })()}
                   {cut === f.id && (
                     <CutForm f={f} m={m} onCancel={() => setCut(null)}
                       onDone={async (text) => { setCut(null); await load(); setMsg({ ok: true, text }); }}

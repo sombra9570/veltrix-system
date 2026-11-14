@@ -1260,6 +1260,18 @@ const de: Record<DictKey, string> = {
   "fund.t.payment_out": "Zahlung",
   "fund.t.shortage": "Fehlbetrag",
   "fund.t.surplus": "Überschuss",
+  "day.today": "Heute",
+  "day.cutAt": "Tagesschnitt {time}",
+  "day.open": "Tag offen",
+  "day.cut": "Tagesschnitt",
+  "day.recut": "Tagesschnitt aktualisieren",
+  "day.syncFirst": "zuerst synchronisieren",
+  "day.sinceLiq": "Seit dem letzten Kassenabschluss",
+  "day.done": "✂️ Tagesschnitt erledigt: kassiert {cash} · verliehen {lent}.",
+  "day.date": "Tag",
+  "day.week": "Letzte 7 Tage",
+  "day.sinceLiqShort": "Seit Abschluss",
+  "day.title": "Kassiert und verliehen pro Tag",
 };
 
 export default de;

@@ -1260,6 +1260,18 @@ const hi: Record<DictKey, string> = {
   "fund.t.payment_out": "भुगतान",
   "fund.t.shortage": "कमी",
   "fund.t.surplus": "अधिक",
+  "day.today": "आज",
+  "day.cutAt": "दिन का कट {time}",
+  "day.open": "दिन खुला",
+  "day.cut": "दिन का कट",
+  "day.recut": "दिन का कट अपडेट करें",
+  "day.syncFirst": "पहले सिंक करें",
+  "day.sinceLiq": "पिछले कैश कट से",
+  "day.done": "✂️ दिन का कट हुआ: वसूली {cash} · ऋण {lent}।",
+  "day.date": "दिन",
+  "day.week": "पिछले 7 दिन",
+  "day.sinceLiqShort": "कट से",
+  "day.title": "दिन अनुसार वसूली और ऋण",
 };
 
 export default hi;

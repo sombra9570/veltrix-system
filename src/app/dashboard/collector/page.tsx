@@ -9,6 +9,7 @@ import { money, parseAmount } from '../format';
 import { useStaff } from '../staff-context';
 import { CreditCard, applyPayment, freqOf, type Credit, type Freq, type Method } from './credit-card';
 import { LoanForm, RATING_DOT, type LoanPolicy } from './loan-form';
+import { DaysTable, type DayRow } from './days-table';
 
 /* ------------------------------------------------------------------
  * Cobrador de calle: trabaja SIN internet.
@@ -30,7 +31,7 @@ type Route = {
   id: string; name: string; branch: string; currency: string; today: string;
   unsettled_cash: number; unsettled_digital: number; unsettled_expenses: number; unsettled_loans?: number;
   fund_balance?: number; fund_float?: number;
-  period?: Period; liquidations?: Liquidation[];
+  period?: Period; liquidations?: Liquidation[]; days?: DayRow[];
   policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_interest?: boolean;
   customers: Customer[]; settlements: Settlement[];
 };
@@ -47,6 +48,17 @@ type Op =
 const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
 const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
 const VISITS: VisitResult[] = ['no_one_home', 'promise', 'refused', 'other'];
+
+/** Suma un movimiento local (aún sin señal) a la fila de hoy */
+function bumpToday(r: { today: string; days?: DayRow[] }, add: Partial<Record<'cash' | 'digital' | 'payments' | 'lent' | 'expenses', number>>): DayRow[] | undefined {
+  if (!r.days) return r.days;
+  const has = r.days.some((d) => d.day === r.today);
+  const base: DayRow[] = has ? r.days : [{ day: r.today, cash: 0, digital: 0, payments: 0, lent: 0, expenses: 0, cut_at: null }, ...r.days];
+  return base.map((d) => d.day !== r.today ? d : {
+    ...d, cash: Number(d.cash) + (add.cash ?? 0), digital: Number(d.digital) + (add.digital ?? 0), payments: Number(d.payments) + (add.payments ?? 0),
+    lent: Number(d.lent) + (add.lent ?? 0), expenses: Number(d.expenses) + (add.expenses ?? 0),
+  });
+}
 
 const load = <T,>(k: string, d: T): T => { try { return JSON.parse(localStorage.getItem(k) ?? 'null') ?? d; } catch { return d; } };
 const save = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* lleno */ } };
@@ -169,6 +181,7 @@ export default function CollectorPage() {
         routes: d.routes.map((r) => {
           if (r.id !== op.route) return r;
           if (op.kind === 'expense') return { ...r, unsettled_expenses: Number(r.unsettled_expenses) + op.amount,
+            days: bumpToday(r, { expenses: op.amount }),
             fund_balance: r.fund_balance === undefined ? undefined : Number(r.fund_balance) - op.amount };
           const customers = r.customers.map((c) => {
             if (c.id !== op.customer) return c;
@@ -201,6 +214,7 @@ export default function CollectorPage() {
           return {
             ...r, customers,
             unsettled_cash: Number(r.unsettled_cash) + cashAdd,
+            days: op.kind === 'payment' ? bumpToday(r, { cash: cashAdd, digital: digAdd, payments: 1 }) : r.days,
             fund_balance: r.fund_balance === undefined ? undefined : Number(r.fund_balance) + cashAdd,
             unsettled_digital: Number(r.unsettled_digital) + digAdd,
           };
@@ -217,6 +231,16 @@ export default function CollectorPage() {
     if (!route) return;
     enqueue({ kind: 'payment', id: crypto.randomUUID(), at: new Date().toISOString(), route: route.id, customer, method, amount, order });
     flash(true, online ? t('col.paySaved') : t('col.savedOffline'));
+  };
+  const [dayBusy, setDayBusy] = useState(false);
+  const dayCut = async () => {
+    if (!route) return;
+    setDayBusy(true);
+    try {
+      const r = await rpc<{ cash: number; lent: number }>('route_day_cut', { p_route: route.id });
+      flash(true, t('day.done', { cash: fmt(r.cash), lent: fmt(r.lent) }));
+      await refresh();
+    } catch { flash(false, t('err.generic')); } finally { setDayBusy(false); }
   };
   // La ficha abierta se mantiene al día con lo guardado (tarjetas marcadas)
   const selNow = sel ? route?.customers.find((x) => x.id === sel.id) ?? sel : null;
@@ -237,6 +261,7 @@ export default function CollectorPage() {
   const inHand = Number(route.unsettled_cash) - Number(route.unsettled_expenses) - loans;
   const fund = route.fund_balance === undefined ? null : Number(route.fund_balance);
   const opening = fund === null ? 0 : fund - inHand;
+  const todayRow = route.days?.find((d) => d.day === route.today);
   const shown = freq === 'all' ? route.customers : route.customers.filter((c) => c.credits?.some((k) => freqOf(k) === freq));
 
   return (
@@ -279,6 +304,25 @@ export default function CollectorPage() {
           <p className={`mt-1 text-[11px] ${ui.muted}`}>{t('liq.formula')}</p>
         </Card>
       )}
+      {fund !== null && route.days && (
+        <Card className="!p-3">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-bold">📅 {t('day.today')}</p>
+            {todayRow?.cut_at
+              ? <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">✓ {t('day.cutAt', { time: new Date(todayRow.cut_at).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' }) })}</span>
+              : <span className={`text-[11px] ${ui.muted}`}>{t('day.open')}</span>}
+          </div>
+          <div className="mt-2 grid grid-cols-3 gap-2 text-center">
+            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.cash')}</p><p className="font-extrabold">{fmt(todayRow?.cash ?? 0)}</p></div>
+            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('loan.lent')}</p><p className="font-extrabold text-violet-600 dark:text-violet-400">{fmt(todayRow?.lent ?? 0)}</p></div>
+            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.expenses')}</p><p className="font-extrabold text-red-600 dark:text-red-400">{fmt(todayRow?.expenses ?? 0)}</p></div>
+          </div>
+          <button type="button" disabled={!online || dayBusy || queue.length > 0} onClick={dayCut} className={`${ui.btnGhost} mt-3 w-full !py-2 text-sm`}>
+            ✂️ {todayRow?.cut_at ? t('day.recut') : t('day.cut')}{!online ? ` · ${t('loan.needsSignal')}` : queue.length > 0 ? ` · ${t('day.syncFirst')}` : ''}
+          </button>
+        </Card>
+      )}
+      {fund !== null && <p className={`text-xs font-bold uppercase ${ui.muted}`}>{t('day.sinceLiq')}</p>}
       <div className={`grid gap-2 text-center ${fund !== null ? 'grid-cols-2 sm:grid-cols-4' : loans !== 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
         {fund !== null && (
           <Card className="!p-3">
@@ -661,6 +705,7 @@ function PeriodSheet({ route, fmt, fund }: { route: Route; fmt: (n: number) => s
         <li className="flex justify-between border-t border-slate-200 pt-2 text-base dark:border-slate-800"><span>💼 {t('fund.title')}</span><b>{fmt(fund)}</b></li>
         {Number(route.unsettled_digital) > 0 && <li className={`flex justify-between text-xs ${ui.muted}`}><span>{t('col.digital')}</span><span>{fmt(route.unsettled_digital)}</span></li>}
       </ul>
+      {(route.days ?? []).length > 0 && <DaysTable days={route.days ?? []} fmt={fmt} />}
       <p className="rounded-xl bg-slate-50 p-3 text-xs dark:bg-slate-800/50">✂️ {t('liq.collectorHint')}</p>
       {(route.liquidations ?? []).length > 0 && (
         <div>

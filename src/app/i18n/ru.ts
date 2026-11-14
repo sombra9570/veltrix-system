@@ -1260,6 +1260,18 @@ const ru: Record<DictKey, string> = {
   "fund.t.payment_out": "Выплата",
   "fund.t.shortage": "Недостача",
   "fund.t.surplus": "Излишек",
+  "day.today": "Сегодня",
+  "day.cutAt": "Итог дня {time}",
+  "day.open": "День открыт",
+  "day.cut": "Итог дня",
+  "day.recut": "Обновить итог дня",
+  "day.syncFirst": "сначала синхронизируйте",
+  "day.sinceLiq": "С последней инкассации",
+  "day.done": "✂️ Итог дня сделан: собрано {cash} · выдано {lent}.",
+  "day.date": "День",
+  "day.week": "Последние 7 дней",
+  "day.sinceLiqShort": "С инкассации",
+  "day.title": "Собрано и выдано по дням",
 };
 
 export default ru;

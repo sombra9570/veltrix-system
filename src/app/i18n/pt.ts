@@ -1260,6 +1260,18 @@ const pt: Record<DictKey, string> = {
   "fund.t.payment_out": "Pagamento",
   "fund.t.shortage": "Falta",
   "fund.t.surplus": "Sobra",
+  "day.today": "Hoje",
+  "day.cutAt": "Corte do dia {time}",
+  "day.open": "Dia aberto",
+  "day.cut": "Corte do dia",
+  "day.recut": "Atualizar corte do dia",
+  "day.syncFirst": "sincronize primeiro",
+  "day.sinceLiq": "Desde o último fechamento de caixa",
+  "day.done": "✂️ Corte do dia feito: cobrado {cash} · emprestado {lent}.",
+  "day.date": "Dia",
+  "day.week": "Últimos 7 dias",
+  "day.sinceLiqShort": "Desde o fechamento",
+  "day.title": "Cobrado e emprestado por dia",
 };
 
 export default pt;

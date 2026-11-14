@@ -1260,6 +1260,18 @@ const ko: Record<DictKey, string> = {
   "fund.t.payment_out": "지급",
   "fund.t.shortage": "부족",
   "fund.t.surplus": "초과",
+  "day.today": "오늘",
+  "day.cutAt": "일일 마감 {time}",
+  "day.open": "마감 전",
+  "day.cut": "일일 마감",
+  "day.recut": "일일 마감 갱신",
+  "day.syncFirst": "먼저 동기화하세요",
+  "day.sinceLiq": "마지막 자금 정산 이후",
+  "day.done": "✂️ 일일 마감 완료: 수금 {cash} · 대출 {lent}.",
+  "day.date": "날짜",
+  "day.week": "최근 7일",
+  "day.sinceLiqShort": "정산 이후",
+  "day.title": "일별 수금과 대출",
 };
 
 export default ko;

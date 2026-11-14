@@ -1260,6 +1260,18 @@ const it: Record<DictKey, string> = {
   "fund.t.payment_out": "Pagamento",
   "fund.t.shortage": "Ammanco",
   "fund.t.surplus": "Eccedenza",
+  "day.today": "Oggi",
+  "day.cutAt": "Chiusura giornata {time}",
+  "day.open": "Giornata aperta",
+  "day.cut": "Chiusura giornata",
+  "day.recut": "Aggiorna chiusura giornata",
+  "day.syncFirst": "sincronizza prima",
+  "day.sinceLiq": "Dall'ultima chiusura di cassa",
+  "day.done": "✂️ Giornata chiusa: incassato {cash} · prestato {lent}.",
+  "day.date": "Giorno",
+  "day.week": "Ultimi 7 giorni",
+  "day.sinceLiqShort": "Dalla chiusura",
+  "day.title": "Incassato e prestato per giorno",
 };
 
 export default it;

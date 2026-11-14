@@ -1260,6 +1260,18 @@ const ar: Record<DictKey, string> = {
   "fund.t.payment_out": "دفعة",
   "fund.t.shortage": "عجز",
   "fund.t.surplus": "فائض",
+  "day.today": "اليوم",
+  "day.cutAt": "إقفال اليوم {time}",
+  "day.open": "اليوم مفتوح",
+  "day.cut": "إقفال اليوم",
+  "day.recut": "تحديث إقفال اليوم",
+  "day.syncFirst": "زامن أولًا",
+  "day.sinceLiq": "منذ آخر تسوية للصندوق",
+  "day.done": "✂️ تم إقفال اليوم: المحصَّل {cash} · المُقرض {lent}.",
+  "day.date": "اليوم",
+  "day.week": "آخر 7 أيام",
+  "day.sinceLiqShort": "منذ التسوية",
+  "day.title": "المحصَّل والمُقرض يوميًا",
 };
 
 export default ar;

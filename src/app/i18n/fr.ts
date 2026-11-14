@@ -1260,6 +1260,18 @@ const fr: Record<DictKey, string> = {
   "fund.t.payment_out": "Paiement",
   "fund.t.shortage": "Manquant",
   "fund.t.surplus": "Excédent",
+  "day.today": "Aujourd'hui",
+  "day.cutAt": "Arrêté du jour {time}",
+  "day.open": "Journée ouverte",
+  "day.cut": "Arrêté du jour",
+  "day.recut": "Mettre à jour l'arrêté",
+  "day.syncFirst": "synchronisez d'abord",
+  "day.sinceLiq": "Depuis la dernière clôture de caisse",
+  "day.done": "✂️ Arrêté du jour fait : encaissé {cash} · prêté {lent}.",
+  "day.date": "Jour",
+  "day.week": "7 derniers jours",
+  "day.sinceLiqShort": "Depuis la clôture",
+  "day.title": "Encaissé et prêté par jour",
 };
 
 export default fr;

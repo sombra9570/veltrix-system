@@ -1260,6 +1260,18 @@ const ja: Record<DictKey, string> = {
   "fund.t.payment_out": "支払",
   "fund.t.shortage": "不足",
   "fund.t.surplus": "過剰",
+  "day.today": "今日",
+  "day.cutAt": "日次締め {time}",
+  "day.open": "未締め",
+  "day.cut": "日次締め",
+  "day.recut": "日次締めを更新",
+  "day.syncFirst": "先に同期してください",
+  "day.sinceLiq": "前回の資金締め以降",
+  "day.done": "✂️ 日次締め完了：回収 {cash} · 貸付 {lent}。",
+  "day.date": "日付",
+  "day.week": "直近7日",
+  "day.sinceLiqShort": "締め以降",
+  "day.title": "日別の回収と貸付",
 };
 
 export default ja;

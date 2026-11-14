@@ -1260,6 +1260,18 @@ const zh: Record<DictKey, string> = {
   "fund.t.payment_out": "付款",
   "fund.t.shortage": "短款",
   "fund.t.surplus": "长款",
+  "day.today": "今天",
+  "day.cutAt": "日结 {time}",
+  "day.open": "未日结",
+  "day.cut": "日结",
+  "day.recut": "更新日结",
+  "day.syncFirst": "请先同步",
+  "day.sinceLiq": "自上次结账以来",
+  "day.done": "✂️ 已日结：收款 {cash} · 放款 {lent}。",
+  "day.date": "日期",
+  "day.week": "近 7 天",
+  "day.sinceLiqShort": "自结账",
+  "day.title": "每日收款与放款",
 };
 
 export default zh;
