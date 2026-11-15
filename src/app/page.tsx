@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useVeltrixAuth, homeForRole } from './auth-system';
 import { useLanguage } from './language-selector';
-import { BUSINESS_CATEGORIES, catKey, modKey } from './business-catalog';
 import { SiteHeader, SiteFooter, ui } from './site-header';
 import { useT } from './i18n';
 import { rpc } from '../lib/supabase';
@@ -12,10 +11,10 @@ import { HomeShowcase } from './home-showcase';
 import { useRouter } from 'next/navigation';
 import { isInstalledApp } from '../lib/standalone';
 
-// Funciones en orden de prioridad: lo que más buscan cobradores y vendedores a plazos va primero
-const FEATURES: { icon: string; n: number }[] = [
-  { icon: '🛵', n: 3 }, { icon: '🧾', n: 7 }, { icon: '💵', n: 2 }, { icon: '🛒', n: 1 },
-  { icon: '📦', n: 4 }, { icon: '📊', n: 6 }, { icon: '🛍️', n: 8 }, { icon: '🍽️', n: 5 }, { icon: '🔐', n: 9 },
+// Roles: cada persona trabaja en su propio panel
+const ROLES: [string, string][] = [
+  ['owner', '👔'], ['supervisor', '🧭'], ['cashier', '💵'], ['vendor', '🛒'], ['storekeeper', '📦'],
+  ['accountant', '📈'], ['collector', '🛵'], ['waiter', '🍽️'], ['kitchen', '🔥'], ['technician', '🔧'],
 ];
 
 // Precio regional: Latinoamérica paga el precio regional; el resto, el internacional (los dos salen de la base)
@@ -34,9 +33,6 @@ export default function HomePage() {
   const k = (key: string) => t(key as DictKey);
   const latam = LATAM.has(country.code);
   const [plans, setPlans] = useState<PublicPlan[]>(FALLBACK);
-  const [feature, setFeature] = useState(FEATURES[0].n);
-  const [kind, setKind] = useState<'products' | 'services'>('products');
-  const [cat, setCat] = useState('credit_sales');
   const [faq, setFaq] = useState<number | null>(0);
 
   const router = useRouter();
@@ -48,9 +44,6 @@ export default function HomePage() {
   useEffect(() => { rpc<PublicPlan[]>('public_plans').then((p) => { if (p?.length) setPlans(p); }).catch(() => {}); }, []);
   useEffect(() => { rpc<typeof extras>('public_addons').then((a) => setExtras(a ?? [])).catch(() => {}); }, []);
 
-  const cats = BUSINESS_CATEGORIES.filter((c) => c.kind === kind);
-  const selectedCat = BUSINESS_CATEGORIES.find((c) => c.id === cat) ?? cats[0];
-  const f = FEATURES.find((x) => x.n === feature) ?? FEATURES[0];
   const cta = loaded && session
     ? <Link href={homeForRole(session.role)} className={`${ui.btnPrimary} px-7 py-3`}>{t('home.ctaPanel')}</Link>
     : <Link href="/registro" className={`${ui.btnPrimary} px-7 py-3`}>{t('home.ctaTrial')}</Link>;
@@ -83,89 +76,77 @@ export default function HomePage() {
         <HomeShowcase />
       </section>
 
-      {/* TODO EN UNO: módulos incluidos */}
-      <section className={`${wrap} pb-6`}>
-        <p className={`text-center text-xs font-bold uppercase tracking-wide ${ui.muted}`}>{t('home.sc.allInOne')}</p>
-        <ul className="mt-3 flex flex-wrap justify-center gap-2 text-sm font-semibold">
-          {(['🛵', '🧾', '🛒', '💵', '📦', '📊', '🔐'] as const).map((ic, i) => (
-            <li key={i} className={`rounded-xl px-3 py-2 ${ui.card}`}>{ic} {k(`home.sc.mod${i + 1}`)}</li>
+      {/* OPERACIÓN CONECTADA: una acción alimenta a todo el sistema */}
+      <section className={`${wrap} py-12`}>
+        <h2 className="text-center text-2xl font-extrabold sm:text-3xl">{t('home.flow.title')}</h2>
+        <p className={`mx-auto mt-2 max-w-2xl text-center ${ui.muted}`}>{t('home.flow.sub')}</p>
+        <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {(['🧾', '🍽️', '💵', '🏢'] as const).map((ic, i) => (
+            <li key={i} className={`rounded-2xl p-5 ${ui.card}`}>
+              <p className="text-2xl">{ic}</p>
+              <p className="mt-3 font-bold">{k(`home.flow${i + 1}.a`)}</p>
+              <p className={`mt-1 text-sm ${ui.muted}`}>→ {k(`home.flow${i + 1}.b`)}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* UNA PLATAFORMA, DISTINTOS EQUIPOS */}
+      <section className={`${wrap} py-12`}>
+        <h2 className="text-center text-2xl font-extrabold sm:text-3xl">{t('home.roles.title')}</h2>
+        <p className={`mx-auto mt-2 max-w-2xl text-center ${ui.muted}`}>{t('home.roles.sub')}</p>
+        <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {ROLES.map(([r, ic]) => (
+            <li key={r} className={`rounded-2xl p-4 ${ui.card}`}>
+              <p className="font-bold">{ic} {k(`role.${r}`)}</p>
+              <p className={`mt-1 text-sm ${ui.muted}`}>{k(`home.rd.${r}`)}</p>
+            </li>
           ))}
         </ul>
       </section>
 
-      {/* PROBLEMAS QUE RESUELVE */}
-      <section className={`${wrap} py-10`}>
-        <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.p.title')}</h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className={`rounded-2xl p-5 ${ui.card}`}>
-              <p className="font-bold">😟 {k(`home.p${i}.title`)}</p>
-              <p className={`mt-2 text-sm ${ui.muted}`}>✅ {k(`home.p${i}.desc`)}</p>
+      {/* SOLUCIONES POR FORMA DE OPERAR */}
+      <section className={`${wrap} py-12`}>
+        <h2 className="text-center text-2xl font-extrabold sm:text-3xl">{t('home.v.title')}</h2>
+        <p className={`mx-auto mt-2 max-w-2xl text-center ${ui.muted}`}>{t('home.v.sub')}</p>
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {(['🏪', '🛵', '🍽️', '🔧'] as const).map((ic, i) => (
+            <div key={i} className={`rounded-2xl p-6 ${ui.card}`}>
+              <p className="text-3xl">{ic}</p>
+              <h3 className="mt-3 text-lg font-extrabold">{k(`home.v${i + 1}.t`)}</h3>
+              <p className={`mt-2 text-sm ${ui.muted}`}>{k(`home.v${i + 1}.d`)}</p>
+            </div>
+          ))}
+        </div>
+        <p className={`mt-4 text-center text-xs ${ui.muted}`}>{t('home.mixedHint')}</p>
+      </section>
+
+      {/* POR QUÉ VELTRIX */}
+      <section className={`${wrap} py-12`}>
+        <h2 className="text-center text-2xl font-extrabold sm:text-3xl">{t('home.why.title')}</h2>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className={`rounded-2xl p-6 ${ui.card}`}>
+              <h3 className="font-extrabold text-blue-700 dark:text-blue-400">{k(`home.why${i}.t`)}</h3>
+              <p className={`mt-2 text-sm ${ui.muted}`}>{k(`home.why${i}.d`)}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* FUNCIONES: lista en panel lateral + detalle */}
-      <section className={`${wrap} py-10`}>
-        <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.featuresTitle')}</h2>
-        <p className={`mt-1 text-center text-sm ${ui.muted}`}>{t('home.featuresHint')}</p>
-        <div className={`mt-6 grid overflow-hidden rounded-2xl md:grid-cols-[18rem_1fr] ${ui.card}`}>
-          <nav className="grid grid-cols-2 gap-1 border-b border-slate-200 p-2 sm:grid-cols-3 md:grid-cols-1 md:border-b-0 md:border-e dark:border-slate-800" aria-label={t('home.featuresTitle')}>
-            {FEATURES.map((x) => (
-              <button key={x.n} type="button" onClick={() => setFeature(x.n)}
-                className={`flex items-center gap-2 rounded-xl px-3 py-2.5 text-start text-sm font-semibold transition cursor-pointer ${feature === x.n ? 'bg-blue-600 text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
-                <span className="text-lg">{x.icon}</span><span className="min-w-0">{k(`home.f${x.n}.title`)}</span>
-              </button>
+      {/* SEGURIDAD: solo garantías que cumplimos */}
+      <section className={`${wrap} py-12`}>
+        <div className={`rounded-3xl p-6 sm:p-10 ${ui.card}`}>
+          <h2 className="text-center text-2xl font-extrabold sm:text-3xl">🔐 {t('home.sec.title')}</h2>
+          <p className={`mx-auto mt-2 max-w-2xl text-center ${ui.muted}`}>{t('home.sec.sub')}</p>
+          <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <li key={i}>
+                <p className="font-bold">✓ {k(`home.sec${i}.t`)}</p>
+                <p className={`mt-1 text-sm ${ui.muted}`}>{k(`home.sec${i}.d`)}</p>
+              </li>
             ))}
-          </nav>
-          <div className="flex flex-col justify-center p-6 sm:p-10">
-            <p className="text-5xl">{f.icon}</p>
-            <h3 className="mt-4 text-2xl font-extrabold">{k(`home.f${f.n}.title`)}</h3>
-            <p className={`mt-3 max-w-xl text-base ${ui.muted}`}>{k(`home.f${f.n}.desc`)}</p>
-            <div className="mt-6">{cta}</div>
-          </div>
-        </div>
-      </section>
-
-      {/* TIPO DE NEGOCIO: rubros en panel lateral + lo que se activa */}
-      <section className={`${wrap} py-10`}>
-        <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.forYourBusiness')}</h2>
-        <p className={`mt-1 text-center text-sm ${ui.muted}`}>{t('home.bizHint')}</p>
-        <div className={`mt-6 grid overflow-hidden rounded-2xl md:grid-cols-[18rem_1fr] ${ui.card}`}>
-          <div className="border-b border-slate-200 md:border-b-0 md:border-e dark:border-slate-800">
-            <div className="grid grid-cols-2 gap-1 p-2">
-              {(['products', 'services'] as const).map((kd) => (
-                <button key={kd} type="button" onClick={() => { setKind(kd); setCat(BUSINESS_CATEGORIES.find((c) => c.kind === kd)!.id); }}
-                  className={`rounded-lg px-3 py-2 text-sm font-semibold cursor-pointer ${kind === kd ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'border border-slate-200 dark:border-slate-700'}`}>
-                  {kd === 'products' ? '📦' : '🛠️'} {k(`kind.${kd}`)}
-                </button>
-              ))}
-            </div>
-            <ul className="grid max-h-80 grid-cols-1 gap-1 overflow-y-auto overscroll-contain p-2 pt-0 sm:grid-cols-2 md:grid-cols-1">
-              {cats.map((c) => (
-                <li key={c.id}>
-                  <button type="button" onClick={() => setCat(c.id)}
-                    className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-start text-sm transition cursor-pointer ${selectedCat?.id === c.id ? 'bg-blue-600 font-semibold text-white' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
-                    <span>{c.icon}</span><span className="min-w-0">{t(catKey(c.id))}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-          {selectedCat && (
-            <div className="flex flex-col justify-center p-6 sm:p-10">
-              <p className="text-5xl">{selectedCat.icon}</p>
-              <h3 className="mt-4 text-2xl font-extrabold">{t(catKey(selectedCat.id))}</h3>
-              <p className={`mt-3 text-sm font-semibold ${ui.muted}`}>{t('home.bizModules')}</p>
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {selectedCat.modules.map((m) => (
-                  <li key={m} className="rounded-full border border-blue-300 bg-blue-50 px-3 py-1.5 text-sm font-semibold text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">✓ {t(modKey(m))}</li>
-                ))}
-              </ul>
-              <p className={`mt-4 text-xs ${ui.muted}`}>{t('home.mixedHint')}</p>
-            </div>
-          )}
+          </ul>
         </div>
       </section>
 
