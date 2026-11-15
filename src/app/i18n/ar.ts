@@ -1399,6 +1399,7 @@ const ar: Record<DictKey, string> = {
   "tp.st.pending": "قيد المراجعة",
   "tp.st.approved": "مقبول",
   "tp.st.rejected": "مرفوض",
+  "home.taxIncluded": "الأسعار مع الفاتورة: تشمل ضريبة القيمة المضافة وضريبة المعاملات.",
 };
 
 export default ar;

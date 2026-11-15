@@ -1408,6 +1408,7 @@ const es = {
   "tp.st.pending": "En revisión",
   "tp.st.approved": "Aprobado",
   "tp.st.rejected": "Rechazado",
+  "home.taxIncluded": "Precios con factura: IVA e IT incluidos.",
 };
 
 export default es;

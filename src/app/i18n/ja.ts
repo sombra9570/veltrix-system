@@ -1399,6 +1399,7 @@ const ja: Record<DictKey, string> = {
   "tp.st.pending": "確認中",
   "tp.st.approved": "承認済み",
   "tp.st.rejected": "却下",
+  "home.taxIncluded": "請求書付き価格：付加価値税と取引税込み。",
 };
 
 export default ja;

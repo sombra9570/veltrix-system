@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase, rpc } from '../../../lib/supabase';
 import { compressImage } from '../image';
+import { grossUp } from '../../../lib/tax';
 
 type Info = { holder?: string; bank?: string; account?: string; currency?: string; note?: string; qr_path?: string };
 type Proof = { id: string; at: string; org: string; email: string | null; plan: string | null; plan_usd: number | null; months: number; amount: number; currency: string; reference: string | null; path: string };
@@ -23,7 +24,7 @@ export function TransferAdmin() {
       setInfo(await rpc<Info>('billing_transfer_info') ?? {});
       const p = await rpc<Proof[]>('admin_payment_proofs', { p_status: 'pending' }) ?? [];
       setProofs(p);
-      setUsd(Object.fromEntries(p.map((x) => [x.id, String(Number(x.plan_usd ?? 0) * x.months)])));
+      setUsd(Object.fromEntries(p.map((x) => [x.id, String(Math.round((x.currency === 'BOB' ? grossUp(Number(x.plan_usd ?? 0), 'BO') : Number(x.plan_usd ?? 0)) * x.months * 100) / 100)])));
     } catch (e) { setMsg(e instanceof Error ? e.message : 'No se pudo cargar'); }
   }, []);
   useEffect(() => { load(); }, [load]);

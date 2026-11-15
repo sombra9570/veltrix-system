@@ -1399,6 +1399,7 @@ const ru: Record<DictKey, string> = {
   "tp.st.pending": "На проверке",
   "tp.st.approved": "Одобрено",
   "tp.st.rejected": "Отклонено",
+  "home.taxIncluded": "Цены со счётом-фактурой: НДС и IT включены.",
 };
 
 export default ru;

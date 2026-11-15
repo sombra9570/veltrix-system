@@ -1399,6 +1399,7 @@ const ko: Record<DictKey, string> = {
   "tp.st.pending": "검토 중",
   "tp.st.approved": "승인됨",
   "tp.st.rejected": "거절됨",
+  "home.taxIncluded": "세금계산서 포함 가격: 부가세 및 거래세 포함.",
 };
 
 export default ko;

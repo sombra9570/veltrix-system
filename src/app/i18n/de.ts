@@ -1399,6 +1399,7 @@ const de: Record<DictKey, string> = {
   "tp.st.pending": "In Prüfung",
   "tp.st.approved": "Genehmigt",
   "tp.st.rejected": "Abgelehnt",
+  "home.taxIncluded": "Preise mit Rechnung: MwSt. und IT inbegriffen.",
 };
 
 export default de;

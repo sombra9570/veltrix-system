@@ -7,6 +7,7 @@ import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { compressImage } from '../../image';
 import { parseAmount } from '../../format';
+import { grossUp } from '../../../../lib/tax';
 
 type Info = { holder?: string; bank?: string; account?: string; currency?: string; note?: string; qr_path?: string };
 type Proof = { id: string; at: string; months: number; amount: number; currency: string; reference: string | null; status: 'pending' | 'approved' | 'rejected'; note: string | null };
@@ -76,7 +77,7 @@ export function TransferPay({ orgId, monthly, currency }: { orgId: string; month
           {info.bank && <div><dt className={`inline ${ui.muted}`}>{t('tp.bank')}: </dt><dd className="inline font-semibold">{info.bank}</dd></div>}
           {info.account && <div><dt className={`inline ${ui.muted}`}>{t('tp.account')}: </dt><dd className="inline font-semibold tabular-nums">{info.account}</dd></div>}
           {info.note && <p className={`pt-1 text-xs ${ui.muted}`}>{info.note}</p>}
-          <p className="pt-2 text-xs font-semibold">{t('tp.monthly', { amount: fmt(monthly, 'US$') })}</p>
+          <p className="pt-2 text-xs font-semibold">{t('tp.monthly', { amount: fmt(info.currency === 'BOB' ? grossUp(monthly, 'BO') : monthly, 'US$') })}{info.currency === 'BOB' ? ` · ${t('home.taxIncluded')}` : ''}</p>
         </dl>
         {qr && <img src={qr} alt="QR" className="h-40 w-40 rounded-xl border border-slate-200 bg-white object-contain p-1 dark:border-slate-700" />}
       </div>

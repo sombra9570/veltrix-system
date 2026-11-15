@@ -1399,6 +1399,7 @@ const pt: Record<DictKey, string> = {
   "tp.st.pending": "Em análise",
   "tp.st.approved": "Aprovado",
   "tp.st.rejected": "Recusado",
+  "home.taxIncluded": "Preços com nota fiscal: IVA e IT incluídos.",
 };
 
 export default pt;

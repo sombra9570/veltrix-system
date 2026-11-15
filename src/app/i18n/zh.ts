@@ -1399,6 +1399,7 @@ const zh: Record<DictKey, string> = {
   "tp.st.pending": "审核中",
   "tp.st.approved": "已通过",
   "tp.st.rejected": "已拒绝",
+  "home.taxIncluded": "含发票价格：已含增值税和交易税。",
 };
 
 export default zh;

@@ -10,6 +10,7 @@ import type { DictKey } from './i18n/es';
 import { HomeShowcase } from './home-showcase';
 import { useRouter } from 'next/navigation';
 import { isInstalledApp } from '../lib/standalone';
+import { grossUp, taxIncluded } from '../lib/tax';
 
 // Roles: cada persona trabaja en su propio panel
 const ROLES: [string, string][] = [
@@ -170,7 +171,7 @@ export default function HomePage() {
       <section id="planes" className={`${wrap} py-10`}>
         <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.plansTitle')}</h2>
         <p className={`mt-1 text-center text-sm ${ui.muted}`}>{t('home.plansSubtitle')}</p>
-        <p className={`text-center text-xs ${ui.muted}`}>{t('home.pricesLocal')} {t('home.plusTax')}</p>
+        <p className={`text-center text-xs ${ui.muted}`}>{t('home.pricesLocal')} {taxIncluded(country.code) ? t('home.taxIncluded') : t('home.plusTax')}</p>
         <div className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-4 lg:grid-cols-3 xl:grid-cols-5">
           {plans.map((p) => {
             const best = p.code === 'pro';
@@ -180,7 +181,7 @@ export default function HomePage() {
                 <p className="text-lg font-bold">{p.name}</p>
                 <p className={`text-xs ${ui.muted}`}>{k(`plan.${p.code}.desc`)}</p>
                 <p className="mt-4 text-2xl font-extrabold sm:text-3xl">
-                  {formatMoney(Number(latam ? p.price_usd : p.price_global_usd), false, true)}
+                  {formatMoney(grossUp(Number(latam ? p.price_usd : p.price_global_usd), country.code), false, true)}
                   <span className={`text-sm font-semibold ${ui.muted}`}> {t('common.perMonth')}</span>
                 </p>
                 <ul className="mt-4 flex-1 space-y-1.5 text-sm">
@@ -196,7 +197,7 @@ export default function HomePage() {
           })}
         </div>
         {extras.length > 0 && (() => {
-          const px = (c: string) => { const a = extras.find((e) => e.code === c); return a ? formatMoney(Number(latam ? a.price_usd : a.price_global_usd), false, true) : null; };
+          const px = (c: string) => { const a = extras.find((e) => e.code === c); return a ? formatMoney(grossUp(Number(latam ? a.price_usd : a.price_global_usd), country.code), false, true) : null; };
           const st = extras.find((e) => e.code === 'storage');
           return (
             <p className={`mt-4 text-center text-xs ${ui.muted}`}>

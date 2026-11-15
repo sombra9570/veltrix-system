@@ -1399,6 +1399,7 @@ const hi: Record<DictKey, string> = {
   "tp.st.pending": "जाँच में",
   "tp.st.approved": "मंज़ूर",
   "tp.st.rejected": "अस्वीकृत",
+  "home.taxIncluded": "बिल सहित कीमतें: VAT और IT शामिल।",
 };
 
 export default hi;
