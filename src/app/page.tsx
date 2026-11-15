@@ -21,9 +21,11 @@ const ROLES: [string, string][] = [
 const LATAM = new Set(['BO', 'MX', 'CO', 'AR', 'CL', 'PE', 'BR', 'EC', 'PY', 'UY', 'VE', 'GT', 'HN', 'SV', 'NI', 'CR', 'PA', 'DO', 'PR', 'CU']);
 type PublicPlan = { code: string; name: string; price_usd: number; price_global_usd: number; max_companies: number; max_branches: number; max_users: number; max_storage_mb: number };
 const FALLBACK: PublicPlan[] = [
-  { code: 'starter', name: 'Starter', price_usd: 19, price_global_usd: 29, max_companies: 1, max_branches: 1, max_users: 3, max_storage_mb: 1024 },
-  { code: 'pro', name: 'Pro', price_usd: 40, price_global_usd: 59, max_companies: 1, max_branches: 3, max_users: 15, max_storage_mb: 5120 },
-  { code: 'enterprise', name: 'Enterprise', price_usd: 115, price_global_usd: 199, max_companies: 3, max_branches: 10, max_users: 50, max_storage_mb: 20480 },
+  { code: 'basic', name: 'Básico', price_usd: 12, price_global_usd: 19, max_companies: 1, max_branches: 1, max_users: 4, max_storage_mb: 1024 },
+  { code: 'starter', name: 'Startup', price_usd: 25, price_global_usd: 39, max_companies: 1, max_branches: 1, max_users: 8, max_storage_mb: 3072 },
+  { code: 'pro', name: 'Empresa', price_usd: 49, price_global_usd: 79, max_companies: 1, max_branches: 2, max_users: 15, max_storage_mb: 8192 },
+  { code: 'enterprise', name: 'Enterprise', price_usd: 129, price_global_usd: 219, max_companies: 3, max_branches: 10, max_users: 50, max_storage_mb: 25600 },
+  { code: 'enterprise_plus', name: 'Enterprise Plus', price_usd: 249, price_global_usd: 399, max_companies: 10, max_branches: 25, max_users: 91, max_storage_mb: 61440 },
 ];
 
 export default function HomePage() {
@@ -169,7 +171,7 @@ export default function HomePage() {
         <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.plansTitle')}</h2>
         <p className={`mt-1 text-center text-sm ${ui.muted}`}>{t('home.plansSubtitle')}</p>
         <p className={`text-center text-xs ${ui.muted}`}>{t('home.pricesLocal')} {t('home.plusTax')}</p>
-        <div className="mt-8 grid gap-6 md:grid-cols-3 md:gap-4">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-4 lg:grid-cols-3 xl:grid-cols-5">
           {plans.map((p) => {
             const best = p.code === 'pro';
             return (
@@ -182,11 +184,11 @@ export default function HomePage() {
                   <span className={`text-sm font-semibold ${ui.muted}`}> {t('common.perMonth')}</span>
                 </p>
                 <ul className="mt-4 flex-1 space-y-1.5 text-sm">
+                  <li className="font-semibold">✓ {t('bill.limWorkers', { n: Math.max(1, p.max_users - 1) })}</li>
                   <li>✓ {p.max_branches === 1 ? k('plan.starter.i3') : t('bill.limBranches', { n: p.max_branches })}</li>
-                  <li>✓ {t('bill.limUsers', { n: p.max_users })}</li>
                   {p.max_companies > 1 && <li>✓ {t('bill.limCompanies', { n: p.max_companies })}</li>}
                   <li>✓ {t('bill.limStorage', { n: Math.round(p.max_storage_mb / 1024) })}</li>
-                  {[1, 2, 3].filter((i) => !(p.code === 'starter' && i === 3) && !(p.code === 'enterprise' && i === 2)).map((i) => <li key={i}>✓ {k(`plan.${p.code}.i${i}`)}</li>)}
+                  <li>✓ {k(`plan.${p.code}.i1`)}</li>
                 </ul>
                 <Link href="/registro" className={`${best ? ui.btnPrimary : ui.btnGhost} mt-6 w-full`}>{t('home.startFree')}</Link>
               </div>

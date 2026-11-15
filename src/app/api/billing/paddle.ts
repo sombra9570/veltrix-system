@@ -3,7 +3,7 @@
 //   PADDLE_API_KEY              clave de la API (Developer tools → Authentication)
 //   PADDLE_WEBHOOK_SECRET       "secret key" del destino de notificaciones
 //   PADDLE_ENV                  "sandbox" para pruebas; vacío = producción
-//   PADDLE_PRICES               {"starter":{"latam":"pri_…","global":"pri_…"},"pro":{…},"enterprise":{…}}
+//   PADDLE_PRICES               {"basic":{"latam":"pri_…","global":"pri_…"},"starter":{…},"pro":{…},"enterprise":{…},"enterprise_plus":{…}}
 //   PADDLE_FOUNDER_DISCOUNTS    (opcional) {"50":"dsc_…"}: descuento recurrente de 12 meses por % de fundador
 //   PADDLE_ADDON_PRICES         {"user":{"latam":"pri_…","global":"pri_…"},"branch":{…},"storage":{…}}
 //   PADDLE_REFERRAL_DISCOUNTS   (opcional) {"15":"dsc_…","20":"dsc_…","30":"dsc_…"}: descuentos de UN solo cobro
