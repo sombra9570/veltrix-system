@@ -39,6 +39,7 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [ ] QR del negocio en pantalla al cobrar + foto del comprobante (QR Simple dinámico requiere convenio bancario)
 - [ ] Demo pública que se reinicia cada noche (no usar las cuentas de auditoría)
 - [ ] Sección de seguridad y 4 rubros en la portada; más roles en la vitrina; video de 60–120 s
+- [ ] Reporte consolidado de todas las empresas en una moneda (USD u otra) con tipo de cambio del día — ADICIONAL: se mantiene la vista por empresa y por sucursal en su moneda
 - [ ] Cuentas financieras: pantalla para crear banco/caja general (pago a proveedores las necesita)
 - [ ] Copias de seguridad diarias garantizadas al pasar a Supabase Pro (recién ahí prometerlas)
 
