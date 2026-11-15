@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase, rpc } from '../../lib/supabase';
 import { useLanguage, LangCode } from '../language-selector';
 import es, { DictKey } from './es';
@@ -37,7 +37,7 @@ export function translate(lang: LangCode, key: DictKey, vars?: Record<string, st
 
 export function useT() {
   const { lang } = useLanguage();
-  const [, rerender] = useState(0);
+  const [ver, rerender] = useState(0);
   useEffect(() => {
     if (DICTS[lang]) return;
     const f = () => rerender((x) => x + 1);
@@ -45,7 +45,10 @@ export function useT() {
     ensureDict(lang);
     return () => { dictListeners.delete(f); };
   }, [lang]);
-  const t: TFunction = (key, vars) => translate(lang, key, vars);
+  // Función estable: solo cambia al cambiar el idioma o al llegar su diccionario.
+  // Si cambiara en cada render, las pantallas que la usan al cargar datos entrarían en bucle (parpadeo).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const t = useCallback<TFunction>((key, vars) => translate(lang, key, vars), [lang, ver]);
   return { t, lang };
 }
 
