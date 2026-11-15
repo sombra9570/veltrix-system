@@ -75,7 +75,7 @@ export function OutForm({ branchId, items, onDone, flash }: {
       setProduct(''); setQty(''); setEv(emptyEvidence());
       flash(true, t('ev.outSaved'));
       onDone();
-    } catch (e) { flash(false, (e as Error).message.includes('suficiente') ? t('ev.noStock') : t('err.generic')); }
+    } catch (e) { flash(false, (e as Error).message.includes('suficiente') ? t('ev.noStock') : (e as Error).message.includes('PERM_DENIED') ? t('err.permDenied') : t('err.generic')); }
     finally { setBusy(false); }
   };
 

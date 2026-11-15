@@ -67,6 +67,7 @@ const DAY = 86_400_000;
 
 /** Traduce los errores de la base (límites del plan, etc.) a un mensaje claro */
 export function friendlyError(msg: string, t: (k: DictKey) => string): string {
+  if (msg.includes('PERM_DENIED')) return t('err.permDenied');
   if (msg.includes('PLAN_LIMIT_BRANCHES')) return t('err.limitBranches');
   if (msg.includes('PLAN_LIMIT_USERS')) return t('err.limitUsers');
   if (msg.includes('PLAN_LIMIT_COMPANIES')) return t('err.limitCompanies');

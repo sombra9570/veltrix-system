@@ -14,10 +14,14 @@ type Data = {
 };
 
 // Qué permisos tienen sentido para cada rol (los demás no se muestran para no confundir)
+// Permisos delegables por rol (el dueño y el supervisor ya lo tienen todo en su sucursal)
 const ROLE_KEYS: Record<string, string[]> = {
-  cashier: ['cash.see_expected', 'cash.movements', 'customers.view_docs'],
-  vendor: ['sales.credit', 'customers.edit', 'customers.view_docs'],
-  collector: ['collector.expenses'],
+  cashier: ['cash.see_expected', 'cash.movements', 'customers.view_docs', 'payments.reverse'],
+  vendor: ['sales.credit', 'customers.edit', 'customers.view_docs', 'payments.reverse'],
+  collector: ['collector.expenses', 'loans.create', 'loans.customers', 'loans.interest', 'loans.cancel', 'loans.reschedule', 'payments.reverse', 'routes.liquidate', 'routes.invest'],
+  storekeeper: ['products.edit', 'products.price', 'products.delete', 'inv.receive', 'inv.adjust', 'inv.out', 'inv.transfer'],
+  accountant: ['reports.export'],
+  technician: ['customers.edit', 'customers.view_docs'],
 };
 
 function Toggle({ on, onChange, label, disabled }: { on: boolean; onChange: (v: boolean) => void; label: string; disabled?: boolean }) {
@@ -113,7 +117,7 @@ export default function PermissionsPage() {
                       </button>
                       {open === u.membership_id && (
                         <ul className="space-y-3 px-4 pb-4">
-                          {ROLE_KEYS[u.role].map((key) => {
+                          {(ROLE_KEYS[u.role] ?? []).map((key) => {
                             const own = u.permissions?.[key];
                             const inherited = !!d.roles[u.role]?.[key];
                             const val = own === undefined ? 'inherit' : own ? 'yes' : 'no';

@@ -59,6 +59,7 @@ export default function ReportsPage() {
   const [r, setR] = useState<Report | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
+  const [canExport, setCanExport] = useState(true);
 
   useEffect(() => {
     const [f, tt] = range('month');
@@ -66,6 +67,8 @@ export default function ReportsPage() {
     rpc<MBranch[]>('reader_branches').catch(() => rpc<MBranch[]>('manager_branches')).then((b) => {
       const list = b ?? [];
       setBranches(list);
+      if (list.length) rpc<Record<string, boolean>>('my_permissions', { p_branch: list[0].id })
+        .then((p) => setCanExport(p?.['reports.export'] !== false)).catch(() => undefined);
       if (list.length) setScope(list[0].company_wide && list.filter((x) => x.company_id === list[0].company_id).length > 1 ? `company:${list[0].company_id}` : `branch:${list[0].id}`);
     }).catch(() => {});
   }, []);
@@ -131,7 +134,7 @@ export default function ReportsPage() {
           <h1 className="text-xl font-extrabold sm:text-2xl">📊 {t('nav.reports')}</h1>
           <p className={`text-sm ${ui.muted}`}>{t('rep.subtitle')}</p>
         </div>
-        <button type="button" disabled={!r} onClick={exportCsv} className={`${ui.btnGhost} max-sm:w-full`}>⬇️ {t('rep.export')}</button>
+        {canExport && <button type="button" disabled={!r} onClick={exportCsv} className={`${ui.btnGhost} max-sm:w-full`}>⬇️ {t('rep.export')}</button>}
       </div>
 
       <div className="space-y-3">
