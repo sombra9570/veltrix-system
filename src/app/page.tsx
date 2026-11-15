@@ -24,9 +24,9 @@ type PublicPlan = { code: string; name: string; price_usd: number; price_global_
 const FALLBACK: PublicPlan[] = [
   { code: 'basic', name: 'Básico', price_usd: 12, price_global_usd: 19, max_companies: 1, max_branches: 1, max_users: 4, max_storage_mb: 1024 },
   { code: 'starter', name: 'Startup', price_usd: 25, price_global_usd: 39, max_companies: 1, max_branches: 1, max_users: 8, max_storage_mb: 3072 },
-  { code: 'pro', name: 'Empresa', price_usd: 49, price_global_usd: 79, max_companies: 1, max_branches: 2, max_users: 15, max_storage_mb: 8192 },
+  { code: 'pro', name: 'Empresa', price_usd: 49, price_global_usd: 75, max_companies: 1, max_branches: 2, max_users: 15, max_storage_mb: 8192 },
   { code: 'enterprise', name: 'Enterprise', price_usd: 129, price_global_usd: 219, max_companies: 3, max_branches: 10, max_users: 50, max_storage_mb: 25600 },
-  { code: 'enterprise_plus', name: 'Enterprise Plus', price_usd: 249, price_global_usd: 399, max_companies: 10, max_branches: 25, max_users: 91, max_storage_mb: 61440 },
+  { code: 'enterprise_plus', name: 'Enterprise Plus', price_usd: 235, price_global_usd: 389, max_companies: 10, max_branches: 25, max_users: 91, max_storage_mb: 61440 },
 ];
 
 export default function HomePage() {
