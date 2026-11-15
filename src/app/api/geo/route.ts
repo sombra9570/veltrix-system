@@ -1,5 +1,4 @@
 // País del visitante según su conexión (Vercel lo agrega en cada petición). Sin datos personales ni cookies.
-export const runtime = 'edge';
 
 export function GET(req: Request) {
   const country = req.headers.get('x-vercel-ip-country') ?? null;
