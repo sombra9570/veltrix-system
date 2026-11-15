@@ -314,13 +314,14 @@ export function PosScreen() {
                 const out = p.stock !== null && Number(p.stock) - inCart(p.id) <= 0;
                 const qty = inCart(p.id);
                 return (
+                  <div key={p.id} className="relative">
                   <button
-                    key={p.id}
                     type="button"
-                    disabled={out}
-                    onClick={() => add(p)}
-                    className={`relative flex min-h-28 flex-col justify-between rounded-2xl p-3 text-left transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${ui.card} ${
-                      qty > 0 ? 'ring-2 ring-blue-500' : 'hover:border-blue-400'
+                    disabled={out && qty === 0}
+                    onClick={() => { if (!out) add(p); }}
+                    onContextMenu={(e) => { if (qty > 0) { e.preventDefault(); change(p.id, -1); } }}
+                    className={`relative flex min-h-28 w-full flex-col justify-between rounded-2xl p-3 text-left transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 ${ui.card} ${
+                      qty > 0 ? 'ring-2 ring-blue-500 pb-12' : 'hover:border-blue-400'
                     }`}
                   >
                     {qty > 0 && (
@@ -340,6 +341,22 @@ export function PosScreen() {
                       </span>
                     </span>
                   </button>
+                  {qty > 0 && (
+                    <>
+                      {/* Quitar del todo */}
+                      <button type="button" onClick={() => change(p.id, -qty)} aria-label={t('pos.removeItem')}
+                        className="absolute start-1.5 top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-slate-700 dark:text-slate-200">✕</button>
+                      {/* − a la izquierda (quita uno), + a la derecha (agrega uno) */}
+                      <div className="absolute inset-x-2 bottom-2 z-10 flex items-center justify-between gap-1">
+                        <button type="button" onClick={() => change(p.id, -1)} aria-label="−"
+                          className="h-9 flex-1 rounded-lg border border-slate-300 bg-white text-lg font-bold text-slate-700 cursor-pointer hover:bg-red-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">−</button>
+                        <span className="w-8 text-center text-sm font-extrabold tabular-nums">{qty}</span>
+                        <button type="button" disabled={out} onClick={() => add(p)} aria-label="+"
+                          className="h-9 flex-1 rounded-lg bg-blue-600 text-lg font-bold text-white cursor-pointer hover:bg-blue-700 disabled:opacity-40">+</button>
+                      </div>
+                    </>
+                  )}
+                  </div>
                 );
               })}
             </div>

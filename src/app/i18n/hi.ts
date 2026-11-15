@@ -1404,6 +1404,7 @@ const hi: Record<DictKey, string> = {
   "net.offline": "इंटरनेट कनेक्शन नहीं है। सिग्नल लौटते ही ऐप अपने आप अपडेट हो जाएगा।",
   "net.failed": "जानकारी लोड नहीं हो सकी। अपना कनेक्शन जाँचें।",
   "net.retry": "फिर कोशिश करें",
+  "pos.removeItem": "हटाएँ",
 };
 
 export default hi;

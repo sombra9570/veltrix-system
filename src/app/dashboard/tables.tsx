@@ -182,6 +182,14 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
     const ex = a.find((l) => l.product.id === p.id && !l.notes);
     return ex ? a.map((l) => (l === ex ? { ...l, qty: l.qty + 1 } : l)) : [...a, { product: p, qty: 1, notes: '' }];
   });
+  // Quita uno (del último renglón de ese producto) o todos
+  const sub = (p: Product, all = false) => setAdding((a) => {
+    if (all) return a.filter((l) => l.product.id !== p.id);
+    const k = a.map((l) => l.product.id).lastIndexOf(p.id);
+    if (k < 0) return a;
+    return a.map((l, j) => (j === k ? { ...l, qty: l.qty - 1 } : l)).filter((l) => l.qty > 0);
+  });
+  const qtyOf = (id: string) => adding.filter((l) => l.product.id === id).reduce((n, l) => n + l.qty, 0);
 
   const send = async () => {
     if (!adding.length) return;
@@ -245,13 +253,30 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
         <p className="text-sm font-bold">➕ {t('rest.addItems')}</p>
         <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('pos.search')} className={ui.input} />
         <div className="grid max-h-56 grid-cols-2 gap-2 overflow-y-auto">
-          {list.map((p) => (
-            <button key={p.id} type="button" onClick={() => add(p)} disabled={p.stock !== null && Number(p.stock) <= 0}
-              className="rounded-xl border border-slate-200 p-2 text-left text-sm transition hover:border-blue-400 cursor-pointer disabled:opacity-40 dark:border-slate-700">
-              <span className="line-clamp-2 font-semibold">{p.name}</span>
-              <span className={`text-xs ${ui.muted}`}>{fmt(p.price)}</span>
-            </button>
-          ))}
+          {list.map((p) => {
+            const q = qtyOf(p.id);
+            return (
+              <div key={p.id} className="relative">
+                <button type="button" onClick={() => add(p)} disabled={p.stock !== null && Number(p.stock) <= 0}
+                  onContextMenu={(e) => { if (q > 0) { e.preventDefault(); sub(p); } }}
+                  className={`w-full rounded-xl border p-2 text-left text-sm transition cursor-pointer disabled:opacity-40 ${q > 0 ? 'border-blue-500 ring-1 ring-blue-500 pb-10' : 'border-slate-200 hover:border-blue-400 dark:border-slate-700'}`}>
+                  <span className={`line-clamp-2 font-semibold ${q > 0 ? 'ps-5' : ''}`}>{p.name}</span>
+                  <span className={`text-xs ${ui.muted}`}>{fmt(p.price)}</span>
+                </button>
+                {q > 0 && (
+                  <>
+                    <button type="button" onClick={() => sub(p, true)} aria-label={t('pos.removeItem')}
+                      className="absolute start-1 top-1 z-10 grid h-5 w-5 place-items-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-700 cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-slate-700 dark:text-slate-200">✕</button>
+                    <div className="absolute inset-x-1.5 bottom-1.5 z-10 flex items-center gap-1">
+                      <button type="button" onClick={() => sub(p)} aria-label="−" className="h-7 flex-1 rounded-md border border-slate-300 bg-white font-bold text-slate-700 cursor-pointer dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">−</button>
+                      <span className="w-6 text-center text-xs font-extrabold tabular-nums">{q}</span>
+                      <button type="button" onClick={() => add(p)} aria-label="+" className="h-7 flex-1 rounded-md bg-blue-600 font-bold text-white cursor-pointer">+</button>
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
         {adding.length > 0 && (
           <div className="space-y-2 border-t border-slate-200 pt-2 dark:border-slate-800">

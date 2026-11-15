@@ -1404,6 +1404,7 @@ const pt: Record<DictKey, string> = {
   "net.offline": "Sem conexão com a internet. Quando o sinal voltar, o app se atualiza sozinho.",
   "net.failed": "Não foi possível carregar as informações. Verifique sua conexão.",
   "net.retry": "Tentar de novo",
+  "pos.removeItem": "Remover",
 };
 
 export default pt;

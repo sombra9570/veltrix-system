@@ -1404,6 +1404,7 @@ const ja: Record<DictKey, string> = {
   "net.offline": "インターネットに接続されていません。電波が戻るとアプリが自動で更新されます。",
   "net.failed": "情報を読み込めませんでした。接続を確認してください。",
   "net.retry": "再試行",
+  "pos.removeItem": "削除",
 };
 
 export default ja;

@@ -1413,6 +1413,7 @@ const es = {
   "net.offline": "Sin conexión a internet. Al volver la señal, la app se actualiza sola.",
   "net.failed": "No se pudo cargar la información. Revisa tu conexión.",
   "net.retry": "Reintentar",
+  "pos.removeItem": "Quitar",
 };
 
 export default es;

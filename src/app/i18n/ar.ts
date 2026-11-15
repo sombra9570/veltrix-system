@@ -1404,6 +1404,7 @@ const ar: Record<DictKey, string> = {
   "net.offline": "لا يوجد اتصال بالإنترنت. عند عودة الإشارة يتحدّث التطبيق تلقائيًا.",
   "net.failed": "تعذّر تحميل المعلومات. تحقّق من اتصالك.",
   "net.retry": "إعادة المحاولة",
+  "pos.removeItem": "إزالة",
 };
 
 export default ar;

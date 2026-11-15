@@ -1404,6 +1404,7 @@ const ko: Record<DictKey, string> = {
   "net.offline": "인터넷 연결이 없습니다. 신호가 돌아오면 앱이 자동으로 업데이트됩니다.",
   "net.failed": "정보를 불러오지 못했습니다. 연결을 확인하세요.",
   "net.retry": "다시 시도",
+  "pos.removeItem": "빼기",
 };
 
 export default ko;

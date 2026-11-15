@@ -1404,6 +1404,7 @@ const zh: Record<DictKey, string> = {
   "net.offline": "没有网络连接。信号恢复后应用会自动更新。",
   "net.failed": "无法加载信息，请检查网络连接。",
   "net.retry": "重试",
+  "pos.removeItem": "移除",
 };
 
 export default zh;
