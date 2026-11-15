@@ -6,6 +6,7 @@ import { LanguageDropdown, RegionalStatusBar, translations } from './regional-to
 import { useVeltrixAuth } from '../../auth-system';
 import { rpc, supabase } from '../../../lib/supabase';
 import { Spinner } from '../../spinner';
+import { TransferAdmin } from './transfer-admin';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -472,6 +473,9 @@ export default function GlobalCoreAdminPage() {
             </div>
           )}
         </section>
+
+        {/* PAGOS POR TRANSFERENCIA O QR */}
+        <TransferAdmin />
 
         {/* PILOTOS Y FUNDADORES */}
         <section className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">

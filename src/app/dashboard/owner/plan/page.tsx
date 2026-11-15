@@ -6,6 +6,7 @@ import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { useOwner } from '../owner-context';
+import { TransferPay } from './transfer-pay';
 
 type PlanOpt = { code: string; name: string; price: number; max_branches: number; max_users: number; max_companies: number; max_storage_mb: number; max_store_products: number };
 type Billing = {
@@ -234,6 +235,8 @@ export default function PlanPage() {
         <p className={`mt-1 text-sm ${ui.muted}`}>{t('bill.qrText')}</p>
         <a href="mailto:hola@veltrixsystem.app?subject=Pago%20Veltrix" className={`${ui.btnGhost} mt-3 max-sm:w-full`}>✉️ hola@veltrixsystem.app</a>
       </Card>
+
+      {orgId && <TransferPay orgId={orgId} monthly={Number(b.price_now)} currency="USD" />}
 
       <Card className="!p-0 overflow-hidden">
         <h2 className="border-b border-slate-200 p-4 font-bold dark:border-slate-800">{t('bill.history')}</h2>
