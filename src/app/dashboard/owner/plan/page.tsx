@@ -156,9 +156,10 @@ export default function PlanPage() {
           <div>
             <h2 className="font-bold">➕ {t('addon.title')}</h2>
             <p className={`text-xs ${ui.muted}`}>{t('addon.hint')}</p>
+            {ad.items.some((it) => it.code !== 'storage' && it.max === 0) && <p className={`mt-1 text-xs font-semibold ${ui.muted}`}>⬆️ {t('addon.upgradeHint')}</p>}
           </div>
           <ul className="space-y-3">
-            {ad.items.map((it) => {
+            {ad.items.filter((it) => it.max > 0 || it.qty > 0).map((it) => {
               const q = qty[it.code] ?? 0;
               const usage = it.code === 'user' ? t('addon.usageUsers', { used: ad.used.users, max: ad.limits.users })
                 : it.code === 'branch' ? t('addon.usageBranches', { used: ad.used.branches, max: ad.limits.branches })

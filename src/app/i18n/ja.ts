@@ -1018,7 +1018,7 @@ const ja: Record<DictKey, string> = {
   "addon.inUseStorage": "そこまで減らせません：ファイルの容量が多いため、先に空きを作ってください。",
   "addon.billingCard": "サブスクリプションで調整：今月は日割り分のみお支払い。",
   "addon.billingNext": "次回のお支払いに加算されます。",
-  "home.extras": "もっと必要？追加ユーザー {user}/月 · 追加支店 {branch}/月 · +{gb} GB {storage}/月、プラン変更不要。",
+  "home.extras": "追加：全プランで +{gb} GB {storage}/月 · Enterprise と Enterprise Plus で追加店舗 {branch}/月 · Enterprise Plus で追加従業員 {user}/月（90名超）。",
   "home.sc.tab.owner": "管理者",
   "home.sc.tab.collector": "集金担当",
   "home.sc.tab.cash": "レジ",
@@ -1400,6 +1400,7 @@ const ja: Record<DictKey, string> = {
   "tp.st.approved": "承認済み",
   "tp.st.rejected": "却下",
   "home.taxIncluded": "請求書付き価格：付加価値税と取引税込み。",
+  "addon.upgradeHint": "従業員や店舗を増やすにはプランを上げてください。追加購入より常にお得です。",
 };
 
 export default ja;

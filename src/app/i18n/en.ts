@@ -1018,7 +1018,7 @@ const en: Record<DictKey, string> = {
   "addon.inUseStorage": "You can't go that low: your files use more space. Free up space first.",
   "addon.billingCard": "Adjusted on your subscription: this month you pay only the prorated part.",
   "addon.billingNext": "It will be added to your next payment.",
-  "home.extras": "Need more? Extra user {user}/mo · Extra branch {branch}/mo · +{gb} GB {storage}/mo, no plan change.",
+  "home.extras": "Extras: +{gb} GB {storage}/mo on any plan · Extra branch {branch}/mo on Enterprise and Enterprise Plus · Extra worker {user}/mo on Enterprise Plus (over 90).",
   "home.sc.tab.owner": "Administrator",
   "home.sc.tab.collector": "Collector",
   "home.sc.tab.cash": "Cash",
@@ -1400,6 +1400,7 @@ const en: Record<DictKey, string> = {
   "tp.st.approved": "Approved",
   "tp.st.rejected": "Rejected",
   "home.taxIncluded": "Prices include invoice taxes (VAT and IT).",
+  "addon.upgradeHint": "For more workers or branches, upgrade your plan: it always costs less than buying extras.",
 };
 
 export default en;

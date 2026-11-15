@@ -1018,7 +1018,7 @@ const ru: Record<DictKey, string> = {
   "addon.inUseStorage": "Нельзя уменьшить так сильно: файлы занимают больше места. Сначала освободите место.",
   "addon.billingCard": "Изменено в подписке: в этом месяце оплачивается только пропорциональная часть.",
   "addon.billingNext": "Будет добавлено к следующему платежу.",
-  "home.extras": "Нужно больше? Пользователь {user}/мес · Филиал {branch}/мес · +{gb} ГБ {storage}/мес, без смены тарифа.",
+  "home.extras": "Дополнения: +{gb} ГБ {storage}/мес. на любом тарифе · Доп. филиал {branch}/мес. на Enterprise и Enterprise Plus · Доп. сотрудник {user}/мес. на Enterprise Plus (свыше 90).",
   "home.sc.tab.owner": "Администратор",
   "home.sc.tab.collector": "Инкассатор",
   "home.sc.tab.cash": "Касса",
@@ -1400,6 +1400,7 @@ const ru: Record<DictKey, string> = {
   "tp.st.approved": "Одобрено",
   "tp.st.rejected": "Отклонено",
   "home.taxIncluded": "Цены со счётом-фактурой: НДС и IT включены.",
+  "addon.upgradeHint": "Для большего числа сотрудников или филиалов перейдите на старший тариф: это всегда выгоднее дополнений.",
 };
 
 export default ru;

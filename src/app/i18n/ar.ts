@@ -1018,7 +1018,7 @@ const ar: Record<DictKey, string> = {
   "addon.inUseStorage": "لا يمكن التخفيض لهذا الحد: ملفاتك تشغل مساحة أكبر. حرّر مساحة أولًا.",
   "addon.billingCard": "يُعدَّل في اشتراكك: تدفع هذا الشهر الجزء النسبي فقط.",
   "addon.billingNext": "ستُضاف إلى دفعتك القادمة.",
-  "home.extras": "تحتاج المزيد؟ مستخدم إضافي {user}/شهر · فرع إضافي {branch}/شهر · +{gb} غيغابايت {storage}/شهر، دون تغيير الخطة.",
+  "home.extras": "الإضافات: +{gb} غيغابايت {storage}/شهريًا في أي خطة · فرع إضافي {branch}/شهريًا في Enterprise وEnterprise Plus · موظف إضافي {user}/شهريًا في Enterprise Plus (أكثر من 90).",
   "home.sc.tab.owner": "المدير",
   "home.sc.tab.collector": "المحصّل",
   "home.sc.tab.cash": "الصندوق",
@@ -1400,6 +1400,7 @@ const ar: Record<DictKey, string> = {
   "tp.st.approved": "مقبول",
   "tp.st.rejected": "مرفوض",
   "home.taxIncluded": "الأسعار مع الفاتورة: تشمل ضريبة القيمة المضافة وضريبة المعاملات.",
+  "addon.upgradeHint": "لمزيد من الموظفين أو الفروع، قم بترقية خطتك: فهي دائمًا أوفر من شراء الإضافات.",
 };
 
 export default ar;

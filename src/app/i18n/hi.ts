@@ -1018,7 +1018,7 @@ const hi: Record<DictKey, string> = {
   "addon.inUseStorage": "इतना कम नहीं कर सकते: आपकी फ़ाइलें ज़्यादा जगह ले रही हैं। पहले जगह खाली करें।",
   "addon.billingCard": "आपकी सदस्यता में समायोजित: इस माह केवल आनुपातिक राशि देनी होगी।",
   "addon.billingNext": "आपके अगले भुगतान में जोड़ा जाएगा।",
-  "home.extras": "और चाहिए? अतिरिक्त यूज़र {user}/माह · अतिरिक्त शाखा {branch}/माह · +{gb} GB {storage}/माह, प्लान बदले बिना।",
+  "home.extras": "एक्स्ट्रा: किसी भी प्लान में +{gb} GB {storage}/माह · Enterprise और Enterprise Plus में अतिरिक्त शाखा {branch}/माह · Enterprise Plus में अतिरिक्त कर्मचारी {user}/माह (90 से ज़्यादा)।",
   "home.sc.tab.owner": "प्रशासक",
   "home.sc.tab.collector": "वसूली एजेंट",
   "home.sc.tab.cash": "कैश",
@@ -1400,6 +1400,7 @@ const hi: Record<DictKey, string> = {
   "tp.st.approved": "मंज़ूर",
   "tp.st.rejected": "अस्वीकृत",
   "home.taxIncluded": "बिल सहित कीमतें: VAT और IT शामिल।",
+  "addon.upgradeHint": "ज़्यादा कर्मचारियों या शाखाओं के लिए प्लान बढ़ाएँ: यह हमेशा एक्स्ट्रा खरीदने से सस्ता है।",
 };
 
 export default hi;

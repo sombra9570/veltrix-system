@@ -1,0 +1,3 @@
+-- 047: extras por plan (aplicada en producción como addon_caps_by_plan)
+-- Usuarios extra solo en Enterprise Plus (hasta 50); sucursales extra en Enterprise (15) y Plus (20); espacio en todos.
+-- Ver addon_cap(); my_addons devuelve el tope por plan y set_my_addons rechaza con ADDON_UPGRADE.

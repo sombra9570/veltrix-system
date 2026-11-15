@@ -1018,7 +1018,7 @@ const ko: Record<DictKey, string> = {
   "addon.inUseStorage": "그만큼 줄일 수 없습니다: 파일이 더 많은 공간을 사용 중입니다. 먼저 공간을 확보하세요.",
   "addon.billingCard": "구독에 반영됨: 이번 달은 일할 계산된 금액만 결제됩니다.",
   "addon.billingNext": "다음 결제에 추가됩니다.",
-  "home.extras": "더 필요하세요? 추가 사용자 {user}/월 · 추가 지점 {branch}/월 · +{gb} GB {storage}/월, 요금제 변경 없음.",
+  "home.extras": "추가: 모든 요금제 +{gb} GB {storage}/월 · Enterprise·Enterprise Plus 추가 지점 {branch}/월 · Enterprise Plus 추가 직원 {user}/월(90명 초과).",
   "home.sc.tab.owner": "총괄 관리자",
   "home.sc.tab.collector": "수금원",
   "home.sc.tab.cash": "계산대",
@@ -1400,6 +1400,7 @@ const ko: Record<DictKey, string> = {
   "tp.st.approved": "승인됨",
   "tp.st.rejected": "거절됨",
   "home.taxIncluded": "세금계산서 포함 가격: 부가세 및 거래세 포함.",
+  "addon.upgradeHint": "직원이나 지점을 늘리려면 요금제를 올리세요. 추가 구매보다 항상 저렴합니다.",
 };
 
 export default ko;

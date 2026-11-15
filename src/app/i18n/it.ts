@@ -1018,7 +1018,7 @@ const it: Record<DictKey, string> = {
   "addon.inUseStorage": "Non puoi scendere così: i tuoi file occupano più spazio. Libera spazio prima.",
   "addon.billingCard": "Adeguato nell'abbonamento: questo mese paghi solo la quota proporzionale.",
   "addon.billingNext": "Sarà aggiunto al prossimo pagamento.",
-  "home.extras": "Serve di più? Utente extra {user}/mese · Filiale extra {branch}/mese · +{gb} GB {storage}/mese, senza cambiare piano.",
+  "home.extras": "Extra: +{gb} GB {storage}/mese con qualsiasi piano · Filiale extra {branch}/mese con Enterprise ed Enterprise Plus · Collaboratore extra {user}/mese con Enterprise Plus (oltre 90).",
   "home.sc.tab.owner": "Amministratore",
   "home.sc.tab.collector": "Esattore",
   "home.sc.tab.cash": "Cassa",
@@ -1400,6 +1400,7 @@ const it: Record<DictKey, string> = {
   "tp.st.approved": "Approvata",
   "tp.st.rejected": "Rifiutata",
   "home.taxIncluded": "Prezzi con fattura: IVA e IT incluse.",
+  "addon.upgradeHint": "Per più collaboratori o filiali, passa al piano superiore: conviene sempre più degli extra.",
 };
 
 export default it;

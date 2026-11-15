@@ -1018,7 +1018,7 @@ const zh: Record<DictKey, string> = {
   "addon.inUseStorage": "无法减少这么多：文件占用空间更多，请先释放空间。",
   "addon.billingCard": "已在订阅中调整：本月只需支付按比例计算的部分。",
   "addon.billingNext": "将计入你的下次付款。",
-  "home.extras": "需要更多？额外用户 {user}/月 · 额外分店 {branch}/月 · +{gb} GB {storage}/月，无需换套餐。",
+  "home.extras": "附加项：任何套餐 +{gb} GB {storage}/月 · Enterprise 和 Enterprise Plus 额外分店 {branch}/月 · Enterprise Plus 额外员工 {user}/月（超过90人）。",
   "home.sc.tab.owner": "管理员",
   "home.sc.tab.collector": "收款员",
   "home.sc.tab.cash": "收银",
@@ -1400,6 +1400,7 @@ const zh: Record<DictKey, string> = {
   "tp.st.approved": "已通过",
   "tp.st.rejected": "已拒绝",
   "home.taxIncluded": "含发票价格：已含增值税和交易税。",
+  "addon.upgradeHint": "需要更多员工或分店时，请升级套餐：总比购买附加项更划算。",
 };
 
 export default zh;

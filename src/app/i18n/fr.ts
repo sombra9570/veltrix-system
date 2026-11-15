@@ -1018,7 +1018,7 @@ const fr: Record<DictKey, string> = {
   "addon.inUseStorage": "Impossible de descendre autant : vos fichiers occupent plus d'espace. Libérez de l'espace d'abord.",
   "addon.billingCard": "Ajusté sur votre abonnement : ce mois-ci vous payez seulement le prorata.",
   "addon.billingNext": "Sera ajouté à votre prochain paiement.",
-  "home.extras": "Besoin de plus ? Utilisateur {user}/mois · Succursale {branch}/mois · +{gb} Go {storage}/mois, sans changer de forfait.",
+  "home.extras": "Options : +{gb} Go {storage}/mois sur toutes les offres · Succursale en plus {branch}/mois sur Enterprise et Enterprise Plus · Employé en plus {user}/mois sur Enterprise Plus (au-delà de 90).",
   "home.sc.tab.owner": "Administrateur",
   "home.sc.tab.collector": "Encaisseur",
   "home.sc.tab.cash": "Caisse",
@@ -1400,6 +1400,7 @@ const fr: Record<DictKey, string> = {
   "tp.st.approved": "Validé",
   "tp.st.rejected": "Refusé",
   "home.taxIncluded": "Prix avec facture : TVA et IT inclus.",
+  "addon.upgradeHint": "Pour plus d’employés ou de succursales, passez à l’offre supérieure : c’est toujours plus avantageux que les options.",
 };
 
 export default fr;
