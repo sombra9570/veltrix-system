@@ -127,7 +127,7 @@ export function EvidenceLog({ branchId }: { branchId: string }) {
       const paths = r.filter((x) => x.photo).map((x) => x.photo!) ;
       if (paths.length) {
         const { data } = await supabase.storage.from(BUCKET).createSignedUrls(paths, 3600);
-        setUrls(Object.fromEntries((data ?? []).filter((d) => d.signedUrl).map((d) => [d.path!, d.signedUrl])));
+        setUrls(Object.fromEntries((data ?? []).filter((d) => d.signedUrl && d.path).map((d) => [d.path as string, d.signedUrl as string])));
       }
     } catch { setRows([]); }
   }, [branchId]);
