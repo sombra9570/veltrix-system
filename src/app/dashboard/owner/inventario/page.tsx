@@ -7,6 +7,7 @@ import { useT } from '../../../i18n';
 import { money, parseAmount } from '../../format';
 import { Sheet } from '../../sheet';
 import { friendlyError } from '../owner-context';
+import { EvidenceFields, EvidenceLog, OutForm, emptyEvidence, saveEvidence, type Evidence } from './evidence';
 
 type MBranch = { id: string; name: string; company_id: string; company: string; currency: string; company_wide: boolean };
 type Item = { id: string; name: string; sku: string; unit: string; type: string; qty: number; min: number; cost: number; price: number; value: number };
@@ -18,7 +19,7 @@ type Overview = {
 };
 type Movement = { at: string; product: string; unit: string; type: string; qty: number; cost: number; by: string | null; note: string | null };
 type Purchase = { id: string; at: string; supplier: string; total: number; doc: string | null; due: string | null; status: string; items: number; paid: number };
-type Tab = 'stock' | 'entry' | 'moves' | 'suppliers';
+type Tab = 'stock' | 'entry' | 'out' | 'log' | 'moves' | 'suppliers';
 type Line = { product_id: string; qty: string; cost: string };
 
 const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
@@ -37,6 +38,7 @@ export default function InventoryPage() {
   const [branchId, setBranchId] = useState('');
   const [data, setData] = useState<Overview | null>(null);
   const [tab, setTab] = useState<Tab>('stock');
+  const [entryEv, setEntryEv] = useState<Evidence>(emptyEvidence());
   const [query, setQuery] = useState('');
   const [onlyLow, setOnlyLow] = useState(false);
   const [sel, setSel] = useState<Item | null>(null);
@@ -117,6 +119,10 @@ export default function InventoryPage() {
         p_doc_ref: entry.doc.trim() || null,
         p_due_days: entry.supplier && entry.due ? parseInt(entry.due, 10) : null,
       });
+      // Constancia de lo recibido (estado + foto opcional); si falla, la entrada igual quedó registrada
+      const names = validLines.map((l) => `${num(l.qty)} × ${allProducts.find((x) => x.id === l.product_id)?.name ?? ''}`).join(', ');
+      await saveEvidence(branchId, 'in', entryEv, `${entry.doc.trim() ? entry.doc.trim() + ' · ' : ''}${names}`.slice(0, 300)).catch(() => undefined);
+      setEntryEv(emptyEvidence());
       setLines([emptyLine()]); setEntry({ supplier: '', doc: '', due: '' }); setMoves(null); setPurchases(null);
       flash(true, t('inv.entrySaved'));
       setTab('stock');
@@ -144,7 +150,7 @@ export default function InventoryPage() {
   };
 
   const s = data?.summary;
-  const tabs: [Tab, string][] = [['stock', t('inv.tabStock')], ['entry', t('inv.tabEntry')], ['moves', t('inv.tabMoves')], ['suppliers', t('inv.tabSuppliers')]];
+  const tabs: [Tab, string][] = [['stock', t('inv.tabStock')], ['entry', t('inv.tabEntry')], ['out', t('ev.tabOut')], ['log', t('ev.tabLog')], ['moves', t('inv.tabMoves')], ['suppliers', t('inv.tabSuppliers')]];
   const typeLabel = (k: string) => t(`inv.mt.${k}` as 'inv.mt.sale');
 
   return (
@@ -177,7 +183,7 @@ export default function InventoryPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
         {tabs.map(([k, label]) => (
           <button key={k} type="button" onClick={() => setTab(k)}
             className={`rounded-xl px-2 py-2 text-xs font-semibold transition cursor-pointer sm:text-sm ${tab === k ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
@@ -283,6 +289,7 @@ export default function InventoryPage() {
             </div>
           )}
 
+          <EvidenceFields value={entryEv} onChange={setEntryEv} />
           <div className="flex flex-col gap-3 border-t border-slate-200 pt-3 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
             <p className="text-lg font-extrabold">{t('inv.entryTotal')}: {fmt(entryTotal)}</p>
             <button type="button" disabled={busy || validLines.length === 0} onClick={saveEntry} className={`${ui.btnPrimary} max-sm:w-full`}>
@@ -291,6 +298,11 @@ export default function InventoryPage() {
           </div>
         </Card>
       )}
+
+      {tab === 'out' && branchId && (
+        <OutForm branchId={branchId} items={data?.items ?? []} flash={flash} onDone={() => { setMoves(null); load(); }} />
+      )}
+      {tab === 'log' && branchId && <EvidenceLog branchId={branchId} />}
 
       {/* MOVIMIENTOS (KARDEX) */}
       {tab === 'moves' && (

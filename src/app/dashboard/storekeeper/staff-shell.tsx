@@ -4,6 +4,8 @@ import type { NavItem } from '../shell';
 
 const NAV: NavItem[] = [
   { href: '/dashboard/storekeeper', icon: '📦', label: 'nav.inventory' },
+  { href: '/dashboard/storekeeper/productos', icon: '🏷️', label: 'nav.products' },
+  { href: '/dashboard/storekeeper/tienda', icon: '📋', label: 'nav.store' },
   { href: '/dashboard/storekeeper/mensajes', icon: '💬', label: 'nav.messages' },
 ];
 

@@ -107,6 +107,18 @@ export default function ProductsPage() {
     }
   };
 
+  // Borrar: deja de venderse y sale del catálogo; el historial de ventas se conserva
+  const remove = async (p: Product) => {
+    if (!window.confirm(t('prod.deleteConfirm', { name: p.name }))) return;
+    try {
+      await rpc('delete_product', { p_product: p.id });
+      flash(true, t('prod.deleted'));
+      await load();
+    } catch (err) {
+      flash(false, friendlyError((err as Error).message, t));
+    }
+  };
+
   const saveStock = async (p: Product) => {
     const n = parseAmount(stockEdit[p.id] ?? '');
     if (Number.isNaN(n) || n < 0) return flash(false, t('cash.invalidAmount'));
@@ -263,6 +275,7 @@ export default function ProductsPage() {
                     <button type="button" onClick={() => toggle(p)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>
                       {p.active ? t('prod.hide') : t('prod.show')}
                     </button>
+                    <button type="button" onClick={() => remove(p)} aria-label={t('prod.delete')} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs hover:!border-red-400 hover:!text-red-600`}>🗑️</button>
                   </div>
                 </li>
               );
