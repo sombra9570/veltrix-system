@@ -1486,6 +1486,9 @@ const de: Record<DictKey, string> = {
   "perm.sales.cancel_request.d": "Storno eines Verkaufs beantragen; Supervisor oder Inhaber geben frei.",
   "perm.inv.see_cost": "Kosten sehen",
   "perm.inv.see_cost.d": "Einkaufskosten und Lagerwert sehen.",
+  "appr.refundSale": "Rückerstattung",
+  "appr.askRefund": "Rückerstattung beantragen",
+  "appr.sharedPayment": "Eine Zahlung dieses Verkaufs deckt auch andere Verkäufe: Zahlung unter Inkasso stornieren.",
 };
 
 export default de;

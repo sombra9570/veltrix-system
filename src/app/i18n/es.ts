@@ -1495,6 +1495,9 @@ const es = {
   "perm.sales.cancel_request.d": "Solicitar que se anule una venta; la aprueba el supervisor o el dueño.",
   "perm.inv.see_cost": "Ver costos",
   "perm.inv.see_cost.d": "Ver el costo de compra y el valor del inventario.",
+  "appr.refundSale": "Devolución de venta",
+  "appr.askRefund": "Pedir devolución",
+  "appr.sharedPayment": "Un cobro de esta venta cubre también otras ventas: reverse ese cobro desde Cobranza.",
 };
 
 export default es;

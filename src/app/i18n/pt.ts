@@ -1486,6 +1486,9 @@ const pt: Record<DictKey, string> = {
   "perm.sales.cancel_request.d": "Solicitar o cancelamento de uma venda; o supervisor ou o dono aprova.",
   "perm.inv.see_cost": "Ver custos",
   "perm.inv.see_cost.d": "Ver o custo de compra e o valor do estoque.",
+  "appr.refundSale": "Devolução de venda",
+  "appr.askRefund": "Pedir devolução",
+  "appr.sharedPayment": "Um recebimento desta venda cobre também outras vendas: estorne esse recebimento em Cobranças.",
 };
 
 export default pt;

@@ -1486,6 +1486,9 @@ const ru: Record<DictKey, string> = {
   "perm.sales.cancel_request.d": "Просить отменить продажу; одобряет руководитель или владелец.",
   "perm.inv.see_cost": "Видеть себестоимость",
   "perm.inv.see_cost.d": "Видеть закупочную цену и стоимость склада.",
+  "appr.refundSale": "Возврат продажи",
+  "appr.askRefund": "Запросить возврат",
+  "appr.sharedPayment": "Платёж по этой продаже покрывает и другие продажи: сторнируйте его в разделе «Платежи».",
 };
 
 export default ru;

@@ -1486,6 +1486,9 @@ const fr: Record<DictKey, string> = {
   "perm.sales.cancel_request.d": "Demander l’annulation d’une vente ; le superviseur ou le propriétaire l’approuve.",
   "perm.inv.see_cost": "Voir les coûts",
   "perm.inv.see_cost.d": "Voir le coût d’achat et la valeur du stock.",
+  "appr.refundSale": "Remboursement de vente",
+  "appr.askRefund": "Demander un remboursement",
+  "appr.sharedPayment": "Un encaissement de cette vente couvre aussi d’autres ventes : annulez-le depuis Encaissements.",
 };
 
 export default fr;

@@ -1486,6 +1486,9 @@ const ja: Record<DictKey, string> = {
   "perm.sales.cancel_request.d": "販売の取消を申請（責任者またはオーナーが承認）。",
   "perm.inv.see_cost": "原価を見る",
   "perm.inv.see_cost.d": "仕入原価と在庫評価額を見る。",
+  "appr.refundSale": "販売の返金",
+  "appr.askRefund": "返金を申請",
+  "appr.sharedPayment": "この販売の入金は他の販売にもまたがっています。入金管理から先にその入金を取り消してください。",
 };
 
 export default ja;

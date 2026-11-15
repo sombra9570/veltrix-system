@@ -1486,6 +1486,9 @@ const zh: Record<DictKey, string> = {
   "perm.sales.cancel_request.d": "申请作废一笔销售，由主管或店主批准。",
   "perm.inv.see_cost": "查看成本",
   "perm.inv.see_cost.d": "查看进货成本和库存价值。",
+  "appr.refundSale": "销售退款",
+  "appr.askRefund": "申请退款",
+  "appr.sharedPayment": "这笔销售的收款还涉及其他销售，请先在收款中冲销该收款。",
 };
 
 export default zh;

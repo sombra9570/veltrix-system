@@ -1486,6 +1486,9 @@ const en: Record<DictKey, string> = {
   "perm.sales.cancel_request.d": "Ask to void a sale; the supervisor or owner approves it.",
   "perm.inv.see_cost": "See costs",
   "perm.inv.see_cost.d": "See purchase cost and inventory value.",
+  "appr.refundSale": "Sale refund",
+  "appr.askRefund": "Request refund",
+  "appr.sharedPayment": "A payment on this sale also covers other sales: reverse that payment from Collections.",
 };
 
 export default en;

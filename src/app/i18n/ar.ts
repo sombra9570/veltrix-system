@@ -1486,6 +1486,9 @@ const ar: Record<DictKey, string> = {
   "perm.sales.cancel_request.d": "طلب إلغاء بيع؛ يوافق عليه المشرف أو المالك.",
   "perm.inv.see_cost": "رؤية التكاليف",
   "perm.inv.see_cost.d": "رؤية تكلفة الشراء وقيمة المخزون.",
+  "appr.refundSale": "استرداد بيع",
+  "appr.askRefund": "طلب استرداد",
+  "appr.sharedPayment": "تحصيل هذا البيع يغطي مبيعات أخرى أيضًا: اعكس هذا التحصيل من قسم التحصيلات.",
 };
 
 export default ar;

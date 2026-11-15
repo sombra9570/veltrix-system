@@ -1486,6 +1486,9 @@ const ko: Record<DictKey, string> = {
   "perm.sales.cancel_request.d": "판매 취소를 요청합니다(관리자 또는 대표 승인).",
   "perm.inv.see_cost": "원가 보기",
   "perm.inv.see_cost.d": "매입 원가와 재고 가치를 봅니다.",
+  "appr.refundSale": "판매 환불",
+  "appr.askRefund": "환불 요청",
+  "appr.sharedPayment": "이 판매의 수금이 다른 판매에도 걸려 있습니다. 수금 메뉴에서 먼저 해당 수금을 취소하세요.",
 };
 
 export default ko;

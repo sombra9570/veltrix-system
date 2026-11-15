@@ -29,7 +29,7 @@ export function ApprovalsTray() {
       load();
     } catch (e) {
       const m = (e as Error).message;
-      setMsg({ ok: false, text: m.includes('SALE_HAS_PAYMENTS') ? t('appr.hasPayments') : m.includes('SALE_NOT_CANCELLABLE') ? t('appr.notCancellable') : t('err.generic') });
+      setMsg({ ok: false, text: m.includes('REFUND_SHARED_PAYMENT') ? t('appr.sharedPayment') : m.includes('SALE_HAS_PAYMENTS') ? t('appr.hasPayments') : m.includes('SALE_NOT_CANCELLABLE') ? t('appr.notCancellable') : t('err.generic') });
     } finally { setBusy(null); }
   };
 
@@ -42,7 +42,7 @@ export function ApprovalsTray() {
         {rows.map((r) => (
           <li key={r.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center">
             <div className="min-w-0 flex-1 text-sm">
-              <p className="font-semibold">🚫 {t('appr.cancelSale')} · {r.amount != null && r.currency ? money(Number(r.amount), r.currency, lang) : ''}</p>
+              <p className="font-semibold">{r.kind === 'refund_sale' ? `↩️ ${t('appr.refundSale')}` : `🚫 ${t('appr.cancelSale')}`} · {r.amount != null && r.currency ? money(Number(r.amount), r.currency, lang) : ''}</p>
               <p className={`text-xs ${ui.muted}`}>{r.by ?? '—'} · {r.branch} · {new Date(r.at).toLocaleString(lang, { dateStyle: 'short', timeStyle: 'short' })}</p>
               <p className="text-xs">📝 {r.reason}</p>
             </div>

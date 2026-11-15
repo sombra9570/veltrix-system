@@ -163,6 +163,7 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
   const [adding, setAdding] = useState<Line[]>([]);
   const [q, setQ] = useState('');
   const [tip, setTip] = useState('');
+  const [disc, setDisc] = useState('');
   const [closing, setClosing] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -177,6 +178,8 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
 
   const total = order.items.reduce((s, i) => s + Number(i.total), 0);
   const tipN = parseAmount(tip || '0');
+  const pct = Math.min(99, Math.max(0, parseFloat(disc.replace(',', '.')) || 0));
+  const net = pct > 0 ? order.items.reduce((s, i) => s + Number(i.qty) * Math.round(Number(i.price) * (1 - pct / 100) * 100) / 100, 0) : total;
 
   const add = (p: Product) => setAdding((a) => {
     const ex = a.find((l) => l.product.id === p.id && !l.notes);
@@ -207,9 +210,13 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
     if (Number.isNaN(tipN) || tipN < 0) return flash(false, t('cash.invalidAmount'));
     setBusy(true);
     try {
-      await rpc('close_table', { p_order: order.id, p_tip: tipN });
-      await onClosed(total + tipN);
-    } catch { flash(false, t('err.generic')); } finally { setBusy(false); }
+      await rpc('close_table', pct > 0 ? { p_order: order.id, p_tip: tipN, p_discount: pct } : { p_order: order.id, p_tip: tipN });
+      await onClosed(net + tipN);
+    } catch (e) {
+      const m = (e as Error).message;
+      const over = m.match(/DISCOUNT_OVER_LIMIT:([\d.]+)/);
+      flash(false, over ? t('pos.discountOver', { n: Number(over[1]) }) : m.includes('PERM_DENIED') ? t('err.permDenied') : t('err.generic'));
+    } finally { setBusy(false); }
   };
 
   return (
@@ -308,7 +315,15 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
             <label className={ui.label}>{t('rest.tip')}</label>
             <input inputMode="decimal" value={tip} onChange={(e) => setTip(e.target.value)} placeholder="0" className={ui.input} />
           </div>
-          <p className="text-sm font-semibold">{t('rest.billTotal', { amount: fmt(total + (Number.isNaN(tipN) ? 0 : tipN)) })}</p>
+          <div className="flex items-center justify-between gap-3">
+            <label className={`${ui.label} !mb-0`} htmlFor="tbl-disc">🏷️ {t('pos.discount')}</label>
+            <div className="flex items-center gap-1">
+              <input id="tbl-disc" inputMode="decimal" value={disc} onChange={(e) => setDisc(e.target.value.replace(/[^\d.,]/g, ''))} placeholder="0" className={`${ui.input} !w-20 text-right`} />
+              <span className="font-semibold">%</span>
+            </div>
+          </div>
+          {pct > 0 && <p className={`text-right text-xs ${ui.muted}`}>{t('pos.discountSaved', { amount: fmt(total - net) })}</p>}
+          <p className="text-sm font-semibold">{t('rest.billTotal', { amount: fmt(net + (Number.isNaN(tipN) ? 0 : tipN)) })}</p>
           <div className="grid grid-cols-2 gap-2">
             <button type="button" onClick={() => setClosing(false)} className={ui.btnGhost}>{t('prod.cancel')}</button>
             <button type="button" disabled={busy} onClick={close} className={ui.btnPrimary}>{t('rest.closeBill')}</button>

@@ -153,7 +153,7 @@ export function PosScreen() {
       await load();
     } catch (err) {
       const m = (err as Error).message;
-      flash(false, m.includes('REQUEST_PENDING') ? t('appr.alreadyPending') : m.includes('SALE_HAS_PAYMENTS') ? t('appr.hasPayments') : posError(m, t));
+      flash(false, m.includes('REQUEST_PENDING') ? t('appr.alreadyPending') : m.includes('REFUND_SHARED_PAYMENT') ? t('appr.sharedPayment') : posError(m, t));
     }
   };
 
@@ -415,10 +415,8 @@ export function PosScreen() {
                   {s.paid ? t('pos.paid') : t('pos.pending')}
                 </span>
                 <span className="w-24 text-right font-bold">{money(Number(s.total), s.currency, lang)}</span>
-                {!s.paid && (
-                  <button type="button" onClick={() => askCancel(s.id)} aria-label={t('appr.askCancel')} title={t('appr.askCancel')}
-                    className={`${ui.btnGhost} !px-2 !py-1 text-xs`}>🚫</button>
-                )}
+                <button type="button" onClick={() => askCancel(s.id)} aria-label={s.paid ? t('appr.askRefund') : t('appr.askCancel')} title={s.paid ? t('appr.askRefund') : t('appr.askCancel')}
+                  className={`${ui.btnGhost} !px-2 !py-1 text-xs`}>{s.paid ? '↩️' : '🚫'}</button>
               </li>
             ))}
           </ul>

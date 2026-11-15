@@ -1486,6 +1486,9 @@ const hi: Record<DictKey, string> = {
   "perm.sales.cancel_request.d": "बिक्री रद्द करने का अनुरोध; सुपरवाइज़र या मालिक मंज़ूर करता है।",
   "perm.inv.see_cost": "लागत देखना",
   "perm.inv.see_cost.d": "खरीद लागत और स्टॉक का मूल्य देखना।",
+  "appr.refundSale": "बिक्री वापसी",
+  "appr.askRefund": "वापसी का अनुरोध",
+  "appr.sharedPayment": "इस बिक्री की वसूली दूसरी बिक्रियों को भी कवर करती है: पहले वसूली में जाकर उसे उलटें।",
 };
 
 export default hi;
