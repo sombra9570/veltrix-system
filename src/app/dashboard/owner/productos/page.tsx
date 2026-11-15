@@ -28,6 +28,7 @@ export default function ProductsPage() {
   const [data, setData] = useState<Admin | null>(null);
   const [branchId, setBranchId] = useState('');
   const [form, setForm] = useState<Form | null>(null);
+  const [inMenu, setInMenu] = useState(true);
   const [stockEdit, setStockEdit] = useState<Record<string, string>>({});
   const [query, setQuery] = useState('');
   const [busy, setBusy] = useState(false);
@@ -75,11 +76,15 @@ export default function ProductsPage() {
     if (!form.name.trim() || Number.isNaN(price) || price < 0) return flash(false, t('cash.invalidAmount'));
     setBusy(true);
     try {
-      await rpc('save_product', {
+      const id = await rpc<string>('save_product', {
         p_id: form.id, p_company: companyId, p_name: form.name, p_price: price,
         p_type: form.type, p_track: form.type === 'good' && form.track,
         p_sku: form.sku || null, p_unit: form.unit, p_active: true,
       });
+      if (!form.id && inMenu && id) {
+        // Si la carta ya llegó al límite del plan, el producto igual queda creado
+        await rpc('set_product_store', { p_product: id, p_in_store: true, p_description: null }).catch(() => undefined);
+      }
       flash(true, t('prod.saved'));
       setForm(null);
       await load();
@@ -171,6 +176,15 @@ export default function ProductsPage() {
                 ))}
               </div>
             </div>
+            {!form.id && (
+              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-300 p-3 dark:border-slate-700">
+                <input type="checkbox" checked={inMenu} onChange={(e) => setInMenu(e.target.checked)} className="mt-1 h-4 w-4" />
+                <span>
+                  <span className="block text-sm font-semibold">📋 {t('prod.inMenu')}</span>
+                  <span className={`block text-xs ${ui.muted}`}>{t('prod.inMenuHint')}</span>
+                </span>
+              </label>
+            )}
             {form.type === 'good' && (
               <>
                 <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-300 p-3 dark:border-slate-700">

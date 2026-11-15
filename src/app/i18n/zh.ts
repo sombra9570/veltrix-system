@@ -1405,6 +1405,16 @@ const zh: Record<DictKey, string> = {
   "net.failed": "无法加载信息，请检查网络连接。",
   "net.retry": "重试",
   "pos.removeItem": "移除",
+  "store.qrOwn": "这是您上传的店铺二维码。",
+  "store.qrDownload": "下载二维码",
+  "store.qrPrint": "打印菜单",
+  "store.qrUpload": "上传我的二维码",
+  "store.qrUseVeltrix": "使用 Veltrix 二维码",
+  "store.scanToSee": "扫码查看菜单和价格",
+  "store.addAll": "将所有商品和服务加入菜单",
+  "store.addedAll": "已加入菜单 {n} 项",
+  "prod.inMenu": "显示在菜单/网店",
+  "prod.inMenuHint": "顾客扫描店铺二维码即可看到。",
 };
 
 export default zh;

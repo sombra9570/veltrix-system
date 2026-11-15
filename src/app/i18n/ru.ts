@@ -1405,6 +1405,16 @@ const ru: Record<DictKey, string> = {
   "net.failed": "Не удалось загрузить информацию. Проверьте подключение.",
   "net.retry": "Повторить",
   "pos.removeItem": "Убрать",
+  "store.qrOwn": "Это загруженный вами QR-код вашего бизнеса.",
+  "store.qrDownload": "Скачать QR",
+  "store.qrPrint": "Распечатать меню",
+  "store.qrUpload": "Загрузить мой QR",
+  "store.qrUseVeltrix": "Использовать QR Veltrix",
+  "store.scanToSee": "Сканируйте, чтобы увидеть меню и цены",
+  "store.addAll": "Добавить все товары и услуги в меню",
+  "store.addedAll": "Добавлено в меню: {n}",
+  "prod.inMenu": "Показывать в меню / интернет-магазине",
+  "prod.inMenuHint": "Клиенты увидят это, отсканировав QR-код.",
 };
 
 export default ru;

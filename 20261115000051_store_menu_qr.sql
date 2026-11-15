@@ -1,0 +1,1 @@
+-- 051: carta con QR (aplicada como store_menu_qr y store_add_all_fix): stores.own_qr_path, set_store_qr(), store_add_all()

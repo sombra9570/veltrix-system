@@ -1405,6 +1405,16 @@ const pt: Record<DictKey, string> = {
   "net.failed": "Não foi possível carregar as informações. Verifique sua conexão.",
   "net.retry": "Tentar de novo",
   "pos.removeItem": "Remover",
+  "store.qrOwn": "Este é o QR do seu negócio que você enviou.",
+  "store.qrDownload": "Baixar QR",
+  "store.qrPrint": "Imprimir cardápio",
+  "store.qrUpload": "Enviar meu QR",
+  "store.qrUseVeltrix": "Usar QR da Veltrix",
+  "store.scanToSee": "Escaneie para ver o cardápio e os preços",
+  "store.addAll": "Adicionar todos os produtos e serviços ao cardápio",
+  "store.addedAll": "{n} adicionados ao cardápio",
+  "prod.inMenu": "Mostrar no cardápio / loja online",
+  "prod.inMenuHint": "Seus clientes verão ao escanear o QR do negócio.",
 };
 
 export default pt;

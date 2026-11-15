@@ -1405,6 +1405,16 @@ const ko: Record<DictKey, string> = {
   "net.failed": "정보를 불러오지 못했습니다. 연결을 확인하세요.",
   "net.retry": "다시 시도",
   "pos.removeItem": "빼기",
+  "store.qrOwn": "업로드한 매장 QR입니다.",
+  "store.qrDownload": "QR 다운로드",
+  "store.qrPrint": "메뉴 인쇄",
+  "store.qrUpload": "내 QR 업로드",
+  "store.qrUseVeltrix": "Veltrix QR 사용",
+  "store.scanToSee": "스캔하여 메뉴와 가격 보기",
+  "store.addAll": "모든 상품과 서비스를 메뉴에 추가",
+  "store.addedAll": "메뉴에 {n}개 추가됨",
+  "prod.inMenu": "메뉴/온라인 스토어에 표시",
+  "prod.inMenuHint": "고객이 매장 QR을 스캔하면 볼 수 있습니다.",
 };
 
 export default ko;

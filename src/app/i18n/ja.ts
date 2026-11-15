@@ -1405,6 +1405,16 @@ const ja: Record<DictKey, string> = {
   "net.failed": "情報を読み込めませんでした。接続を確認してください。",
   "net.retry": "再試行",
   "pos.removeItem": "削除",
+  "store.qrOwn": "アップロードしたお店のQRコードです。",
+  "store.qrDownload": "QRをダウンロード",
+  "store.qrPrint": "メニューを印刷",
+  "store.qrUpload": "自分のQRをアップロード",
+  "store.qrUseVeltrix": "VeltrixのQRを使う",
+  "store.scanToSee": "スキャンしてメニューと価格を見る",
+  "store.addAll": "すべての商品・サービスをメニューに追加",
+  "store.addedAll": "{n}件をメニューに追加しました",
+  "prod.inMenu": "メニュー・オンラインショップに表示",
+  "prod.inMenuHint": "お客様がお店のQRを読み取ると表示されます。",
 };
 
 export default ja;

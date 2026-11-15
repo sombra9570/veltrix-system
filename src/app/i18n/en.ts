@@ -1405,6 +1405,16 @@ const en: Record<DictKey, string> = {
   "net.failed": "Could not load the information. Check your connection.",
   "net.retry": "Retry",
   "pos.removeItem": "Remove",
+  "store.qrOwn": "This is your business QR that you uploaded.",
+  "store.qrDownload": "Download QR",
+  "store.qrPrint": "Print menu card",
+  "store.qrUpload": "Upload my QR",
+  "store.qrUseVeltrix": "Use Veltrix QR",
+  "store.scanToSee": "Scan to see the menu and prices",
+  "store.addAll": "Add all products and services to the menu",
+  "store.addedAll": "{n} added to the menu",
+  "prod.inMenu": "Show on the menu / online store",
+  "prod.inMenuHint": "Your customers will see it when they scan the business QR.",
 };
 
 export default en;

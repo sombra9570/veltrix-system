@@ -1405,6 +1405,16 @@ const ar: Record<DictKey, string> = {
   "net.failed": "تعذّر تحميل المعلومات. تحقّق من اتصالك.",
   "net.retry": "إعادة المحاولة",
   "pos.removeItem": "إزالة",
+  "store.qrOwn": "هذا رمز QR الخاص بنشاطك الذي رفعته.",
+  "store.qrDownload": "تنزيل QR",
+  "store.qrPrint": "طباعة القائمة",
+  "store.qrUpload": "رفع رمز QR الخاص بي",
+  "store.qrUseVeltrix": "استخدام QR من Veltrix",
+  "store.scanToSee": "امسح لرؤية القائمة والأسعار",
+  "store.addAll": "إضافة كل المنتجات والخدمات إلى القائمة",
+  "store.addedAll": "تمت إضافة {n} إلى القائمة",
+  "prod.inMenu": "عرض في القائمة / المتجر الإلكتروني",
+  "prod.inMenuHint": "سيراه عملاؤك عند مسح رمز QR الخاص بالنشاط.",
 };
 
 export default ar;

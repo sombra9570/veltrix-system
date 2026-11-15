@@ -1405,6 +1405,16 @@ const hi: Record<DictKey, string> = {
   "net.failed": "जानकारी लोड नहीं हो सकी। अपना कनेक्शन जाँचें।",
   "net.retry": "फिर कोशिश करें",
   "pos.removeItem": "हटाएँ",
+  "store.qrOwn": "यह आपके व्यवसाय का अपलोड किया गया QR है।",
+  "store.qrDownload": "QR डाउनलोड करें",
+  "store.qrPrint": "मेन्यू प्रिंट करें",
+  "store.qrUpload": "मेरा QR अपलोड करें",
+  "store.qrUseVeltrix": "Veltrix QR इस्तेमाल करें",
+  "store.scanToSee": "मेन्यू और कीमतें देखने के लिए स्कैन करें",
+  "store.addAll": "सभी उत्पाद और सेवाएँ मेन्यू में जोड़ें",
+  "store.addedAll": "मेन्यू में {n} जोड़े गए",
+  "prod.inMenu": "मेन्यू / ऑनलाइन स्टोर में दिखाएँ",
+  "prod.inMenuHint": "ग्राहक व्यवसाय का QR स्कैन करके इसे देखेंगे।",
 };
 
 export default hi;

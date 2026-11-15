@@ -1405,6 +1405,16 @@ const fr: Record<DictKey, string> = {
   "net.failed": "Impossible de charger les informations. Vérifiez votre connexion.",
   "net.retry": "Réessayer",
   "pos.removeItem": "Retirer",
+  "store.qrOwn": "Voici le QR de votre commerce que vous avez importé.",
+  "store.qrDownload": "Télécharger le QR",
+  "store.qrPrint": "Imprimer la carte",
+  "store.qrUpload": "Importer mon QR",
+  "store.qrUseVeltrix": "Utiliser le QR Veltrix",
+  "store.scanToSee": "Scannez pour voir la carte et les prix",
+  "store.addAll": "Ajouter tous les produits et services à la carte",
+  "store.addedAll": "{n} ajoutés à la carte",
+  "prod.inMenu": "Afficher sur la carte / boutique en ligne",
+  "prod.inMenuHint": "Vos clients le verront en scannant le QR du commerce.",
 };
 
 export default fr;

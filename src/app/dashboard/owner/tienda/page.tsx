@@ -10,7 +10,7 @@ import { compressImage, extFor, storeImageUrl } from '../../image';
 
 type Company = { id: string; legal_name: string };
 type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean };
-type Store = { id: string; company_id: string; branch_id: string; slug: string; name: string; description: string | null; whatsapp: string | null; logo_path: string | null; is_published: boolean };
+type Store = { id: string; company_id: string; branch_id: string; slug: string; name: string; description: string | null; whatsapp: string | null; logo_path: string | null; own_qr_path?: string | null; is_published: boolean };
 type Admin = { store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
 
 const BUCKET = 'store-images';
@@ -82,6 +82,53 @@ export default function StoreAdminPage() {
     return path;
   };
   const removeOld = async (path: string | null) => { if (path) await supabase.storage.from(BUCKET).remove([path]); };
+
+  // QR propio del negocio (carta existente): se guarda nítido y sin recorte
+  const setOwnQr = async (file: File | undefined) => {
+    if (!file || !data) return;
+    setBusy(true);
+    try {
+      const path = await upload(file, 'qr', 1000);
+      await rpc('set_store_qr', { p_company: companyId, p_path: path });
+      await removeOld(data.store.own_qr_path ?? null);
+      flash(true, t('store.saved'));
+      await load();
+    } catch (err) { flash(false, storeError((err as Error).message, t)); } finally { setBusy(false); }
+  };
+  const useVeltrixQr = async () => {
+    if (!data?.store.own_qr_path) return;
+    setBusy(true);
+    try {
+      await rpc('set_store_qr', { p_company: companyId, p_path: null });
+      await removeOld(data.store.own_qr_path);
+      await load();
+    } catch (err) { flash(false, storeError((err as Error).message, t)); } finally { setBusy(false); }
+  };
+  const addAll = async () => {
+    setBusy(true);
+    try {
+      const n = await rpc<number>('store_add_all', { p_company: companyId });
+      flash(true, t('store.addedAll', { n }));
+      await load();
+    } catch (err) { flash(false, storeError((err as Error).message, t)); } finally { setBusy(false); }
+  };
+  // Hoja imprimible: logo, nombre, QR grande y llamado a escanear (para mesas, mostrador o vitrina)
+  const printCard = (qrSrc: string) => {
+    const w = window.open('', '_blank', 'noopener,width=600,height=800');
+    if (!w || !form) return;
+    const logo = data?.store.logo_path ? storeImageUrl(data.store.logo_path) : '';
+    const esc = (x: string) => x.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(form.name)}</title>
+<style>body{font-family:system-ui,sans-serif;margin:0;display:grid;place-items:center;min-height:100vh}
+.c{text-align:center;padding:32px;border:2px solid #e2e8f0;border-radius:24px;width:340px}
+img.l{max-height:80px;max-width:200px;object-fit:contain}h1{margin:12px 0 4px;font-size:26px}
+p{margin:4px 0;color:#475569}img.q{width:260px;height:260px;margin:16px auto;display:block}
+small{color:#94a3b8}@media print{.c{border:none}}</style></head><body><div class="c">
+${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><p>${esc(t('store.scanToSee'))}</p>
+<img class="q" src="${qrSrc}" alt="QR"><small>${esc(link)}</small></div>
+<script>window.onload=()=>setTimeout(()=>window.print(),400)</script></body></html>`);
+    w.document.close();
+  };
 
   const setLogo = async (file: File | undefined) => {
     if (!file || !data) return;
@@ -200,10 +247,26 @@ export default function StoreAdminPage() {
                 <a href={`https://wa.me/?text=${encodeURIComponent(`${form.name} 👉 ${link}`)}`} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>💬 WhatsApp</a>
                 <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>📘 Facebook</a>
               </div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(link)}`}
-                alt="QR" width={240} height={240} className="mx-auto rounded-xl bg-white" />
-              <p className={`text-center text-xs ${ui.muted}`}>{t('store.qrHint')}</p>
+              {(() => {
+                const own = data.store.own_qr_path ? storeImageUrl(data.store.own_qr_path) : null;
+                const gen = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=12&format=png&data=${encodeURIComponent(link)}`;
+                const qr = own ?? gen;
+                return (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={qr} alt="QR" width={240} height={240} className="mx-auto h-60 w-60 rounded-xl bg-white object-contain p-1" />
+                    <p className={`text-center text-xs ${ui.muted}`}>{own ? t('store.qrOwn') : t('store.qrHint')}</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <a href={qr} download={`qr-${form.slug}.png`} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>⬇️ {t('store.qrDownload')}</a>
+                      <button type="button" onClick={() => printCard(qr)} className={`${ui.btnGhost} cursor-pointer`}>🖨️ {t('store.qrPrint')}</button>
+                      <label className={`${ui.btnGhost} cursor-pointer text-center`}>📤 {t('store.qrUpload')}
+                        <input type="file" accept="image/*" className="hidden" disabled={busy} onChange={(e) => setOwnQr(e.target.files?.[0])} />
+                      </label>
+                      {own && <button type="button" disabled={busy} onClick={useVeltrixQr} className={`${ui.btnGhost} cursor-pointer`}>↺ {t('store.qrUseVeltrix')}</button>}
+                    </div>
+                  </>
+                );
+              })()}
             </>
           ) : (
             <p className={`text-sm ${ui.muted}`}>{t('store.notPublished')}</p>
@@ -220,6 +283,9 @@ export default function StoreAdminPage() {
           </span>
         </div>
         <p className={`text-xs ${ui.muted}`}>{t('store.photoHint')}</p>
+        {data.products.some((p) => !p.in_store && p.active) && (
+          <button type="button" disabled={busy} onClick={addAll} className={`${ui.btnGhost} w-full cursor-pointer`}>➕ {t('store.addAll')}</button>
+        )}
         {data.products.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('prod.empty')}</p>}
         <ul className="divide-y divide-slate-200 dark:divide-slate-800">
           {data.products.map((p) => {

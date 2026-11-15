@@ -1414,6 +1414,16 @@ const es = {
   "net.failed": "No se pudo cargar la información. Revisa tu conexión.",
   "net.retry": "Reintentar",
   "pos.removeItem": "Quitar",
+  "store.qrOwn": "Este es el QR de tu negocio que subiste.",
+  "store.qrDownload": "Descargar QR",
+  "store.qrPrint": "Imprimir carta",
+  "store.qrUpload": "Subir mi QR",
+  "store.qrUseVeltrix": "Usar QR de Veltrix",
+  "store.scanToSee": "Escanea para ver la carta y precios",
+  "store.addAll": "Agregar todos los productos y servicios a la carta",
+  "store.addedAll": "Se agregaron {n} a la carta",
+  "prod.inMenu": "Mostrar en la carta / tienda online",
+  "prod.inMenuHint": "Tus clientes lo verán al escanear el QR del negocio.",
 };
 
 export default es;
