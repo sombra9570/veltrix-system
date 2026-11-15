@@ -80,3 +80,43 @@ export function SyncButton() {
     </button>
   );
 }
+
+/** Aviso global: sin conexión, o una consulta que falló por red/servidor, con botón Reintentar.
+ *  Ninguna pantalla queda "cargando" en silencio. */
+export function NetBanner() {
+  const { t } = useT();
+  const [offline, setOffline] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const upd = () => setOffline(!navigator.onLine);
+    const fail = () => setFailed(true);
+    upd();
+    window.addEventListener('online', upd);
+    window.addEventListener('offline', upd);
+    window.addEventListener('veltrix:net-error', fail);
+    return () => {
+      window.removeEventListener('online', upd);
+      window.removeEventListener('offline', upd);
+      window.removeEventListener('veltrix:net-error', fail);
+    };
+  }, []);
+
+  if (!offline && !failed) return null;
+  const retry = async () => {
+    setBusy(true); setFailed(false);
+    if (loaders.size === 0) { window.location.reload(); return; }
+    try { await syncAll(); } finally { setBusy(false); }
+  };
+  return (
+    <div role="status" className="mx-4 mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm text-amber-900 sm:mx-6 md:mx-8 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
+      <span className="font-semibold">{offline ? `📡 ${t('net.offline')}` : `⚠️ ${t('net.failed')}`}</span>
+      {!offline && (
+        <button type="button" disabled={busy} onClick={retry} className="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white cursor-pointer disabled:opacity-60">
+          {busy ? '…' : `↻ ${t('net.retry')}`}
+        </button>
+      )}
+    </div>
+  );
+}

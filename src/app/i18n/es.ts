@@ -1410,6 +1410,9 @@ const es = {
   "tp.st.rejected": "Rechazado",
   "home.taxIncluded": "Precios con factura: IVA e IT incluidos.",
   "addon.upgradeHint": "Para más trabajadores o sucursales, sube de plan: siempre te conviene más que comprar extras.",
+  "net.offline": "Sin conexión a internet. Al volver la señal, la app se actualiza sola.",
+  "net.failed": "No se pudo cargar la información. Revisa tu conexión.",
+  "net.retry": "Reintentar",
 };
 
 export default es;

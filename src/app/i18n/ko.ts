@@ -1401,6 +1401,9 @@ const ko: Record<DictKey, string> = {
   "tp.st.rejected": "거절됨",
   "home.taxIncluded": "세금계산서 포함 가격: 부가세 및 거래세 포함.",
   "addon.upgradeHint": "직원이나 지점을 늘리려면 요금제를 올리세요. 추가 구매보다 항상 저렴합니다.",
+  "net.offline": "인터넷 연결이 없습니다. 신호가 돌아오면 앱이 자동으로 업데이트됩니다.",
+  "net.failed": "정보를 불러오지 못했습니다. 연결을 확인하세요.",
+  "net.retry": "다시 시도",
 };
 
 export default ko;

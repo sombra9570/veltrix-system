@@ -7,7 +7,7 @@ import { ThemeToggle } from '../theme';
 import { HelpButton } from './help';
 import { RegionSelectors, ui } from '../site-header';
 import { useT } from '../i18n';
-import { useSync, SyncButton } from './sync';
+import { useSync, SyncButton, NetBanner } from './sync';
 import { loadAuth } from '../auth-system';
 import type { DictKey } from '../i18n/es';
 
@@ -150,6 +150,7 @@ export function AppShell({
           </div>
         </header>
 
+        <NetBanner />
         {banner}
         <main className="mx-auto w-full min-w-0 max-w-[1600px] flex-1 px-4 pt-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 md:p-8">{children}</main>
       </div>

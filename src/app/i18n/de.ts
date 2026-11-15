@@ -1401,6 +1401,9 @@ const de: Record<DictKey, string> = {
   "tp.st.rejected": "Abgelehnt",
   "home.taxIncluded": "Preise mit Rechnung: MwSt. und IT inbegriffen.",
   "addon.upgradeHint": "Für mehr Mitarbeitende oder Filialen wechseln Sie den Plan: Das ist immer günstiger als Extras.",
+  "net.offline": "Keine Internetverbindung. Sobald das Netz zurück ist, aktualisiert sich die App selbst.",
+  "net.failed": "Die Informationen konnten nicht geladen werden. Prüfen Sie Ihre Verbindung.",
+  "net.retry": "Erneut versuchen",
 };
 
 export default de;

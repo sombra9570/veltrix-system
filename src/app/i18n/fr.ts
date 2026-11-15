@@ -1401,6 +1401,9 @@ const fr: Record<DictKey, string> = {
   "tp.st.rejected": "Refusé",
   "home.taxIncluded": "Prix avec facture : TVA et IT inclus.",
   "addon.upgradeHint": "Pour plus d’employés ou de succursales, passez à l’offre supérieure : c’est toujours plus avantageux que les options.",
+  "net.offline": "Pas de connexion internet. L’application se met à jour seule au retour du réseau.",
+  "net.failed": "Impossible de charger les informations. Vérifiez votre connexion.",
+  "net.retry": "Réessayer",
 };
 
 export default fr;

@@ -1401,6 +1401,9 @@ const zh: Record<DictKey, string> = {
   "tp.st.rejected": "已拒绝",
   "home.taxIncluded": "含发票价格：已含增值税和交易税。",
   "addon.upgradeHint": "需要更多员工或分店时，请升级套餐：总比购买附加项更划算。",
+  "net.offline": "没有网络连接。信号恢复后应用会自动更新。",
+  "net.failed": "无法加载信息，请检查网络连接。",
+  "net.retry": "重试",
 };
 
 export default zh;

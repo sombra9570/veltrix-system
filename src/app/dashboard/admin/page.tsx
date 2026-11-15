@@ -7,6 +7,7 @@ import { useVeltrixAuth } from '../../auth-system';
 import { rpc, supabase } from '../../../lib/supabase';
 import { Spinner } from '../../spinner';
 import { TransferAdmin } from './transfer-admin';
+import { NetBanner } from '../sync';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -247,6 +248,7 @@ export default function GlobalCoreAdminPage() {
   return (
     <main className="min-h-dvh bg-slate-950 text-white px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:p-8">
       <div className="w-full max-w-[1600px] mx-auto space-y-6 min-w-0">
+        <NetBanner />
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-6 gap-4">
           <div>
             <span className="text-xs font-semibold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">

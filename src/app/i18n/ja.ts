@@ -1401,6 +1401,9 @@ const ja: Record<DictKey, string> = {
   "tp.st.rejected": "却下",
   "home.taxIncluded": "請求書付き価格：付加価値税と取引税込み。",
   "addon.upgradeHint": "従業員や店舗を増やすにはプランを上げてください。追加購入より常にお得です。",
+  "net.offline": "インターネットに接続されていません。電波が戻るとアプリが自動で更新されます。",
+  "net.failed": "情報を読み込めませんでした。接続を確認してください。",
+  "net.retry": "再試行",
 };
 
 export default ja;

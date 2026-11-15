@@ -1401,6 +1401,9 @@ const en: Record<DictKey, string> = {
   "tp.st.rejected": "Rejected",
   "home.taxIncluded": "Prices include invoice taxes (VAT and IT).",
   "addon.upgradeHint": "For more workers or branches, upgrade your plan: it always costs less than buying extras.",
+  "net.offline": "No internet connection. The app updates itself when the signal returns.",
+  "net.failed": "Could not load the information. Check your connection.",
+  "net.retry": "Retry",
 };
 
 export default en;

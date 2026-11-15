@@ -15,6 +15,13 @@ export const supabase = createClient(url ?? 'http://localhost', anonKey ?? 'miss
 /** Llama a una función de la base de datos (RPC) y devuelve el error en texto claro. */
 export async function rpc<T = unknown>(fn: string, args: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await supabase.rpc(fn, args);
-  if (error) throw new Error(error.message);
+  if (error) {
+    // Falla de red o del servidor (no un error de negocio como "sin permiso"): avisar a la pantalla
+    const code = (error as { code?: string }).code ?? '';
+    if (!code || /^(5|PGRST0|08)/.test(code) || /fetch|network|timeout/i.test(error.message)) {
+      if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('veltrix:net-error'));
+    }
+    throw new Error(error.message);
+  }
   return data as T;
 }
