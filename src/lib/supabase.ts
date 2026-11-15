@@ -8,8 +8,18 @@ if (!url || !anonKey) {
   console.error('Veltrix: faltan NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY en .env.local');
 }
 
+// Tiempo máximo por consulta: si la red queda colgada, falla y la pantalla avisa (nunca espera para siempre).
+// Las subidas de fotos tienen más margen por las señales lentas.
+const timedFetch: typeof fetch = (input, init) => {
+  const ms = String(input instanceof Request ? input.url : input).includes('/storage/') ? 90_000 : 25_000;
+  const timeout = AbortSignal.timeout(ms);
+  const signal = init?.signal && 'any' in AbortSignal ? AbortSignal.any([init.signal, timeout]) : (init?.signal ?? timeout);
+  return fetch(input, { ...init, signal });
+};
+
 export const supabase = createClient(url ?? 'http://localhost', anonKey ?? 'missing', {
   auth: { persistSession: true, autoRefreshToken: true },
+  global: { fetch: timedFetch },
 });
 
 /** Llama a una función de la base de datos (RPC) y devuelve el error en texto claro. */
