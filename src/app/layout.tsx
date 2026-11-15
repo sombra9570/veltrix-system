@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#020617',
+  themeColor: '#ffffff',
   width: 'device-width',
   initialScale: 1,
   minimumScale: 1,
@@ -40,7 +40,7 @@ export const viewport: Viewport = {
 // Aplica el tema guardado antes de pintar la página (evita el parpadeo).
 // Por defecto: oscuro.
 // También pinta la barra del teléfono/navegador del mismo color que la app.
-const themeScript = `(function(){var d=true;try{d=localStorage.getItem('veltrix_theme')!=='light'}catch(e){}if(d){document.documentElement.classList.add('dark')}var m=document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m)}m.content=d?'#020617':'#ffffff'})()`;
+const themeScript = `(function(){var d=false;try{d=localStorage.getItem('veltrix_theme')==='dark'}catch(e){}if(d){document.documentElement.classList.add('dark')}var m=document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m)}m.content=d?'#020617':'#ffffff'})()`;
 
 export default function RootLayout({
   children,
@@ -62,7 +62,7 @@ export default function RootLayout({
           <PwaRegister />
           <NoZoom />
           {/* Franja bajo el reloj y la batería del iPhone (app instalada): siempre oscura para que se lean */}
-          <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[env(safe-area-inset-top)] bg-slate-950" />
+          <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[env(safe-area-inset-top)] bg-white dark:bg-slate-950" />
           {children}
         </LanguageProvider>
       </body>

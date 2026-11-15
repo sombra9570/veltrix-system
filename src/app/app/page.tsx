@@ -12,5 +12,5 @@ export default function AppEntry() {
     if (!loaded) return;
     router.replace(session ? homeForRole(session.role) : '/ingresar');
   }, [loaded, session, router]);
-  return <div className="grid min-h-dvh place-items-center bg-slate-950"><Spinner /></div>;
+  return <div className="grid min-h-dvh place-items-center bg-slate-50 dark:bg-slate-950"><Spinner /></div>;
 }

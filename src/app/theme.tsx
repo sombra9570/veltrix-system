@@ -5,7 +5,7 @@ import { useT } from './i18n';
 export type Theme = 'light' | 'dark';
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>('dark');
+  const [theme, setThemeState] = useState<Theme>('light');
 
   useEffect(() => {
     setThemeState(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
