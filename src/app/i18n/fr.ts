@@ -1018,7 +1018,7 @@ const fr: Record<DictKey, string> = {
   "addon.inUseStorage": "Impossible de descendre autant : vos fichiers occupent plus d'espace. Libérez de l'espace d'abord.",
   "addon.billingCard": "Ajusté sur votre abonnement : ce mois-ci vous payez seulement le prorata.",
   "addon.billingNext": "Sera ajouté à votre prochain paiement.",
-  "home.extras": "Options : +{gb} Go {storage}/mois sur toutes les offres · Succursale en plus {branch}/mois sur Enterprise et Enterprise Plus · Employé en plus {user}/mois sur Enterprise Plus (au-delà de 90).",
+  "home.extras": "Options : +{gb} Go {storage}/mois sur toutes les offres · Succursale complète en plus dès {branch}/mois (Enterprise et Enterprise Plus) · Employé en plus {user}/mois sur Enterprise Plus (au-delà de 90).",
   "home.sc.tab.owner": "Administrateur",
   "home.sc.tab.collector": "Encaisseur",
   "home.sc.tab.cash": "Caisse",

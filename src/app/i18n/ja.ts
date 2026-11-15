@@ -1018,7 +1018,7 @@ const ja: Record<DictKey, string> = {
   "addon.inUseStorage": "そこまで減らせません：ファイルの容量が多いため、先に空きを作ってください。",
   "addon.billingCard": "サブスクリプションで調整：今月は日割り分のみお支払い。",
   "addon.billingNext": "次回のお支払いに加算されます。",
-  "home.extras": "追加：全プランで +{gb} GB {storage}/月 · Enterprise と Enterprise Plus で追加店舗 {branch}/月 · Enterprise Plus で追加従業員 {user}/月（90名超）。",
+  "home.extras": "追加：全プランで +{gb} GB {storage}/月 · 追加の店舗一式 {branch}/月から（Enterprise・Enterprise Plus）· Enterprise Plus で追加従業員 {user}/月（90名超）。",
   "home.sc.tab.owner": "管理者",
   "home.sc.tab.collector": "集金担当",
   "home.sc.tab.cash": "レジ",

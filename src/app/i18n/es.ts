@@ -1027,7 +1027,7 @@ const es = {
   "addon.inUseStorage": "No puedes bajar tanto: tus archivos ocupan más espacio. Libera espacio primero.",
   "addon.billingCard": "Se ajusta en tu suscripción: este mes pagas solo la parte proporcional.",
   "addon.billingNext": "Se sumará a tu próximo pago.",
-  "home.extras": "Extras: +{gb} GB {storage}/mes en cualquier plan · Sucursal extra {branch}/mes en Enterprise y Enterprise Plus · Trabajador extra {user}/mes en Enterprise Plus (más de 90).",
+  "home.extras": "Extras: +{gb} GB {storage}/mes en cualquier plan · Sucursal completa extra desde {branch}/mes (Enterprise y Enterprise Plus) · Trabajador extra {user}/mes en Enterprise Plus (más de 90).",
   "home.sc.tab.owner": "Administrador",
   "home.sc.tab.collector": "Cobrador",
   "home.sc.tab.cash": "Caja",

@@ -1018,7 +1018,7 @@ const ar: Record<DictKey, string> = {
   "addon.inUseStorage": "لا يمكن التخفيض لهذا الحد: ملفاتك تشغل مساحة أكبر. حرّر مساحة أولًا.",
   "addon.billingCard": "يُعدَّل في اشتراكك: تدفع هذا الشهر الجزء النسبي فقط.",
   "addon.billingNext": "ستُضاف إلى دفعتك القادمة.",
-  "home.extras": "الإضافات: +{gb} غيغابايت {storage}/شهريًا في أي خطة · فرع إضافي {branch}/شهريًا في Enterprise وEnterprise Plus · موظف إضافي {user}/شهريًا في Enterprise Plus (أكثر من 90).",
+  "home.extras": "الإضافات: +{gb} غيغابايت {storage}/شهريًا في أي خطة · فرع كامل إضافي ابتداءً من {branch}/شهريًا (Enterprise وEnterprise Plus) · موظف إضافي {user}/شهريًا في Enterprise Plus (أكثر من 90).",
   "home.sc.tab.owner": "المدير",
   "home.sc.tab.collector": "المحصّل",
   "home.sc.tab.cash": "الصندوق",

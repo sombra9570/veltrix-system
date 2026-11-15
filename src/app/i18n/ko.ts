@@ -1018,7 +1018,7 @@ const ko: Record<DictKey, string> = {
   "addon.inUseStorage": "그만큼 줄일 수 없습니다: 파일이 더 많은 공간을 사용 중입니다. 먼저 공간을 확보하세요.",
   "addon.billingCard": "구독에 반영됨: 이번 달은 일할 계산된 금액만 결제됩니다.",
   "addon.billingNext": "다음 결제에 추가됩니다.",
-  "home.extras": "추가: 모든 요금제 +{gb} GB {storage}/월 · Enterprise·Enterprise Plus 추가 지점 {branch}/월 · Enterprise Plus 추가 직원 {user}/월(90명 초과).",
+  "home.extras": "추가: 모든 요금제 +{gb} GB {storage}/월 · 추가 지점 전체 {branch}/월부터(Enterprise·Enterprise Plus) · Enterprise Plus 추가 직원 {user}/월(90명 초과).",
   "home.sc.tab.owner": "총괄 관리자",
   "home.sc.tab.collector": "수금원",
   "home.sc.tab.cash": "계산대",

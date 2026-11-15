@@ -1,0 +1,2 @@
+-- 048: precios de extras por plan (aplicada como addon_prices_by_plan): tabla addon_plan_prices + addon_price();
+-- base: usuario 3.50/5.50, sucursal 15/24 (Enterprise Plus); Enterprise sucursal 19/29; espacio 3/4 en todos.

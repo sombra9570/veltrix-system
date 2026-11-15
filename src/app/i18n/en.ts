@@ -1018,7 +1018,7 @@ const en: Record<DictKey, string> = {
   "addon.inUseStorage": "You can't go that low: your files use more space. Free up space first.",
   "addon.billingCard": "Adjusted on your subscription: this month you pay only the prorated part.",
   "addon.billingNext": "It will be added to your next payment.",
-  "home.extras": "Extras: +{gb} GB {storage}/mo on any plan · Extra branch {branch}/mo on Enterprise and Enterprise Plus · Extra worker {user}/mo on Enterprise Plus (over 90).",
+  "home.extras": "Extras: +{gb} GB {storage}/mo on any plan · Extra full branch from {branch}/mo (Enterprise and Enterprise Plus) · Extra worker {user}/mo on Enterprise Plus (over 90).",
   "home.sc.tab.owner": "Administrator",
   "home.sc.tab.collector": "Collector",
   "home.sc.tab.cash": "Cash",

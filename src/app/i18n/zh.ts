@@ -1018,7 +1018,7 @@ const zh: Record<DictKey, string> = {
   "addon.inUseStorage": "无法减少这么多：文件占用空间更多，请先释放空间。",
   "addon.billingCard": "已在订阅中调整：本月只需支付按比例计算的部分。",
   "addon.billingNext": "将计入你的下次付款。",
-  "home.extras": "附加项：任何套餐 +{gb} GB {storage}/月 · Enterprise 和 Enterprise Plus 额外分店 {branch}/月 · Enterprise Plus 额外员工 {user}/月（超过90人）。",
+  "home.extras": "附加项：任何套餐 +{gb} GB {storage}/月 · 额外完整分店 {branch}/月起（Enterprise 和 Enterprise Plus）· Enterprise Plus 额外员工 {user}/月（超过90人）。",
   "home.sc.tab.owner": "管理员",
   "home.sc.tab.collector": "收款员",
   "home.sc.tab.cash": "收银",
