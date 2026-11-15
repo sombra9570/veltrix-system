@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useOwner } from './owner-context';
 import { Card, UsageBar } from '../shell';
+import { ApprovalsTray } from '../approvals';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 
@@ -30,6 +31,8 @@ export default function OwnerHome() {
         <h1 className="text-xl font-extrabold sm:text-2xl">{t('owner.welcome', { name: firstName })}</h1>
         <p className={`text-sm ${ui.muted}`}>{t('owner.subtitle')}</p>
       </div>
+
+      <ApprovalsTray />
 
       {/* HOY */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">

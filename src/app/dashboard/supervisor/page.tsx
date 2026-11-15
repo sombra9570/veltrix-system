@@ -8,6 +8,7 @@ import { money, parseAmount } from '../format';
 import { DaysTable } from '../collector/days-table';
 import { CutForm } from '../collector/cut-form';
 import { RouteTrail } from '../route-trail';
+import { ApprovalsTray } from '../approvals';
 import { useBoard, type SRoute, type SBranch } from './board';
 
 // Panel del supervisor: cajas de ruta de sus sucursales, cobrado y prestado por día,
@@ -27,6 +28,7 @@ export default function SupervisorRoutes() {
         <h1 className="text-xl font-extrabold sm:text-2xl">🛵 {t('sup.title')}</h1>
         <p className={`text-sm ${ui.muted}`}>{t('sup.subtitle')}</p>
       </div>
+      <ApprovalsTray />
       {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300' : 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400'}`}>{msg.text}</p>}
       {pending > 0 && (
         <a href="/dashboard/supervisor/prestamos" className="block rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm font-bold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">

@@ -170,7 +170,7 @@ export default function InventoryPage() {
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {[
-          [t('inv.value'), s ? fmt(s.value) : '—', t('inv.productsN', { n: s?.products ?? 0 })],
+          [t('inv.value'), s && s.value != null ? fmt(s.value) : '🔒', t('inv.productsN', { n: s?.products ?? 0 })],
           [t('inv.retailValue'), s ? fmt(s.retail_value) : '—', ''],
           [t('inv.low'), s ? String(s.low) : '—', ''],
           [t('inv.out'), s ? String(s.out) : '—', ''],
@@ -213,11 +213,11 @@ export default function InventoryPage() {
                       <button type="button" onClick={() => openItem(i)} className="flex w-full items-center gap-3 p-4 text-start hover:bg-slate-50 cursor-pointer dark:hover:bg-slate-800/50">
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-semibold">{i.name}</p>
-                          <p className={`truncate text-xs ${ui.muted}`}>{i.sku} · {t('inv.costEach', { cost: fmt(i.cost) })}{Number(i.min) > 0 ? ` · ${t('inv.minN', { n: qtyFmt(i.min) })}` : ''}</p>
+                          <p className={`truncate text-xs ${ui.muted}`}>{i.sku}{i.cost != null ? ` · ${t('inv.costEach', { cost: fmt(i.cost) })}` : ''}{Number(i.min) > 0 ? ` · ${t('inv.minN', { n: qtyFmt(i.min) })}` : ''}</p>
                         </div>
                         <div className="shrink-0 text-end">
                           <p className={`text-lg font-extrabold ${out ? 'text-red-600 dark:text-red-400' : low ? 'text-amber-600 dark:text-amber-400' : ''}`}>{qtyFmt(i.qty)} <span className="text-xs font-semibold">{i.unit}</span></p>
-                          <p className={`text-xs ${ui.muted}`}>{fmt(i.value)}</p>
+                          {i.value != null && <p className={`text-xs ${ui.muted}`}>{fmt(i.value)}</p>}
                         </div>
                       </button>
                     </li>

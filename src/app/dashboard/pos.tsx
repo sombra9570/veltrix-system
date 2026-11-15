@@ -27,7 +27,10 @@ const addDays = (d: number) => {
 const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
 const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
 
-function posError(msg: string, t: (k: DictKey) => string) {
+function posError(msg: string, t: (k: DictKey, v?: Record<string, string | number>) => string) {
+  const over = msg.match(/DISCOUNT_OVER_LIMIT:([\d.]+)/);
+  if (over) return t('pos.discountOver', { n: Number(over[1]) });
+  if (/PERM_DENIED/.test(msg)) return t('err.permDenied');
   if (/Stock insuficiente/i.test(msg)) return t('pos.noStock');
   if (/suspendida/i.test(msg)) return t('err.suspended');
   return t('err.generic');
@@ -40,6 +43,7 @@ export function PosScreen() {
   const [branchId, setBranchId] = useState('');
   const [catalog, setCatalog] = useState<Product[]>([]);
   const [sales, setSales] = useState<Sale[]>([]);
+  const [disc, setDisc] = useState('');
   const [query, setQuery] = useState('');
   const [cart, setCart] = useState<Line[]>([]);
   const [notes, setNotes] = useState('');
@@ -133,9 +137,25 @@ export function PosScreen() {
     );
   };
 
-  const total = cart.reduce((s, l) => s + l.qty * Number(l.product.price), 0);
+  const gross = cart.reduce((s, l) => s + l.qty * Number(l.product.price), 0);
+  const pct = mode === 'cash' ? Math.min(99, Math.max(0, parseFloat(disc.replace(',', '.')) || 0)) : 0;
+  const total = pct > 0 ? cart.reduce((s, l) => s + l.qty * Math.round(Number(l.product.price) * (1 - pct / 100) * 100) / 100, 0) : gross;
   const units = cart.reduce((s, l) => s + l.qty, 0);
   const nInst = Math.max(1, Math.min(120, parseInt(count, 10) || 1));
+
+  // Pedir anulación: si es supervisor o dueño se anula directo; si no, va a la bandeja de aprobaciones
+  const askCancel = async (id: string) => {
+    const reason = window.prompt(t('appr.reasonAsk'));
+    if (!reason?.trim()) return;
+    try {
+      const r = await rpc<string | null>('request_cancel_sale', { p_order: id, p_reason: reason.trim() });
+      flash(true, r ? t('appr.requested') : t('appr.cancelled'));
+      await load();
+    } catch (err) {
+      const m = (err as Error).message;
+      flash(false, m.includes('REQUEST_PENDING') ? t('appr.alreadyPending') : m.includes('SALE_HAS_PAYMENTS') ? t('appr.hasPayments') : posError(m, t));
+    }
+  };
 
   const send = async () => {
     if (!cart.length || !branchId) return;
@@ -154,11 +174,12 @@ export function PosScreen() {
         setCustomer(null);
         setMode('cash');
       } else {
-        await rpc('create_sale', { p_branch: branchId, p_items: items, p_notes: notes });
+        await rpc('create_sale', pct > 0 ? { p_branch: branchId, p_items: items, p_notes: notes, p_discount: pct } : { p_branch: branchId, p_items: items, p_notes: notes });
         flash(true, t('pos.sent', { amount: fmt(total) }));
       }
       setCart([]);
       setNotes('');
+      setDisc('');
       setSheet(false);
       await load();
     } catch (err) {
@@ -263,6 +284,16 @@ export function PosScreen() {
         <label className={ui.label}>{t('pos.notes')}</label>
         <input value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={200} className={ui.input} />
       </div>
+      {mode === 'cash' && cart.length > 0 && (
+        <div className="flex items-center justify-between gap-3">
+          <label className={`${ui.label} !mb-0`} htmlFor="pos-disc">🏷️ {t('pos.discount')}</label>
+          <div className="flex items-center gap-1">
+            <input id="pos-disc" inputMode="decimal" value={disc} onChange={(e) => setDisc(e.target.value.replace(/[^\d.,]/g, ''))} placeholder="0" className={`${ui.input} !w-20 text-right`} />
+            <span className="font-semibold">%</span>
+          </div>
+        </div>
+      )}
+      {pct > 0 && <p className={`text-right text-xs ${ui.muted}`}>{t('pos.discountSaved', { amount: fmt(gross - total) })}</p>}
       <div className="flex items-baseline justify-between border-t border-slate-200 pt-3 dark:border-slate-800">
         <span className="font-semibold">{t('pos.total')}</span>
         <span className="text-2xl font-extrabold">{fmt(total)}</span>
@@ -384,6 +415,10 @@ export function PosScreen() {
                   {s.paid ? t('pos.paid') : t('pos.pending')}
                 </span>
                 <span className="w-24 text-right font-bold">{money(Number(s.total), s.currency, lang)}</span>
+                {!s.paid && (
+                  <button type="button" onClick={() => askCancel(s.id)} aria-label={t('appr.askCancel')} title={t('appr.askCancel')}
+                    className={`${ui.btnGhost} !px-2 !py-1 text-xs`}>🚫</button>
+                )}
               </li>
             ))}
           </ul>

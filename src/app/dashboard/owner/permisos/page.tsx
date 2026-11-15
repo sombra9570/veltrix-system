@@ -16,11 +16,11 @@ type Data = {
 // Qué permisos tienen sentido para cada rol (los demás no se muestran para no confundir)
 // Permisos delegables por rol (el dueño y el supervisor ya lo tienen todo en su sucursal)
 const ROLE_KEYS: Record<string, string[]> = {
-  cashier: ['cash.see_expected', 'cash.movements', 'customers.view_docs', 'payments.reverse'],
-  vendor: ['sales.credit', 'customers.edit', 'customers.view_docs', 'payments.reverse'],
+  cashier: ['cash.see_expected', 'cash.movements', 'customers.view_docs', 'payments.reverse', 'sales.cancel_request'],
+  vendor: ['sales.credit', 'customers.edit', 'customers.view_docs', 'payments.reverse', 'sales.cancel_request'],
   collector: ['collector.expenses', 'loans.create', 'loans.customers', 'loans.interest', 'loans.cancel', 'loans.reschedule', 'payments.reverse', 'routes.liquidate', 'routes.invest'],
-  storekeeper: ['products.edit', 'products.price', 'products.delete', 'inv.receive', 'inv.adjust', 'inv.out', 'inv.transfer'],
-  accountant: ['reports.export'],
+  storekeeper: ['products.edit', 'products.price', 'products.delete', 'inv.receive', 'inv.adjust', 'inv.out', 'inv.transfer', 'inv.see_cost'],
+  accountant: ['reports.export', 'inv.see_cost'],
   technician: ['customers.edit', 'customers.view_docs'],
 };
 
@@ -61,6 +61,18 @@ export default function PermissionsPage() {
     finally { setBusy(false); }
   };
 
+  const [limits, setLimits] = useState<Record<string, Record<string, number>>>({});
+  useEffect(() => {
+    if (orgId) rpc<{ roles: Record<string, Record<string, number>> }>('limits_admin', { p_org: orgId }).then((r) => setLimits(r?.roles ?? {})).catch(() => undefined);
+  }, [orgId]);
+  const saveLimit = async (role: string, v: string) => {
+    const n = Math.min(99, Math.max(0, parseFloat(v.replace(',', '.')) || 0));
+    setBusy(true); setErr('');
+    try { await rpc('set_role_limit', { p_org: orgId, p_role: role, p_key: 'discount_pct', p_value: n }); setLimits({ ...limits, [role]: { ...(limits[role] ?? {}), discount_pct: n } }); }
+    catch (e) { setErr(friendlyError((e as Error).message, t)); }
+    finally { setBusy(false); }
+  };
+
   const users = useMemo(() => (d?.users ?? []).filter((u) => ROLE_KEYS[u.role]), [d]);
 
   return (
@@ -73,6 +85,25 @@ export default function PermissionsPage() {
 
       {!d ? <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p> : (
         <>
+          {/* Topes */}
+          <Card>
+            <h2 className="font-bold">🏷️ {t('lim.title')}</h2>
+            <p className={`mb-3 text-xs ${ui.muted}`}>{t('lim.hint')}</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {['cashier', 'vendor', 'waiter'].map((role) => (
+                <label key={role} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+                  <span className="text-sm font-semibold">{k(`role.${role}`)}</span>
+                  <span className="flex items-center gap-1">
+                    <input key={`${role}-${limits[role]?.discount_pct ?? 0}`} inputMode="decimal" defaultValue={String(limits[role]?.discount_pct ?? 0)} disabled={busy}
+                      onBlur={(e) => { if (Number(e.target.value) !== (limits[role]?.discount_pct ?? 0)) saveLimit(role, e.target.value); }}
+                      className={`${ui.input} !w-20 text-right`} aria-label={`${k(`role.${role}`)} %`} />
+                    <span className="font-semibold">%</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </Card>
+
           {/* Por rol */}
           <div className="grid gap-4 lg:grid-cols-3">
             {Object.entries(ROLE_KEYS).map(([role, keys]) => (
