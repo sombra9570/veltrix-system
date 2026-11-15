@@ -1,2 +1,2 @@
 -- 052: almacenero — delete_product(), inventory_evidence (estado + foto), bucket inventory-files, inv_evidence_add/list, inv_out
--- PENDIENTE DE APLICAR en producción (requiere aprobación del usuario). Contenido completo en la migración "storekeeper_products_and_evidence".
+-- Aplicada en producción el 2026-11-15 (migración "storekeeper_products_and_evidence").
