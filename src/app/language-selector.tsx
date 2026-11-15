@@ -872,6 +872,39 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
     const savedCountry = localStorage.getItem('veltrix_country') as CountryCode | null;
     const foundCountry = COUNTRIES.find((c) => c.code === savedCountry);
+    // Sin elección guardada: país (y su idioma, si tampoco eligió idioma) según la ubicación de la conexión;
+    // si no se puede, por la zona horaria del dispositivo. Una elección manual siempre manda.
+    if (!foundCountry) {
+      const apply = (code: string | null) => {
+        const c = COUNTRIES.find((x) => x.code === code);
+        if (!c) return false;
+        const devTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        setCountryCode(c.code);
+        setCustomTz(c.timezones.some((t) => t.tz === devTz) ? devTz : c.timezones[0].tz);
+        if (!savedLang) {
+          const base = (c.locale ?? 'en').split('-')[0] as LangCode;
+          setLang(LANGUAGES.some((l) => l.code === base) ? base : 'en');
+        }
+        try { sessionStorage.setItem('veltrix_geo', c.code); } catch {}
+        return true;
+      };
+      const byTz = () => {
+        const devTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const c = COUNTRIES.find((x) => x.timezones.some((t) => t.tz === devTz));
+        apply(c?.code ?? null);
+      };
+      let cached: string | null = null;
+      try { cached = sessionStorage.getItem('veltrix_geo'); } catch {}
+      if (!cached || !apply(cached)) {
+        const ctl = new AbortController();
+        const timer = setTimeout(() => ctl.abort(), 2500);
+        fetch('/api/geo', { signal: ctl.signal })
+          .then((r) => r.json())
+          .then((d: { country: string | null }) => { if (!apply(d.country)) byTz(); })
+          .catch(byTz)
+          .finally(() => clearTimeout(timer));
+      }
+    }
     if (foundCountry) {
       setCountryCode(foundCountry.code);
       const savedTz = localStorage.getItem('veltrix_tz');
