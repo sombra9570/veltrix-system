@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ui } from '../site-header';
 import { useT } from '../i18n';
 
@@ -13,8 +13,6 @@ export function PhotoPicker({ value, onChange, facing = 'environment', disabled 
   value: File | null; onChange: (f: File | null) => void; facing?: 'environment' | 'user'; disabled?: boolean;
 }) {
   const { t } = useT();
-  const camera = useRef<HTMLInputElement>(null);
-  const files = useRef<HTMLInputElement>(null);
   const [url, setUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -32,11 +30,15 @@ export function PhotoPicker({ value, onChange, facing = 'environment', disabled 
 
   return (
     <div className="space-y-2">
-      <input ref={camera} type="file" accept="image/*" capture={facing} className="hidden" onChange={pick} />
-      <input ref={files} type="file" accept="image/*" className="hidden" onChange={pick} />
       <div className="grid grid-cols-2 gap-2">
-        <button type="button" disabled={disabled} onClick={() => camera.current?.click()} className={`${ui.btnGhost} !px-3 !py-2 text-sm`}>📷 {t('photo.take')}</button>
-        <button type="button" disabled={disabled} onClick={() => files.current?.click()} className={`${ui.btnGhost} !px-3 !py-2 text-sm`}>🖼️ {t('photo.pick')}</button>
+        <label className={`${ui.btnGhost} relative flex cursor-pointer items-center justify-center !px-3 !py-2 text-sm ${disabled ? 'opacity-50' : ''}`}>
+          📷 {t('photo.take')}
+          <input type="file" accept="image/*" capture={facing} disabled={disabled} onChange={pick} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+        </label>
+        <label className={`${ui.btnGhost} relative flex cursor-pointer items-center justify-center !px-3 !py-2 text-sm ${disabled ? 'opacity-50' : ''}`}>
+          🖼️ {t('photo.pick')}
+          <input type="file" accept="image/*" disabled={disabled} onChange={pick} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+        </label>
       </div>
       {value && url && (
         <div className="flex items-center gap-3 rounded-xl border border-slate-200 p-2 dark:border-slate-800">
@@ -58,4 +60,42 @@ export function photoErrorKey(message: string): 'photo.unreadable' | 'photo.tooB
   if (message.includes('PHOTO_UNREADABLE')) return 'photo.unreadable';
   if (message.includes('PHOTO_TOO_BIG')) return 'photo.tooBig';
   return 'photo.uploadFailed';
+}
+
+/**
+ * Foto que se sube al elegirla (logo, QR, producto de la tienda): miniatura grande con la foto actual,
+ * dos botones (cámara / archivo) y vista previa inmediata mientras se sube.
+ */
+export function PhotoSlot({ current, onFile, busy, size = 'h-16 w-16', icon = '📷' }: {
+  current: string | null; onFile: (f: File) => void; busy?: boolean; size?: string; icon?: string;
+}) {
+  const { t } = useT();
+  const [local, setLocal] = useState<string | null>(null);
+  useEffect(() => () => { if (local) URL.revokeObjectURL(local); }, [local]);
+  useEffect(() => { if (current) setLocal(null); }, [current]);
+  const pick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f) return;
+    setLocal(URL.createObjectURL(f));
+    onFile(f);
+  };
+  const shown = local ?? current;
+  return (
+    <div className="flex shrink-0 flex-col items-center gap-1">
+      <div className={`relative grid ${size} place-items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {shown ? <img src={shown} alt="" className="h-full w-full object-cover" /> : <span className="text-xl">{icon}</span>}
+        {busy && <span className="absolute inset-0 grid place-items-center bg-black/40 text-xs font-bold text-white">…</span>}
+      </div>
+      <div className="flex gap-1">
+        <label className="relative grid h-8 w-8 cursor-pointer place-items-center rounded-lg border border-slate-300 text-sm dark:border-slate-700" title={t('photo.take')}>
+          📷<input type="file" accept="image/*" capture="environment" disabled={busy} onChange={pick} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+        </label>
+        <label className="relative grid h-8 w-8 cursor-pointer place-items-center rounded-lg border border-slate-300 text-sm dark:border-slate-700" title={t('photo.pick')}>
+          🖼️<input type="file" accept="image/*" disabled={busy} onChange={pick} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+        </label>
+      </div>
+    </div>
+  );
 }

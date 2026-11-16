@@ -6,6 +6,7 @@ import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { money } from '../../format';
+import { PhotoSlot } from '../../photo-picker';
 import { compressImage, extFor, storeImageUrl } from '../../image';
 
 type Company = { id: string; legal_name: string };
@@ -191,11 +192,7 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
         <Card className="lg:col-span-3">
           <form onSubmit={save} className="grid gap-4 sm:grid-cols-2">
             <div className="flex items-center gap-4 sm:col-span-2">
-              <label className="relative grid h-20 w-20 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                {logo ? <img src={logo} alt="" className="h-full w-full object-cover" /> : <span className="text-2xl">🏪</span>}
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => setLogo(e.target.files?.[0])} />
-              </label>
+              <PhotoSlot current={logo} onFile={(f) => setLogo(f)} busy={busy} size="h-20 w-20" icon="🏪" />
               <p className={`text-xs ${ui.muted}`}>{t('store.logoHint')}</p>
             </div>
             <div>
@@ -261,8 +258,8 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
                     <div className="grid grid-cols-2 gap-2">
                       <a href={qr} download={`qr-${form.slug}.png`} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>⬇️ {t('store.qrDownload')}</a>
                       <button type="button" onClick={() => printCard(qr)} className={`${ui.btnGhost} cursor-pointer`}>🖨️ {t('store.qrPrint')}</button>
-                      <label className={`${ui.btnGhost} cursor-pointer text-center`}>📤 {t('store.qrUpload')}
-                        <input type="file" accept="image/*" className="hidden" disabled={busy} onChange={(e) => setOwnQr(e.target.files?.[0])} />
+                      <label className={`${ui.btnGhost} relative cursor-pointer text-center`}>📤 {t('store.qrUpload')}
+                        <input type="file" accept="image/*" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; setOwnQr(f); }} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
                       </label>
                       {own && <button type="button" disabled={busy} onClick={useVeltrixQr} className={`${ui.btnGhost} cursor-pointer`}>↺ {t('store.qrUseVeltrix')}</button>}
                     </div>
@@ -294,11 +291,7 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
             const img = storeImageUrl(p.photo);
             return (
               <li key={p.id} className={`flex flex-wrap items-center gap-3 py-3 ${p.active ? '' : 'opacity-50'}`}>
-                <label className="relative grid h-16 w-16 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  {img ? <img src={img} alt="" className="h-full w-full object-cover" loading="lazy" /> : <span className="text-xl">📷</span>}
-                  <input type="file" accept="image/*" className="hidden" onChange={(e) => setPhoto(p, e.target.files?.[0])} />
-                </label>
+                <PhotoSlot current={img} onFile={(f) => setPhoto(p, f)} busy={busy} />
                 <div className="min-w-0 flex-1 basis-40">
                   <p className="truncate font-semibold">{p.name}</p>
                   <p className={`text-xs ${ui.muted}`}>{fmt(p.price)}</p>
