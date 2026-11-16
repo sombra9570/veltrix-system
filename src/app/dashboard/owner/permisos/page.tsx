@@ -6,6 +6,7 @@ import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { friendlyError, useOwner } from '../owner-context';
+import { CustomRoles } from './custom-roles';
 
 type Data = {
   keys: string[];
@@ -103,6 +104,8 @@ export default function PermissionsPage() {
               ))}
             </div>
           </Card>
+
+          <CustomRoles keys={d.keys} />
 
           {/* Por rol */}
           <div className="grid gap-4 lg:grid-cols-3">

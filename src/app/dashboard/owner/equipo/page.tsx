@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useOwner, friendlyError } from '../owner-context';
 import { Card } from '../../shell';
 import { ui, PasswordInput } from '../../../site-header';
-import { supabase } from '../../../../lib/supabase';
+import { rpc, supabase } from '../../../../lib/supabase';
 import { useT } from '../../../i18n';
 import { Sheet } from '../../sheet';
 import type { DictKey } from '../../../i18n/es';
@@ -13,9 +13,9 @@ const ROLES = ['supervisor', 'cashier', 'vendor', 'collector', 'waiter', 'kitche
 const ROLE_MODULE: Partial<Record<(typeof ROLES)[number], string>> = { collector: 'field_collection', waiter: 'restaurant', kitchen: 'restaurant', technician: 'workshop', storekeeper: 'inventory' };
 
 type Branch = { id: string; name: string; company_id: string };
-type Member = { user_id: string; role: string; branch_id: string | null; is_active: boolean };
+type Member = { id: string; user_id: string; role: string; branch_id: string | null; is_active: boolean; custom_role_id: string | null };
 type Person = { id: string; full_name: string | null; email: string | null };
-type Row = { userId: string; name: string; email: string; roles: string[]; branchIds: string[]; active: boolean };
+type Row = { userId: string; name: string; email: string; roles: string[]; branchIds: string[]; active: boolean; membershipIds: string[]; customRoleId: string | null };
 
 export default function TeamPage() {
   const { orgId, reload, overview, modules } = useOwner();
@@ -28,6 +28,7 @@ export default function TeamPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'cashier', branchId: '' });
+  const [customRoles, setCustomRoles] = useState<{ id: string; name: string }[]>([]);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -36,7 +37,7 @@ export default function TeamPage() {
     setLoading(true);
     const [b, m] = await Promise.all([
       supabase.from('branches').select('id, name, company_id').eq('org_id', orgId).is('deleted_at', null).order('created_at'),
-      supabase.from('memberships').select('user_id, role, branch_id, is_active').eq('org_id', orgId).is('deleted_at', null).neq('role', 'owner'),
+      supabase.from('memberships').select('id, user_id, role, branch_id, is_active, custom_role_id').eq('org_id', orgId).is('deleted_at', null).neq('role', 'owner'),
     ]);
     const bs = (b.data ?? []) as Branch[];
     const ms = (m.data ?? []) as Member[];
@@ -48,13 +49,16 @@ export default function TeamPage() {
     for (const x of ms) {
       const r = byUser.get(x.user_id) ?? {
         userId: x.user_id, name: people.get(x.user_id)?.full_name ?? '', email: people.get(x.user_id)?.email ?? '',
-        roles: [], branchIds: [], active: false,
+        roles: [], branchIds: [], active: false, membershipIds: [], customRoleId: null,
       };
       if (!r.roles.includes(x.role)) r.roles.push(x.role);
       if (x.branch_id && !r.branchIds.includes(x.branch_id)) r.branchIds.push(x.branch_id);
       r.active = r.active || x.is_active;
+      r.membershipIds.push(x.id);
+      r.customRoleId = r.customRoleId ?? x.custom_role_id;
       byUser.set(x.user_id, r);
     }
+    try { setCustomRoles((await rpc<{ id: string; name: string }[]>('custom_roles_list', { p_org: orgId })) ?? []); } catch { setCustomRoles([]); }
     setBranches(bs);
     setRows([...byUser.values()].sort((a, b2) => Number(b2.active) - Number(a.active) || a.name.localeCompare(b2.name)));
     setForm((f) => ({ ...f, branchId: f.branchId || bs[0]?.id || '' }));
@@ -94,6 +98,13 @@ export default function TeamPage() {
   };
 
   // Cambiar la contraseña de un trabajador (el administrador la escribe y se la entrega)
+  const assignRole = async (r: Row, roleId: string) => {
+    setMsg(null);
+    try {
+      for (const m of r.membershipIds) await rpc('set_member_custom_role', { p_membership: m, p_role: roleId || null });
+      await load();
+    } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
+  };
   const [pw, setPw] = useState<{ row: Row; value: string } | null>(null);
   const [pwBusy, setPwBusy] = useState(false);
   const [pwMsg, setPwMsg] = useState<string | null>(null);
@@ -219,6 +230,12 @@ export default function TeamPage() {
                     {r.roles.map(roleLabel).join(', ')} · {r.branchIds.map(branchName).join(', ')}
                   </p>
                 </div>
+                {customRoles.length > 0 && (
+                  <select aria-label={t('roles.assign')} className={`${ui.input} !w-auto !py-1.5 text-xs`} value={r.customRoleId ?? ''} onChange={(e) => assignRole(r, e.target.value)}>
+                    <option value="">{t('roles.none')}</option>
+                    {customRoles.map((c) => <option key={c.id} value={c.id}>🧩 {c.name}</option>)}
+                  </select>
+                )}
                 <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
                 <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${r.active
                   ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
