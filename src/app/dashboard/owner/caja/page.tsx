@@ -7,7 +7,7 @@ import { useSync } from '../../sync';
 import { useT } from '../../../i18n';
 import { money, shortTime } from '../../format';
 import { Sheet, BranchOpt } from '../../sheet';
-import { friendlyError, useOwner } from '../owner-context';
+import { friendlyError, useOwnerOptional } from '../owner-context';
 
 type OpenShift = { id: string; cashier: string | null; opened_at: string; opening: number; expected: number; cash_in: number; digital_in: number; count: number };
 type Register = { id: string; name: string; active: boolean; shift: OpenShift | null };
@@ -27,7 +27,8 @@ const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-eme
 
 export default function CashPage() {
   const { t, lang } = useT();
-  const { reload } = useOwner();
+  const owner = useOwnerOptional();
+  const reload = owner?.reload ?? (async () => {});
   const [branches, setBranches] = useState<BranchOpt[]>([]);
   const [branchId, setBranchId] = useState('');
   const [data, setData] = useState<Overview | null>(null);

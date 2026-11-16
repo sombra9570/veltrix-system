@@ -9,6 +9,7 @@ import type { DictKey } from '../i18n/es';
 import { money, parseAmount } from './format';
 import { compressImage, extFor } from './image';
 import { PhotoPicker } from './photo-picker';
+import { useVeltrixAuth } from '../auth-system';
 
 type Branch = { id: string; name: string; company: string; currency: string };
 type Row = {
@@ -55,6 +56,8 @@ function custError(msg: string, t: (k: DictKey) => string) {
 
 /** Clientes y crédito: lo usan el vendedor, el supervisor y el dueño. */
 export function CustomersScreen() {
+  const { session } = useVeltrixAuth();
+  const readOnly = session?.role === 'accountant'; // el contador consulta saldos y mora, no edita clientes
   const { t, lang } = useT();
   const [branches, setBranches] = useState<Branch[] | null>(null);
   const [branchId, setBranchId] = useState('');
@@ -68,7 +71,7 @@ export function CustomersScreen() {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   useEffect(() => {
-    rpc<Branch[]>('seller_branches')
+    rpc<Branch[]>(readOnly ? 'reader_branches' : 'seller_branches')
       .then((b) => { setBranches(b ?? []); if (b?.length) setBranchId(b[0].id); })
       .catch(() => setBranches([]));
   }, []);
@@ -185,7 +188,7 @@ export function CustomersScreen() {
               {branches.map((b) => <option key={b.id} value={b.id}>{b.company} · {b.name}</option>)}
             </select>
           )}
-          <button type="button" onClick={() => { setForm({ ...blank }); setDetail(null); }} className={`${ui.btnPrimary} max-sm:w-full`}>+ {t('cust.add')}</button>
+          {!readOnly && <button type="button" onClick={() => { setForm({ ...blank }); setDetail(null); }} className={`${ui.btnPrimary} max-sm:w-full`}>+ {t('cust.add')}</button>}
         </div>
       </div>
 
@@ -320,10 +323,10 @@ export function CustomersScreen() {
                   <p className={`text-sm ${ui.muted}`}>{[detail.customer.tax_id, detail.customer.phone, detail.customer.address].filter(Boolean).join(' · ')}</p>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  <button type="button" className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}
+                  {!readOnly && <button type="button" className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}
                     onClick={() => setForm({ ...blank, id: detail.customer.id, name: detail.customer.name, tax_id: detail.customer.tax_id ?? '', phone: detail.customer.phone ?? '', address: detail.customer.address ?? '', limit: String(detail.customer.credit_limit), notes: detail.customer.notes ?? '' })}>
                     {t('prod.edit')}
-                  </button>
+                  </button>}
                   <button type="button" onClick={() => setDetail(null)} aria-label={t('pos.close')} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
                 </div>
               </div>

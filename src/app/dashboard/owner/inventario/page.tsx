@@ -9,6 +9,7 @@ import { Sheet } from '../../sheet';
 import { friendlyError } from '../owner-context';
 import { EvidenceFields, EvidenceLog, OutForm, addEvidence, emptyEvidence, uploadEvidencePhoto, type Evidence } from './evidence';
 import { photoErrorKey } from '../../photo-picker';
+import { useVeltrixAuth } from '../../../auth-system';
 
 type MBranch = { id: string; name: string; company_id: string; company: string; currency: string; company_wide: boolean };
 type Item = { id: string; name: string; sku: string; unit: string; type: string; qty: number; min: number; cost: number; price: number; value: number };
@@ -35,6 +36,8 @@ const emptyLine = (): Line => ({ product_id: '', qty: '', cost: '' });
 
 export default function InventoryPage() {
   const { t, lang } = useT();
+  const { session } = useVeltrixAuth();
+  const readOnly = session?.role === 'accountant'; // el contador ve existencias y movimientos; no mueve stock
   const [branches, setBranches] = useState<MBranch[]>([]);
   const [branchId, setBranchId] = useState('');
   const [data, setData] = useState<Overview | null>(null);
@@ -58,8 +61,8 @@ export default function InventoryPage() {
   const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 6000); };
 
   useEffect(() => {
-    rpc<MBranch[]>('manager_branches').then((b) => { setBranches(b ?? []); if (b?.length) setBranchId(b[0].id); }).catch(() => {});
-  }, []);
+    rpc<MBranch[]>(readOnly ? 'reader_branches' : 'manager_branches').then((b) => { setBranches(b ?? []); if (b?.length) setBranchId(b[0].id); }).catch(() => {});
+  }, [readOnly]);
 
   const load = useCallback(async () => {
     if (!branchId) return;
@@ -85,7 +88,7 @@ export default function InventoryPage() {
     ...(data?.untracked ?? []).map((u) => ({ id: u.id, name: u.name, cost: 0 })),
   ].sort((a, b) => a.name.localeCompare(b.name)), [data]);
 
-  const openItem = (i: Item) => { setSel(i); setCount({ qty: String(Number(i.qty)), note: '', min: String(Number(i.min)) }); };
+  const openItem = (i: Item) => { if (readOnly) return; setSel(i); setCount({ qty: String(Number(i.qty)), note: '', min: String(Number(i.min)) }); };
 
   const saveCount = async () => {
     if (!sel) return;
@@ -153,6 +156,7 @@ export default function InventoryPage() {
 
   const s = data?.summary;
   const tabs: [Tab, string][] = [['stock', t('inv.tabStock')], ['entry', t('inv.tabEntry')], ['out', t('ev.tabOut')], ['log', t('ev.tabLog')], ['moves', t('inv.tabMoves')], ['suppliers', t('inv.tabSuppliers')]];
+  const shownTabs = readOnly ? tabs.filter(([k]) => k === 'stock' || k === 'moves') : tabs;
   const typeLabel = (k: string) => t(`inv.mt.${k}` as 'inv.mt.sale');
 
   return (
@@ -186,7 +190,7 @@ export default function InventoryPage() {
       </div>
 
       <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:grid sm:grid-cols-6 sm:overflow-visible">
-        {tabs.map(([k, label]) => (
+        {shownTabs.map(([k, label]) => (
           <button key={k} type="button" onClick={() => setTab(k)}
             className={`shrink-0 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold transition cursor-pointer sm:text-sm ${tab === k ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
             {label}

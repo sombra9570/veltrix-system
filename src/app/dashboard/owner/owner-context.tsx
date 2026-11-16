@@ -38,6 +38,9 @@ export function useOwner() {
   return c;
 }
 
+/** Igual que useOwner, pero devuelve null si no está dentro del panel del dueño (p. ej. el supervisor usando la misma pantalla) */
+export function useOwnerOptional() { return useContext(OwnerContext); }
+
 const NAV: NavItem[] = [
   { href: '/dashboard/owner', icon: '🏠', label: 'nav.home' },
   { href: '/dashboard/owner/mensajes', icon: '💬', label: 'nav.messages' },
