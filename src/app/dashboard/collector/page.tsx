@@ -458,7 +458,7 @@ export default function CollectorPage() {
               <div className="flex items-start gap-3">
                 <span className="text-xl">{c.visited_today ? '✅' : Number(c.overdue) > 0 ? '🔴' : Number(c.due_today) > 0 ? '🟡' : '⚪'}</span>
                 <div className="min-w-0 flex-1">
-                  <p className="flex items-center gap-1.5 truncate font-bold"><Dot r={c.rating} />{c.name}</p>
+                  <p className="flex items-start gap-1.5 break-words font-bold leading-tight"><span className="mt-1.5"><Dot r={c.rating} /></span><span className="min-w-0">{c.name}</span></p>
                   <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
                   {c.last_visit && <Note v={c.last_visit} />}
                 </div>
@@ -481,12 +481,12 @@ export default function CollectorPage() {
               className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer ${ui.card} ${c.visited_today ? 'opacity-60' : ''} ${sel?.id === c.id ? 'ring-2 ring-blue-500' : ''}`}>
               <span className="text-xl">{c.visited_today ? '✅' : Number(c.overdue) > 0 ? '🔴' : Number(c.due_today) > 0 ? '🟡' : '⚪'}</span>
               <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-1.5 truncate font-bold"><Dot r={c.rating} />{c.name}</p>
+                <p className="flex items-start gap-1.5 break-words font-bold leading-tight"><span className="mt-1.5"><Dot r={c.rating} /></span><span className="min-w-0">{c.name}</span></p>
                 <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
                 {c.last_visit && <Note v={c.last_visit} />}
               </div>
-              <div className="text-right">
-                <p className="text-sm font-extrabold">{fmt(Number(c.overdue) + Number(c.due_today))}</p>
+              <div className="shrink-0 text-right">
+                <p className="whitespace-nowrap text-sm font-extrabold">{fmt(Number(c.overdue) + Number(c.due_today))}</p>
                 <p className={`text-[11px] ${ui.muted}`}>{t('col.ofBalance', { amount: fmt(c.balance) })}</p>
               </div>
             </button>
