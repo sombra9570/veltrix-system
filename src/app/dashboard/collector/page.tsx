@@ -379,9 +379,9 @@ export default function CollectorPage() {
             <span className={`text-[11px] ${ui.muted}`}>{t('day.auto')}</span>
           </div>
           <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.cash')}</p><p className="font-extrabold">{fmt(todayRow?.cash ?? 0)}</p></div>
-            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('loan.lent')}</p><p className="font-extrabold text-violet-600 dark:text-violet-400">{fmt(todayRow?.lent ?? 0)}</p></div>
-            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.expenses')}</p><p className="font-extrabold text-red-600 dark:text-red-400">{fmt(todayRow?.expenses ?? 0)}</p></div>
+            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.cash')}</p><p className="whitespace-nowrap text-sm font-extrabold sm:text-base">{fmt(todayRow?.cash ?? 0)}</p></div>
+            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('loan.lent')}</p><p className="whitespace-nowrap text-sm font-extrabold sm:text-base text-violet-600 dark:text-violet-400">{fmt(todayRow?.lent ?? 0)}</p></div>
+            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.expenses')}</p><p className="whitespace-nowrap text-sm font-extrabold sm:text-base text-red-600 dark:text-red-400">{fmt(todayRow?.expenses ?? 0)}</p></div>
           </div>
         </Card>
       )}
@@ -390,27 +390,27 @@ export default function CollectorPage() {
         {fund !== null && (
           <Card className="!p-3">
             <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('liq.opening')}</p>
-            <p className="font-extrabold">{fmt(opening)}</p>
+            <p className="whitespace-nowrap text-sm font-extrabold sm:text-base">{fmt(opening)}</p>
           </Card>
         )}
         <Card className="!p-3">
           <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.cash')}</p>
-          <p className="font-extrabold">{fmt(route.unsettled_cash)}</p>
+          <p className="whitespace-nowrap text-sm font-extrabold sm:text-base">{fmt(route.unsettled_cash)}</p>
         </Card>
         {(fund !== null || loans !== 0) && (
           <Card className="!p-3">
             <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('loan.lent')}</p>
-            <p className="font-extrabold text-violet-600 dark:text-violet-400">{fmt(loans)}</p>
+            <p className="whitespace-nowrap text-sm font-extrabold sm:text-base text-violet-600 dark:text-violet-400">{fmt(loans)}</p>
           </Card>
         )}
         <Card className="!p-3">
           <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.expenses')}</p>
-          <p className="font-extrabold text-red-600 dark:text-red-400">{fmt(route.unsettled_expenses)}</p>
+          <p className="whitespace-nowrap text-sm font-extrabold sm:text-base text-red-600 dark:text-red-400">{fmt(route.unsettled_expenses)}</p>
         </Card>
         {fund === null && (
           <Card className="!p-3">
             <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.toDeliver')}</p>
-            <p className="font-extrabold text-emerald-600 dark:text-emerald-400">{fmt(inHand)}</p>
+            <p className="whitespace-nowrap text-sm font-extrabold sm:text-base text-emerald-600 dark:text-emerald-400">{fmt(inHand)}</p>
           </Card>
         )}
       </div>
