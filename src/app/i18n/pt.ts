@@ -1489,6 +1489,13 @@ const pt: Record<DictKey, string> = {
   "appr.refundSale": "Devolução de venda",
   "appr.askRefund": "Pedir devolução",
   "appr.sharedPayment": "Um recebimento desta venda cobre também outras vendas: estorne esse recebimento em Cobranças.",
+  "photo.take": "Tirar foto",
+  "photo.pick": "Escolher arquivo",
+  "photo.remove": "Remover foto",
+  "photo.willCompress": "é comprimida ao enviar",
+  "photo.unreadable": "Não foi possível ler essa foto. Tire outra ou escolha um arquivo JPG ou PNG.",
+  "photo.tooBig": "A foto é pesada demais mesmo comprimida. Tire outra com menos detalhes.",
+  "photo.uploadFailed": "Não foi possível enviar a foto. Verifique a conexão e tente de novo; nada foi salvo.",
 };
 
 export default pt;

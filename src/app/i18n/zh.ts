@@ -1489,6 +1489,13 @@ const zh: Record<DictKey, string> = {
   "appr.refundSale": "销售退款",
   "appr.askRefund": "申请退款",
   "appr.sharedPayment": "这笔销售的收款还涉及其他销售，请先在收款中冲销该收款。",
+  "photo.take": "拍照",
+  "photo.pick": "选择文件",
+  "photo.remove": "移除照片",
+  "photo.willCompress": "上传时自动压缩",
+  "photo.unreadable": "无法读取该照片。请重新拍摄，或选择 JPG、PNG 文件。",
+  "photo.tooBig": "照片压缩后仍然过大，请换一张细节较少的照片。",
+  "photo.uploadFailed": "照片上传失败。请检查网络后重试；没有保存任何内容。",
 };
 
 export default zh;

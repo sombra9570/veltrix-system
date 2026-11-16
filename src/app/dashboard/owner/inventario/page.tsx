@@ -7,7 +7,8 @@ import { useT } from '../../../i18n';
 import { money, parseAmount } from '../../format';
 import { Sheet } from '../../sheet';
 import { friendlyError } from '../owner-context';
-import { EvidenceFields, EvidenceLog, OutForm, emptyEvidence, saveEvidence, type Evidence } from './evidence';
+import { EvidenceFields, EvidenceLog, OutForm, addEvidence, emptyEvidence, uploadEvidencePhoto, type Evidence } from './evidence';
+import { photoErrorKey } from '../../photo-picker';
 
 type MBranch = { id: string; name: string; company_id: string; company: string; currency: string; company_wide: boolean };
 type Item = { id: string; name: string; sku: string; unit: string; type: string; qty: number; min: number; cost: number; price: number; value: number };
@@ -112,6 +113,7 @@ export default function InventoryPage() {
     if (validLines.length === 0) return;
     setBusy(true);
     try {
+      const photoPath = await uploadEvidencePhoto(branchId, 'in', entryEv); // primero la foto: si falla, no se registra nada y se avisa
       await rpc('inv_receive', {
         p_branch: branchId,
         p_supplier: entry.supplier || null,
@@ -121,7 +123,7 @@ export default function InventoryPage() {
       });
       // Constancia de lo recibido (estado + foto opcional); si falla, la entrada igual quedó registrada
       const names = validLines.map((l) => `${num(l.qty)} × ${allProducts.find((x) => x.id === l.product_id)?.name ?? ''}`).join(', ');
-      await saveEvidence(branchId, 'in', entryEv, `${entry.doc.trim() ? entry.doc.trim() + ' · ' : ''}${names}`.slice(0, 300)).catch(() => undefined);
+      await addEvidence(branchId, 'in', entryEv, photoPath, `${entry.doc.trim() ? entry.doc.trim() + ' · ' : ''}${names}`.slice(0, 300)).catch(() => undefined);
       setEntryEv(emptyEvidence());
       setLines([emptyLine()]); setEntry({ supplier: '', doc: '', due: '' }); setMoves(null); setPurchases(null);
       flash(true, t('inv.entrySaved'));
@@ -129,7 +131,7 @@ export default function InventoryPage() {
       await load();
     } catch (e) {
       const m = (e as Error).message;
-      flash(false, m.includes('MODULE_PURCHASING') ? t('inv.needPurchasing') : friendlyError(m, t));
+      flash(false, m.startsWith('PHOTO:') ? t(photoErrorKey(m)) : m.includes('MODULE_PURCHASING') ? t('inv.needPurchasing') : friendlyError(m, t));
     } finally { setBusy(false); }
   };
 

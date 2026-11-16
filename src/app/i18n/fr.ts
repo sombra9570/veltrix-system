@@ -1489,6 +1489,13 @@ const fr: Record<DictKey, string> = {
   "appr.refundSale": "Remboursement de vente",
   "appr.askRefund": "Demander un remboursement",
   "appr.sharedPayment": "Un encaissement de cette vente couvre aussi d’autres ventes : annulez-le depuis Encaissements.",
+  "photo.take": "Prendre une photo",
+  "photo.pick": "Choisir un fichier",
+  "photo.remove": "Retirer la photo",
+  "photo.willCompress": "compressée à l’envoi",
+  "photo.unreadable": "Cette photo est illisible. Prenez-en une autre ou choisissez un fichier JPG ou PNG.",
+  "photo.tooBig": "La photo est trop lourde même compressée. Prenez-en une autre avec moins de détails.",
+  "photo.uploadFailed": "La photo n’a pas pu être envoyée. Vérifiez votre connexion et réessayez ; rien n’a été enregistré.",
 };
 
 export default fr;

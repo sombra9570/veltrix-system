@@ -1489,6 +1489,13 @@ const it: Record<DictKey, string> = {
   "appr.refundSale": "Rimborso vendita",
   "appr.askRefund": "Chiedi rimborso",
   "appr.sharedPayment": "Un incasso di questa vendita copre anche altre vendite: stornalo da Incassi.",
+  "photo.take": "Scatta foto",
+  "photo.pick": "Scegli file",
+  "photo.remove": "Rimuovi foto",
+  "photo.willCompress": "compressa al caricamento",
+  "photo.unreadable": "Impossibile leggere questa foto. Scattane un’altra o scegli un file JPG o PNG.",
+  "photo.tooBig": "La foto è troppo pesante anche compressa. Scattane un’altra con meno dettagli.",
+  "photo.uploadFailed": "Impossibile caricare la foto. Controlla la connessione e riprova; non è stato salvato nulla.",
 };
 
 export default it;

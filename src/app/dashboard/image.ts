@@ -3,24 +3,33 @@
  * lado mayor 1600 px, WebP (o JPEG si el navegador no sabe WebP), calidad 0.8.
  * Una foto de 4–5 MB queda en ~150–300 KB y se sigue leyendo nítida.
  */
-export async function compressImage(file: File, maxSide = 1600, quality = 0.8): Promise<Blob> {
-  const bitmap = await loadImage(file);
-  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
-  const w = Math.round(bitmap.width * scale);
-  const h = Math.round(bitmap.height * scale);
+export const MAX_UPLOAD_BYTES = 800_000; // los buckets aceptan 1 MB: se deja margen
 
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('canvas');
-  ctx.drawImage(bitmap, 0, 0, w, h);
-
-  const webp = await toBlob(canvas, 'image/webp', quality);
-  if (webp && webp.type === 'image/webp') return webp;
-  const jpeg = await toBlob(canvas, 'image/jpeg', quality);
-  if (!jpeg) throw new Error('compress');
-  return jpeg;
+export async function compressImage(file: File, maxSide = 1600, quality = 0.8, maxBytes = MAX_UPLOAD_BYTES): Promise<Blob> {
+  let bitmap: ImageBitmap | HTMLImageElement;
+  try { bitmap = await loadImage(file); } catch { throw new Error('PHOTO_UNREADABLE'); }
+  let side = maxSide;
+  let q = quality;
+  let best: Blob | null = null;
+  // Si la foto es muy detallada y pesa demasiado, se baja la calidad y luego el tamaño hasta que quepa
+  for (let i = 0; i < 8; i++) {
+    const scale = Math.min(1, side / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('PHOTO_UNREADABLE');
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    // WebP; si el navegador no lo sabe (Safari), JPEG
+    let blob = await toBlob(canvas, 'image/webp', q);
+    if (!blob || blob.type !== 'image/webp') blob = await toBlob(canvas, 'image/jpeg', q);
+    if (!blob) throw new Error('PHOTO_UNREADABLE');
+    best = blob;
+    if (blob.size <= maxBytes) return blob;
+    if (q > 0.55) q -= 0.1; else { side = Math.round(side * 0.8); q = 0.6; }
+  }
+  if (best && best.size <= 1_000_000) return best;
+  throw new Error('PHOTO_TOO_BIG');
 }
 
 function toBlob(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob | null> {

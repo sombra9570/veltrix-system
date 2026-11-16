@@ -6,6 +6,7 @@ import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { compressImage } from '../../image';
+import { PhotoPicker } from '../../photo-picker';
 import { parseAmount } from '../../format';
 import { grossUp } from '../../../../lib/tax';
 
@@ -58,7 +59,7 @@ export function TransferPay({ orgId, monthly, currency }: { orgId: string; month
       load();
     } catch (e) {
       const m = e instanceof Error ? e.message : '';
-      setMsg({ ok: false, text: m.includes('PROOF_TOO_MANY') ? t('tp.tooMany') : t('tp.error') });
+      setMsg({ ok: false, text: m.includes('PROOF_TOO_MANY') ? t('tp.tooMany') : m.includes('PHOTO_UNREADABLE') ? t('photo.unreadable') : m.includes('PHOTO_TOO_BIG') ? t('photo.tooBig') : t('tp.error') });
     } finally { setBusy(false); }
   };
 
@@ -94,9 +95,9 @@ export function TransferPay({ orgId, monthly, currency }: { orgId: string; month
         <label className="block"><span className={ui.label}>{t('tp.reference')}</span>
           <input className={ui.input} value={ref} maxLength={80} onChange={(e) => setRef(e.target.value)} />
         </label>
-        <label className="block"><span className={ui.label}>{t('tp.photo')}</span>
-          <input type="file" accept="image/*" className={`${ui.input} cursor-pointer`} onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
-        </label>
+        <div className="block sm:col-span-2"><span className={ui.label}>{t('tp.photo')}</span>
+          <PhotoPicker value={file} onChange={setFile} />
+        </div>
       </div>
       {msg && <p className={`text-sm font-semibold ${msg.ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>{msg.text}</p>}
       <button type="button" disabled={busy} onClick={send} className={ui.btnPrimary}>{busy ? '…' : `📤 ${t('tp.send')}`}</button>

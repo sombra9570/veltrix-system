@@ -1498,6 +1498,13 @@ const es = {
   "appr.refundSale": "Devolución de venta",
   "appr.askRefund": "Pedir devolución",
   "appr.sharedPayment": "Un cobro de esta venta cubre también otras ventas: reverse ese cobro desde Cobranza.",
+  "photo.take": "Tomar foto",
+  "photo.pick": "Elegir archivo",
+  "photo.remove": "Quitar foto",
+  "photo.willCompress": "se comprime al subir",
+  "photo.unreadable": "No se pudo leer esa foto. Toma otra o elige un archivo JPG o PNG.",
+  "photo.tooBig": "La foto es demasiado pesada incluso comprimida. Toma otra con menos detalle.",
+  "photo.uploadFailed": "No se pudo subir la foto. Revisa tu conexión e inténtalo de nuevo; no se guardó nada.",
 };
 
 export default es;

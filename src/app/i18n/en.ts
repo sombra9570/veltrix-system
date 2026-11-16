@@ -1489,6 +1489,13 @@ const en: Record<DictKey, string> = {
   "appr.refundSale": "Sale refund",
   "appr.askRefund": "Request refund",
   "appr.sharedPayment": "A payment on this sale also covers other sales: reverse that payment from Collections.",
+  "photo.take": "Take photo",
+  "photo.pick": "Choose file",
+  "photo.remove": "Remove photo",
+  "photo.willCompress": "compressed on upload",
+  "photo.unreadable": "That photo could not be read. Take another or choose a JPG or PNG file.",
+  "photo.tooBig": "The photo is too large even after compression. Take another with less detail.",
+  "photo.uploadFailed": "The photo could not be uploaded. Check your connection and try again; nothing was saved.",
 };
 
 export default en;

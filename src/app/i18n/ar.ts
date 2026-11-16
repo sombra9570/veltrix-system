@@ -1489,6 +1489,13 @@ const ar: Record<DictKey, string> = {
   "appr.refundSale": "استرداد بيع",
   "appr.askRefund": "طلب استرداد",
   "appr.sharedPayment": "تحصيل هذا البيع يغطي مبيعات أخرى أيضًا: اعكس هذا التحصيل من قسم التحصيلات.",
+  "photo.take": "التقاط صورة",
+  "photo.pick": "اختيار ملف",
+  "photo.remove": "إزالة الصورة",
+  "photo.willCompress": "تُضغط عند الرفع",
+  "photo.unreadable": "تعذّرت قراءة هذه الصورة. التقط صورة أخرى أو اختر ملف JPG أو PNG.",
+  "photo.tooBig": "الصورة كبيرة جدًا حتى بعد الضغط. التقط صورة أخرى بتفاصيل أقل.",
+  "photo.uploadFailed": "تعذّر رفع الصورة. تحقق من الاتصال وحاول مجددًا؛ لم يُحفظ شيء.",
 };
 
 export default ar;

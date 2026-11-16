@@ -18,6 +18,8 @@ const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-eme
 const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
 
 function storeError(msg: string, t: (k: DictKey) => string) {
+  if (msg.includes('PHOTO_UNREADABLE')) return t('photo.unreadable');
+  if (msg.includes('PHOTO_TOO_BIG')) return t('photo.tooBig');
   if (msg.includes('STORE_SLUG_INVALID')) return t('store.slugInvalid');
   if (msg.includes('STORE_SLUG_TAKEN')) return t('store.slugTaken');
   if (msg.includes('STORE_NEEDS_WHATSAPP')) return t('store.needsWhatsapp');

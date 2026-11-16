@@ -1489,6 +1489,13 @@ const ja: Record<DictKey, string> = {
   "appr.refundSale": "販売の返金",
   "appr.askRefund": "返金を申請",
   "appr.sharedPayment": "この販売の入金は他の販売にもまたがっています。入金管理から先にその入金を取り消してください。",
+  "photo.take": "写真を撮る",
+  "photo.pick": "ファイルを選ぶ",
+  "photo.remove": "写真を外す",
+  "photo.willCompress": "アップロード時に圧縮されます",
+  "photo.unreadable": "この写真を読み込めません。撮り直すか、JPG・PNG のファイルを選んでください。",
+  "photo.tooBig": "圧縮しても写真が大きすぎます。細部の少ない写真で撮り直してください。",
+  "photo.uploadFailed": "写真をアップロードできませんでした。通信を確認して再度お試しください。何も保存されていません。",
 };
 
 export default ja;

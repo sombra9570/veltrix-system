@@ -7,6 +7,7 @@ import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { compressImage } from '../../image';
 import { parseAmount } from '../../format';
+import { PhotoPicker, photoErrorKey } from '../../photo-picker';
 
 export type Evidence = { condition: string; note: string; photo: File | null };
 export const emptyEvidence = (): Evidence => ({ condition: 'ok', note: '', photo: null });
@@ -14,24 +15,32 @@ const CONDITIONS = ['ok', 'damaged', 'incomplete', 'expired', 'returned'] as con
 const REASONS = ['waste', 'internal', 'supplier_return', 'damaged', 'expired', 'other'] as const;
 const BUCKET = 'inventory-files';
 
-/** Sube la foto de respaldo (comprimida) a <org>/<sucursal>/… y deja la constancia. */
-export async function saveEvidence(branchId: string, kind: 'in' | 'out', ev: Evidence, summary: string) {
-  let path: string | null = null;
-  if (ev.photo) {
-    const { data: b } = await supabase.from('branches').select('org_id').eq('id', branchId).single();
+/** Sube la foto de respaldo (comprimida) a <org>/<sucursal>/… Si falla, lanza un error con el motivo. */
+export async function uploadEvidencePhoto(branchId: string, kind: 'in' | 'out', ev: Evidence): Promise<string | null> {
+  if (!ev.photo) return null;
+  try {
+    const { data: b, error: e1 } = await supabase.from('branches').select('org_id').eq('id', branchId).single();
+    if (e1 || !b) throw new Error(e1?.message ?? 'branch');
     const blob = await compressImage(ev.photo);
-    path = `${b?.org_id}/${branchId}/${kind}-${Date.now()}.${blob.type === 'image/webp' ? 'webp' : 'jpg'}`;
+    const path = `${b.org_id}/${branchId}/${kind}-${Date.now()}.${blob.type === 'image/webp' ? 'webp' : 'jpg'}`;
     const up = await supabase.storage.from(BUCKET).upload(path, blob, { contentType: blob.type });
     if (up.error) throw new Error(up.error.message);
+    return path;
+  } catch (e) {
+    throw new Error(`PHOTO:${(e as Error).message}`);
   }
-  await rpc('inv_evidence_add', { p_branch: branchId, p_kind: kind, p_condition: ev.condition, p_summary: summary, p_note: ev.note || null, p_photo: path });
+}
+
+/** Deja la constancia (estado, nota y foto si hay) */
+export async function addEvidence(branchId: string, kind: 'in' | 'out', ev: Evidence, photoPath: string | null, summary: string) {
+  await rpc('inv_evidence_add', { p_branch: branchId, p_kind: kind, p_condition: ev.condition, p_summary: summary, p_note: ev.note || null, p_photo: photoPath });
 }
 
 /** Estado de lo recibido / entregado, nota y foto opcional */
 export function EvidenceFields({ value, onChange }: { value: Evidence; onChange: (e: Evidence) => void }) {
   const { t } = useT();
   return (
-    <div className="grid gap-3 rounded-xl border border-slate-200 p-3 sm:grid-cols-3 dark:border-slate-800">
+    <div className="grid gap-3 rounded-xl border border-slate-200 p-3 sm:grid-cols-2 dark:border-slate-800">
       <div>
         <label className={ui.label}>{t('ev.condition')}</label>
         <select className={ui.input} value={value.condition} onChange={(e) => onChange({ ...value, condition: e.target.value })}>
@@ -42,10 +51,9 @@ export function EvidenceFields({ value, onChange }: { value: Evidence; onChange:
         <label className={ui.label}>{t('ev.note')}</label>
         <input className={ui.input} maxLength={500} value={value.note} onChange={(e) => onChange({ ...value, note: e.target.value })} />
       </div>
-      <div>
+      <div className="sm:col-span-3">
         <label className={ui.label}>📷 {t('ev.photo')}</label>
-        <input type="file" accept="image/*" capture="environment" className={`${ui.input} cursor-pointer`}
-          onChange={(e) => onChange({ ...value, photo: e.target.files?.[0] ?? null })} />
+        <PhotoPicker value={value.photo} onChange={(f) => onChange({ ...value, photo: f })} />
       </div>
     </div>
   );
@@ -70,12 +78,16 @@ export function OutForm({ branchId, items, onDone, flash }: {
     setBusy(true);
     try {
       const label = t(`ev.r.${reason}` as DictKey);
+      const photoPath = await uploadEvidencePhoto(branchId, 'out', ev);
       await rpc('inv_out', { p_branch: branchId, p_product: sel.id, p_qty: q, p_reason: ev.note ? `${label}: ${ev.note}` : label });
-      await saveEvidence(branchId, 'out', ev, `${q} ${sel.unit} · ${sel.name} · ${label}`).catch(() => undefined);
+      await addEvidence(branchId, 'out', ev, photoPath, `${q} ${sel.unit} · ${sel.name} · ${label}`);
       setProduct(''); setQty(''); setEv(emptyEvidence());
       flash(true, t('ev.outSaved'));
       onDone();
-    } catch (e) { flash(false, (e as Error).message.includes('suficiente') ? t('ev.noStock') : (e as Error).message.includes('PERM_DENIED') ? t('err.permDenied') : t('err.generic')); }
+    } catch (e) {
+      const m = (e as Error).message;
+      flash(false, m.startsWith('PHOTO:') ? t(photoErrorKey(m)) : m.includes('suficiente') ? t('ev.noStock') : m.includes('PERM_DENIED') ? t('err.permDenied') : t('err.generic'));
+    }
     finally { setBusy(false); }
   };
 

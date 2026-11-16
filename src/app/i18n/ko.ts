@@ -1489,6 +1489,13 @@ const ko: Record<DictKey, string> = {
   "appr.refundSale": "판매 환불",
   "appr.askRefund": "환불 요청",
   "appr.sharedPayment": "이 판매의 수금이 다른 판매에도 걸려 있습니다. 수금 메뉴에서 먼저 해당 수금을 취소하세요.",
+  "photo.take": "사진 촬영",
+  "photo.pick": "파일 선택",
+  "photo.remove": "사진 제거",
+  "photo.willCompress": "업로드 시 압축됩니다",
+  "photo.unreadable": "사진을 읽을 수 없습니다. 다시 촬영하거나 JPG·PNG 파일을 선택하세요.",
+  "photo.tooBig": "압축해도 사진이 너무 큽니다. 디테일이 적은 사진으로 다시 찍어 주세요.",
+  "photo.uploadFailed": "사진을 업로드하지 못했습니다. 연결을 확인하고 다시 시도하세요. 저장된 것이 없습니다.",
 };
 
 export default ko;

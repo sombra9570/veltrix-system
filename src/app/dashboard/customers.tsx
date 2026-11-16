@@ -8,6 +8,7 @@ import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 import { money, parseAmount } from './format';
 import { compressImage, extFor } from './image';
+import { PhotoPicker } from './photo-picker';
 
 type Branch = { id: string; name: string; company: string; currency: string };
 type Row = {
@@ -44,6 +45,8 @@ const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dar
 const pill = 'rounded-full px-2.5 py-0.5 text-[11px] font-bold';
 
 function custError(msg: string, t: (k: DictKey) => string) {
+  if (msg.includes('PHOTO_UNREADABLE')) return t('photo.unreadable');
+  if (msg.includes('PHOTO_TOO_BIG')) return t('photo.tooBig');
   if (/consentimiento/i.test(msg)) return t('cust.needConsent');
   if (/row-level security|storage/i.test(msg)) return t('cust.uploadFailed');
   if (/suspendida/i.test(msg)) return t('err.suspended');
@@ -254,9 +257,7 @@ export function CustomersScreen() {
             {/* Fotos: se comprimen en el teléfono y van a un almacenamiento privado */}
             <div className="space-y-2 rounded-xl border border-slate-300 p-3 dark:border-slate-700">
               <p className="text-sm font-semibold">🪪 {t('cust.docPhoto')}</p>
-              <input type="file" accept="image/*" capture="environment"
-                onChange={(e) => setForm({ ...form, doc: e.target.files?.[0] ?? null })}
-                className="block w-full text-sm file:me-3 file:rounded-lg file:border-0 file:bg-blue-600 file:px-3 file:py-2 file:font-semibold file:text-white" />
+              <PhotoPicker value={form.doc} onChange={(f) => setForm({ ...form, doc: f })} />
               <label className="flex cursor-pointer items-start gap-2 text-xs">
                 <input type="checkbox" checked={form.consent} onChange={(e) => setForm({ ...form, consent: e.target.checked })} className="mt-0.5 h-4 w-4" />
                 <span>{t('cust.consent')}</span>
@@ -265,9 +266,7 @@ export function CustomersScreen() {
             </div>
             <div className="space-y-2 rounded-xl border border-slate-300 p-3 dark:border-slate-700">
               <p className="text-sm font-semibold">🙂 {t('cust.photo')}</p>
-              <input type="file" accept="image/*" capture="user"
-                onChange={(e) => setForm({ ...form, photo: e.target.files?.[0] ?? null })}
-                className="block w-full text-sm file:me-3 file:rounded-lg file:border-0 file:bg-slate-600 file:px-3 file:py-2 file:font-semibold file:text-white" />
+              <PhotoPicker value={form.photo} onChange={(f) => setForm({ ...form, photo: f })} facing="user" />
             </div>
 
             <div className="flex gap-2 sm:col-span-2 sm:justify-end">

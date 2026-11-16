@@ -1489,6 +1489,13 @@ const hi: Record<DictKey, string> = {
   "appr.refundSale": "बिक्री वापसी",
   "appr.askRefund": "वापसी का अनुरोध",
   "appr.sharedPayment": "इस बिक्री की वसूली दूसरी बिक्रियों को भी कवर करती है: पहले वसूली में जाकर उसे उलटें।",
+  "photo.take": "फ़ोटो खींचें",
+  "photo.pick": "फ़ाइल चुनें",
+  "photo.remove": "फ़ोटो हटाएँ",
+  "photo.willCompress": "अपलोड पर संपीड़ित होती है",
+  "photo.unreadable": "यह फ़ोटो पढ़ी नहीं जा सकी। दूसरी खींचें या JPG/PNG फ़ाइल चुनें।",
+  "photo.tooBig": "संपीड़न के बाद भी फ़ोटो बहुत भारी है। कम विवरण वाली दूसरी फ़ोटो लें।",
+  "photo.uploadFailed": "फ़ोटो अपलोड नहीं हो सकी। कनेक्शन जाँचकर फिर कोशिश करें; कुछ सहेजा नहीं गया।",
 };
 
 export default hi;
