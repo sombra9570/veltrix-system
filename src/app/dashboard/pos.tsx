@@ -7,6 +7,8 @@ import { useSync } from './sync';
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 import { money, shortTime } from './format';
+import { ReceiptButtons } from './receipt-buttons';
+import { ShareStoreButton } from './share-store';
 
 type Branch = { id: string; name: string; company: string; currency: string };
 type Product = { id: string; sku: string; name: string; price: number; type: string; unit: string; stock: number | null };
@@ -310,6 +312,7 @@ export function PosScreen() {
         <div className="min-w-0">
           <h1 className="text-xl font-extrabold sm:text-2xl">🛒 {t('pos.title')}</h1>
           {branch && <p className={`text-sm ${ui.muted}`}>{branch.company} · {branch.name}</p>}
+          {branchId && <div className="mt-2"><ShareStoreButton branchId={branchId} /></div>}
         </div>
         {branches.length > 1 && (
           <select
@@ -408,13 +411,14 @@ export function PosScreen() {
         ) : (
           <ul className="divide-y divide-slate-200 dark:divide-slate-800">
             {sales.map((s) => (
-              <li key={s.id} className="flex items-center gap-3 px-5 py-3">
+              <li key={s.id} className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-5 py-3">
                 <span className={`w-12 shrink-0 text-xs ${ui.muted}`}>{shortTime(s.at, lang)}</span>
-                <span className={`flex-1 text-sm ${ui.muted}`}>{t('pos.items', { n: s.items })}</span>
+                <span className={`min-w-16 flex-1 text-sm ${ui.muted}`}>{t('pos.items', { n: s.items })}</span>
                 <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${s.paid ? okBox : 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300'}`}>
                   {s.paid ? t('pos.paid') : t('pos.pending')}
                 </span>
                 <span className="w-24 text-right font-bold">{money(Number(s.total), s.currency, lang)}</span>
+                <ReceiptButtons orderId={s.id} />
                 <button type="button" onClick={() => askCancel(s.id)} aria-label={s.paid ? t('appr.askRefund') : t('appr.askCancel')} title={s.paid ? t('appr.askRefund') : t('appr.askCancel')}
                   className={`${ui.btnGhost} !px-2 !py-1 text-xs`}>{s.paid ? '↩️' : '🚫'}</button>
               </li>
