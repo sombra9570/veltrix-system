@@ -1,12 +1,8 @@
 'use client';
 import { StaffProvider } from '../staff-context';
-import type { NavItem } from '../shell';
+import { ROLE_NAV } from '../role-nav';
 
-const NAV: NavItem[] = [
-  { href: '/dashboard/kitchen', icon: '🔥', label: 'nav.kitchen' },
-  { href: '/dashboard/kitchen/mensajes', icon: '💬', label: 'nav.messages' },
-];
 
 export function KitchenLayout({ children }: { children: React.ReactNode }) {
-  return <StaffProvider role="kitchen" nav={NAV}>{children}</StaffProvider>;
+  return <StaffProvider role="kitchen" nav={ROLE_NAV.kitchen}>{children}</StaffProvider>;
 }

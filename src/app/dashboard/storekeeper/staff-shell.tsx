@@ -1,14 +1,8 @@
 'use client';
 import { StaffProvider } from '../staff-context';
-import type { NavItem } from '../shell';
+import { ROLE_NAV } from '../role-nav';
 
-const NAV: NavItem[] = [
-  { href: '/dashboard/storekeeper', icon: '📦', label: 'nav.inventory' },
-  { href: '/dashboard/storekeeper/productos', icon: '🏷️', label: 'nav.products' },
-  { href: '/dashboard/storekeeper/tienda', icon: '📋', label: 'nav.store' },
-  { href: '/dashboard/storekeeper/mensajes', icon: '💬', label: 'nav.messages' },
-];
 
 export function StorekeeperLayout({ children }: { children: React.ReactNode }) {
-  return <StaffProvider role="storekeeper" nav={NAV}>{children}</StaffProvider>;
+  return <StaffProvider role="storekeeper" nav={ROLE_NAV.storekeeper}>{children}</StaffProvider>;
 }
