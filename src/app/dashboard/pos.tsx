@@ -286,9 +286,9 @@ export function PosScreen() {
       </div>
       {mode === 'cash' && cart.length > 0 && (
         <div className="flex items-center justify-between gap-3">
-          <label className={`${ui.label} !mb-0`} htmlFor="pos-disc">🏷️ {t('pos.discount')}</label>
+          <span className={`${ui.label} !mb-0`}>🏷️ {t('pos.discount')}</span>
           <div className="flex items-center gap-1">
-            <input id="pos-disc" inputMode="decimal" value={disc} onChange={(e) => setDisc(e.target.value.replace(/[^\d.,]/g, ''))} placeholder="0" className={`${ui.input} !w-20 text-right`} />
+            <input aria-label={t('pos.discount')} inputMode="decimal" value={disc} onChange={(e) => setDisc(e.target.value.replace(/[^\d.,]/g, ''))} placeholder="0" className={`${ui.input} !w-20 text-right`} />
             <span className="font-semibold">%</span>
           </div>
         </div>

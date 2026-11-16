@@ -177,16 +177,16 @@ export default function InventoryPage() {
         ].map(([label, value, sub], i) => (
           <Card key={i} className={`!p-4 ${i === 2 && Number(s?.low) > 0 ? '!border-amber-300 dark:!border-amber-500/40' : ''} ${i === 3 && Number(s?.out) > 0 ? '!border-red-300 dark:!border-red-500/40' : ''}`}>
             <p className={`text-xs font-semibold ${ui.muted}`}>{label}</p>
-            <p className="mt-1 truncate text-lg font-extrabold sm:text-xl">{value}</p>
+            <p className="mt-1 text-base font-extrabold break-words sm:text-xl">{value}</p>
             {sub && <p className={`text-xs ${ui.muted}`}>{sub}</p>}
           </Card>
         ))}
       </div>
 
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:grid sm:grid-cols-6 sm:overflow-visible">
         {tabs.map(([k, label]) => (
           <button key={k} type="button" onClick={() => setTab(k)}
-            className={`rounded-xl px-2 py-2 text-xs font-semibold transition cursor-pointer sm:text-sm ${tab === k ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
+            className={`shrink-0 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold transition cursor-pointer sm:text-sm ${tab === k ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
             {label}
           </button>
         ))}
