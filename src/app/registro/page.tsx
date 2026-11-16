@@ -7,12 +7,12 @@ import { useVeltrixAuth, homeForRole } from '../auth-system';
 import { useLanguage, COUNTRIES, CountryCode } from '../language-selector';
 import { useT, countryName } from '../i18n';
 import {
-  BUSINESS_KINDS, BusinessKind, categoriesForKind, suggestedModules, kindKey, kindDescKey, catKey, modKey,
+  BUSINESS_KINDS, BusinessKind, categoriesForKind, suggestedModules, suggestedRoles, recommendPlan, TEAM_SIZES, BRANCH_SIZES, TEAM_ROLES, type TeamRole, type PublicPlan, kindKey, kindDescKey, catKey, modKey,
 } from '../business-catalog';
 import { SiteHeader, SiteFooter, ui, useCountryChange, PasswordInput } from '../site-header';
 import type { DictKey } from '../i18n/es';
 
-const STEPS: DictKey[] = ['reg.step1', 'reg.step2', 'reg.step3', 'reg.step4'];
+const STEPS: DictKey[] = ['reg.step1', 'reg.step2', 'need.stepTeam', 'need.stepExtras', 'need.stepSolution', 'need.stepAccount'];
 
 export default function RegistroPage() {
   const router = useRouter();
@@ -24,6 +24,15 @@ export default function RegistroPage() {
   const [step, setStep] = useState(0);
   const [kind, setKind] = useState<BusinessKind | null>(null);
   const [cats, setCats] = useState<string[]>([]);
+  // Diagnóstico: primero entendemos qué necesita, luego recomendamos
+  const [teamSize, setTeamSize] = useState<string | null>(null);
+  const [branchSize, setBranchSize] = useState<string>('b1');
+  const [roles, setRoles] = useState<TeamRole[]>([]);
+  const [rolesTouched, setRolesTouched] = useState(false);
+  const [invoice, setInvoice] = useState<string | null>(null);
+  const [wantAi, setWantAi] = useState<boolean | null>(null);
+  const [plans, setPlans] = useState<PublicPlan[]>([]);
+  useEffect(() => { rpc<PublicPlan[]>('public_plans').then((p) => setPlans(p ?? [])).catch(() => {}); }, []);
   const [compName, setCompName] = useState('');
   const [taxId, setTaxId] = useState('');
   const [ownerName, setOwnerName] = useState('');
@@ -54,13 +63,22 @@ export default function RegistroPage() {
   };
   const toggleCat = (id: string) =>
     setCats((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  const solo = teamSize === 's0';
+  const teamMax = TEAM_SIZES.find((x) => x.id === teamSize)?.max ?? 0;
+  const branchMax = BRANCH_SIZES.find((x) => x.id === branchSize)?.max ?? 1;
+  const suggested = suggestedRoles(cats);
+  const shownRoles = rolesTouched ? roles : suggested;      // marcados de entrada según el rubro; el cliente los cambia
+  const toggleRole = (r: TeamRole) => { setRolesTouched(true); setRoles((rolesTouched ? roles : suggested).includes(r) ? (rolesTouched ? roles : suggested).filter((x) => x !== r) : [...(rolesTouched ? roles : suggested), r]); };
+  const plan = recommendPlan(plans, teamMax, branchMax);
 
   // Qué falta en cada paso para poder avanzar
   const stepError = (): string => {
     if (step === 0 && !kind) return t('val.chooseKind');
     if (step === 1 && cats.length === 0) return t('val.chooseCat');
-    if (step === 2 && !compName.trim()) return t('val.companyName');
-    if (step === 3) {
+    if (step === 2 && !teamSize) return t('need.val.team');
+    if (step === 3 && (!invoice || wantAi === null)) return t('need.val.extras');
+    if (step === 5) {
+      if (!compName.trim()) return t('val.companyName');
       if (!ownerName.trim()) return t('val.ownerName');
       if (!/^\S+@\S+\.\S+$/.test(email.trim())) return t('val.email');
       if (pass1.length < 8) return t('val.passMin');
@@ -87,6 +105,15 @@ export default function RegistroPage() {
       ownerEmail: email.trim(),
       ownerPassword: pass1,
     });
+    if (ok) {
+      // Lo que nos contó queda guardado: con eso se arma y se recomienda a su medida
+      try {
+        await rpc('save_onboarding', { p_data: {
+          team: teamSize, team_max: teamMax, branches: branchSize, branches_max: branchMax, roles: solo ? [] : shownRoles,
+          invoice, ai: wantAi, plan: plan?.code ?? null, categories: cats,
+        } });
+      } catch { /* el diagnóstico es un extra: no frena el registro */ }
+    }
     setBusy(false);
     if (ok) router.push('/dashboard/owner');
   };
@@ -205,6 +232,97 @@ export default function RegistroPage() {
 
           {step === 2 && (
             <>
+              <h2 className="text-lg font-bold">{t('need.teamQ')}</h2>
+              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {TEAM_SIZES.map((z) => (
+                  <button key={z.id} type="button" aria-pressed={teamSize === z.id} onClick={() => { setTeamSize(z.id); setError(''); }}
+                    className={`rounded-xl border px-3 py-3 text-sm font-semibold cursor-pointer ${teamSize === z.id ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 dark:border-slate-700'}`}>
+                    {t(`need.size.${z.id}` as DictKey)}
+                  </button>
+                ))}
+              </div>
+
+              <h2 className="mt-6 text-lg font-bold">{t('need.branchesQ')}</h2>
+              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {BRANCH_SIZES.map((z) => (
+                  <button key={z.id} type="button" aria-pressed={branchSize === z.id} onClick={() => setBranchSize(z.id)}
+                    className={`rounded-xl border px-3 py-3 text-sm font-semibold cursor-pointer ${branchSize === z.id ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 dark:border-slate-700'}`}>
+                    {t(`need.br.${z.id}` as DictKey)}
+                  </button>
+                ))}
+              </div>
+
+              {teamSize && (solo ? (
+                <p className="mt-6 rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200">🙋 {t('need.soloNote')}</p>
+              ) : (
+                <>
+                  <h2 className="mt-6 text-lg font-bold">{t('need.rolesQ')}</h2>
+                  <p className={`text-sm ${ui.muted}`}>{t('need.rolesHint')}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {TEAM_ROLES.map((r) => {
+                      const on = shownRoles.includes(r);
+                      return (
+                        <button key={r} type="button" aria-pressed={on} onClick={() => toggleRole(r)}
+                          className={`rounded-full border px-3 py-1.5 text-sm font-semibold cursor-pointer ${on ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 dark:border-slate-700'}`}>
+                          {t(`role.${r}` as DictKey)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              ))}
+            </>
+          )}
+
+          {step === 3 && (
+            <>
+              <h2 className="text-lg font-bold">{t('need.invoiceQ')}</h2>
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                {(['no', 'yes', 'later'] as const).map((v) => (
+                  <button key={v} type="button" aria-pressed={invoice === v} onClick={() => { setInvoice(v); setError(''); }}
+                    className={`rounded-xl border px-3 py-3 text-sm font-semibold cursor-pointer ${invoice === v ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 dark:border-slate-700'}`}>
+                    {t(`need.inv.${v}` as DictKey)}
+                  </button>
+                ))}
+              </div>
+
+              <h2 className="mt-6 text-lg font-bold">{t('need.aiQ')}</h2>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {([true, false] as const).map((v) => (
+                  <button key={String(v)} type="button" aria-pressed={wantAi === v} onClick={() => { setWantAi(v); setError(''); }}
+                    className={`rounded-xl border px-3 py-3 text-sm font-semibold cursor-pointer ${wantAi === v ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 dark:border-slate-700'}`}>
+                    {v ? t('need.ai.yes') : t('need.ai.no')}
+                  </button>
+                ))}
+              </div>
+
+              <p className={`mt-6 rounded-xl border border-slate-200 p-3 text-sm dark:border-slate-800 ${ui.muted}`}>💬 {solo ? t('need.chatSolo') : t('need.chatTeam')}</p>
+            </>
+          )}
+
+          {step === 4 && (
+            <>
+              <h2 className="text-lg font-bold">{t('need.solTitle')}</h2>
+              <ul className="mt-3 space-y-3 text-sm">
+                <li><span className="font-semibold">🧩 {t('need.solModules')}: </span>{modules.map((m) => t(modKey(m))).join(', ')}</li>
+                <li><span className="font-semibold">👥 {t('need.solRoles')}: </span>{solo || shownRoles.length === 0 ? t('need.solSolo') : shownRoles.map((r) => t(`role.${r}` as DictKey)).join(', ')}</li>
+                <li><span className="font-semibold">✨ {t('need.solExtras')}: </span>
+                  {[invoice === 'yes' ? t('need.solInvoice') : null, wantAi ? t('need.solAi') : null, !solo ? t('need.solChat') : null].filter(Boolean).join(', ') || t('need.solNone')}
+                </li>
+              </ul>
+              {plan && (
+                <div className="mt-5 rounded-2xl border border-blue-300 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
+                  <p className="text-xs font-bold uppercase text-blue-700 dark:text-blue-300">{t('need.solPlan')}</p>
+                  <p className="mt-1 text-xl font-extrabold">{plan.name} · {t('need.planPrice', { price: Number(plan.price_usd) })}</p>
+                  <p className={`mt-1 text-sm ${ui.muted}`}>{t('need.planWhy', { users: plan.max_users, branches: plan.max_branches, storage: `${Math.round(plan.max_storage_mb / 1024)} GB` })}</p>
+                  <p className={`mt-2 text-xs ${ui.muted}`}>{t('need.free')}</p>
+                </div>
+              )}
+            </>
+          )}
+
+          {step === 5 && (
+            <>
               <h2 className="text-lg font-bold">{t('reg.companyData')}</h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
@@ -233,9 +351,9 @@ export default function RegistroPage() {
             </>
           )}
 
-          {step === 3 && (
+          {step === 5 && (
             <>
-              <h2 className="text-lg font-bold">{t('reg.ownerTitle')}</h2>
+              <h2 className="mt-8 text-lg font-bold">{t('reg.ownerTitle')}</h2>
               <p className={`text-sm ${ui.muted}`}>{t('reg.ownerHint')}</p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">

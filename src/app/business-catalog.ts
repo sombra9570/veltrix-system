@@ -86,3 +86,30 @@ export const kindKey = (id: BusinessKind) => `kind.${id}` as DictKey;
 export const kindDescKey = (id: BusinessKind) => `kind.${id}.desc` as DictKey;
 export const catKey = (id: string) => `cat.${id}` as DictKey;
 export const modKey = (m: ModuleCode) => `mod.${m}` as DictKey;
+
+// Cargos que suelen hacer falta según los módulos del rubro (se muestran marcados y el cliente los ajusta)
+export const TEAM_ROLES = ['cashier', 'vendor', 'waiter', 'kitchen', 'collector', 'supervisor', 'storekeeper', 'accountant', 'technician'] as const;
+export type TeamRole = (typeof TEAM_ROLES)[number];
+
+export function suggestedRoles(categoryIds: string[]): TeamRole[] {
+  const mods = new Set<ModuleCode>();
+  for (const id of categoryIds) BUSINESS_CATEGORIES.find((c) => c.id === id)?.modules.forEach((m) => mods.add(m));
+  const r = new Set<TeamRole>();
+  if (mods.has('retail') || mods.has('distribution')) { r.add('vendor'); r.add('cashier'); }
+  if (mods.has('restaurant')) { r.add('waiter'); r.add('kitchen'); r.add('cashier'); }
+  if (mods.has('workshop')) { r.add('technician'); r.add('cashier'); }
+  if (mods.has('inventory')) r.add('storekeeper');
+  if (mods.has('field_collection')) { r.add('collector'); r.add('supervisor'); }
+  return TEAM_ROLES.filter((x) => r.has(x));
+}
+
+// Tamaños del equipo (personas que trabajan con el dueño) y de sucursales: el tope sirve para recomendar el plan
+export const TEAM_SIZES = [{ id: 's0', max: 0 }, { id: 's1', max: 3 }, { id: 's2', max: 7 }, { id: 's3', max: 14 }, { id: 's4', max: 49 }, { id: 's5', max: 90 }] as const;
+export const BRANCH_SIZES = [{ id: 'b1', max: 1 }, { id: 'b2', max: 2 }, { id: 'b3', max: 10 }, { id: 'b4', max: 25 }] as const;
+
+export type PublicPlan = { code: string; name: string; price_usd: number; max_branches: number; max_users: number; max_storage_mb: number };
+/** El plan más barato que alcanza para el dueño + su equipo y sus sucursales */
+export function recommendPlan(plans: PublicPlan[], teamMax: number, branchMax: number): PublicPlan | null {
+  const sorted = [...plans].sort((a, b) => Number(a.price_usd) - Number(b.price_usd));
+  return sorted.find((p) => p.max_users >= teamMax + 1 && p.max_branches >= branchMax) ?? sorted[sorted.length - 1] ?? null;
+}
