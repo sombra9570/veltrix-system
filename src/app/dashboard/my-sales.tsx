@@ -60,7 +60,7 @@ export function MySalesScreen() {
             {branches.map((b) => <option key={b.id} value={b.id}>{b.company} · {b.name}</option>)}
           </select>
         )}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2">
           <label className="block"><span className={ui.label}>{t('ms.from')}</span>
             <input type="date" value={from} max={to} onChange={(e) => setFrom(e.target.value)} className={ui.input} /></label>
           <label className="block"><span className={ui.label}>{t('ms.to')}</span>
