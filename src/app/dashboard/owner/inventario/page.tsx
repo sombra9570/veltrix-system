@@ -175,9 +175,9 @@ export default function InventoryPage() {
           [t('inv.low'), s ? String(s.low) : '—', ''],
           [t('inv.out'), s ? String(s.out) : '—', ''],
         ].map(([label, value, sub], i) => (
-          <Card key={i} className={`!p-4 ${i === 2 && Number(s?.low) > 0 ? '!border-amber-300 dark:!border-amber-500/40' : ''} ${i === 3 && Number(s?.out) > 0 ? '!border-red-300 dark:!border-red-500/40' : ''}`}>
+          <Card key={i} className={`!p-3 sm:!p-4 ${i === 2 && Number(s?.low) > 0 ? '!border-amber-300 dark:!border-amber-500/40' : ''} ${i === 3 && Number(s?.out) > 0 ? '!border-red-300 dark:!border-red-500/40' : ''}`}>
             <p className={`text-xs font-semibold ${ui.muted}`}>{label}</p>
-            <p className="mt-1 text-base font-extrabold break-words sm:text-xl">{value}</p>
+            <p className="mt-1 whitespace-nowrap text-sm font-extrabold tracking-tight sm:text-xl">{value}</p>
             {sub && <p className={`text-xs ${ui.muted}`}>{sub}</p>}
           </Card>
         ))}
