@@ -1531,6 +1531,15 @@ const pt: Record<DictKey, string> = {
   "sh.copied": "Copiado",
   "sh.whatsapp": "Enviar por WhatsApp",
   "sh.link": "Link da loja",
+  "team.pwChange": "Senha",
+  "team.pwTitle": "Alterar senha",
+  "team.pwNew": "Nova senha",
+  "team.pwHint": "Mínimo de 8 caracteres. Entregue ao funcionário e peça que não a compartilhe.",
+  "team.pwSave": "Salvar senha",
+  "team.pwDone": "Senha alterada. O funcionário já pode entrar com a nova.",
+  "team.pwFail": "Não foi possível alterar a senha. Tente de novo.",
+  "team.pwShared": "Esta conta pertence a mais de uma empresa; só o titular pode alterar a senha.",
+  "team.pwOwner": "Não é possível alterar a senha de um administrador.",
 };
 
 export default pt;

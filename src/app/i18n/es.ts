@@ -1540,6 +1540,15 @@ const es = {
   "sh.copied": "Copiado",
   "sh.whatsapp": "Enviar por WhatsApp",
   "sh.link": "Enlace de la tienda",
+  "team.pwChange": "Contraseña",
+  "team.pwTitle": "Cambiar contraseña",
+  "team.pwNew": "Nueva contraseña",
+  "team.pwHint": "Mínimo 8 caracteres. Entrégasela al trabajador y pídele que no la comparta.",
+  "team.pwSave": "Guardar contraseña",
+  "team.pwDone": "Contraseña cambiada. El trabajador ya puede ingresar con la nueva.",
+  "team.pwFail": "No se pudo cambiar la contraseña. Inténtalo de nuevo.",
+  "team.pwShared": "Esta cuenta pertenece a más de una empresa; solo su titular puede cambiar la contraseña.",
+  "team.pwOwner": "No se puede cambiar la contraseña de un administrador.",
 };
 
 export default es;

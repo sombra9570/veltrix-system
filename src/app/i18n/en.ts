@@ -1531,6 +1531,15 @@ const en: Record<DictKey, string> = {
   "sh.copied": "Copied",
   "sh.whatsapp": "Send via WhatsApp",
   "sh.link": "Store link",
+  "team.pwChange": "Password",
+  "team.pwTitle": "Change password",
+  "team.pwNew": "New password",
+  "team.pwHint": "At least 8 characters. Give it to the worker and ask them not to share it.",
+  "team.pwSave": "Save password",
+  "team.pwDone": "Password changed. The worker can now sign in with the new one.",
+  "team.pwFail": "The password could not be changed. Try again.",
+  "team.pwShared": "This account belongs to more than one company; only its owner can change the password.",
+  "team.pwOwner": "An administrator’s password cannot be changed here.",
 };
 
 export default en;

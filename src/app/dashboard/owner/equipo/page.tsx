@@ -5,6 +5,7 @@ import { Card } from '../../shell';
 import { ui, PasswordInput } from '../../../site-header';
 import { supabase } from '../../../../lib/supabase';
 import { useT } from '../../../i18n';
+import { Sheet } from '../../sheet';
 import type { DictKey } from '../../../i18n/es';
 
 const ROLES = ['supervisor', 'cashier', 'vendor', 'collector', 'waiter', 'kitchen', 'technician', 'storekeeper', 'accountant'] as const;
@@ -90,6 +91,33 @@ export default function TeamPage() {
     } finally {
       setBusy(false);
     }
+  };
+
+  // Cambiar la contraseña de un trabajador (el administrador la escribe y se la entrega)
+  const [pw, setPw] = useState<{ row: Row; value: string } | null>(null);
+  const [pwBusy, setPwBusy] = useState(false);
+  const [pwMsg, setPwMsg] = useState<string | null>(null);
+  const savePw = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pw) return;
+    setPwMsg(null);
+    if (pw.value.length < 8) return setPwMsg(t('val.passMin'));
+    setPwBusy(true);
+    try {
+      const { data: s } = await supabase.auth.getSession();
+      const res = await fetch('/api/workers/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${s.session?.access_token ?? ''}` },
+        body: JSON.stringify({ orgId, userId: pw.row.userId, password: pw.value }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error ?? '');
+      setPw(null);
+      setMsg({ ok: true, text: t('team.pwDone') });
+    } catch (err) {
+      const m = err instanceof Error ? err.message : '';
+      setPwMsg(/más de una empresa/.test(m) ? t('team.pwShared') : /administrador/.test(m) ? t('team.pwOwner') : t('team.pwFail'));
+    } finally { setPwBusy(false); }
   };
 
   const toggle = async (r: Row) => {
@@ -197,6 +225,7 @@ export default function TeamPage() {
                   : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
                   {r.active ? t('team.active') : t('team.inactive')}
                 </span>
+                <button type="button" onClick={() => { setPw({ row: r, value: '' }); setPwMsg(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>🔑 {t('team.pwChange')}</button>
                 <button type="button" onClick={() => toggle(r)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>
                   {r.active ? t('team.deactivate') : t('team.activate')}
                 </button>
@@ -206,6 +235,27 @@ export default function TeamPage() {
           </ul>
         )}
       </Card>
+
+      {pw && (
+        <Sheet onClose={() => setPw(null)} label={t('pos.close')}>
+          <form onSubmit={savePw} className="space-y-4">
+            <div>
+              <h2 className="text-lg font-extrabold">🔑 {t('team.pwTitle')}</h2>
+              <p className={`text-sm ${ui.muted}`}>{pw.row.name || pw.row.email}</p>
+            </div>
+            <div>
+              <label className={ui.label}>{t('team.pwNew')}</label>
+              <PasswordInput value={pw.value} onChange={(v) => setPw({ ...pw, value: v })} autoComplete="new-password" />
+              <p className={`mt-1 text-xs ${ui.muted}`}>{t('team.pwHint')}</p>
+            </div>
+            {pwMsg && <p className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">{pwMsg}</p>}
+            <div className="flex gap-2">
+              <button type="button" onClick={() => setPw(null)} className={`${ui.btnGhost} flex-1`}>{t('cash.cancel')}</button>
+              <button type="submit" disabled={pwBusy} className={`${ui.btnPrimary} flex-1`}>{pwBusy ? t('common.wait') : t('team.pwSave')}</button>
+            </div>
+          </form>
+        </Sheet>
+      )}
     </div>
   );
 }

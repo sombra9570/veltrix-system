@@ -1531,6 +1531,15 @@ const de: Record<DictKey, string> = {
   "sh.copied": "Kopiert",
   "sh.whatsapp": "Per WhatsApp senden",
   "sh.link": "Shop-Link",
+  "team.pwChange": "Passwort",
+  "team.pwTitle": "Passwort ändern",
+  "team.pwNew": "Neues Passwort",
+  "team.pwHint": "Mindestens 8 Zeichen. Geben Sie es dem Mitarbeiter und bitten Sie ihn, es nicht weiterzugeben.",
+  "team.pwSave": "Passwort speichern",
+  "team.pwDone": "Passwort geändert. Der Mitarbeiter kann sich jetzt mit dem neuen anmelden.",
+  "team.pwFail": "Das Passwort konnte nicht geändert werden. Bitte erneut versuchen.",
+  "team.pwShared": "Dieses Konto gehört zu mehr als einem Unternehmen; nur der Inhaber kann das Passwort ändern.",
+  "team.pwOwner": "Das Passwort eines Administrators kann hier nicht geändert werden.",
 };
 
 export default de;

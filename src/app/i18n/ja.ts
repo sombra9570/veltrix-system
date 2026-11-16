@@ -1531,6 +1531,15 @@ const ja: Record<DictKey, string> = {
   "sh.copied": "コピーしました",
   "sh.whatsapp": "WhatsAppで送る",
   "sh.link": "ショップのリンク",
+  "team.pwChange": "パスワード",
+  "team.pwTitle": "パスワードを変更",
+  "team.pwNew": "新しいパスワード",
+  "team.pwHint": "8文字以上。従業員に渡し、他人に教えないよう伝えてください。",
+  "team.pwSave": "パスワードを保存",
+  "team.pwDone": "パスワードを変更しました。従業員は新しいパスワードでログインできます。",
+  "team.pwFail": "パスワードを変更できませんでした。もう一度お試しください。",
+  "team.pwShared": "このアカウントは複数の会社に所属しているため、本人のみ変更できます。",
+  "team.pwOwner": "管理者のパスワードはここでは変更できません。",
 };
 
 export default ja;

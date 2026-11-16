@@ -1531,6 +1531,15 @@ const zh: Record<DictKey, string> = {
   "sh.copied": "已复制",
   "sh.whatsapp": "通过 WhatsApp 发送",
   "sh.link": "店铺链接",
+  "team.pwChange": "密码",
+  "team.pwTitle": "修改密码",
+  "team.pwNew": "新密码",
+  "team.pwHint": "至少8个字符。请交给员工，并提醒其不要泄露。",
+  "team.pwSave": "保存密码",
+  "team.pwDone": "密码已修改。员工现在可以使用新密码登录。",
+  "team.pwFail": "无法修改密码，请重试。",
+  "team.pwShared": "此账号属于多家公司，只有其所有者可以修改密码。",
+  "team.pwOwner": "无法在此修改管理员的密码。",
 };
 
 export default zh;

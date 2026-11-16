@@ -1531,6 +1531,15 @@ const ko: Record<DictKey, string> = {
   "sh.copied": "복사됨",
   "sh.whatsapp": "WhatsApp으로 보내기",
   "sh.link": "상점 링크",
+  "team.pwChange": "비밀번호",
+  "team.pwTitle": "비밀번호 변경",
+  "team.pwNew": "새 비밀번호",
+  "team.pwHint": "8자 이상. 직원에게 전달하고 공유하지 않도록 안내하세요.",
+  "team.pwSave": "비밀번호 저장",
+  "team.pwDone": "비밀번호가 변경되었습니다. 직원이 새 비밀번호로 로그인할 수 있습니다.",
+  "team.pwFail": "비밀번호를 변경하지 못했습니다. 다시 시도하세요.",
+  "team.pwShared": "이 계정은 여러 회사에 속해 있어 소유자만 비밀번호를 변경할 수 있습니다.",
+  "team.pwOwner": "관리자의 비밀번호는 여기서 변경할 수 없습니다.",
 };
 
 export default ko;
