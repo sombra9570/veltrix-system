@@ -1540,6 +1540,17 @@ const ko: Record<DictKey, string> = {
   "team.pwFail": "비밀번호를 변경하지 못했습니다. 다시 시도하세요.",
   "team.pwShared": "이 계정은 여러 회사에 속해 있어 소유자만 비밀번호를 변경할 수 있습니다.",
   "team.pwOwner": "관리자의 비밀번호는 여기서 변경할 수 없습니다.",
+  'pos.synced': "✅ 오프라인 판매 {n}건을 전송했습니다.",
+  'pos.queued': "📡 인터넷 없음: 판매가 이 휴대폰에 저장되었습니다. 신호가 돌아오면 자동으로 전송됩니다.",
+  'pos.creditOffline': "외상 판매에는 인터넷이 필요합니다.",
+  'pos.offlineNote': "인터넷이 없습니다. 현금 판매는 계속할 수 있으며, 판매는 저장되어 자동으로 전송됩니다.",
+  'pos.rejectedTitle': "서버가 거부한 판매 {n}건",
+  'pos.rejectedHint': "손실되지 않았습니다. 사유를 확인한 뒤 다시 시도하거나 폐기하세요.",
+  'pos.retry': "다시 시도",
+  'pos.discard': "폐기",
+  'pos.pendingTitle': "인터넷을 기다리는 판매 {n}건",
+  'pos.sendNow': "지금 전송",
+  'pos.pendingTag': "⏳ 대기 중",
 };
 
 export default ko;

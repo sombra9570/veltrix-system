@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { rpc } from '../../lib/supabase';
 import { Card } from './shell';
 import { ui } from '../site-header';
@@ -9,6 +9,11 @@ import type { DictKey } from '../i18n/es';
 import { money, shortTime } from './format';
 import { ReceiptButtons } from './receipt-buttons';
 import { ShareStoreButton } from './share-store';
+import { useVeltrixAuth } from '../auth-system';
+import {
+  cacheBranches, cacheCatalog, isNetworkError, loadPending, loadRejected, readBranches, readCatalog,
+  savePending, saveRejected, type PendingSale, type RejectedSale,
+} from './offline-sales';
 
 type Branch = { id: string; name: string; company: string; currency: string };
 type Product = { id: string; sku: string; name: string; price: number; type: string; unit: string; stock: number | null };
@@ -52,6 +57,13 @@ export function PosScreen() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [sheet, setSheet] = useState(false);   // pedido abierto en celular
+  // Ventas sin internet
+  const { session } = useVeltrixAuth();
+  const userId = session?.userId ?? '';
+  const [online, setOnline] = useState(true);
+  const [pending, setPending] = useState<PendingSale[]>([]);
+  const [rejected, setRejected] = useState<RejectedSale[]>([]);
+  const flushing = useRef(false);
   // Venta a crédito
   const [mode, setMode] = useState<'cash' | 'credit'>('cash');
   const [canCredit, setCanCredit] = useState(true);   // permiso que da el dueño
@@ -64,9 +76,13 @@ export function PosScreen() {
 
   useEffect(() => {
     rpc<Branch[]>('seller_branches')
-      .then((b) => { setBranches(b ?? []); if (b?.length) setBranchId(b[0].id); })
-      .catch(() => setBranches([]));
-  }, []);
+      .then((b) => { setBranches(b ?? []); if (b?.length) setBranchId(b[0].id); if (b?.length && userId) cacheBranches(userId, b); })
+      .catch(() => {
+        // Sin señal: se usan las sucursales de la última vez
+        const b = userId ? readBranches<Branch>(userId) : [];
+        setBranches(b); if (b.length) setBranchId(b[0].id);
+      });
+  }, [userId]);
 
   const branch = branches?.find((b) => b.id === branchId);
   const currency = branch?.currency ?? 'USD';
@@ -79,10 +95,20 @@ export function PosScreen() {
         rpc<Product[]>('pos_catalog', { p_branch: branchId }),
         rpc<Sale[]>('my_sales_today', { p_branch: branchId }),
       ]);
-      setCatalog(c ?? []);
+      // El stock mostrado descuenta lo vendido sin internet que todavía no llegó al servidor
+      const waiting = userId ? loadPending(userId).filter((q) => q.branchId === branchId) : [];
+      const shown = (c ?? []).map((p) => {
+        const used = waiting.reduce((n, q) => n + (q.items.find((i) => i.product_id === p.id)?.qty ?? 0), 0);
+        return used && p.stock !== null ? { ...p, stock: Number(p.stock) - used } : p;
+      });
+      setCatalog(shown);
+      cacheCatalog(branchId, shown);
       setSales(s ?? []);
-    } catch { /* sin conexión */ }
-  }, [branchId]);
+    } catch {
+      // Sin conexión: se vende con el catálogo de la última vez
+      setCatalog((cur) => (cur.length ? cur : readCatalog<Product>(branchId)));
+    }
+  }, [branchId, userId]);
 
   // Permisos del usuario en esta sucursal (el dueño puede quitar la venta a crédito)
   useEffect(() => {
@@ -96,6 +122,83 @@ export function PosScreen() {
     load();
   }, [load]);
   useSync(load);
+
+  // Ventas sin internet: lo guardado aparece al instante y se envía solo al volver la señal
+  useEffect(() => {
+    if (!userId) return;
+    setPending(loadPending(userId));
+    setRejected(loadRejected(userId));
+    setOnline(navigator.onLine);
+    const on = () => setOnline(true);
+    const off = () => setOnline(false);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
+  }, [userId]);
+
+  const flushQueue = useCallback(async () => {
+    if (flushing.current || !userId) return;
+    flushing.current = true;
+    let sent = 0;
+    try {
+      let list = loadPending(userId);
+      while (list.length) {
+        const s = list[0];
+        try {
+          await rpc('create_sale_idem', { p_branch: s.branchId, p_items: s.items, p_notes: s.notes, p_discount: s.discount, p_uuid: s.id, p_at: s.at });
+          sent++;
+        } catch (err) {
+          const m = (err as Error).message;
+          if (isNetworkError(m)) break;          // sin señal: se reintenta más tarde
+          // Rechazo real: no se pierde, queda visible para decidir
+          saveRejected(userId, [...loadRejected(userId), { ...s, reason: m }]);
+          setRejected(loadRejected(userId));
+        }
+        list = loadPending(userId).filter((o) => o.id !== s.id);
+        savePending(userId, list);
+        setPending(list);
+        await new Promise((r) => setTimeout(r, 150));   // de a una, sin saturar la señal
+      }
+    } finally { flushing.current = false; }
+    if (sent > 0) { flash(true, t('pos.synced', { n: sent })); await load(); }
+  }, [userId, load, t]);  // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!online || !userId) return;
+    flushQueue();
+    const id = setInterval(() => { if (loadPending(userId).length > 0) flushQueue(); }, 60_000);
+    return () => clearInterval(id);
+  }, [online, userId, flushQueue]);
+
+  const enqueueSale = (sale: PendingSale) => {
+    const next = [...loadPending(userId), sale];
+    savePending(userId, next);
+    setPending(next);
+    // Descuenta el stock en pantalla para no vender de más sin señal
+    setCatalog((cur) => {
+      const upd = cur.map((p) => {
+        const it = sale.items.find((i) => i.product_id === p.id);
+        return it && p.stock !== null ? { ...p, stock: Number(p.stock) - it.qty } : p;
+      });
+      cacheCatalog(sale.branchId, upd);
+      return upd;
+    });
+  };
+  const retryRejected = (id: string) => {
+    const r = loadRejected(userId);
+    const s = r.find((x) => x.id === id);
+    if (!s) return;
+    saveRejected(userId, r.filter((x) => x.id !== id));
+    setRejected(loadRejected(userId));
+    const next = [...loadPending(userId), s];
+    savePending(userId, next);
+    setPending(next);
+    flushQueue();
+  };
+  const discardRejected = (id: string) => {
+    saveRejected(userId, loadRejected(userId).filter((x) => x.id !== id));
+    setRejected(loadRejected(userId));
+  };
 
   const flash = (ok: boolean, text: string) => {
     setMsg({ ok, text });
@@ -162,6 +265,7 @@ export function PosScreen() {
   const send = async () => {
     if (!cart.length || !branchId) return;
     if (mode === 'credit' && !customer) return flash(false, t('pos.pickCustomer'));
+    if (mode === 'credit' && !online) return flash(false, t('pos.creditOffline'));
     setBusy(true);
     try {
       const items = cart.map((l) => ({ product_id: l.product.id, qty: l.qty }));
@@ -176,8 +280,19 @@ export function PosScreen() {
         setCustomer(null);
         setMode('cash');
       } else {
-        await rpc('create_sale', pct > 0 ? { p_branch: branchId, p_items: items, p_notes: notes, p_discount: pct } : { p_branch: branchId, p_items: items, p_notes: notes });
-        flash(true, t('pos.sent', { amount: fmt(total) }));
+        // Cada venta lleva su identificador: si la señal falla al confirmar y se reintenta, no se duplica
+        const sale: PendingSale = {
+          id: crypto.randomUUID(), branchId, items, notes, discount: pct, at: new Date().toISOString(),
+          total: Math.round(total * 100) / 100, currency, lines: cart.map((l) => ({ name: l.product.name, qty: l.qty })),
+        };
+        try {
+          await rpc('create_sale_idem', { p_branch: branchId, p_items: items, p_notes: notes, p_discount: pct, p_uuid: sale.id, p_at: sale.at });
+          flash(true, t('pos.sent', { amount: fmt(total) }));
+        } catch (err) {
+          if (!isNetworkError((err as Error).message)) throw err;
+          enqueueSale(sale);
+          flash(true, t('pos.queued'));
+        }
       }
       setCart([]);
       setNotes('');
@@ -312,7 +427,7 @@ export function PosScreen() {
         <div className="min-w-0">
           <h1 className="text-xl font-extrabold sm:text-2xl">🛒 {t('pos.title')}</h1>
           {branch && <p className={`text-sm ${ui.muted}`}>{branch.company} · {branch.name}</p>}
-          {branchId && <div className="mt-2"><ShareStoreButton branchId={branchId} /></div>}
+          {branchId && online && <div className="mt-2"><ShareStoreButton branchId={branchId} /></div>}
         </div>
         {branches.length > 1 && (
           <select
@@ -402,6 +517,51 @@ export function PosScreen() {
           <Card className="sticky top-24">{cartPanel}</Card>
         </div>
       </div>
+
+      {!online && (
+        <p role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-900 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">📡 {t('pos.offlineNote')}</p>
+      )}
+
+      {rejected.length > 0 && (
+        <Card className={`space-y-3 ${errBox}`}>
+          <div>
+            <h2 className="font-bold">⚠️ {t('pos.rejectedTitle', { n: rejected.length })}</h2>
+            <p className="text-xs">{t('pos.rejectedHint')}</p>
+          </div>
+          <ul className="space-y-2">
+            {rejected.map((r) => (
+              <li key={r.id} className="rounded-xl border border-red-200 bg-white/70 p-3 text-sm dark:border-red-500/30 dark:bg-slate-900/40">
+                <p className="font-semibold">{shortTime(r.at, lang)} · {money(r.total, r.currency, lang)}</p>
+                <p className={`text-xs ${ui.muted}`}>{r.lines.map((l) => `${l.qty}× ${l.name}`).join(', ')}</p>
+                <p className="mt-1 text-xs font-semibold">{posError(r.reason, t)}</p>
+                <div className="mt-2 flex gap-2">
+                  <button type="button" onClick={() => retryRejected(r.id)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>↻ {t('pos.retry')}</button>
+                  <button type="button" onClick={() => discardRejected(r.id)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>🗑️ {t('pos.discard')}</button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      {pending.length > 0 && (
+        <Card className="!p-0 overflow-hidden">
+          <div className="flex items-center justify-between gap-2 border-b border-slate-200 px-5 py-3 dark:border-slate-800">
+            <h2 className="font-bold">⏳ {t('pos.pendingTitle', { n: pending.length })}</h2>
+            {online && <button type="button" onClick={() => flushQueue()} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>↻ {t('pos.sendNow')}</button>}
+          </div>
+          <ul className="divide-y divide-slate-200 dark:divide-slate-800">
+            {pending.map((p) => (
+              <li key={p.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3 text-sm">
+                <span className={`w-12 shrink-0 text-xs ${ui.muted}`}>{shortTime(p.at, lang)}</span>
+                <span className={`min-w-16 flex-1 text-xs ${ui.muted}`}>{p.lines.map((l) => `${l.qty}× ${l.name}`).join(', ')}</span>
+                <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">{t('pos.pendingTag')}</span>
+                <span className="w-24 text-right font-bold">{money(p.total, p.currency, lang)}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
 
       {/* Mis ventas de hoy */}
       <Card className="!p-0 overflow-hidden">

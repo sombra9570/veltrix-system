@@ -1540,6 +1540,17 @@ const fr: Record<DictKey, string> = {
   "team.pwFail": "Impossible de changer le mot de passe. Réessayez.",
   "team.pwShared": "Ce compte appartient à plusieurs entreprises ; seul son titulaire peut changer le mot de passe.",
   "team.pwOwner": "Le mot de passe d’un administrateur ne peut pas être changé ici.",
+  'pos.synced': "✅ {n} vente(s) hors ligne ont été envoyées.",
+  'pos.queued': "📡 Pas d'internet : vente enregistrée sur ce téléphone. Elle sera envoyée automatiquement au retour du réseau.",
+  'pos.creditOffline': "Les ventes à crédit nécessitent internet.",
+  'pos.offlineNote': "Pas d'internet. Vous pouvez continuer à vendre au comptant : les ventes sont enregistrées et envoyées automatiquement.",
+  'pos.rejectedTitle': "{n} vente(s) refusée(s) par le serveur",
+  'pos.rejectedHint': "Rien n'est perdu : vérifiez le motif puis réessayez ou supprimez chacune.",
+  'pos.retry': "Réessayer",
+  'pos.discard': "Supprimer",
+  'pos.pendingTitle': "{n} vente(s) en attente d'internet",
+  'pos.sendNow': "Envoyer maintenant",
+  'pos.pendingTag': "⏳ en attente",
 };
 
 export default fr;

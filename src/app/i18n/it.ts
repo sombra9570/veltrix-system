@@ -1540,6 +1540,17 @@ const it: Record<DictKey, string> = {
   "team.pwFail": "Impossibile cambiare la password. Riprova.",
   "team.pwShared": "Questo account appartiene a più aziende; solo il titolare può cambiare la password.",
   "team.pwOwner": "La password di un amministratore non può essere cambiata qui.",
+  'pos.synced': "✅ {n} vendita/e offline sono state inviate.",
+  'pos.queued': "📡 Nessuna connessione: vendita salvata su questo telefono. Verrà inviata da sola quando torna il segnale.",
+  'pos.creditOffline': "Le vendite a credito richiedono internet.",
+  'pos.offlineNote': "Nessuna connessione. Puoi continuare a vendere in contanti: le vendite vengono salvate e inviate automaticamente.",
+  'pos.rejectedTitle': "{n} vendita/e rifiutata/e dal server",
+  'pos.rejectedHint': "Nulla è andato perso: controlla il motivo, poi riprova o scarta ciascuna.",
+  'pos.retry': "Riprova",
+  'pos.discard': "Scarta",
+  'pos.pendingTitle': "{n} vendita/e in attesa di internet",
+  'pos.sendNow': "Invia ora",
+  'pos.pendingTag': "⏳ in attesa",
 };
 
 export default it;

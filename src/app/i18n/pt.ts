@@ -1540,6 +1540,17 @@ const pt: Record<DictKey, string> = {
   "team.pwFail": "Não foi possível alterar a senha. Tente de novo.",
   "team.pwShared": "Esta conta pertence a mais de uma empresa; só o titular pode alterar a senha.",
   "team.pwOwner": "Não é possível alterar a senha de um administrador.",
+  'pos.synced': "✅ {n} venda(s) feita(s) sem internet já foram enviadas.",
+  'pos.queued': "📡 Sem internet: venda guardada neste telefone. Será enviada sozinha quando o sinal voltar.",
+  'pos.creditOffline': "Vendas a crédito precisam de internet.",
+  'pos.offlineNote': "Sem internet. Você pode continuar vendendo à vista: as vendas são guardadas e enviadas sozinhas.",
+  'pos.rejectedTitle': "{n} venda(s) rejeitada(s) pelo servidor",
+  'pos.rejectedHint': "Nada se perdeu: veja o motivo e tente de novo ou descarte cada uma.",
+  'pos.retry': "Tentar de novo",
+  'pos.discard': "Descartar",
+  'pos.pendingTitle': "{n} venda(s) aguardando internet",
+  'pos.sendNow': "Enviar agora",
+  'pos.pendingTag': "⏳ pendente",
 };
 
 export default pt;

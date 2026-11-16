@@ -1540,6 +1540,17 @@ const de: Record<DictKey, string> = {
   "team.pwFail": "Das Passwort konnte nicht geändert werden. Bitte erneut versuchen.",
   "team.pwShared": "Dieses Konto gehört zu mehr als einem Unternehmen; nur der Inhaber kann das Passwort ändern.",
   "team.pwOwner": "Das Passwort eines Administrators kann hier nicht geändert werden.",
+  'pos.synced': "✅ {n} Offline-Verkauf/Verkäufe wurde(n) gesendet.",
+  'pos.queued': "📡 Kein Internet: Verkauf auf diesem Telefon gespeichert. Er wird automatisch gesendet, sobald das Signal zurück ist.",
+  'pos.creditOffline': "Kreditverkäufe benötigen Internet.",
+  'pos.offlineNote': "Kein Internet. Sie können weiter gegen Bargeld verkaufen: Verkäufe werden gespeichert und automatisch gesendet.",
+  'pos.rejectedTitle': "{n} Verkauf/Verkäufe vom Server abgelehnt",
+  'pos.rejectedHint': "Nichts ging verloren: Grund prüfen, dann wiederholen oder verwerfen.",
+  'pos.retry': "Erneut versuchen",
+  'pos.discard': "Verwerfen",
+  'pos.pendingTitle': "{n} Verkauf/Verkäufe warten auf Internet",
+  'pos.sendNow': "Jetzt senden",
+  'pos.pendingTag': "⏳ ausstehend",
 };
 
 export default de;

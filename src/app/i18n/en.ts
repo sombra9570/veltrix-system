@@ -1540,6 +1540,17 @@ const en: Record<DictKey, string> = {
   "team.pwFail": "The password could not be changed. Try again.",
   "team.pwShared": "This account belongs to more than one company; only its owner can change the password.",
   "team.pwOwner": "An administrator’s password cannot be changed here.",
+  'pos.synced': "✅ {n} offline sale(s) have been sent.",
+  'pos.queued': "📡 No internet: sale saved on this phone. It will send itself when the signal returns.",
+  'pos.creditOffline': "Credit sales need internet.",
+  'pos.offlineNote': "No internet. You can keep selling for cash: sales are saved and sent automatically.",
+  'pos.rejectedTitle': "{n} sale(s) rejected by the server",
+  'pos.rejectedHint': "Nothing was lost: check the reason, then retry or discard each one.",
+  'pos.retry': "Retry",
+  'pos.discard': "Discard",
+  'pos.pendingTitle': "{n} sale(s) waiting for internet",
+  'pos.sendNow': "Send now",
+  'pos.pendingTag': "⏳ pending",
 };
 
 export default en;

@@ -1540,6 +1540,17 @@ const zh: Record<DictKey, string> = {
   "team.pwFail": "无法修改密码，请重试。",
   "team.pwShared": "此账号属于多家公司，只有其所有者可以修改密码。",
   "team.pwOwner": "无法在此修改管理员的密码。",
+  'pos.synced': "✅ {n} 笔离线销售已发送。",
+  'pos.queued': "📡 无网络：销售已保存在此手机上，网络恢复后会自动发送。",
+  'pos.creditOffline': "赊账销售需要联网。",
+  'pos.offlineNote': "无网络。您可以继续现金销售：销售会被保存并自动发送。",
+  'pos.rejectedTitle': "服务器拒绝了 {n} 笔销售",
+  'pos.rejectedHint': "没有丢失：请查看原因，然后重试或放弃每一笔。",
+  'pos.retry': "重试",
+  'pos.discard': "放弃",
+  'pos.pendingTitle': "{n} 笔销售等待联网",
+  'pos.sendNow': "立即发送",
+  'pos.pendingTag': "⏳ 待发送",
 };
 
 export default zh;

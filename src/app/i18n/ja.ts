@@ -1540,6 +1540,17 @@ const ja: Record<DictKey, string> = {
   "team.pwFail": "パスワードを変更できませんでした。もう一度お試しください。",
   "team.pwShared": "このアカウントは複数の会社に所属しているため、本人のみ変更できます。",
   "team.pwOwner": "管理者のパスワードはここでは変更できません。",
+  'pos.synced': "✅ オフラインの販売 {n} 件を送信しました。",
+  'pos.queued': "📡 オフライン：販売をこの端末に保存しました。電波が戻ると自動で送信されます。",
+  'pos.creditOffline': "掛け売りにはインターネットが必要です。",
+  'pos.offlineNote': "オフラインです。現金販売は続けられます。販売は保存され、自動で送信されます。",
+  'pos.rejectedTitle': "サーバーに拒否された販売 {n} 件",
+  'pos.rejectedHint': "失われていません。理由を確認して、再試行または破棄してください。",
+  'pos.retry': "再試行",
+  'pos.discard': "破棄",
+  'pos.pendingTitle': "インターネット待ちの販売 {n} 件",
+  'pos.sendNow': "今すぐ送信",
+  'pos.pendingTag': "⏳ 保留中",
 };
 
 export default ja;

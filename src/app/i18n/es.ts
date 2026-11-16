@@ -1549,6 +1549,17 @@ const es = {
   "team.pwFail": "No se pudo cambiar la contraseña. Inténtalo de nuevo.",
   "team.pwShared": "Esta cuenta pertenece a más de una empresa; solo su titular puede cambiar la contraseña.",
   "team.pwOwner": "No se puede cambiar la contraseña de un administrador.",
+  'pos.synced': "✅ {n} venta(s) guardadas sin internet ya se enviaron.",
+  'pos.queued': "📡 Sin internet: venta guardada en este teléfono. Se enviará sola al volver la señal.",
+  'pos.creditOffline': "Las ventas a crédito necesitan internet.",
+  'pos.offlineNote': "Sin internet. Puedes seguir vendiendo al contado: las ventas se guardan y se envían solas.",
+  'pos.rejectedTitle': "{n} venta(s) rechazada(s) por el servidor",
+  'pos.rejectedHint': "No se perdieron: revisa el motivo y reintenta o descarta cada una.",
+  'pos.retry': "Reintentar",
+  'pos.discard': "Descartar",
+  'pos.pendingTitle': "{n} venta(s) esperando internet",
+  'pos.sendNow': "Enviar ahora",
+  'pos.pendingTag': "⏳ pendiente",
 };
 
 export default es;
