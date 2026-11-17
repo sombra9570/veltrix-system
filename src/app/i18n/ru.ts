@@ -1619,6 +1619,7 @@ const ru: Record<DictKey, string> = {
   'team.ownerRolesTitle': "Мои роли администратора",
   'team.ownerRolesHint': "Помимо управления вы можете сами работать в этих ролях. Они входят в лимит вашего тарифа.",
   'team.ownerRolesSaved': "Сохранено",
+  'err.roleNiche': "Эта роль не подходит типу вашего бизнеса.",
 };
 
 export default ru;

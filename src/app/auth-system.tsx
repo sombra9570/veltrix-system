@@ -1,4 +1,5 @@
 'use client';
+import { suggestedModules } from './business-catalog';
 // =====================================================================
 //  Veltrix · Sistema de acceso conectado a Supabase
 //
@@ -132,7 +133,8 @@ async function finishRegistration(details: NewCompany, email: string) {
                 tax_regime: regime, business_sector: sector,
                 tax_rate: country.taxRate / 100 })
       .eq('id', comp.id);
-    await rpc('bootstrap_company', { p_company: comp.id });
+    const mods = details.categories?.length ? Array.from(new Set([...suggestedModules(details.categories), 'finance'])) : null;
+    await rpc('bootstrap_company', { p_company: comp.id, p_modules: mods });
   }
   // Si lo invitó otro negocio: 30 días de prueba y premio para quien invitó cuando pague
   try {

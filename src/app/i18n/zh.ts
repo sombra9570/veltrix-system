@@ -1619,6 +1619,7 @@ const zh: Record<DictKey, string> = {
   'team.ownerRolesTitle': "我作为管理员的角色",
   'team.ownerRolesHint': "除管理外，您也可以亲自担任这些角色。它们计入套餐上限。",
   'team.ownerRolesSaved': "已保存",
+  'err.roleNiche': "该角色与您的业务类型不符。",
 };
 
 export default zh;

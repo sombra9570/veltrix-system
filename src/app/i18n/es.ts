@@ -1628,6 +1628,7 @@ const es = {
   'team.ownerRolesTitle': "Mis roles como administrador",
   'team.ownerRolesHint': "Además de administrar, puedes trabajar tú mismo en estos roles. Cuentan dentro del límite de tu plan.",
   'team.ownerRolesSaved': "Guardado",
+  'err.roleNiche': "Ese rol no corresponde al tipo de negocio de tu empresa.",
 };
 
 export default es;

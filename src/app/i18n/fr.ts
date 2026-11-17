@@ -1619,6 +1619,7 @@ const fr: Record<DictKey, string> = {
   'team.ownerRolesTitle': "Mes rôles d'administrateur",
   'team.ownerRolesHint': "En plus de gérer, vous pouvez travailler dans ces rôles. Ils comptent dans la limite de votre forfait.",
   'team.ownerRolesSaved': "Enregistré",
+  'err.roleNiche': "Ce rôle ne correspond pas au type de votre entreprise.",
 };
 
 export default fr;

@@ -1619,6 +1619,7 @@ const pt: Record<DictKey, string> = {
   'team.ownerRolesTitle': "Minhas funções como administrador",
   'team.ownerRolesHint': "Além de administrar, você pode trabalhar nestas funções. Elas contam no limite do seu plano.",
   'team.ownerRolesSaved': "Salvo",
+  'err.roleNiche': "Essa função não corresponde ao tipo do seu negócio.",
 };
 
 export default pt;

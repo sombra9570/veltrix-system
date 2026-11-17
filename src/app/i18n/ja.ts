@@ -1619,6 +1619,7 @@ const ja: Record<DictKey, string> = {
   'team.ownerRolesTitle': "管理者としての自分の役割",
   'team.ownerRolesHint': "管理に加え、自分でもこれらの役割で働けます。プランの上限に含まれます。",
   'team.ownerRolesSaved': "保存しました",
+  'err.roleNiche': "その役割は事業の種類に合いません。",
 };
 
 export default ja;

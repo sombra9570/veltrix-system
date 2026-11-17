@@ -1619,6 +1619,7 @@ const de: Record<DictKey, string> = {
   'team.ownerRolesTitle': "Meine Rollen als Administrator",
   'team.ownerRolesHint': "Neben der Verwaltung können Sie selbst in diesen Rollen arbeiten. Sie zählen zum Limit Ihres Tarifs.",
   'team.ownerRolesSaved': "Gespeichert",
+  'err.roleNiche': "Diese Rolle passt nicht zur Art Ihres Unternehmens.",
 };
 
 export default de;

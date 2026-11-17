@@ -1619,6 +1619,7 @@ const ko: Record<DictKey, string> = {
   'team.ownerRolesTitle': "관리자로서 나의 역할",
   'team.ownerRolesHint': "관리 외에 직접 이 역할로 일할 수 있습니다. 요금제 한도에 포함됩니다.",
   'team.ownerRolesSaved': "저장됨",
+  'err.roleNiche': "해당 역할은 사업 유형과 맞지 않습니다.",
 };
 
 export default ko;

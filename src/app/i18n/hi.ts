@@ -1619,6 +1619,7 @@ const hi: Record<DictKey, string> = {
   'team.ownerRolesTitle': "एडमिन के रूप में मेरी भूमिकाएँ",
   'team.ownerRolesHint': "प्रबंधन के साथ आप खुद भी इन भूमिकाओं में काम कर सकते हैं। ये आपके प्लान की सीमा में गिनी जाती हैं।",
   'team.ownerRolesSaved': "सहेजा गया",
+  'err.roleNiche': "यह भूमिका आपके व्यवसाय के प्रकार से मेल नहीं खाती।",
 };
 
 export default hi;

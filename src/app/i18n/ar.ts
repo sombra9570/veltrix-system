@@ -1619,6 +1619,7 @@ const ar: Record<DictKey, string> = {
   'team.ownerRolesTitle': "أدواري كمدير",
   'team.ownerRolesHint': "إلى جانب الإدارة يمكنك العمل بنفسك في هذه الأدوار. تُحتسب ضمن حد خطتك.",
   'team.ownerRolesSaved': "تم الحفظ",
+  'err.roleNiche': "هذا الدور لا يناسب نوع نشاطك.",
 };
 
 export default ar;

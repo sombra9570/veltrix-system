@@ -1619,6 +1619,7 @@ const it: Record<DictKey, string> = {
   'team.ownerRolesTitle': "I miei ruoli da amministratore",
   'team.ownerRolesHint': "Oltre a gestire, puoi lavorare in questi ruoli. Contano nel limite del tuo piano.",
   'team.ownerRolesSaved': "Salvato",
+  'err.roleNiche': "Questo ruolo non corrisponde al tipo della tua attività.",
 };
 
 export default it;

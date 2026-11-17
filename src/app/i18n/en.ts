@@ -1619,6 +1619,7 @@ const en: Record<DictKey, string> = {
   'team.ownerRolesTitle': "My roles as admin",
   'team.ownerRolesHint': "Besides managing, you can work in these roles yourself. They count toward your plan's limit.",
   'team.ownerRolesSaved': "Saved",
+  'err.roleNiche': "That role doesn't fit your business type.",
 };
 
 export default en;
