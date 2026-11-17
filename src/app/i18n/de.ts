@@ -1612,6 +1612,9 @@ const de: Record<DictKey, string> = {
   'need.planPrice': "{price} USD pro Monat",
   'need.planWhy': "Reicht für {users} Personen, {branches} Filiale(n) und {storage} Speicher.",
   'need.free': "Sie starten mit einer kostenlosen Testphase; der Tarif wird danach bestätigt.",
+  'err.limitCombo': "Ihr Tarif erlaubt nicht so viele Aufgaben in einer Rolle. Wählen Sie weniger oder wechseln Sie den Tarif.",
+  'err.limitCustom': "Sie haben das Maximum eigener Rollen Ihres Tarifs erreicht. Wechseln Sie den Tarif für mehr.",
+  'err.limitRoles': "Ihr Tarif begrenzt, wie viele verschiedene Rollen Sie nutzen können. Wechseln Sie den Tarif für mehr.",
 };
 
 export default de;

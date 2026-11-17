@@ -1612,6 +1612,9 @@ const pt: Record<DictKey, string> = {
   'need.planPrice': "{price} USD por mês",
   'need.planWhy': "Atende {users} pessoas, {branches} filial(is) e {storage} de espaço.",
   'need.free': "Você começa com teste grátis; o plano é confirmado quando terminar.",
+  'err.limitCombo': "Seu plano não permite juntar tantas funções em uma só função. Escolha menos ou melhore o plano.",
+  'err.limitCustom': "Você chegou ao máximo de funções próprias do seu plano. Melhore o plano para criar mais.",
+  'err.limitRoles': "Seu plano limita quantas funções diferentes você pode usar. Melhore o plano para incluir mais.",
 };
 
 export default pt;

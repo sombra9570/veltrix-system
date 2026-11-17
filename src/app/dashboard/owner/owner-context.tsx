@@ -74,6 +74,9 @@ export function friendlyError(msg: string, t: (k: DictKey) => string): string {
   if (msg.includes('PLAN_LIMIT_BRANCHES')) return t('err.limitBranches');
   if (msg.includes('PLAN_LIMIT_USERS')) return t('err.limitUsers');
   if (msg.includes('PLAN_LIMIT_COMPANIES')) return t('err.limitCompanies');
+  if (msg.includes('PLAN_COMBO_LIMIT')) return t('err.limitCombo');
+  if (msg.includes('PLAN_CUSTOM_LIMIT')) return t('err.limitCustom');
+  if (msg.includes('PLAN_ROLES_LIMIT')) return t('err.limitRoles');
   if (/suspendida/i.test(msg)) return t('err.suspended');
   if (/already (been )?registered|already exists/i.test(msg)) return t('err.emailTaken');
   return t('err.generic');

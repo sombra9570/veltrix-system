@@ -1621,6 +1621,9 @@ const es = {
   'need.planPrice': "{price} USD al mes",
   'need.planWhy': "Alcanza para {users} personas, {branches} sucursal(es) y {storage} de espacio.",
   'need.free': "Empiezas con prueba gratis; el plan se confirma cuando termine.",
+  'err.limitCombo': "Tu plan no permite juntar tantas funciones en un solo rol. Elige menos o mejora de plan.",
+  'err.limitCustom': "Llegaste al máximo de roles propios de tu plan. Mejora de plan para crear más.",
+  'err.limitRoles': "Tu plan limita cuántos cargos distintos puedes usar. Mejora de plan para sumar más.",
 };
 
 export default es;

@@ -1612,6 +1612,9 @@ const en: Record<DictKey, string> = {
   'need.planPrice': "{price} USD per month",
   'need.planWhy': "Covers {users} people, {branches} branch(es) and {storage} of space.",
   'need.free': "You start with a free trial; the plan is confirmed when it ends.",
+  'err.limitCombo': "Your plan doesn't allow combining that many duties in one role. Pick fewer or upgrade your plan.",
+  'err.limitCustom': "You've reached your plan's limit of custom roles. Upgrade your plan to create more.",
+  'err.limitRoles': "Your plan limits how many different roles you can use. Upgrade your plan to add more.",
 };
 
 export default en;

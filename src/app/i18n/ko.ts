@@ -1612,6 +1612,9 @@ const ko: Record<DictKey, string> = {
   'need.planPrice': "월 {price} USD",
   'need.planWhy': "{users}명, 지점 {branches}개, 저장공간 {storage}를 지원합니다.",
   'need.free': "무료 체험으로 시작하며, 종료 시 요금제를 확정합니다.",
+  'err.limitCombo': "현재 요금제는 한 역할에 이렇게 많은 업무를 합칠 수 없습니다. 줄이거나 요금제를 올리세요.",
+  'err.limitCustom': "요금제의 맞춤 역할 최대 개수에 도달했습니다. 요금제를 올리면 더 만들 수 있습니다.",
+  'err.limitRoles': "요금제가 사용할 수 있는 역할 종류 수를 제한합니다. 요금제를 올려 늘리세요.",
 };
 
 export default ko;

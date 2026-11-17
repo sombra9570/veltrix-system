@@ -1612,6 +1612,9 @@ const zh: Record<DictKey, string> = {
   'need.planPrice': "每月 {price} 美元",
   'need.planWhy': "可容纳 {users} 人、{branches} 个分店和 {storage} 存储空间。",
   'need.free': "您将先免费试用；试用结束后确认套餐。",
+  'err.limitCombo': "您的套餐不允许在一个角色中合并这么多职责。请减少或升级套餐。",
+  'err.limitCustom': "已达到套餐的自定义角色上限。升级套餐可创建更多。",
+  'err.limitRoles': "您的套餐限制可使用的不同岗位数量。升级套餐可增加。",
 };
 
 export default zh;

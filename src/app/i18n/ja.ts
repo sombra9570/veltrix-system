@@ -1612,6 +1612,9 @@ const ja: Record<DictKey, string> = {
   'need.planPrice': "月額 {price} USD",
   'need.planWhy': "{users}人、{branches}拠点、{storage} の容量に対応します。",
   'need.free': "まず無料トライアルで開始し、終了時にプランを確定します。",
+  'err.limitCombo': "ご利用のプランでは、1つの役割にそれほど多くの業務をまとめられません。減らすか、プランを上げてください。",
+  'err.limitCustom': "プランのカスタム役割の上限に達しました。プランを上げるとさらに作成できます。",
+  'err.limitRoles': "プランでは使える役割の種類数に上限があります。プランを上げると増やせます。",
 };
 
 export default ja;

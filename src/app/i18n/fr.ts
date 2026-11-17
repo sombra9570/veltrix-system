@@ -1612,6 +1612,9 @@ const fr: Record<DictKey, string> = {
   'need.planPrice': "{price} USD par mois",
   'need.planWhy': "Convient pour {users} personnes, {branches} succursale(s) et {storage} d'espace.",
   'need.free': "Vous commencez par un essai gratuit ; le forfait est confirmé à la fin.",
+  'err.limitCombo': "Votre forfait ne permet pas de cumuler autant de tâches dans un seul rôle. Choisissez-en moins ou changez de forfait.",
+  'err.limitCustom': "Vous avez atteint le maximum de rôles personnalisés de votre forfait. Changez de forfait pour en créer d'autres.",
+  'err.limitRoles': "Votre forfait limite le nombre de rôles différents utilisables. Changez de forfait pour en ajouter.",
 };
 
 export default fr;
