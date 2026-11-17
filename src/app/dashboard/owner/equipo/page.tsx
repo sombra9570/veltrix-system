@@ -7,6 +7,7 @@ import { rpc, supabase } from '../../../../lib/supabase';
 import { useT } from '../../../i18n';
 import { Sheet } from '../../sheet';
 import type { DictKey } from '../../../i18n/es';
+import { suggestedRoles } from '../../../business-catalog';
 
 const ROLES = ['supervisor', 'cashier', 'vendor', 'collector', 'waiter', 'kitchen', 'technician', 'storekeeper', 'accountant'] as const;
 // Roles que solo tienen sentido si el módulo de su rubro está activo
@@ -19,7 +20,11 @@ type Row = { userId: string; name: string; email: string; roles: string[]; branc
 
 export default function TeamPage() {
   const { orgId, reload, overview, modules } = useOwner();
-  const roles = ROLES.filter((r) => !ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!));
+  const [niches, setNiches] = useState<string[]>([]);
+  const limitedPlan = ['basic', 'starter', 'pro'].includes(overview?.org.plan_code ?? '');
+  // En planes chicos solo se ofrecen los cargos propios del nicho del negocio
+  const nicheRoles: string[] | null = limitedPlan && niches.length ? suggestedRoles(niches) : null;
+  const roles = ROLES.filter((r) => (!ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!)) && (!nicheRoles || nicheRoles.includes(r)));
   const { t } = useT();
   const roleLabel = (r: string) => t(`role.${r}` as DictKey);
 
@@ -59,6 +64,10 @@ export default function TeamPage() {
       r.customRoleId = r.customRoleId ?? x.custom_role_id;
       byUser.set(x.user_id, r);
     }
+    try {
+      const { data: ob } = await supabase.from('organizations').select('onboarding').eq('id', orgId).limit(1);
+      setNiches(((ob ?? [])[0]?.onboarding as { categories?: string[] } | null)?.categories ?? []);
+    } catch { setNiches([]); }
     try {
       const { data: me } = await supabase.from('memberships').select('extra_roles').eq('org_id', orgId).eq('role', 'owner').is('deleted_at', null).limit(1);
       setOwnerRoles(((me ?? [])[0]?.extra_roles as string[] | undefined) ?? []);
