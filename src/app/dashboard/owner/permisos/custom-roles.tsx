@@ -7,6 +7,7 @@ import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { friendlyError, useOwner } from '../owner-context';
+import { roleAvailable, keyAvailable } from './availability';
 
 export type CustomRole = { id: string; name: string; base_role: string; also_roles: string[]; permissions: Record<string, boolean>; members: number };
 
@@ -16,7 +17,8 @@ const BASE_ROLES = ['cashier', 'vendor', 'supervisor', 'collector', 'waiter', 't
 /** Roles propios: un nombre + pantalla principal + otras funciones que cubre + permisos finos */
 export function CustomRoles({ keys }: { keys: string[] }) {
   const { t } = useT();
-  const { orgId } = useOwner();
+  const { orgId, modules } = useOwner();
+  const baseRoles = BASE_ROLES.filter((r) => roleAvailable(r, modules));
   const k = (key: string) => t(key as DictKey);
   const [list, setList] = useState<CustomRole[]>([]);
   const [edit, setEdit] = useState<{ id: string | null; name: string; base: string; also: string[]; perms: Record<string, boolean> } | null>(null);
@@ -88,7 +90,7 @@ export function CustomRoles({ keys }: { keys: string[] }) {
             <div>
               <label className={ui.label}>{t('roles.base')}</label>
               <select className={ui.input} value={edit.base} onChange={(e) => setEdit({ ...edit, base: e.target.value, also: edit.also.filter((r) => r !== e.target.value) })}>
-                {BASE_ROLES.map((r) => <option key={r} value={r}>{k(`role.${r}`)}</option>)}
+                {baseRoles.map((r) => <option key={r} value={r}>{k(`role.${r}`)}</option>)}
               </select>
               <p className={`mt-1 text-xs ${ui.muted}`}>{t('roles.baseHint')}</p>
             </div>
@@ -96,7 +98,7 @@ export function CustomRoles({ keys }: { keys: string[] }) {
               <p className={ui.label}>{t('roles.also')}</p>
               <p className={`mb-2 text-xs ${ui.muted}`}>{t('roles.alsoHint')}</p>
               <div className="flex flex-wrap gap-2">
-                {BASE_ROLES.filter((r) => r !== edit.base).map((r) => {
+                {baseRoles.filter((r) => r !== edit.base).map((r) => {
                   const on = edit.also.includes(r);
                   return (
                     <button key={r} type="button" aria-pressed={on}
@@ -112,7 +114,7 @@ export function CustomRoles({ keys }: { keys: string[] }) {
               <p className={ui.label}>{t('roles.perms')}</p>
               <p className={`mb-2 text-xs ${ui.muted}`}>{t('roles.permsHint')}</p>
               <ul className="space-y-3">
-                {keys.map((key) => {
+                {keys.filter((x) => keyAvailable(x, modules)).map((key) => {
                   const own = edit.perms[key];
                   const val = own === undefined ? 'inherit' : own ? 'yes' : 'no';
                   return (

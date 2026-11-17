@@ -7,6 +7,7 @@ import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { friendlyError, useOwner } from '../owner-context';
 import { CustomRoles } from './custom-roles';
+import { roleAvailable, keyAvailable } from './availability';
 
 type Data = {
   keys: string[];
@@ -36,7 +37,7 @@ function Toggle({ on, onChange, label, disabled }: { on: boolean; onChange: (v: 
 
 export default function PermissionsPage() {
   const { t } = useT();
-  const { orgId } = useOwner();
+  const { orgId, modules } = useOwner();
   const [d, setD] = useState<Data | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -109,7 +110,7 @@ export default function PermissionsPage() {
 
           {/* Por rol */}
           <div className="grid gap-4 lg:grid-cols-3">
-            {Object.entries(ROLE_KEYS).map(([role, keys]) => (
+            {Object.entries(ROLE_KEYS).filter(([role]) => roleAvailable(role, modules)).map(([role, allKeys]) => { const keys = allKeys.filter((x) => keyAvailable(x, modules)); return (
               <Card key={role}>
                 <h2 className="font-bold">{k(`role.${role}`)}</h2>
                 <p className={`mb-3 text-xs ${ui.muted}`}>{t('perm.roleHint')}</p>
@@ -125,7 +126,7 @@ export default function PermissionsPage() {
                   ))}
                 </ul>
               </Card>
-            ))}
+            ); })}
           </div>
 
           {/* Por usuario */}
@@ -151,7 +152,7 @@ export default function PermissionsPage() {
                       </button>
                       {open === u.membership_id && (
                         <ul className="space-y-3 px-4 pb-4">
-                          {(ROLE_KEYS[u.role] ?? []).map((key) => {
+                          {(ROLE_KEYS[u.role] ?? []).filter((x) => keyAvailable(x, modules)).map((key) => {
                             const own = u.permissions?.[key];
                             const inherited = !!d.roles[u.role]?.[key];
                             const val = own === undefined ? 'inherit' : own ? 'yes' : 'no';
