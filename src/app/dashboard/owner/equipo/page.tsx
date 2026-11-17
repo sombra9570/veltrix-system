@@ -80,7 +80,8 @@ export default function TeamPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${s.session?.access_token ?? ''}` },
         body: JSON.stringify({
-          companyId: branch.company_id, branchId: branch.id, role: form.role,
+          companyId: branch.company_id, branchId: branch.id,
+          ...(form.role.startsWith('custom:') ? { customRoleId: form.role.slice(7) } : { role: form.role }),
           name: form.name, email: form.email, password: form.password,
         }),
       });
@@ -187,6 +188,11 @@ export default function TeamPage() {
               <label className={ui.label}>{t('team.role')}</label>
               <select className={ui.input} value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
                 {roles.map((r) => <option key={r} value={r}>{roleLabel(r)}</option>)}
+                {customRoles.length > 0 && (
+                  <optgroup label={`🧩 ${t('roles.title')}`}>
+                    {customRoles.map((c) => <option key={c.id} value={`custom:${c.id}`}>{c.name}</option>)}
+                  </optgroup>
+                )}
               </select>
             </div>
             <div>
