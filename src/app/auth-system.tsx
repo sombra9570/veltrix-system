@@ -219,7 +219,7 @@ async function loadAuthImpl(): Promise<ActiveSession | null> {
     const [{ data: admin }, { data: profile }, { data: myMems }] = await Promise.all([
       supabase.from('platform_admins').select('user_id').eq('user_id', user.id).maybeSingle(),
       supabase.from('profiles').select('id, full_name, email, org_id').eq('id', user.id).maybeSingle(),
-      supabase.from('memberships').select('role, company_id, org_id, custom_roles(also_roles)').eq('user_id', user.id)
+      supabase.from('memberships').select('role, company_id, org_id, extra_roles, custom_roles(also_roles)').eq('user_id', user.id)
         .eq('is_active', true).is('deleted_at', null),
     ]);
 
@@ -293,9 +293,10 @@ async function loadAuthImpl(): Promise<ActiveSession | null> {
     const companyId = (myMems ?? []).find((m) => m.company_id)?.company_id
       ?? list.find((c) => c.orgId === profile?.org_id)?.id ?? null;
     const alsoRoles: UserRole[] = [];
-    if (role !== 'owner' && role !== 'superadmin') {
-      for (const m of (myMems ?? []) as unknown as { custom_roles?: { also_roles?: string[] } | null }[]) {
-        for (const r of m.custom_roles?.also_roles ?? []) if (!alsoRoles.includes(r as UserRole)) alsoRoles.push(r as UserRole);
+    if (role !== 'superadmin') {
+      for (const m of (myMems ?? []) as unknown as { extra_roles?: string[] | null; custom_roles?: { also_roles?: string[] } | null }[]) {
+        const list = role === 'owner' ? (m.extra_roles ?? []) : (m.custom_roles?.also_roles ?? []);
+        for (const r of list) if (!alsoRoles.includes(r as UserRole)) alsoRoles.push(r as UserRole);
       }
     }
     const s: ActiveSession = {

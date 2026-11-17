@@ -1615,6 +1615,10 @@ const fr: Record<DictKey, string> = {
   'err.limitCombo': "Votre forfait ne permet pas de cumuler autant de tâches dans un seul rôle. Choisissez-en moins ou changez de forfait.",
   'err.limitCustom': "Vous avez atteint le maximum de rôles personnalisés de votre forfait. Changez de forfait pour en créer d'autres.",
   'err.limitRoles': "Votre forfait limite le nombre de rôles différents utilisables. Changez de forfait pour en ajouter.",
+  'err.limitTotalRoles': "Votre forfait limite le total des rôles (admin + employés). Changez de forfait pour en ajouter.",
+  'team.ownerRolesTitle': "Mes rôles d'administrateur",
+  'team.ownerRolesHint': "En plus de gérer, vous pouvez travailler dans ces rôles. Ils comptent dans la limite de votre forfait.",
+  'team.ownerRolesSaved': "Enregistré",
 };
 
 export default fr;

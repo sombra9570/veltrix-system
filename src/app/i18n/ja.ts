@@ -1615,6 +1615,10 @@ const ja: Record<DictKey, string> = {
   'err.limitCombo': "ご利用のプランでは、1つの役割にそれほど多くの業務をまとめられません。減らすか、プランを上げてください。",
   'err.limitCustom': "プランのカスタム役割の上限に達しました。プランを上げるとさらに作成できます。",
   'err.limitRoles': "プランでは使える役割の種類数に上限があります。プランを上げると増やせます。",
+  'err.limitTotalRoles': "プランでは役割の合計（管理者＋従業員）に上限があります。プランを上げると増やせます。",
+  'team.ownerRolesTitle': "管理者としての自分の役割",
+  'team.ownerRolesHint': "管理に加え、自分でもこれらの役割で働けます。プランの上限に含まれます。",
+  'team.ownerRolesSaved': "保存しました",
 };
 
 export default ja;

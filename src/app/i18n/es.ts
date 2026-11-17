@@ -1624,6 +1624,10 @@ const es = {
   'err.limitCombo': "Tu plan no permite juntar tantas funciones en un solo rol. Elige menos o mejora de plan.",
   'err.limitCustom': "Llegaste al máximo de roles propios de tu plan. Mejora de plan para crear más.",
   'err.limitRoles': "Tu plan limita cuántos cargos distintos puedes usar. Mejora de plan para sumar más.",
+  'err.limitTotalRoles': "Tu plan limita el total de roles (administrador + trabajadores). Mejora de plan para sumar más.",
+  'team.ownerRolesTitle': "Mis roles como administrador",
+  'team.ownerRolesHint': "Además de administrar, puedes trabajar tú mismo en estos roles. Cuentan dentro del límite de tu plan.",
+  'team.ownerRolesSaved': "Guardado",
 };
 
 export default es;

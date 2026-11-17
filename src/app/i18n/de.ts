@@ -1615,6 +1615,10 @@ const de: Record<DictKey, string> = {
   'err.limitCombo': "Ihr Tarif erlaubt nicht so viele Aufgaben in einer Rolle. Wählen Sie weniger oder wechseln Sie den Tarif.",
   'err.limitCustom': "Sie haben das Maximum eigener Rollen Ihres Tarifs erreicht. Wechseln Sie den Tarif für mehr.",
   'err.limitRoles': "Ihr Tarif begrenzt, wie viele verschiedene Rollen Sie nutzen können. Wechseln Sie den Tarif für mehr.",
+  'err.limitTotalRoles': "Ihr Tarif begrenzt die Gesamtzahl der Rollen (Admin + Mitarbeiter). Wechseln Sie den Tarif für mehr.",
+  'team.ownerRolesTitle': "Meine Rollen als Administrator",
+  'team.ownerRolesHint': "Neben der Verwaltung können Sie selbst in diesen Rollen arbeiten. Sie zählen zum Limit Ihres Tarifs.",
+  'team.ownerRolesSaved': "Gespeichert",
 };
 
 export default de;

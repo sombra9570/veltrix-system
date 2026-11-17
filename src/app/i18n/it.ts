@@ -1615,6 +1615,10 @@ const it: Record<DictKey, string> = {
   'err.limitCombo': "Il tuo piano non permette di unire così tanti compiti in un solo ruolo. Scegline meno o migliora il piano.",
   'err.limitCustom': "Hai raggiunto il massimo di ruoli personalizzati del tuo piano. Migliora il piano per crearne altri.",
   'err.limitRoles': "Il tuo piano limita quanti ruoli diversi puoi usare. Migliora il piano per aggiungerne.",
+  'err.limitTotalRoles': "Il tuo piano limita il totale dei ruoli (admin + lavoratori). Migliora il piano per aggiungerne.",
+  'team.ownerRolesTitle': "I miei ruoli da amministratore",
+  'team.ownerRolesHint': "Oltre a gestire, puoi lavorare in questi ruoli. Contano nel limite del tuo piano.",
+  'team.ownerRolesSaved': "Salvato",
 };
 
 export default it;

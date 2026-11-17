@@ -28,6 +28,7 @@ export default function TeamPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'cashier', branchId: '' });
+  const [ownerRoles, setOwnerRoles] = useState<string[]>([]);
   const [customRoles, setCustomRoles] = useState<{ id: string; name: string }[]>([]);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -58,6 +59,10 @@ export default function TeamPage() {
       r.customRoleId = r.customRoleId ?? x.custom_role_id;
       byUser.set(x.user_id, r);
     }
+    try {
+      const { data: me } = await supabase.from('memberships').select('extra_roles').eq('org_id', orgId).eq('role', 'owner').is('deleted_at', null).limit(1);
+      setOwnerRoles(((me ?? [])[0]?.extra_roles as string[] | undefined) ?? []);
+    } catch { setOwnerRoles([]); }
     try { setCustomRoles((await rpc<{ id: string; name: string }[]>('custom_roles_list', { p_org: orgId })) ?? []); } catch { setCustomRoles([]); }
     setBranches(bs);
     setRows([...byUser.values()].sort((a, b2) => Number(b2.active) - Number(a.active) || a.name.localeCompare(b2.name)));
@@ -140,6 +145,14 @@ export default function TeamPage() {
     await Promise.all([load(), reload()]);
   };
 
+  const toggleOwnerRole = async (r: string) => {
+    const next = ownerRoles.includes(r) ? ownerRoles.filter((x) => x !== r) : [...ownerRoles, r];
+    try {
+      await rpc('set_owner_roles', { p_org: orgId, p_roles: next });
+      setOwnerRoles(next); setMsg({ ok: true, text: t('team.ownerRolesSaved') });
+    } catch (e) { setMsg({ ok: false, text: friendlyError(e instanceof Error ? e.message : '', t) }); }
+  };
+
   const users = overview?.usage.users;
   const full = users && users.max !== null && users.used >= users.max;
   const branchName = (id: string) => branches.find((b) => b.id === id)?.name ?? '';
@@ -162,6 +175,19 @@ export default function TeamPage() {
           </button>
         </div>
       </div>
+
+      <Card>
+        <h2 className="text-base font-extrabold">👤 {t('team.ownerRolesTitle')}</h2>
+        <p className={`mb-3 text-sm ${ui.muted}`}>{t('team.ownerRolesHint')}</p>
+        <div className="flex flex-wrap gap-2">
+          {roles.map((r) => (
+            <button key={r} type="button" onClick={() => toggleOwnerRole(r)}
+              className={`rounded-full border px-3 py-1.5 text-sm font-bold ${ownerRoles.includes(r) ? 'border-sky-600 bg-sky-600 text-white' : 'border-slate-300 dark:border-slate-600'}`}>
+              {roleLabel(r)}
+            </button>
+          ))}
+        </div>
+      </Card>
 
       {full && <p className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">{t('err.limitUsers')}</p>}
 

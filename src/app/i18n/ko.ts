@@ -1615,6 +1615,10 @@ const ko: Record<DictKey, string> = {
   'err.limitCombo': "현재 요금제는 한 역할에 이렇게 많은 업무를 합칠 수 없습니다. 줄이거나 요금제를 올리세요.",
   'err.limitCustom': "요금제의 맞춤 역할 최대 개수에 도달했습니다. 요금제를 올리면 더 만들 수 있습니다.",
   'err.limitRoles': "요금제가 사용할 수 있는 역할 종류 수를 제한합니다. 요금제를 올려 늘리세요.",
+  'err.limitTotalRoles': "요금제가 전체 역할 수(관리자+직원)를 제한합니다. 요금제를 올려 늘리세요.",
+  'team.ownerRolesTitle': "관리자로서 나의 역할",
+  'team.ownerRolesHint': "관리 외에 직접 이 역할로 일할 수 있습니다. 요금제 한도에 포함됩니다.",
+  'team.ownerRolesSaved': "저장됨",
 };
 
 export default ko;

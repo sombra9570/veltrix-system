@@ -1615,6 +1615,10 @@ const en: Record<DictKey, string> = {
   'err.limitCombo': "Your plan doesn't allow combining that many duties in one role. Pick fewer or upgrade your plan.",
   'err.limitCustom': "You've reached your plan's limit of custom roles. Upgrade your plan to create more.",
   'err.limitRoles': "Your plan limits how many different roles you can use. Upgrade your plan to add more.",
+  'err.limitTotalRoles': "Your plan limits total roles (admin + workers). Upgrade your plan to add more.",
+  'team.ownerRolesTitle': "My roles as admin",
+  'team.ownerRolesHint': "Besides managing, you can work in these roles yourself. They count toward your plan's limit.",
+  'team.ownerRolesSaved': "Saved",
 };
 
 export default en;

@@ -1615,6 +1615,10 @@ const pt: Record<DictKey, string> = {
   'err.limitCombo': "Seu plano não permite juntar tantas funções em uma só função. Escolha menos ou melhore o plano.",
   'err.limitCustom': "Você chegou ao máximo de funções próprias do seu plano. Melhore o plano para criar mais.",
   'err.limitRoles': "Seu plano limita quantas funções diferentes você pode usar. Melhore o plano para incluir mais.",
+  'err.limitTotalRoles': "Seu plano limita o total de funções (administrador + trabalhadores). Melhore o plano para incluir mais.",
+  'team.ownerRolesTitle': "Minhas funções como administrador",
+  'team.ownerRolesHint': "Além de administrar, você pode trabalhar nestas funções. Elas contam no limite do seu plano.",
+  'team.ownerRolesSaved': "Salvo",
 };
 
 export default pt;

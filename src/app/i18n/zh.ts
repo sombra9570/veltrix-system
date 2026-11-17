@@ -1615,6 +1615,10 @@ const zh: Record<DictKey, string> = {
   'err.limitCombo': "您的套餐不允许在一个角色中合并这么多职责。请减少或升级套餐。",
   'err.limitCustom': "已达到套餐的自定义角色上限。升级套餐可创建更多。",
   'err.limitRoles': "您的套餐限制可使用的不同岗位数量。升级套餐可增加。",
+  'err.limitTotalRoles': "您的套餐限制角色总数（管理员+员工）。升级套餐可增加。",
+  'team.ownerRolesTitle': "我作为管理员的角色",
+  'team.ownerRolesHint': "除管理外，您也可以亲自担任这些角色。它们计入套餐上限。",
+  'team.ownerRolesSaved': "已保存",
 };
 
 export default zh;
