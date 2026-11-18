@@ -1779,6 +1779,7 @@ const ja: Record<DictKey, string> = {
   'home.need.b2': "一緒に働く人数",
   'home.need.b3': "請求書発行とAIの支援が必要か",
   'home.need.b4': "どのプランが合うか",
+  'chat.retention': "チャットのメッセージはプランに応じて {n} 日後に自動削除され、容量を圧迫しません。大切な内容は事前に保存してください。売上・在庫・顧客・財務データが自動で削除されることはありません。",
 };
 
 export default ja;

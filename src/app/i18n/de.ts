@@ -1779,6 +1779,7 @@ const de: Record<DictKey, string> = {
   'home.need.b2': "Wie viele Personen mit Ihnen arbeiten",
   'home.need.b3': "Ob Sie Rechnungsstellung und KI-Hilfe brauchen",
   'home.need.b4': "Welcher Tarif zu Ihnen passt",
+  'chat.retention': "Chat-Nachrichten werden je nach Tarif nach {n} Tagen automatisch gelöscht, damit sie keinen Speicher belegen. Sichern Sie Wichtiges vorher. Verkäufe, Lager, Kunden und Finanzen werden nie automatisch gelöscht.",
 };
 
 export default de;

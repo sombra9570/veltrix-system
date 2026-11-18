@@ -1779,6 +1779,7 @@ const fr: Record<DictKey, string> = {
   'home.need.b2': "Combien de personnes travaillent avec vous",
   'home.need.b3': "Si vous avez besoin de facturation et d'aide IA",
   'home.need.b4': "Quel forfait convient à votre cas",
+  'chat.retention': "Les messages du chat sont supprimés automatiquement après {n} jours selon votre forfait, pour ne pas saturer votre espace. Conservez ce qui est important avant. Vos ventes, stocks, clients et finances ne sont jamais supprimés automatiquement.",
 };
 
 export default fr;

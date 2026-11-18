@@ -1779,6 +1779,7 @@ const pt: Record<DictKey, string> = {
   'home.need.b2': "Quantas pessoas trabalham com você",
   'home.need.b3': "Se precisa de faturamento e ajuda de IA",
   'home.need.b4': "Que plano combina com seu caso",
+  'chat.retention': "As mensagens do chat são apagadas automaticamente após {n} dias conforme seu plano, para não ocupar seu espaço. Guarde o que for importante antes. Suas vendas, estoque, clientes e finanças nunca são apagados automaticamente.",
 };
 
 export default pt;

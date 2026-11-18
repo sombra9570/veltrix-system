@@ -27,6 +27,7 @@ export function ChatScreen() {
   const [busy, setBusy] = useState(false);
   const [photos, setPhotos] = useState<Record<string, string>>({});
   const [err, setErr] = useState('');
+  const [days, setDays] = useState<number | null>(null);
   const bottom = useRef<HTMLDivElement | null>(null);
   const names = useRef<Map<string, string>>(new Map());
 
@@ -36,6 +37,12 @@ export function ChatScreen() {
       if (!u.user) return;
       const { data: p } = await supabase.from('profiles').select('org_id, full_name').eq('id', u.user.id).single();
       setMe({ id: u.user.id, org: p?.org_id ?? '' });
+      if (p?.org_id) {
+        const { data: o } = await supabase.from('organizations').select('plans(chat_retention_days)').eq('id', p.org_id).single();
+        const pl = (o as { plans?: { chat_retention_days?: number } | { chat_retention_days?: number }[] | null } | null)?.plans;
+        const d = Array.isArray(pl) ? pl[0]?.chat_retention_days : pl?.chat_retention_days;
+        if (d) setDays(d);
+      }
       names.current.set(u.user.id, p?.full_name ?? '');
       const ppl = await rpc<Person[]>('chat_people').catch(() => []);
       setPeople(ppl ?? []);
@@ -158,6 +165,7 @@ export function ChatScreen() {
           <h1 className="text-lg font-extrabold">💬 {t('chat.title')}</h1>
           <button type="button" onClick={() => setPicking(!picking)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>+ {t('chat.new')}</button>
         </div>
+        {days !== null && <p className={`border-b border-slate-200 p-3 text-xs ${ui.muted} dark:border-slate-800`}>ℹ️ {t('chat.retention', { n: days })}</p>}
         <div className="min-h-0 flex-1 overflow-y-auto">
           {picking ? (
             <ul className="divide-y divide-slate-100 dark:divide-slate-800">

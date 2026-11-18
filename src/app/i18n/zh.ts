@@ -1779,6 +1779,7 @@ const zh: Record<DictKey, string> = {
   'home.need.b2': "有多少人与您共事",
   'home.need.b3': "是否需要开票和 AI 协助",
   'home.need.b4': "哪个套餐适合您",
+  'chat.retention': "聊天消息将按您的套餐在 {n} 天后自动删除，以免占用空间。重要内容请提前保存。您的销售、库存、客户和财务数据绝不会被自动删除。",
 };
 
 export default zh;
