@@ -6,6 +6,7 @@ import { ui } from '../site-header';
 import { useSync } from './sync';
 import { useT } from '../i18n';
 import { money } from './format';
+import { QrImage } from './qr-image';
 
 type Req = {
   id: string; table: string; at: string; notes: string | null; customer: string | null; pay_pref: 'qr' | 'cash';
@@ -98,7 +99,6 @@ export function TableQrCard({ branchId, flash }: { branchId: string; flash: (ok:
     if (!window.confirm(t('tq.qrRenewConfirm'))) return;
     try { setTables(await rpc<QrTable[]>('table_qr_info', { p_branch: branchId, p_regenerate: id }) ?? []); } catch { flash(false, t('err.generic')); }
   };
-  const qrImg = (token: string) => `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(`${origin}/mesa/${token}`)}`;
 
   return (
     <Card className="space-y-3 lg:col-span-2">
@@ -110,8 +110,7 @@ export function TableQrCard({ branchId, flash }: { branchId: string; flash: (ok:
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {tables.filter((x) => x.active).map((tb) => (
           <div key={tb.id} className="rounded-xl border border-slate-200 p-2 text-center dark:border-slate-700">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={qrImg(tb.token)} alt={`QR ${tb.name}`} className="mx-auto w-full max-w-[180px] rounded bg-white" />
+            <QrImage value={`${origin}/mesa/${tb.token}`} alt={`QR ${tb.name}`} className="mx-auto w-full max-w-[180px] rounded bg-white" />
             <p className="mt-1 font-extrabold">{tb.name}</p>
             <button type="button" onClick={() => renew(tb.id)} className={`${ui.btnGhost} mt-1 !px-2 !py-1 text-[11px] print:hidden`}>{t('tq.qrRenew')}</button>
           </div>
