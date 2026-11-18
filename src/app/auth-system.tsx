@@ -76,6 +76,7 @@ type NewCompany = {
   name: string; taxId: string; type: string; plan: number; modules: string[];
   ownerName: string; ownerEmail: string; ownerPassword: string;
   categories?: string[];   // rubros elegidos (business-catalog.ts)
+  planCode?: string;       // plan recomendado: la prueba de 14 días empieza ya en ese plan
 };
 
 const PENDING_KEY = 'veltrix_pending_org';
@@ -113,12 +114,11 @@ function alertError(e: unknown) {
 // Crea la organización completa para el usuario ya autenticado
 async function finishRegistration(details: NewCompany, email: string) {
   const { country, regime, sector } = regionFromBrowser();
-  // Durante el desarrollo todas las cuentas usan el plan con todos los módulos.
-  // Cuando definas precios, cambia 'enterprise' según details.plan.
+  // La prueba de 14 días corre en el plan recomendado, con sus límites reales.
   await rpc('create_organization', {
     p_org_name: details.name,
     p_billing_email: email,
-    p_plan_code: 'enterprise',
+    p_plan_code: details.planCode || 'enterprise',
     p_full_name: details.ownerName,
     p_legal_name: details.name,
     p_country: country.code,
