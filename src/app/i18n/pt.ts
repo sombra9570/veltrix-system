@@ -1662,6 +1662,21 @@ const pt: Record<DictKey, string> = {
   "shop.waReady": "Pronto para retirar!",
   "shop.waApprove": "Por favor, confirme se aprovamos o serviço.",
   "shop.waSend": "Enviar status por WhatsApp",
+  "nav.dispatch": "Expedição",
+  "dsp.subtitle": "Vendas pagas que devem ser entregues ao cliente.",
+  "dsp.marked": "Marcado como entregue.",
+  "dsp.offTitle": "A expedição está desligada nesta filial",
+  "dsp.offHint": "Ao ligar, cada venda paga com produtos aparece aqui para o almoxarife entregar e marcar. Útil quando quem vende não é quem entrega.",
+  "dsp.turnOn": "Ligar expedição",
+  "dsp.turnOff": "Desligar a expedição nesta filial",
+  "dsp.askAdmin": "Peça ao administrador para ligar.",
+  "dsp.pending": "A entregar",
+  "dsp.done": "Entregues",
+  "dsp.none": "Nada a entregar. As novas vendas aparecem sozinhas.",
+  "dsp.noneDone": "Ainda não há entregas registradas.",
+  "dsp.walkIn": "Cliente de balcão",
+  "dsp.deliveredAt": "Entregue em {date}",
+  "dsp.mark": "Entregue",
 };
 
 export default pt;

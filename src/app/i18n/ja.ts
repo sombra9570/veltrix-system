@@ -1662,6 +1662,21 @@ const ja: Record<DictKey, string> = {
   "shop.waReady": "お引き取りいただけます！",
   "shop.waApprove": "作業を進めてよいかご確認ください。",
   "shop.waSend": "WhatsAppで状況を送信",
+  "nav.dispatch": "出荷",
+  "dsp.subtitle": "お客様へ渡す必要がある支払済みの販売。",
+  "dsp.marked": "引き渡し済みにしました。",
+  "dsp.offTitle": "この支店では出荷がオフです",
+  "dsp.offHint": "オンにすると、商品を含む支払済みの販売がここに表示され、倉庫担当が渡して記録します。売る人と渡す人が別の場合に便利です。",
+  "dsp.turnOn": "出荷をオンにする",
+  "dsp.turnOff": "この支店の出荷をオフにする",
+  "dsp.askAdmin": "管理者にオンにしてもらってください。",
+  "dsp.pending": "未引き渡し",
+  "dsp.done": "引き渡し済み",
+  "dsp.none": "引き渡すものはありません。新しい販売は自動で表示されます。",
+  "dsp.noneDone": "引き渡しの記録はまだありません。",
+  "dsp.walkIn": "店頭のお客様",
+  "dsp.deliveredAt": "{date} に引き渡し",
+  "dsp.mark": "引き渡し済み",
 };
 
 export default ja;

@@ -1662,6 +1662,21 @@ const de: Record<DictKey, string> = {
   "shop.waReady": "Abholbereit!",
   "shop.waApprove": "Bitte bestätige, ob wir die Arbeit ausführen dürfen.",
   "shop.waSend": "Status per WhatsApp senden",
+  "nav.dispatch": "Ausgabe",
+  "dsp.subtitle": "Bezahlte Verkäufe, die an den Kunden ausgegeben werden müssen.",
+  "dsp.marked": "Als ausgegeben markiert.",
+  "dsp.offTitle": "Die Ausgabe ist in dieser Filiale aus",
+  "dsp.offHint": "Eingeschaltet erscheint jeder bezahlte Verkauf mit Produkten hier, damit der Lagerist ihn ausgibt und markiert. Nützlich, wenn Verkäufer und Ausgabe getrennt sind.",
+  "dsp.turnOn": "Ausgabe einschalten",
+  "dsp.turnOff": "Ausgabe in dieser Filiale ausschalten",
+  "dsp.askAdmin": "Bitte den Administrator, es einzuschalten.",
+  "dsp.pending": "Auszugeben",
+  "dsp.done": "Ausgegeben",
+  "dsp.none": "Nichts auszugeben. Neue Verkäufe erscheinen automatisch.",
+  "dsp.noneDone": "Noch keine Ausgaben erfasst.",
+  "dsp.walkIn": "Laufkunde",
+  "dsp.deliveredAt": "Ausgegeben am {date}",
+  "dsp.mark": "Ausgegeben",
 };
 
 export default de;

@@ -1662,6 +1662,21 @@ const it: Record<DictKey, string> = {
   "shop.waReady": "Pronto per il ritiro!",
   "shop.waApprove": "Per favore confermaci se procedere con il lavoro.",
   "shop.waSend": "Invia stato su WhatsApp",
+  "nav.dispatch": "Spedizioni",
+  "dsp.subtitle": "Vendite pagate da consegnare al cliente.",
+  "dsp.marked": "Segnato come consegnato.",
+  "dsp.offTitle": "Le spedizioni sono disattivate in questa filiale",
+  "dsp.offHint": "Quando è attivo, ogni vendita pagata con prodotti appare qui perché il magazziniere la consegni e la segni. Utile quando chi vende non è chi consegna.",
+  "dsp.turnOn": "Attiva spedizioni",
+  "dsp.turnOff": "Disattiva le spedizioni in questa filiale",
+  "dsp.askAdmin": "Chiedi all'amministratore di attivarlo.",
+  "dsp.pending": "Da consegnare",
+  "dsp.done": "Consegnate",
+  "dsp.none": "Niente da consegnare. Le nuove vendite appaiono da sole.",
+  "dsp.noneDone": "Nessuna consegna registrata.",
+  "dsp.walkIn": "Cliente al banco",
+  "dsp.deliveredAt": "Consegnato il {date}",
+  "dsp.mark": "Consegnato",
 };
 
 export default it;

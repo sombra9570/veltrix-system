@@ -1662,6 +1662,21 @@ const ko: Record<DictKey, string> = {
   "shop.waReady": "수령 가능합니다!",
   "shop.waApprove": "작업 진행 여부를 확인해 주세요.",
   "shop.waSend": "WhatsApp으로 상태 보내기",
+  "nav.dispatch": "출고",
+  "dsp.subtitle": "고객에게 전달해야 하는 결제 완료 판매.",
+  "dsp.marked": "전달 완료로 표시했습니다.",
+  "dsp.offTitle": "이 지점은 출고가 꺼져 있습니다",
+  "dsp.offHint": "켜면 상품이 포함된 결제 완료 판매가 여기에 표시되어 창고 담당자가 전달하고 표시합니다. 판매자와 전달자가 다를 때 유용합니다.",
+  "dsp.turnOn": "출고 켜기",
+  "dsp.turnOff": "이 지점 출고 끄기",
+  "dsp.askAdmin": "관리자에게 켜 달라고 요청하세요.",
+  "dsp.pending": "전달 대기",
+  "dsp.done": "전달 완료",
+  "dsp.none": "전달할 것이 없습니다. 새 판매는 자동으로 나타납니다.",
+  "dsp.noneDone": "아직 전달 기록이 없습니다.",
+  "dsp.walkIn": "일반 고객",
+  "dsp.deliveredAt": "{date} 전달",
+  "dsp.mark": "전달 완료",
 };
 
 export default ko;

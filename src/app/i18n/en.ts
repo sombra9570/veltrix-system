@@ -1662,6 +1662,21 @@ const en: Record<DictKey, string> = {
   "shop.waReady": "Ready for pickup!",
   "shop.waApprove": "Please confirm whether we may proceed with the work.",
   "shop.waSend": "Send status via WhatsApp",
+  "nav.dispatch": "Dispatch",
+  "dsp.subtitle": "Paid sales that must be handed to the customer.",
+  "dsp.marked": "Marked as delivered.",
+  "dsp.offTitle": "Dispatch is off at this branch",
+  "dsp.offHint": "When on, every paid sale with products shows here so the storekeeper hands it over and marks it. Useful when the seller is not the one who delivers.",
+  "dsp.turnOn": "Turn on dispatch",
+  "dsp.turnOff": "Turn off dispatch at this branch",
+  "dsp.askAdmin": "Ask the administrator to turn it on.",
+  "dsp.pending": "To deliver",
+  "dsp.done": "Delivered",
+  "dsp.none": "Nothing to deliver. New sales show up automatically.",
+  "dsp.noneDone": "No deliveries recorded yet.",
+  "dsp.walkIn": "Walk-in customer",
+  "dsp.deliveredAt": "Delivered on {date}",
+  "dsp.mark": "Delivered",
 };
 
 export default en;

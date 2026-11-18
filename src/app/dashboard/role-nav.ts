@@ -28,6 +28,7 @@ export const ROLE_NAV = {
 ] as NavItem[],
   storekeeper: [
   { href: '/dashboard/storekeeper', icon: '📦', label: 'nav.inventory' },
+  { href: '/dashboard/storekeeper/despacho', icon: '🚚', label: 'nav.dispatch' },
   { href: '/dashboard/storekeeper/productos', icon: '🏷️', label: 'nav.products' },
   { href: '/dashboard/storekeeper/tienda', icon: '📋', label: 'nav.store' },
   { href: '/dashboard/storekeeper/mensajes', icon: '💬', label: 'nav.messages' },

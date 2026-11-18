@@ -1662,6 +1662,21 @@ const fr: Record<DictKey, string> = {
   "shop.waReady": "Prêt à être récupéré !",
   "shop.waApprove": "Merci de nous confirmer si nous pouvons faire le travail.",
   "shop.waSend": "Envoyer l'état par WhatsApp",
+  "nav.dispatch": "Expédition",
+  "dsp.subtitle": "Ventes encaissées à remettre au client.",
+  "dsp.marked": "Marqué comme remis.",
+  "dsp.offTitle": "L'expédition est désactivée dans cette succursale",
+  "dsp.offHint": "Une fois activé, chaque vente encaissée avec des produits apparaît ici pour que le magasinier la remette et la marque. Utile quand le vendeur n'est pas celui qui livre.",
+  "dsp.turnOn": "Activer l'expédition",
+  "dsp.turnOff": "Désactiver l'expédition dans cette succursale",
+  "dsp.askAdmin": "Demandez à l'administrateur de l'activer.",
+  "dsp.pending": "À remettre",
+  "dsp.done": "Remises",
+  "dsp.none": "Rien à remettre. Les nouvelles ventes apparaissent automatiquement.",
+  "dsp.noneDone": "Aucune remise enregistrée.",
+  "dsp.walkIn": "Client au comptoir",
+  "dsp.deliveredAt": "Remis le {date}",
+  "dsp.mark": "Remis",
 };
 
 export default fr;

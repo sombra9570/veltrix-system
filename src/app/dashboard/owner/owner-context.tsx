@@ -60,6 +60,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/cocina', icon: '🔥', label: 'nav.kitchen', module: 'restaurant' },
   { href: '/dashboard/owner/taller', icon: '🔧', label: 'nav.workshop', module: 'workshop' },
   { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory' },
+  { href: '/dashboard/owner/despacho', icon: '🚚', label: 'nav.dispatch', module: 'retail' },
   { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports' },
   { href: '/dashboard/owner/indicadores', icon: '🌎', label: 'nav.indicators' },
   { href: '/dashboard/owner/plan', icon: '💳', label: 'nav.plan' },

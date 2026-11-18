@@ -1662,6 +1662,21 @@ const zh: Record<DictKey, string> = {
   "shop.waReady": "可以取件了！",
   "shop.waApprove": "请确认是否同意进行维修。",
   "shop.waSend": "通过 WhatsApp 发送状态",
+  "nav.dispatch": "发货",
+  "dsp.subtitle": "已收款、需交付给客户的销售。",
+  "dsp.marked": "已标记为已交付。",
+  "dsp.offTitle": "本分店未启用发货",
+  "dsp.offHint": "开启后，每笔含商品的已收款销售都会显示在这里，由仓管交付并标记。适用于销售和交付不是同一人的情况。",
+  "dsp.turnOn": "启用发货",
+  "dsp.turnOff": "关闭本分店发货",
+  "dsp.askAdmin": "请管理员开启。",
+  "dsp.pending": "待交付",
+  "dsp.done": "已交付",
+  "dsp.none": "暂无待交付。新的销售会自动出现。",
+  "dsp.noneDone": "还没有交付记录。",
+  "dsp.walkIn": "散客",
+  "dsp.deliveredAt": "交付于 {date}",
+  "dsp.mark": "已交付",
 };
 
 export default zh;

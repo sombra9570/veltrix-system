@@ -1671,6 +1671,21 @@ const es = {
   "shop.waReady": "¡Listo para recoger!",
   "shop.waApprove": "Por favor confírmanos si aprobamos el trabajo.",
   "shop.waSend": "Enviar estado por WhatsApp",
+  "nav.dispatch": "Despacho",
+  "dsp.subtitle": "Ventas cobradas que hay que entregar al cliente.",
+  "dsp.marked": "Marcado como entregado.",
+  "dsp.offTitle": "El despacho está apagado en esta sucursal",
+  "dsp.offHint": "Al encenderlo, cada venta cobrada con productos aparece aquí para que el almacenero la entregue y la marque. Sirve cuando quien vende no es quien entrega.",
+  "dsp.turnOn": "Encender despacho",
+  "dsp.turnOff": "Apagar el despacho en esta sucursal",
+  "dsp.askAdmin": "Pídele al administrador que lo encienda.",
+  "dsp.pending": "Por entregar",
+  "dsp.done": "Entregadas",
+  "dsp.none": "No hay nada por entregar. Las ventas nuevas aparecen solas.",
+  "dsp.noneDone": "Todavía no hay entregas registradas.",
+  "dsp.walkIn": "Cliente de mostrador",
+  "dsp.deliveredAt": "Entregado el {date}",
+  "dsp.mark": "Entregado",
 };
 
 export default es;
