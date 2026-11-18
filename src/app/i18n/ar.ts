@@ -1773,6 +1773,12 @@ const ar: Record<DictKey, string> = {
   'help.st.open': "بانتظار الرد",
   'help.st.answered': "تم الرد",
   'help.st.closed': "مغلق",
+  'home.needTitle': "أولاً: اعرف ما يحتاجه نشاطك",
+  'home.needSub': "أجب عن أسئلة بسيطة حول نشاطك وفريقك وما تريد التحكم فيه. نبني لك الحل ونعرض عليك الخطة المناسبة مع سعرها.",
+  'home.need.b1': "ما مجال نشاطك",
+  'home.need.b2': "كم شخصاً يعمل معك",
+  'home.need.b3': "هل تحتاج إلى الفوترة ومساعدة الذكاء الاصطناعي",
+  'home.need.b4': "أي خطة تناسب حالتك",
 };
 
 export default ar;

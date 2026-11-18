@@ -1773,6 +1773,12 @@ const ja: Record<DictKey, string> = {
   'help.st.open': "待機中",
   'help.st.answered': "回答済み",
   'help.st.closed': "終了",
+  'home.needTitle': "まず、事業に必要なことを確認",
+  'home.needSub': "事業、チーム、管理したい内容についていくつかの簡単な質問にお答えください。それをもとに最適な構成をつくり、合うプランと価格をご案内します。",
+  'home.need.b1': "事業の内容",
+  'home.need.b2': "一緒に働く人数",
+  'home.need.b3': "請求書発行とAIの支援が必要か",
+  'home.need.b4': "どのプランが合うか",
 };
 
 export default ja;

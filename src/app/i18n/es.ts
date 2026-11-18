@@ -1782,6 +1782,12 @@ const es = {
   'help.st.open': "En espera",
   'help.st.answered': "Respondida",
   'help.st.closed': "Cerrada",
+  'home.needTitle': "Primero conoce lo que tu negocio necesita",
+  'home.needSub': "Responde unas preguntas simples sobre tu negocio, tu equipo y lo que quieres controlar. Con eso armamos tu solución y te mostramos el plan que se ajusta, con su precio.",
+  'home.need.b1': "A qué se dedica tu negocio",
+  'home.need.b2': "Cuántas personas trabajan contigo",
+  'home.need.b3': "Si necesitas facturación y ayuda de IA",
+  'home.need.b4': "Qué plan encaja con tu caso",
 };
 
 export default es;

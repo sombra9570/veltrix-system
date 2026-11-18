@@ -1773,6 +1773,12 @@ const pt: Record<DictKey, string> = {
   'help.st.open': "Em espera",
   'help.st.answered': "Respondida",
   'help.st.closed': "Fechada",
+  'home.needTitle': "Primeiro, veja o que seu negócio precisa",
+  'home.needSub': "Responda algumas perguntas simples sobre seu negócio, sua equipe e o que quer controlar. Com isso montamos sua solução e mostramos o plano que se ajusta, com o preço.",
+  'home.need.b1': "A que seu negócio se dedica",
+  'home.need.b2': "Quantas pessoas trabalham com você",
+  'home.need.b3': "Se precisa de faturamento e ajuda de IA",
+  'home.need.b4': "Que plano combina com seu caso",
 };
 
 export default pt;

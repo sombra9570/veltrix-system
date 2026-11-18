@@ -99,7 +99,7 @@ export default function RegistroPage() {
       taxId: taxId.trim(),
       type: kind as string,
       categories: cats,
-      planCode: plan?.code,
+      planCode: plan && ['basic', 'starter', 'pro'].includes(plan.code) ? plan.code : 'pro', // el piloto corre en planes chicos
       plan: 0,
       modules: suggestedModules(cats),
       ownerName: ownerName.trim(),

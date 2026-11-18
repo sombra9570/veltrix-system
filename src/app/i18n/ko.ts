@@ -1773,6 +1773,12 @@ const ko: Record<DictKey, string> = {
   'help.st.open': "대기 중",
   'help.st.answered': "답변됨",
   'help.st.closed': "종료됨",
+  'home.needTitle': "먼저 사업에 필요한 것을 확인하세요",
+  'home.needSub': "사업, 팀, 관리하고 싶은 내용에 대한 간단한 질문에 답해 주세요. 이를 바탕으로 솔루션을 구성하고 알맞은 요금제와 가격을 보여 드립니다.",
+  'home.need.b1': "사업의 업종",
+  'home.need.b2': "함께 일하는 인원",
+  'home.need.b3': "청구서 발행과 AI 도움이 필요한지",
+  'home.need.b4': "어떤 요금제가 맞는지",
 };
 
 export default ko;

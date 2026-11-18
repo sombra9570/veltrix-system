@@ -2,15 +2,12 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useVeltrixAuth, homeForRole } from './auth-system';
-import { useLanguage } from './language-selector';
 import { SiteHeader, SiteFooter, ui } from './site-header';
 import { useT } from './i18n';
-import { rpc } from '../lib/supabase';
 import type { DictKey } from './i18n/es';
 import { HomeShowcase } from './home-showcase';
 import { useRouter } from 'next/navigation';
 import { isInstalledApp } from '../lib/standalone';
-import { grossUp, taxIncluded } from '../lib/tax';
 
 // Roles: cada persona trabaja en su propio panel
 const ROLES: [string, string][] = [
@@ -18,26 +15,10 @@ const ROLES: [string, string][] = [
   ['accountant', '📈'], ['collector', '🛵'], ['waiter', '🍽️'], ['kitchen', '🔥'], ['technician', '🔧'],
 ];
 
-// Precio regional: Latinoamérica paga el precio regional; el resto, el internacional (los dos salen de la base)
-const LATAM = new Set(['BO', 'MX', 'CO', 'AR', 'CL', 'PE', 'BR', 'EC', 'PY', 'UY', 'VE', 'GT', 'HN', 'SV', 'NI', 'CR', 'PA', 'DO', 'PR', 'CU']);
-type Extra = { max: number | null; price_usd: number | null; price_global_usd: number | null };
-type PublicPlan = { code: string; name: string; price_usd: number; price_global_usd: number; max_companies: number; max_branches: number; max_users: number; max_storage_mb: number;
-  extra_user?: Extra; extra_branch?: Extra };
-const FALLBACK: PublicPlan[] = [
-  { code: 'basic', name: 'Básico', price_usd: 12, price_global_usd: 19, max_companies: 1, max_branches: 1, max_users: 2, max_storage_mb: 1024 },
-  { code: 'starter', name: 'Startup', price_usd: 25, price_global_usd: 39, max_companies: 1, max_branches: 1, max_users: 6, max_storage_mb: 3072 },
-  { code: 'pro', name: 'Empresa', price_usd: 49, price_global_usd: 75, max_companies: 1, max_branches: 2, max_users: 15, max_storage_mb: 8192 },
-  { code: 'enterprise', name: 'Enterprise', price_usd: 129, price_global_usd: 219, max_companies: 3, max_branches: 3, max_users: 30, max_storage_mb: 25600 },
-  { code: 'enterprise_plus', name: 'Enterprise Plus', price_usd: 235, price_global_usd: 389, max_companies: 10, max_branches: 5, max_users: 50, max_storage_mb: 61440 },
-];
-
 export default function HomePage() {
   const { loaded, session } = useVeltrixAuth();
-  const { formatMoney, country } = useLanguage();
   const { t } = useT();
   const k = (key: string) => t(key as DictKey);
-  const latam = LATAM.has(country.code);
-  const [plans, setPlans] = useState<PublicPlan[]>(FALLBACK);
   const [faq, setFaq] = useState<number | null>(0);
 
   const router = useRouter();
@@ -45,9 +26,6 @@ export default function HomePage() {
   useEffect(() => {
     if (loaded && isInstalledApp()) router.replace(session ? homeForRole(session.role) : '/ingresar');
   }, [loaded, session, router]);
-  const [extras, setExtras] = useState<{ code: string; price_usd: number; price_global_usd: number; unit_mb: number }[]>([]);
-  useEffect(() => { rpc<PublicPlan[]>('public_plans').then((p) => { if (p?.length) setPlans(p); }).catch(() => {}); }, []);
-  useEffect(() => { rpc<typeof extras>('public_addons').then((a) => setExtras(a ?? [])).catch(() => {}); }, []);
 
   const cta = loaded && session
     ? <Link href={homeForRole(session.role)} className={`${ui.btnPrimary} px-7 py-3`}>{t('home.ctaPanel')}</Link>
@@ -169,50 +147,16 @@ export default function HomePage() {
         </ol>
       </section>
 
-      {/* PLANES (precios reales de la base) */}
+      {/* PRIMERO ENTENDEMOS EL NEGOCIO: no se muestran precios antes del diagnóstico */}
       <section id="planes" className={`${wrap} py-10`}>
-        <h2 className="text-center text-xl font-extrabold sm:text-2xl">{t('home.plansTitle')}</h2>
-        <p className={`mt-1 text-center text-sm ${ui.muted}`}>{t('home.plansSubtitle')}</p>
-        <p className={`text-center text-xs ${ui.muted}`}>{t('home.pricesLocal')} {taxIncluded(country.code) ? t('home.taxIncluded') : t('home.plusTax')}</p>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-4 lg:grid-cols-3 xl:grid-cols-5">
-          {plans.map((p) => {
-            const best = p.code === 'pro';
-            return (
-              <div key={p.code} className={`relative flex flex-col rounded-2xl p-6 ${ui.card} ${best ? 'ring-2 ring-blue-500' : ''}`}>
-                {best && <span className="absolute -top-3 left-6 rounded-full bg-blue-600 px-3 py-0.5 text-[11px] font-bold text-white">{t('home.bestPlan')}</span>}
-                <p className="text-lg font-bold">{p.name}</p>
-                <p className={`text-xs ${ui.muted}`}>{k(`plan.${p.code}.desc`)}</p>
-                <p className="mt-4 text-2xl font-extrabold sm:text-3xl">
-                  {formatMoney(grossUp(Number(latam ? p.price_usd : p.price_global_usd), country.code), false, true)}
-                  <span className={`text-sm font-semibold ${ui.muted}`}> {t('common.perMonth')}</span>
-                </p>
-                <ul className="mt-4 flex-1 space-y-1.5 text-sm">
-                  <li className="font-semibold">✓ {t('bill.limWorkers', { n: Math.max(1, p.max_users - 1) })}</li>
-                  <li>✓ {p.max_branches === 1 ? k('plan.starter.i3') : t('bill.limBranches', { n: p.max_branches })}</li>
-                  {p.max_companies > 1 && <li>✓ {t('bill.limCompanies', { n: p.max_companies })}</li>}
-                  <li>✓ {t('bill.limStorage', { n: Math.round(p.max_storage_mb / 1024) })}</li>
-                  <li>✓ {k(`plan.${p.code}.i1`)}</li>
-                  {Number(p.extra_user?.max ?? 0) > 0 && (
-                    <li className={`text-xs ${ui.muted}`}>➕ {t('bill.extraUser', { n: Number(p.extra_user!.max), price: formatMoney(grossUp(Number(latam ? p.extra_user!.price_usd : p.extra_user!.price_global_usd), country.code), false, true) })}</li>
-                  )}
-                  {Number(p.extra_branch?.max ?? 0) > 0 && (
-                    <li className={`text-xs ${ui.muted}`}>➕ {t('bill.extraBranch', { n: Number(p.extra_branch!.max), price: formatMoney(grossUp(Number(latam ? p.extra_branch!.price_usd : p.extra_branch!.price_global_usd), country.code), false, true) })}</li>
-                  )}
-                </ul>
-                <Link href="/registro" className={`${best ? ui.btnPrimary : ui.btnGhost} mt-6 w-full`}>{t('home.startFree')}</Link>
-              </div>
-            );
-          })}
+        <div className={`mx-auto max-w-3xl rounded-3xl p-6 text-center sm:p-8 ${ui.card}`}>
+          <h2 className="text-xl font-extrabold sm:text-2xl">{t('home.needTitle')}</h2>
+          <p className={`mt-2 text-sm ${ui.muted}`}>{t('home.needSub')}</p>
+          <ul className={`mx-auto mt-4 grid max-w-xl gap-2 text-start text-sm sm:grid-cols-2 ${ui.muted}`}>
+            {[1, 2, 3, 4].map((i) => <li key={i}>✓ {k(`home.need.b${i}`)}</li>)}
+          </ul>
+          <div className="mt-6">{cta}</div>
         </div>
-        {extras.length > 0 && (() => {
-          const px = (c: string) => { const a = extras.find((e) => e.code === c); return a ? formatMoney(grossUp(Number(latam ? a.price_usd : a.price_global_usd), country.code), false, true) : null; };
-          const st = extras.find((e) => e.code === 'storage');
-          return (
-            <p className={`mt-4 text-center text-xs ${ui.muted}`}>
-              ➕ {t('home.extraStorage', { storage: px('storage') ?? '—', gb: st ? Math.round(st.unit_mb / 1024) : 5 })}
-            </p>
-          );
-        })()}
       </section>
 
       {/* PREGUNTAS FRECUENTES */}

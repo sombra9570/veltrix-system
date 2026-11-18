@@ -1773,6 +1773,12 @@ const zh: Record<DictKey, string> = {
   'help.st.open': "等待中",
   'help.st.answered': "已回复",
   'help.st.closed': "已关闭",
+  'home.needTitle': "先了解您的业务需要什么",
+  'home.needSub': "回答几个关于业务、团队和您想控制内容的简单问题。我们据此为您配置方案，并展示合适的套餐及价格。",
+  'home.need.b1': "您的业务做什么",
+  'home.need.b2': "有多少人与您共事",
+  'home.need.b3': "是否需要开票和 AI 协助",
+  'home.need.b4': "哪个套餐适合您",
 };
 
 export default zh;

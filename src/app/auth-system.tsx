@@ -118,7 +118,7 @@ async function finishRegistration(details: NewCompany, email: string) {
   await rpc('create_organization', {
     p_org_name: details.name,
     p_billing_email: email,
-    p_plan_code: details.planCode || 'enterprise',
+    p_plan_code: details.planCode || 'basic',
     p_full_name: details.ownerName,
     p_legal_name: details.name,
     p_country: country.code,
