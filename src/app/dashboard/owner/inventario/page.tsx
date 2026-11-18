@@ -10,6 +10,8 @@ import { friendlyError } from '../owner-context';
 import { EvidenceFields, EvidenceLog, OutForm, addEvidence, emptyEvidence, uploadEvidencePhoto, type Evidence } from './evidence';
 import { photoErrorKey } from '../../photo-picker';
 import { useVeltrixAuth } from '../../../auth-system';
+import { TransferForm } from './transfer';
+import { AccountsCard, PaySheet, useAccounts } from './payments';
 
 type MBranch = { id: string; name: string; company_id: string; company: string; currency: string; company_wide: boolean };
 type Item = { id: string; name: string; sku: string; unit: string; type: string; qty: number; min: number; cost: number; price: number; value: number };
@@ -21,7 +23,7 @@ type Overview = {
 };
 type Movement = { at: string; product: string; unit: string; type: string; qty: number; cost: number; by: string | null; note: string | null };
 type Purchase = { id: string; at: string; supplier: string; total: number; doc: string | null; due: string | null; status: string; items: number; paid: number };
-type Tab = 'stock' | 'entry' | 'out' | 'log' | 'moves' | 'suppliers';
+type Tab = 'stock' | 'entry' | 'out' | 'transfer' | 'log' | 'moves' | 'suppliers';
 type Line = { product_id: string; qty: string; cost: string };
 
 const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
@@ -53,9 +55,11 @@ export default function InventoryPage() {
   const [purchases, setPurchases] = useState<Purchase[] | null>(null);
   const [supEdit, setSupEdit] = useState<{ id: string | null; name: string; phone: string; email: string; tax_id: string; terms: string } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [paying, setPaying] = useState<Purchase | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   const branch = branches.find((b) => b.id === branchId);
+  const { accounts, reload: reloadAccounts } = useAccounts(tab === 'suppliers' ? branch?.company_id : undefined);
   const fmt = (n: number) => money(Number(n), data?.currency ?? branch?.currency ?? 'USD', lang);
   const qtyFmt = (n: number) => Number(n).toLocaleString(lang, { maximumFractionDigits: 3 });
   const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 6000); };
@@ -155,7 +159,7 @@ export default function InventoryPage() {
   };
 
   const s = data?.summary;
-  const tabs: [Tab, string][] = [['stock', t('inv.tabStock')], ['entry', t('inv.tabEntry')], ['out', t('ev.tabOut')], ['log', t('ev.tabLog')], ['moves', t('inv.tabMoves')], ['suppliers', t('inv.tabSuppliers')]];
+  const tabs: [Tab, string][] = [['stock', t('inv.tabStock')], ['entry', t('inv.tabEntry')], ['out', t('ev.tabOut')], ['transfer', t('tr.tab')], ['log', t('ev.tabLog')], ['moves', t('inv.tabMoves')], ['suppliers', t('inv.tabSuppliers')]];
   const shownTabs = readOnly ? tabs.filter(([k]) => k === 'stock' || k === 'moves') : tabs;
   const typeLabel = (k: string) => t(`inv.mt.${k}` as 'inv.mt.sale');
 
@@ -189,7 +193,7 @@ export default function InventoryPage() {
         ))}
       </div>
 
-      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:grid sm:grid-cols-6 sm:overflow-visible">
+      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:grid sm:grid-cols-7 sm:overflow-visible">
         {shownTabs.map(([k, label]) => (
           <button key={k} type="button" onClick={() => setTab(k)}
             className={`shrink-0 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold transition cursor-pointer sm:text-sm ${tab === k ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
@@ -308,6 +312,9 @@ export default function InventoryPage() {
       {tab === 'out' && branchId && (
         <OutForm branchId={branchId} items={data?.items ?? []} flash={flash} onDone={() => { setMoves(null); load(); }} />
       )}
+      {tab === 'transfer' && branchId && (
+        <TransferForm branchId={branchId} items={data?.items ?? []} flash={flash} onDone={() => { setMoves(null); load(); }} />
+      )}
       {tab === 'log' && branchId && <EvidenceLog branchId={branchId} />}
 
       {/* MOVIMIENTOS (KARDEX) */}
@@ -375,6 +382,10 @@ export default function InventoryPage() {
                   </ul>
                 )}
               </Card>
+              {branch && (
+                <AccountsCard companyId={branch.company_id} accounts={accounts} reload={reloadAccounts} fmt={fmt} flash={flash}
+                  canEdit={session?.role === 'owner'} />
+              )}
               <Card className="!p-0 overflow-hidden">
                 <h2 className="border-b border-slate-200 p-4 font-bold dark:border-slate-800">{t('inv.purchases')}</h2>
                 {purchases === null ? <p className={`p-5 text-sm ${ui.muted}`}>{t('common.wait')}</p>
@@ -389,7 +400,14 @@ export default function InventoryPage() {
                             {p.due ? ` · ${t('inv.dueOn', { date: new Date(p.due + 'T12:00:00').toLocaleDateString(lang) })}` : ''}
                           </p>
                         </div>
-                        <p className="shrink-0 font-bold">{fmt(p.total)}</p>
+                        <div className="shrink-0 text-end">
+                          <p className="font-bold">{fmt(p.total)}</p>
+                          {p.status === 'received' && (Number(p.paid) >= Number(p.total)
+                            ? <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">✅ {t('pay.paid')}</p>
+                            : <button type="button" onClick={() => setPaying(p)} className="text-xs font-semibold text-blue-600 hover:underline cursor-pointer dark:text-blue-400">
+                                {t('pay.btn', { amount: fmt(Number(p.total) - Number(p.paid)) })}
+                              </button>)}
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -398,6 +416,12 @@ export default function InventoryPage() {
             </>
           )}
         </div>
+      )}
+
+      {paying && (
+        <PaySheet purchase={paying} accounts={accounts ?? []} currency={data?.currency ?? branch?.currency ?? 'USD'} fmt={fmt} flash={flash}
+          onClose={() => setPaying(null)}
+          onPaid={() => { setPaying(null); setPurchases(null); reloadAccounts(); }} />
       )}
 
       {sel && (

@@ -233,6 +233,31 @@ function OrderDetail({ d, technicians, branchId, fmt, onClose, onChanged, flash 
   };
 
   const a = d.asset;
+  // Estado de la orden por WhatsApp al cliente: vehículo/equipo, estado, diagnóstico, detalle y total
+  const waText = () => {
+    const L: string[] = [];
+    const what = a ? [t(`shop.k.${a.kind}` as DictKey), a.brand, a.model, a.identifier].filter(Boolean).join(' · ') : '';
+    L.push(`*${t('shop.waTitle')}* · ${t('rc.no')} ${d.id.slice(0, 8).toUpperCase()}`);
+    L.push(t('shop.waHello', { name: d.customer.name }));
+    if (what) L.push(`🔧 ${what}`);
+    L.push(`📌 ${t('shop.status')}: *${t(`shop.s.${d.status}` as DictKey)}*`);
+    if (d.diagnosis) L.push(`📝 ${t('shop.diagnosis')}: ${d.diagnosis}`);
+    if (d.lines.length) {
+      L.push('');
+      for (const l of d.lines) L.push(`${Number(l.qty)} × ${l.description} — ${fmt(l.total)}`);
+      L.push(`*${t('rc.total')}: ${fmt(d.total)}*`);
+    }
+    if (d.promised_at && !['done', 'delivered', 'cancelled'].includes(d.status)) {
+      L.push(`📅 ${t('shop.promisedAt', { date: new Date(d.promised_at).toLocaleString(lang, { dateStyle: 'short', timeStyle: 'short' }) })}`);
+    }
+    if (d.status === 'done') L.push(`✅ ${t('shop.waReady')}`);
+    if (d.status === 'waiting_approval') L.push(`❓ ${t('shop.waApprove')}`);
+    return L.join('\n');
+  };
+  const sendWa = () => {
+    const phone = (d.customer.phone ?? '').replace(/\D/g, '');
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(waText())}`, '_blank', 'noopener');
+  };
   return (
     <div className="space-y-4">
       <Card className="space-y-3">
@@ -244,6 +269,7 @@ function OrderDetail({ d, technicians, branchId, fmt, onClose, onChanged, flash 
           </div>
           <div className="flex shrink-0 gap-2">
             {d.customer.phone && <a href={`tel:${d.customer.phone}`} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>📞</a>}
+            <button type="button" onClick={sendWa} title={t('shop.waSend')} aria-label={t('shop.waSend')} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>💬</button>
             <button type="button" onClick={onClose} aria-label={t('pos.close')} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
           </div>
         </div>

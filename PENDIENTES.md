@@ -1,7 +1,7 @@
 # Veltrix · Pendientes
 
 Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece algo nuevo.
-Última revisión: 13 nov 2026.
+Última revisión: 18 nov 2026.
 
 ## A. Necesitan que intervenga el dueño (claves, cuentas, DNS, pagos)
 
@@ -33,14 +33,14 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [x] **Reprogramar cuotas** pendientes con permiso (anular préstamo sin cobros ya existía)
 - [x] **Comprobante por WhatsApp** al cobrar en calle (botón con el recibo listo; versión automática requiere API de WhatsApp Business, de pago)
 - [x] **GPS en cada cobro** + recorrido del día con mapa (supervisor y administrador)
-- [ ] Comprobante por WhatsApp también en caja (POS) y en taller
+- [x] Comprobante por WhatsApp también en caja (POS) y en taller (taller: estado de la orden al cliente)
 - [ ] Orden de despacho: vendedor → caja → almacenero ve qué entregar
 - [ ] Taller: fotos de recepción, firma del cliente y estado por WhatsApp
 - [ ] QR del negocio en pantalla al cobrar + foto del comprobante (QR Simple dinámico requiere convenio bancario)
 - [ ] Demo pública que se reinicia cada noche (no usar las cuentas de auditoría)
 - [ ] Sección de seguridad y 4 rubros en la portada; más roles en la vitrina; video de 60–120 s
 - [ ] Reporte consolidado de todas las empresas en una moneda (USD u otra) con tipo de cambio del día — ADICIONAL: se mantiene la vista por empresa y por sucursal en su moneda
-- [ ] Cuentas financieras: pantalla para crear banco/caja general (pago a proveedores las necesita)
+- [x] Cuentas financieras: banco/caja general/billetera en Inventario → Proveedores (migración 053)
 - [ ] Copias de seguridad diarias garantizadas al pasar a Supabase Pro (recién ahí prometerlas)
 
 ### Cobros y legal
@@ -55,9 +55,9 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 ### App
 - [ ] **APK Android** (TWA desde la app web + `/.well-known/assetlinks.json`)
 - [x] Programa de referidos (30 días al invitado, 1 mes gratis al que invita cuando paga)
-- [ ] Pantallas del **almacenero** y del **contador** (roles existen, sin panel propio)
-- [ ] Pagos a proveedores / cuentas por pagar
-- [ ] Transferencias de stock entre sucursales (la función existe, falta pantalla)
+- [x] Pantallas del **almacenero** y del **contador**
+- [x] Pagos a proveedores: saldo por compra y botón Pagar (total o parcial) (migración 053)
+- [x] Traspasos entre sucursales: pestaña Traspasar en Inventario, varios productos a la vez (migración 053)
 - [ ] Página de ajustes de módulos del dueño (activar/desactivar rubros)
 - [ ] Consola superadmin: estilo claro/oscuro y traducción
 - [ ] Insignia de mensajes no leídos: mejoras
