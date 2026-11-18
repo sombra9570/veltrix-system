@@ -35,8 +35,8 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [x] **GPS en cada cobro** + recorrido del día con mapa (supervisor y administrador)
 - [x] Comprobante por WhatsApp también en caja (POS) y en taller (taller: estado de la orden al cliente)
 - [x] Orden de despacho: vendedor → caja → almacenero ve qué entregar (migración 054)
-- [ ] Taller: fotos de recepción, firma del cliente y estado por WhatsApp
-- [ ] QR del negocio en pantalla al cobrar + foto del comprobante (QR Simple dinámico requiere convenio bancario)
+- [x] Taller: fotos de recepción, firma del cliente y estado por WhatsApp (migración 057)
+- [x] QR del negocio en pantalla al cobrar + foto del comprobante (migración 057; QR Simple dinámico requiere convenio bancario)
 - [ ] Demo pública que se reinicia cada noche (no usar las cuentas de auditoría)
 - [ ] Sección de seguridad y 4 rubros en la portada; más roles en la vitrina; video de 60–120 s
 - [ ] Reporte consolidado de todas las empresas en una moneda (USD u otra) con tipo de cambio del día — ADICIONAL: se mantiene la vista por empresa y por sucursal en su moneda

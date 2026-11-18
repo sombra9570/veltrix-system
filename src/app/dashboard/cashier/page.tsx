@@ -7,6 +7,7 @@ import { useSync } from '../sync';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
 import { money, shortTime, parseAmount } from '../format';
+import { QrPayBox, attachPaymentProof, useShiftQr } from '../sale-files';
 
 type Method = 'cash' | 'qr_transfer' | 'card';
 type MovType = 'expense' | 'withdrawal' | 'deposit' | 'change_fund';
@@ -272,10 +273,13 @@ function QueueTab({
   const [items, setItems] = useState<Item[]>([]);
   const [method, setMethod] = useState<Method>('cash');
   const [received, setReceived] = useState('');
+  const qr = useShiftQr(shiftId);
+  const [proof, setProof] = useState<File | null>(null);
 
   const pick = async (row: QueueRow) => {
     setActive(row);
     setMethod('cash');
+    setProof(null);
     setReceived('');
     setItems([]);
     try { setItems((await rpc<Item[]>('cashier_order_items', { p_order: row.order_id })) ?? []); } catch { /* opcional */ }
@@ -294,6 +298,7 @@ function QueueTab({
     if (!active || short) return;
     setBusy(true);
     try {
+      const uuid = crypto.randomUUID();
       await rpc('register_payment', {
         p_customer: active.customer_id,
         p_origin: 'pos_counter',
@@ -301,9 +306,11 @@ function QueueTab({
         p_amount: balance,
         p_shift: shiftId,
         p_order: active.order_id,
-        p_offline_uuid: crypto.randomUUID(),
+        p_offline_uuid: uuid,
       });
-      flash(true, t('cash.charged'));
+      const ok = method !== 'qr_transfer' || await attachPaymentProof(qr, uuid, proof);
+      setProof(null);
+      flash(ok, ok ? t('cash.charged') : t('qr.proofFailed'));
       setActive(null);
       await onDone();
     } catch (err) {
@@ -398,6 +405,7 @@ function QueueTab({
               </div>
             </div>
           )}
+          {method === 'qr_transfer' && <QrPayBox info={qr} photo={proof} onPhoto={setProof} disabled={busy} />}
           {short && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{t('cash.notEnough')}</p>}
 
           <button type="button" onClick={charge} disabled={busy || short} className={`${ui.btnPrimary} w-full py-3 text-base`}>
@@ -420,6 +428,8 @@ function DebtsTab({
   const [sel, setSel] = useState<Debtor | null>(null);
   const [amount, setAmount] = useState('');
   const [method, setMethod] = useState<Method>('cash');
+  const qr = useShiftQr(shiftId);
+  const [proof, setProof] = useState<File | null>(null);
 
   useEffect(() => {
     if (sel) return;
@@ -442,11 +452,14 @@ function DebtsTab({
     if (!sel || invalid) return;
     setBusy(true);
     try {
+      const uuid = crypto.randomUUID();
       await rpc('register_payment', {
         p_customer: sel.id, p_origin: 'pos_counter', p_method: method, p_amount: n,
-        p_shift: shiftId, p_offline_uuid: crypto.randomUUID(),
+        p_shift: shiftId, p_offline_uuid: uuid,
       });
-      flash(true, t('cash.charged'));
+      const ok = method !== 'qr_transfer' || await attachPaymentProof(qr, uuid, proof);
+      setProof(null);
+      flash(ok, ok ? t('cash.charged') : t('qr.proofFailed'));
       setSel(null);
       setQ('');
       await onDone();
@@ -491,6 +504,7 @@ function DebtsTab({
               </button>
             ))}
           </div>
+          {method === 'qr_transfer' && <QrPayBox info={qr} photo={proof} onPhoto={setProof} disabled={busy} />}
           <button type="button" disabled={busy || invalid} onClick={charge} className={`${ui.btnPrimary} w-full py-3 text-base`}>
             {busy ? t('common.wait') : `${t('cash.confirm')} · ${Number.isNaN(n) ? '' : fmt(n)}`}
           </button>

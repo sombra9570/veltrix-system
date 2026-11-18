@@ -6,6 +6,7 @@ import { ui } from '../site-header';
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 import { money, parseAmount } from './format';
+import { WorkshopFiles } from './sale-files';
 
 type Branch = { id: string; name: string; currency: string };
 type Status = 'received' | 'diagnosing' | 'waiting_approval' | 'waiting_parts' | 'in_progress' | 'done' | 'delivered' | 'cancelled';
@@ -303,6 +304,8 @@ function OrderDetail({ d, technicians, branchId, fmt, onClose, onChanged, flash 
           {t('prod.save')}
         </button>
       </Card>
+
+      <WorkshopFiles woId={d.id} canEdit={d.status !== 'cancelled'} />
 
       <Card className="space-y-3">
         <h3 className="font-bold">{t('shop.lines')}</h3>

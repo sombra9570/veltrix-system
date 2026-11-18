@@ -1,4 +1,5 @@
 'use client';
+import { PayQrSetup, ShiftProofs } from '../../sale-files';
 import { useCallback, useEffect, useState } from 'react';
 import { rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
@@ -214,6 +215,8 @@ export default function CashPage() {
         )}
       </Card>
 
+      {branchId && <PayQrSetup branchId={branchId} />}
+
       {shift && (
         <Sheet onClose={() => setShift(null)} label={t('pos.close')}>
           <div className="space-y-4">
@@ -245,6 +248,8 @@ export default function CashPage() {
                 </ul>
               )}
             </div>
+
+            <ShiftProofs shiftId={shift.id} currency={data?.currency ?? 'USD'} />
 
             {shift.movements.length > 0 && (
               <div>
