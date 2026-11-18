@@ -13,11 +13,16 @@ export const ROLE_NAV = {
   { href: '/dashboard/kitchen/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   supervisor: [
-  { href: '/dashboard/supervisor', icon: '🛵', label: 'sup.navRoutes' },
+  // Lo que ve depende del rubro de la empresa: cobranza, restaurante, taller o tienda
+  { href: '/dashboard/supervisor', icon: '🛵', label: 'sup.navRoutes', module: 'field_collection' },
   { href: '/dashboard/supervisor/prestamos', icon: '💸', label: 'nav.loans', module: 'field_collection' },
+  { href: '/dashboard/supervisor/mesas', icon: '🍽️', label: 'nav.tables', module: 'restaurant' },
+  { href: '/dashboard/supervisor/cocina', icon: '🔥', label: 'nav.kitchen', module: 'restaurant' },
+  { href: '/dashboard/supervisor/taller', icon: '🔧', label: 'nav.workshop', module: 'workshop' },
   { href: '/dashboard/supervisor/ventas', icon: '🧾', label: 'nav.sales' },
   { href: '/dashboard/supervisor/caja', icon: '💵', label: 'nav.cash' },
   { href: '/dashboard/supervisor/inventario', icon: '📦', label: 'nav.inventory' },
+  { href: '/dashboard/supervisor/despacho', icon: '🚚', label: 'nav.dispatch', module: 'retail' },
   { href: '/dashboard/supervisor/clientes', icon: '🤝', label: 'nav.customers' },
   { href: '/dashboard/supervisor/reportes', icon: '📈', label: 'nav.reports' },
   { href: '/dashboard/supervisor/mensajes', icon: '💬', label: 'nav.messages' },

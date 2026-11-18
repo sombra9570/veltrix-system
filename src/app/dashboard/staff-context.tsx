@@ -10,7 +10,7 @@ export { Spinner, NoAccess };
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 
-type Ctx = { userId: string; userName: string };
+type Ctx = { userId: string; userName: string; modules: string[] | null };
 const StaffContext = createContext<Ctx | null>(null);
 export function useStaff() {
   const c = useContext(StaffContext);
@@ -69,7 +69,7 @@ export function StaffProvider({
 
   const company = companies.find((c) => c.id === session.companyId);
   return (
-    <StaffContext.Provider value={{ userId: session.userId, userName: session.name || session.email }}>
+    <StaffContext.Provider value={{ userId: session.userId, userName: session.name || session.email, modules }}>
       <AppShell
         nav={menu}
         orgName={company?.name ?? ''}

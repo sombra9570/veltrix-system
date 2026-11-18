@@ -1,5 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useStaff } from '../staff-context';
+import { ROLE_NAV } from '../role-nav';
 import { rpc } from '../../../lib/supabase';
 import { Card } from '../shell';
 import { ui } from '../../site-header';
@@ -16,9 +19,18 @@ import { useBoard, type SRoute, type SBranch } from './board';
 export default function SupervisorRoutes() {
   const { t } = useT();
   const { board, error, load } = useBoard();
+  const { modules } = useStaff();
+  const router = useRouter();
+  const noRoutes = modules !== null && !modules.includes('field_collection');
+  useEffect(() => {
+    if (!noRoutes) return;
+    const first = ROLE_NAV.supervisor.find((n) => n.href !== '/dashboard/supervisor' && (!n.module || modules!.includes(n.module)));
+    if (first) router.replace(first.href);
+  }, [noRoutes, modules, router]);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 6000); };
 
+  if (noRoutes) return <Card><p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p></Card>;
   if (!board) return <Card><p className={`text-sm ${ui.muted}`}>{error || t('common.wait')}</p></Card>;
   const pending = board.loans.filter((l) => l.approval === 'pending_supervisor' && l.status === 'confirmed').length;
 
