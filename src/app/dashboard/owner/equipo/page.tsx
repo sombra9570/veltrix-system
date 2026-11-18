@@ -9,7 +9,7 @@ import { Sheet } from '../../sheet';
 import type { DictKey } from '../../../i18n/es';
 import { suggestedRoles } from '../../../business-catalog';
 
-const ROLES = ['supervisor', 'cashier', 'vendor', 'collector', 'waiter', 'kitchen', 'technician', 'storekeeper', 'accountant'] as const;
+const ROLES = ['supervisor', 'cashier', 'vendor', 'collector', 'waiter', 'kitchen', 'technician', 'storekeeper', 'accountant', 'secretary', 'director'] as const;
 // Roles que solo tienen sentido si el módulo de su rubro está activo
 const ROLE_MODULE: Partial<Record<(typeof ROLES)[number], string>> = { collector: 'field_collection', waiter: 'restaurant', kitchen: 'restaurant', technician: 'workshop', storekeeper: 'inventory' };
 
@@ -24,7 +24,7 @@ export default function TeamPage() {
   const limitedPlan = ['basic', 'starter', 'pro'].includes(overview?.org.plan_code ?? '');
   // En planes chicos solo se ofrecen los cargos propios del nicho del negocio
   const nicheRoles: string[] | null = limitedPlan && niches.length ? suggestedRoles(niches) : null;
-  const roles = ROLES.filter((r) => (!ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!)) && (!nicheRoles || nicheRoles.includes(r)));
+  const roles = ROLES.filter((r) => (!(['secretary', 'director'] as string[]).includes(r) || ['pro', 'enterprise', 'enterprise_plus'].includes(overview?.org.plan_code ?? '')) && (!ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!)) && (!nicheRoles || nicheRoles.includes(r) || r === 'secretary' || r === 'director'));
   const { t } = useT();
   const roleLabel = (r: string) => t(`role.${r}` as DictKey);
 
@@ -189,7 +189,7 @@ export default function TeamPage() {
         <h2 className="text-base font-extrabold">👤 {t('team.ownerRolesTitle')}</h2>
         <p className={`mb-3 text-sm ${ui.muted}`}>{t('team.ownerRolesHint')}</p>
         <div className="flex flex-wrap gap-2">
-          {roles.map((r) => (
+          {roles.filter((r) => r !== 'secretary' && r !== 'director').map((r) => (
             <button key={r} type="button" onClick={() => toggleOwnerRole(r)}
               className={`rounded-full border px-3 py-1.5 text-sm font-bold ${ownerRoles.includes(r) ? 'border-sky-600 bg-sky-600 text-white' : 'border-slate-300 dark:border-slate-600'}`}>
               {roleLabel(r)}

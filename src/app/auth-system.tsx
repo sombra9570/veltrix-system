@@ -13,7 +13,7 @@ import { supabase, rpc } from '../lib/supabase';
 import { COUNTRIES, CountryCode, TaxRegimeId, BusinessSectorId } from './language-selector';
 
 export type UserRole = 'superadmin' | 'owner' | 'cashier' | 'vendor' | 'collector' | 'supervisor' | 'waiter' | 'kitchen' | 'technician'
-  | 'storekeeper' | 'accountant' | 'none'; // none: sin acceso activo (usuario desactivado o empresa sin terminar)
+  | 'storekeeper' | 'accountant' | 'director' | 'secretary' | 'none'; // none: sin acceso activo (usuario desactivado o empresa sin terminar)
 
 // Panel de inicio de cada rol (un solo botón "Ingresar" para todos)
 export function homeForRole(role: UserRole): string {
@@ -28,6 +28,8 @@ export function homeForRole(role: UserRole): string {
     case 'technician': return '/dashboard/workshop';
     case 'storekeeper': return '/dashboard/storekeeper';
     case 'accountant': return '/dashboard/accountant';
+    case 'director': return '/dashboard/director';
+    case 'secretary': return '/dashboard/secretary';
     case 'vendor': return '/dashboard/vendor';
     default: return '/ingresar';
   }

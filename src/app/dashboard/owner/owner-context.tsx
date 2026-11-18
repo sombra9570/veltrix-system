@@ -62,6 +62,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory' },
   { href: '/dashboard/owner/despacho', icon: '🚚', label: 'nav.dispatch', module: 'retail' },
   { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports' },
+  { href: '/dashboard/owner/informes', icon: '📑', label: 'nav.informes' },
   { href: '/dashboard/owner/indicadores', icon: '🌎', label: 'nav.indicators' },
   { href: '/dashboard/owner/plan', icon: '💳', label: 'nav.plan' },
   { href: '/dashboard/owner/invitar', icon: '🎁', label: 'nav.invite' },
@@ -77,6 +78,10 @@ export function friendlyError(msg: string, t: (k: DictKey) => string): string {
   if (msg.includes('PLAN_LIMIT_COMPANIES')) return t('err.limitCompanies');
   if (msg.includes('PLAN_COMBO_LIMIT') || msg.includes('PLAN_BIG_LIMIT')) return t('err.limitCombo');
   if (msg.includes('PLAN_CUSTOM_LIMIT')) return t('err.limitCustom');
+  if (msg.includes('ROLE_NOT_IN_PLAN')) return t('err.roleNotInPlan');
+  if (msg.includes('ROLE_NOT_COMBINABLE')) return t('err.roleNotCombinable');
+  if (msg.includes('REPORT_LOCKED')) return t('rep.locked');
+  if (msg.includes('REPORT_NOT_PENDING')) return t('rep.notPending');
   if (msg.includes('ROLE_NOT_IN_NICHE')) return t('err.roleNiche');
   if (msg.includes('PLAN_TOTAL_ROLES_LIMIT')) return t('err.limitTotalRoles');
   if (msg.includes('PLAN_ROLES_LIMIT')) return t('err.limitRoles');
@@ -178,7 +183,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   return (
     <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name, modules }}>
       <AppShell
-        nav={NAV.filter((n) => !n.module || modules.includes(n.module))}
+        nav={NAV.filter((n) => (!n.module || modules.includes(n.module)) && (!n.href.endsWith('/informes') || ['pro', 'enterprise', 'enterprise_plus'].includes(o?.plan_code ?? '')))}
         orgName={o?.name ?? ''}
         userName={session.name || session.email}
         roleLabel={t('role.owner')}

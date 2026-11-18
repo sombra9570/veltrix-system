@@ -42,6 +42,20 @@ export const ROLE_NAV = {
   { href: '/dashboard/waiter', icon: '🍽️', label: 'nav.tables' },
   { href: '/dashboard/waiter/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
+  director: [
+  { href: '/dashboard/director', icon: '📈', label: 'nav.reports' },
+  { href: '/dashboard/director/informes', icon: '📑', label: 'nav.informes' },
+  { href: '/dashboard/director/ventas', icon: '🧾', label: 'nav.sales' },
+  { href: '/dashboard/director/inventario', icon: '📦', label: 'nav.inventory' },
+  { href: '/dashboard/director/clientes', icon: '🤝', label: 'nav.customers' },
+  { href: '/dashboard/director/mensajes', icon: '💬', label: 'nav.messages' },
+] as NavItem[],
+  secretary: [
+  { href: '/dashboard/secretary', icon: '📑', label: 'nav.informes' },
+  { href: '/dashboard/secretary/reportes', icon: '📈', label: 'nav.reports' },
+  { href: '/dashboard/secretary/clientes', icon: '🤝', label: 'nav.customers' },
+  { href: '/dashboard/secretary/mensajes', icon: '💬', label: 'nav.messages' },
+] as NavItem[],
   accountant: [
   { href: '/dashboard/accountant', icon: '📈', label: 'nav.reports' },
   { href: '/dashboard/accountant/ventas', icon: '🧾', label: 'nav.sales' },

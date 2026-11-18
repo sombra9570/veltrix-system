@@ -57,7 +57,7 @@ function custError(msg: string, t: (k: DictKey) => string) {
 /** Clientes y crédito: lo usan el vendedor, el supervisor y el dueño. */
 export function CustomersScreen() {
   const { session } = useVeltrixAuth();
-  const readOnly = session?.role === 'accountant'; // el contador consulta saldos y mora, no edita clientes
+  const readOnly = ['accountant', 'director', 'secretary'].includes(session?.role ?? ''); // el contador consulta saldos y mora, no edita clientes
   const { t, lang } = useT();
   const [branches, setBranches] = useState<Branch[] | null>(null);
   const [branchId, setBranchId] = useState('');
