@@ -20,13 +20,15 @@ const ROLES: [string, string][] = [
 
 // Precio regional: Latinoamérica paga el precio regional; el resto, el internacional (los dos salen de la base)
 const LATAM = new Set(['BO', 'MX', 'CO', 'AR', 'CL', 'PE', 'BR', 'EC', 'PY', 'UY', 'VE', 'GT', 'HN', 'SV', 'NI', 'CR', 'PA', 'DO', 'PR', 'CU']);
-type PublicPlan = { code: string; name: string; price_usd: number; price_global_usd: number; max_companies: number; max_branches: number; max_users: number; max_storage_mb: number };
+type Extra = { max: number | null; price_usd: number | null; price_global_usd: number | null };
+type PublicPlan = { code: string; name: string; price_usd: number; price_global_usd: number; max_companies: number; max_branches: number; max_users: number; max_storage_mb: number;
+  extra_user?: Extra; extra_branch?: Extra };
 const FALLBACK: PublicPlan[] = [
-  { code: 'basic', name: 'Básico', price_usd: 12, price_global_usd: 19, max_companies: 1, max_branches: 1, max_users: 4, max_storage_mb: 1024 },
-  { code: 'starter', name: 'Startup', price_usd: 25, price_global_usd: 39, max_companies: 1, max_branches: 1, max_users: 8, max_storage_mb: 3072 },
+  { code: 'basic', name: 'Básico', price_usd: 12, price_global_usd: 19, max_companies: 1, max_branches: 1, max_users: 2, max_storage_mb: 1024 },
+  { code: 'starter', name: 'Startup', price_usd: 25, price_global_usd: 39, max_companies: 1, max_branches: 1, max_users: 6, max_storage_mb: 3072 },
   { code: 'pro', name: 'Empresa', price_usd: 49, price_global_usd: 75, max_companies: 1, max_branches: 2, max_users: 15, max_storage_mb: 8192 },
-  { code: 'enterprise', name: 'Enterprise', price_usd: 129, price_global_usd: 219, max_companies: 3, max_branches: 10, max_users: 50, max_storage_mb: 25600 },
-  { code: 'enterprise_plus', name: 'Enterprise Plus', price_usd: 235, price_global_usd: 389, max_companies: 10, max_branches: 25, max_users: 91, max_storage_mb: 61440 },
+  { code: 'enterprise', name: 'Enterprise', price_usd: 129, price_global_usd: 219, max_companies: 3, max_branches: 3, max_users: 30, max_storage_mb: 25600 },
+  { code: 'enterprise_plus', name: 'Enterprise Plus', price_usd: 235, price_global_usd: 389, max_companies: 10, max_branches: 5, max_users: 50, max_storage_mb: 61440 },
 ];
 
 export default function HomePage() {
@@ -190,6 +192,12 @@ export default function HomePage() {
                   {p.max_companies > 1 && <li>✓ {t('bill.limCompanies', { n: p.max_companies })}</li>}
                   <li>✓ {t('bill.limStorage', { n: Math.round(p.max_storage_mb / 1024) })}</li>
                   <li>✓ {k(`plan.${p.code}.i1`)}</li>
+                  {Number(p.extra_user?.max ?? 0) > 0 && (
+                    <li className={`text-xs ${ui.muted}`}>➕ {t('bill.extraUser', { n: Number(p.extra_user!.max), price: formatMoney(grossUp(Number(latam ? p.extra_user!.price_usd : p.extra_user!.price_global_usd), country.code), false, true) })}</li>
+                  )}
+                  {Number(p.extra_branch?.max ?? 0) > 0 && (
+                    <li className={`text-xs ${ui.muted}`}>➕ {t('bill.extraBranch', { n: Number(p.extra_branch!.max), price: formatMoney(grossUp(Number(latam ? p.extra_branch!.price_usd : p.extra_branch!.price_global_usd), country.code), false, true) })}</li>
+                  )}
                 </ul>
                 <Link href="/registro" className={`${best ? ui.btnPrimary : ui.btnGhost} mt-6 w-full`}>{t('home.startFree')}</Link>
               </div>
@@ -201,7 +209,7 @@ export default function HomePage() {
           const st = extras.find((e) => e.code === 'storage');
           return (
             <p className={`mt-4 text-center text-xs ${ui.muted}`}>
-              ➕ {t('home.extras', { user: px('user') ?? '—', branch: px('branch') ?? '—', storage: px('storage') ?? '—', gb: st ? Math.round(st.unit_mb / 1024) : 5 })}
+              ➕ {t('home.extraStorage', { storage: px('storage') ?? '—', gb: st ? Math.round(st.unit_mb / 1024) : 5 })}
             </p>
           );
         })()}

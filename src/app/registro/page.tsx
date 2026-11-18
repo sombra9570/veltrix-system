@@ -315,6 +315,15 @@ export default function RegistroPage() {
                   <p className="text-xs font-bold uppercase text-blue-700 dark:text-blue-300">{t('need.solPlan')}</p>
                   <p className="mt-1 text-xl font-extrabold">{plan.name} · {t('need.planPrice', { price: Number(plan.price_usd) })}</p>
                   <p className={`mt-1 text-sm ${ui.muted}`}>{t('need.planWhy', { users: plan.max_users, branches: plan.max_branches, storage: `${Math.round(plan.max_storage_mb / 1024)} GB` })}</p>
+                  {(() => {
+                    const eu = Math.max(0, teamMax + 1 - plan.max_users);
+                    const eb = Math.max(0, branchMax - plan.max_branches);
+                    if (!eu && !eb) return null;
+                    return <p className="mt-1 text-sm font-semibold">➕ {[
+                      eu ? t('need.plusUsers', { n: eu, price: Number(plan.extra_user?.price_usd ?? 0) }) : null,
+                      eb ? t('need.plusBranches', { n: eb, price: Number(plan.extra_branch?.price_usd ?? 0) }) : null,
+                    ].filter(Boolean).join(' · ')}</p>;
+                  })()}
                   <p className={`mt-2 text-xs ${ui.muted}`}>{t('need.free')}</p>
                 </div>
               )}

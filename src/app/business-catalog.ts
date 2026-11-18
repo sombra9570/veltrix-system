@@ -104,12 +104,24 @@ export function suggestedRoles(categoryIds: string[]): TeamRole[] {
 }
 
 // Tamaños del equipo (personas que trabajan con el dueño) y de sucursales: el tope sirve para recomendar el plan
-export const TEAM_SIZES = [{ id: 's0', max: 0 }, { id: 's1', max: 3 }, { id: 's2', max: 7 }, { id: 's3', max: 14 }, { id: 's4', max: 49 }, { id: 's5', max: 90 }] as const;
-export const BRANCH_SIZES = [{ id: 'b1', max: 1 }, { id: 'b2', max: 2 }, { id: 'b3', max: 10 }, { id: 'b4', max: 25 }] as const;
+// Personas que trabajan con el administrador (él se suma aparte). Tramos de los planes: 1–2 · 3–6 · 7–15 · 16–30 · 31–50 (hasta 65)
+export const TEAM_SIZES = [{ id: 's0', max: 0 }, { id: 's1', max: 1 }, { id: 's2', max: 5 }, { id: 's3', max: 14 }, { id: 's4', max: 29 }, { id: 's5', max: 49 }, { id: 's6', max: 64 }] as const;
+export const BRANCH_SIZES = [{ id: 'b1', max: 1 }, { id: 'b2', max: 2 }, { id: 'b3', max: 4 }, { id: 'b4', max: 7 }] as const;
 
-export type PublicPlan = { code: string; name: string; price_usd: number; max_branches: number; max_users: number; max_storage_mb: number };
-/** El plan más barato que alcanza para el dueño + su equipo y sus sucursales */
+type Extra = { max: number | null; price_usd: number | null; price_global_usd: number | null };
+export type PublicPlan = { code: string; name: string; price_usd: number; max_branches: number; max_users: number; max_storage_mb: number;
+  extra_user?: Extra; extra_branch?: Extra };
+/** El plan que sale más barato para el dueño + su equipo y sus sucursales, contando los extras que puede comprar */
 export function recommendPlan(plans: PublicPlan[], teamMax: number, branchMax: number): PublicPlan | null {
+  const people = teamMax + 1;
+  let best: { p: PublicPlan; cost: number } | null = null;
+  for (const p of plans) {
+    const needU = Math.max(0, people - p.max_users);
+    const needB = Math.max(0, branchMax - p.max_branches);
+    if (needU > Number(p.extra_user?.max ?? 0) || needB > Number(p.extra_branch?.max ?? 0)) continue;
+    const cost = Number(p.price_usd) + needU * Number(p.extra_user?.price_usd ?? 0) + needB * Number(p.extra_branch?.price_usd ?? 0);
+    if (!best || cost < best.cost) best = { p, cost };
+  }
   const sorted = [...plans].sort((a, b) => Number(a.price_usd) - Number(b.price_usd));
-  return sorted.find((p) => p.max_users >= teamMax + 1 && p.max_branches >= branchMax) ?? sorted[sorted.length - 1] ?? null;
+  return best?.p ?? sorted[sorted.length - 1] ?? null;
 }
