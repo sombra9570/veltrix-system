@@ -1677,6 +1677,12 @@ const pt: Record<DictKey, string> = {
   "dsp.walkIn": "Cliente de balcão",
   "dsp.deliveredAt": "Entregue em {date}",
   "dsp.mark": "Entregue",
+  "exp.title": "Exportar meus dados",
+  "exp.text": "Baixe um .zip com seus clientes, produtos, vendas, recebimentos, despesas, fornecedores, compras e ordens de oficina em arquivos que abrem no Excel. Seus dados são seus, mesmo se um dia cancelar.",
+  "exp.btn": "Baixar meus dados (.zip)",
+  "exp.progress": "Preparando {table}… ({n} linhas)",
+  "exp.done": "Pronto: confira seus downloads.",
+  "exp.error": "Não foi possível exportar. Verifique a conexão e tente de novo.",
 };
 
 export default pt;

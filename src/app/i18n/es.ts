@@ -1686,6 +1686,12 @@ const es = {
   "dsp.walkIn": "Cliente de mostrador",
   "dsp.deliveredAt": "Entregado el {date}",
   "dsp.mark": "Entregado",
+  "exp.title": "Exportar mis datos",
+  "exp.text": "Descarga un .zip con tus clientes, productos, ventas, cobros, gastos, proveedores, compras y órdenes de taller en archivos que se abren en Excel. Tus datos son tuyos, también si algún día cancelas.",
+  "exp.btn": "Descargar mis datos (.zip)",
+  "exp.progress": "Preparando {table}… ({n} filas)",
+  "exp.done": "Listo: revisa tus descargas.",
+  "exp.error": "No se pudo exportar. Revisa tu conexión e inténtalo de nuevo.",
 };
 
 export default es;

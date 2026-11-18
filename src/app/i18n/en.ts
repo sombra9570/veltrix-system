@@ -1677,6 +1677,12 @@ const en: Record<DictKey, string> = {
   "dsp.walkIn": "Walk-in customer",
   "dsp.deliveredAt": "Delivered on {date}",
   "dsp.mark": "Delivered",
+  "exp.title": "Export my data",
+  "exp.text": "Download a .zip with your customers, products, sales, payments, expenses, suppliers, purchases and workshop orders in files that open in Excel. Your data is yours, even if you cancel some day.",
+  "exp.btn": "Download my data (.zip)",
+  "exp.progress": "Preparing {table}… ({n} rows)",
+  "exp.done": "Done: check your downloads.",
+  "exp.error": "Export failed. Check your connection and try again.",
 };
 
 export default en;

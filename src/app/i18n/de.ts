@@ -1677,6 +1677,12 @@ const de: Record<DictKey, string> = {
   "dsp.walkIn": "Laufkunde",
   "dsp.deliveredAt": "Ausgegeben am {date}",
   "dsp.mark": "Ausgegeben",
+  "exp.title": "Meine Daten exportieren",
+  "exp.text": "Lade ein .zip mit Kunden, Produkten, Verkäufen, Zahlungen, Ausgaben, Lieferanten, Einkäufen und Werkstattaufträgen herunter – Dateien, die sich in Excel öffnen. Deine Daten gehören dir, auch wenn du eines Tages kündigst.",
+  "exp.btn": "Meine Daten herunterladen (.zip)",
+  "exp.progress": "Bereite {table} vor… ({n} Zeilen)",
+  "exp.done": "Fertig: sieh in deinen Downloads nach.",
+  "exp.error": "Export fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.",
 };
 
 export default de;

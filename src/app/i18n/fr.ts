@@ -1677,6 +1677,12 @@ const fr: Record<DictKey, string> = {
   "dsp.walkIn": "Client au comptoir",
   "dsp.deliveredAt": "Remis le {date}",
   "dsp.mark": "Remis",
+  "exp.title": "Exporter mes données",
+  "exp.text": "Téléchargez un .zip avec vos clients, produits, ventes, encaissements, dépenses, fournisseurs, achats et ordres d'atelier dans des fichiers qui s'ouvrent dans Excel. Vos données vous appartiennent, même si vous résiliez un jour.",
+  "exp.btn": "Télécharger mes données (.zip)",
+  "exp.progress": "Préparation de {table}… ({n} lignes)",
+  "exp.done": "Terminé : vérifiez vos téléchargements.",
+  "exp.error": "Échec de l'export. Vérifiez la connexion et réessayez.",
 };
 
 export default fr;

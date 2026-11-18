@@ -1677,6 +1677,12 @@ const zh: Record<DictKey, string> = {
   "dsp.walkIn": "散客",
   "dsp.deliveredAt": "交付于 {date}",
   "dsp.mark": "已交付",
+  "exp.title": "导出我的数据",
+  "exp.text": "下载一个 .zip，包含客户、商品、销售、收款、支出、供应商、采购和维修单，可用 Excel 打开。即使将来取消，数据也属于你。",
+  "exp.btn": "下载我的数据（.zip）",
+  "exp.progress": "正在准备 {table}…（{n} 行）",
+  "exp.done": "完成：请查看下载内容。",
+  "exp.error": "导出失败。请检查网络后重试。",
 };
 
 export default zh;

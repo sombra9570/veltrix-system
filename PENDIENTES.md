@@ -34,7 +34,7 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [x] **Comprobante por WhatsApp** al cobrar en calle (botón con el recibo listo; versión automática requiere API de WhatsApp Business, de pago)
 - [x] **GPS en cada cobro** + recorrido del día con mapa (supervisor y administrador)
 - [x] Comprobante por WhatsApp también en caja (POS) y en taller (taller: estado de la orden al cliente)
-- [ ] Orden de despacho: vendedor → caja → almacenero ve qué entregar
+- [x] Orden de despacho: vendedor → caja → almacenero ve qué entregar (migración 054)
 - [ ] Taller: fotos de recepción, firma del cliente y estado por WhatsApp
 - [ ] QR del negocio en pantalla al cobrar + foto del comprobante (QR Simple dinámico requiere convenio bancario)
 - [ ] Demo pública que se reinicia cada noche (no usar las cuentas de auditoría)
@@ -50,7 +50,7 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [ ] Pantalla "Mi plan" para el dueño — hecha; probar con un pago real
 - [ ] Venta de extras: usuarios, sucursales y almacenamiento extra (columnas ya existen, falta precio y pantalla)
 - [ ] Paquetes de Veltrix IA con precio (cuando haya consumo real medido)
-- [ ] Exportar datos del cliente al cancelar la cuenta
+- [x] Exportar datos del cliente (.zip con CSV en Mi plan)
 
 ### App
 - [ ] **APK Android** (TWA desde la app web + `/.well-known/assetlinks.json`)

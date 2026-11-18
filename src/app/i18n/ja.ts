@@ -1677,6 +1677,12 @@ const ja: Record<DictKey, string> = {
   "dsp.walkIn": "店頭のお客様",
   "dsp.deliveredAt": "{date} に引き渡し",
   "dsp.mark": "引き渡し済み",
+  "exp.title": "データをエクスポート",
+  "exp.text": "顧客・商品・販売・入金・経費・仕入先・仕入・整備オーダーをExcelで開けるファイルにした.zipをダウンロードします。解約してもデータはあなたのものです。",
+  "exp.btn": "データをダウンロード（.zip）",
+  "exp.progress": "{table} を準備中…（{n} 行）",
+  "exp.done": "完了：ダウンロードを確認してください。",
+  "exp.error": "エクスポートできませんでした。接続を確認してもう一度お試しください。",
 };
 
 export default ja;

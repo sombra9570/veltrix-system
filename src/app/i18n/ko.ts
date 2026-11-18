@@ -1677,6 +1677,12 @@ const ko: Record<DictKey, string> = {
   "dsp.walkIn": "일반 고객",
   "dsp.deliveredAt": "{date} 전달",
   "dsp.mark": "전달 완료",
+  "exp.title": "내 데이터 내보내기",
+  "exp.text": "고객, 상품, 판매, 수금, 비용, 공급업체, 구매, 정비 주문을 Excel에서 열리는 파일로 담은 .zip을 내려받습니다. 언젠가 해지해도 데이터는 당신의 것입니다.",
+  "exp.btn": "내 데이터 내려받기(.zip)",
+  "exp.progress": "{table} 준비 중… ({n}행)",
+  "exp.done": "완료: 다운로드를 확인하세요.",
+  "exp.error": "내보내기에 실패했습니다. 연결을 확인하고 다시 시도하세요.",
 };
 
 export default ko;
