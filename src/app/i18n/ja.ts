@@ -1757,7 +1757,7 @@ const ja: Record<DictKey, string> = {
   'rep.send': "送信",
   'rep.saveDraft': "下書きを保存",
   'nav.help': "ヘルプ",
-  'help.title': "ヘルプとサポート",
+  'support.title': "ヘルプとサポート",
   'help.sub': "問題やご質問をお知らせください。チームがここで返信します。",
   'help.new': "新しい問い合わせ",
   'help.empty': "まだ問い合わせはありません。",

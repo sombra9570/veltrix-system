@@ -1757,7 +1757,7 @@ const en: Record<DictKey, string> = {
   'rep.send': "Send",
   'rep.saveDraft': "Save draft",
   'nav.help': "Help",
-  'help.title': "Help & support",
+  'support.title': "Help & support",
   'help.sub': "Tell us your problem or question and our team will reply here.",
   'help.new': "New request",
   'help.empty': "You haven't sent any requests yet.",

@@ -1766,7 +1766,7 @@ const es = {
   'rep.send': "Enviar",
   'rep.saveDraft': "Guardar borrador",
   'nav.help': "Ayuda",
-  'help.title': "Ayuda y soporte",
+  'support.title': "Ayuda y soporte",
   'help.sub': "Cuéntanos tu problema o duda y nuestro equipo te responde aquí.",
   'help.new': "Nueva consulta",
   'help.empty': "Aún no has enviado consultas.",

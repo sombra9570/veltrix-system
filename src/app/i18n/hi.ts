@@ -1757,7 +1757,7 @@ const hi: Record<DictKey, string> = {
   'rep.send': "भेजें",
   'rep.saveDraft': "मसौदा सहेजें",
   'nav.help': "सहायता",
-  'help.title': "सहायता और सपोर्ट",
+  'support.title': "सहायता और सपोर्ट",
   'help.sub': "अपनी समस्या या सवाल बताइए, हमारी टीम यहीं जवाब देगी।",
   'help.new': "नया अनुरोध",
   'help.empty': "आपने अभी तक कोई अनुरोध नहीं भेजा।",

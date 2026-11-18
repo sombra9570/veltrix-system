@@ -1757,7 +1757,7 @@ const ar: Record<DictKey, string> = {
   'rep.send': "إرسال",
   'rep.saveDraft': "حفظ المسودة",
   'nav.help': "المساعدة",
-  'help.title': "المساعدة والدعم",
+  'support.title': "المساعدة والدعم",
   'help.sub': "أخبرنا بمشكلتك أو سؤالك وسيرد فريقنا هنا.",
   'help.new': "طلب جديد",
   'help.empty': "لم ترسل أي طلبات بعد.",

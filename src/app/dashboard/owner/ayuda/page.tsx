@@ -48,7 +48,7 @@ export default function HelpPage() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-extrabold sm:text-2xl">🎧 {t('help.title')}</h1>
+          <h1 className="text-xl font-extrabold sm:text-2xl">🎧 {t('support.title')}</h1>
           <p className={`text-sm ${ui.muted}`}>{t('help.sub')}</p>
         </div>
         <button type="button" className={ui.btnPrimary} onClick={() => { setMsg(null); setForm({ subject: '', body: '' }); }}>+ {t('help.new')}</button>

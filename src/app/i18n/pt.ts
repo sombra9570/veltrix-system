@@ -1757,7 +1757,7 @@ const pt: Record<DictKey, string> = {
   'rep.send': "Enviar",
   'rep.saveDraft': "Salvar rascunho",
   'nav.help': "Ajuda",
-  'help.title': "Ajuda e suporte",
+  'support.title': "Ajuda e suporte",
   'help.sub': "Conte seu problema ou dúvida e nossa equipe responderá aqui.",
   'help.new': "Nova consulta",
   'help.empty': "Você ainda não enviou consultas.",

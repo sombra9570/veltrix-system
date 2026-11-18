@@ -1757,7 +1757,7 @@ const ko: Record<DictKey, string> = {
   'rep.send': "보내기",
   'rep.saveDraft': "초안 저장",
   'nav.help': "도움말",
-  'help.title': "도움말 및 지원",
+  'support.title': "도움말 및 지원",
   'help.sub': "문제나 질문을 알려주시면 팀이 여기에서 답변합니다.",
   'help.new': "새 문의",
   'help.empty': "아직 보낸 문의가 없습니다.",

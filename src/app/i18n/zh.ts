@@ -1757,7 +1757,7 @@ const zh: Record<DictKey, string> = {
   'rep.send': "发送",
   'rep.saveDraft': "保存草稿",
   'nav.help': "帮助",
-  'help.title': "帮助与支持",
+  'support.title': "帮助与支持",
   'help.sub': "告诉我们您的问题，团队会在这里回复。",
   'help.new': "新咨询",
   'help.empty': "您还没有发送过咨询。",
