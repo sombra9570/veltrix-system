@@ -59,6 +59,12 @@ export default function InventoryPage() {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   const branch = branches.find((b) => b.id === branchId);
+  // Traspasar solo aparece si hay otra sucursal a la que mandar mercadería
+  const [canTransfer, setCanTransfer] = useState(false);
+  useEffect(() => {
+    if (!branchId) return;
+    rpc<unknown[]>('inv_transfer_targets', { p_branch: branchId }).then((r) => setCanTransfer((r ?? []).length > 0)).catch(() => setCanTransfer(false));
+  }, [branchId]);
   const { accounts, reload: reloadAccounts } = useAccounts(tab === 'suppliers' ? branch?.company_id : undefined);
   const fmt = (n: number) => money(Number(n), data?.currency ?? branch?.currency ?? 'USD', lang);
   const qtyFmt = (n: number) => Number(n).toLocaleString(lang, { maximumFractionDigits: 3 });
@@ -159,7 +165,9 @@ export default function InventoryPage() {
   };
 
   const s = data?.summary;
-  const tabs: [Tab, string][] = [['stock', t('inv.tabStock')], ['entry', t('inv.tabEntry')], ['out', t('ev.tabOut')], ['transfer', t('tr.tab')], ['log', t('ev.tabLog')], ['moves', t('inv.tabMoves')], ['suppliers', t('inv.tabSuppliers')]];
+  const allTabs: [Tab, string][] = [['stock', t('inv.tabStock')], ['entry', t('inv.tabEntry')], ['out', t('ev.tabOut')], ['transfer', t('tr.tab')], ['log', t('ev.tabLog')], ['moves', t('inv.tabMoves')], ['suppliers', t('inv.tabSuppliers')]];
+  // Solo las pestañas que este negocio usa
+  const tabs = allTabs.filter(([k]) => (k !== 'transfer' || canTransfer) && (k !== 'suppliers' || !!data?.purchasing));
   const shownTabs = readOnly ? tabs.filter(([k]) => k === 'stock' || k === 'moves') : tabs;
   const typeLabel = (k: string) => t(`inv.mt.${k}` as 'inv.mt.sale');
 
@@ -193,7 +201,7 @@ export default function InventoryPage() {
         ))}
       </div>
 
-      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:grid sm:grid-cols-7 sm:overflow-visible">
+      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] sm:grid sm:grid-flow-col sm:auto-cols-fr sm:overflow-visible">
         {shownTabs.map(([k, label]) => (
           <button key={k} type="button" onClick={() => setTab(k)}
             className={`shrink-0 whitespace-nowrap rounded-xl px-3 py-2 text-xs font-semibold transition cursor-pointer sm:text-sm ${tab === k ? 'bg-blue-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
@@ -312,7 +320,7 @@ export default function InventoryPage() {
       {tab === 'out' && branchId && (
         <OutForm branchId={branchId} items={data?.items ?? []} flash={flash} onDone={() => { setMoves(null); load(); }} />
       )}
-      {tab === 'transfer' && branchId && (
+      {tab === 'transfer' && canTransfer && branchId && (
         <TransferForm branchId={branchId} items={data?.items ?? []} flash={flash} onDone={() => { setMoves(null); load(); }} />
       )}
       {tab === 'log' && branchId && <EvidenceLog branchId={branchId} />}

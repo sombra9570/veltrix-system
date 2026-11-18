@@ -74,8 +74,10 @@ export function ExportData() {
           rows.push(...((data ?? []) as Record<string, unknown>[]));
           if (!data || data.length < PAGE) break;
         }
-        files.push({ name: `${table}.csv`, data: enc.encode(toCsv(rows)) });
+        // Solo lo que el negocio usa: tablas vacías no se incluyen
+        if (rows.length > 0) files.push({ name: `${table}.csv`, data: enc.encode(toCsv(rows)) });
       }
+      if (files.length === 0) files.push({ name: 'customers.csv', data: enc.encode('') });
       const url = URL.createObjectURL(zip(files));
       const a = document.createElement('a');
       a.href = url; a.download = `veltrix-datos-${new Date().toISOString().slice(0, 10)}.zip`;

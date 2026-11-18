@@ -1,5 +1,6 @@
 'use client';
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { rpc } from '../../lib/supabase';
 import { useRouter, usePathname } from 'next/navigation';
 import { useVeltrixAuth, homeForRole, UserRole } from '../auth-system';
 import { AppShell, NavItem } from './shell';
@@ -28,6 +29,13 @@ export function StaffProvider({
   const pathname = usePathname();
   const { t } = useT();
   const { loaded, session, companies, logout } = useVeltrixAuth();
+  // Rubros activos de la empresa: lo que no ocupa no aparece en el menú
+  const [modules, setModules] = useState<string[] | null>(null);
+  const uid = session?.userId;
+  useEffect(() => {
+    if (!uid) return;
+    rpc<string[]>('my_modules').then((m) => setModules(m ?? [])).catch(() => setModules([]));
+  }, [uid]);
   // Panel al que pertenece este usuario; si apunta aquí mismo (o a ingresar con sesión) no se redirige: evita bucles
   const target = session ? homeForRole(session.role) : '/ingresar';
   // Un rol propio también cubre las funciones de otros roles: puede entrar a sus pantallas
@@ -57,7 +65,7 @@ export function StaffProvider({
     }
     const chat = own.filter((n) => n.label === 'nav.messages');
     return [...own.filter((n) => n.label !== 'nav.messages'), ...extra, ...chat];
-  })();
+  })().filter((n) => !n.module || (modules ?? []).includes(n.module));
 
   const company = companies.find((c) => c.id === session.companyId);
   return (

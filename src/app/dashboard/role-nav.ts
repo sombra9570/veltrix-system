@@ -14,7 +14,7 @@ export const ROLE_NAV = {
 ] as NavItem[],
   supervisor: [
   { href: '/dashboard/supervisor', icon: '🛵', label: 'sup.navRoutes' },
-  { href: '/dashboard/supervisor/prestamos', icon: '💸', label: 'nav.loans' },
+  { href: '/dashboard/supervisor/prestamos', icon: '💸', label: 'nav.loans', module: 'field_collection' },
   { href: '/dashboard/supervisor/ventas', icon: '🧾', label: 'nav.sales' },
   { href: '/dashboard/supervisor/caja', icon: '💵', label: 'nav.cash' },
   { href: '/dashboard/supervisor/inventario', icon: '📦', label: 'nav.inventory' },
@@ -28,7 +28,7 @@ export const ROLE_NAV = {
 ] as NavItem[],
   storekeeper: [
   { href: '/dashboard/storekeeper', icon: '📦', label: 'nav.inventory' },
-  { href: '/dashboard/storekeeper/despacho', icon: '🚚', label: 'nav.dispatch' },
+  { href: '/dashboard/storekeeper/despacho', icon: '🚚', label: 'nav.dispatch', module: 'retail' },
   { href: '/dashboard/storekeeper/productos', icon: '🏷️', label: 'nav.products' },
   { href: '/dashboard/storekeeper/tienda', icon: '📋', label: 'nav.store' },
   { href: '/dashboard/storekeeper/mensajes', icon: '💬', label: 'nav.messages' },
