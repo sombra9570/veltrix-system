@@ -1815,6 +1815,7 @@ const fr: Record<DictKey, string> = {
   'tq.qrPrint': "Imprimer",
   'tq.qrRenew': "Renouveler le QR",
   'tq.qrRenewConfirm': "Renouveler le QR de cette table ? L'ancien QR imprimé ne fonctionnera plus.",
+  'tq.qrDownload': "Télécharger",
 };
 
 export default fr;

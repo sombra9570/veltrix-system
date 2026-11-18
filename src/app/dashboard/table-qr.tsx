@@ -6,7 +6,7 @@ import { ui } from '../site-header';
 import { useSync } from './sync';
 import { useT } from '../i18n';
 import { money } from './format';
-import { QrImage } from './qr-image';
+import { QrImage, downloadQr } from './qr-image';
 
 type Req = {
   id: string; table: string; at: string; notes: string | null; customer: string | null; pay_pref: 'qr' | 'cash';
@@ -112,7 +112,10 @@ export function TableQrCard({ branchId, flash }: { branchId: string; flash: (ok:
           <div key={tb.id} className="rounded-xl border border-slate-200 p-2 text-center dark:border-slate-700">
             <QrImage value={`${origin}/mesa/${tb.token}`} alt={`QR ${tb.name}`} className="mx-auto w-full max-w-[180px] rounded bg-white" />
             <p className="mt-1 font-extrabold">{tb.name}</p>
-            <button type="button" onClick={() => renew(tb.id)} className={`${ui.btnGhost} mt-1 !px-2 !py-1 text-[11px] print:hidden`}>{t('tq.qrRenew')}</button>
+            <div className="mt-1 flex justify-center gap-1 print:hidden">
+              <button type="button" onClick={() => downloadQr(`${origin}/mesa/${tb.token}`, tb.name, `qr-${tb.name}`).catch(() => flash(false, t('err.generic')))} className={`${ui.btnGhost} !px-2 !py-1 text-[11px]`}>⬇️ {t('tq.qrDownload')}</button>
+              <button type="button" onClick={() => renew(tb.id)} className={`${ui.btnGhost} !px-2 !py-1 text-[11px]`}>{t('tq.qrRenew')}</button>
+            </div>
           </div>
         ))}
       </div>

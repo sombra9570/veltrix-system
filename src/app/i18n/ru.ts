@@ -1815,6 +1815,7 @@ const ru: Record<DictKey, string> = {
   'tq.qrPrint': "Печать",
   'tq.qrRenew': "Обновить QR",
   'tq.qrRenewConfirm': "Обновить QR этого стола? Ранее распечатанный QR перестанет работать.",
+  'tq.qrDownload': "Скачать",
 };
 
 export default ru;

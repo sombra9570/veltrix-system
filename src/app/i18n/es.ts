@@ -1824,6 +1824,7 @@ const es = {
   'tq.qrPrint': "Imprimir",
   'tq.qrRenew': "Renovar QR",
   'tq.qrRenewConfirm': "¿Renovar el QR de esta mesa? El QR impreso anterior dejará de funcionar.",
+  'tq.qrDownload': "Descargar",
 };
 
 export default es;

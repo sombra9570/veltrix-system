@@ -1815,6 +1815,7 @@ const en: Record<DictKey, string> = {
   'tq.qrPrint': "Print",
   'tq.qrRenew': "Renew QR",
   'tq.qrRenewConfirm': "Renew this table's QR? The previously printed QR will stop working.",
+  'tq.qrDownload': "Download",
 };
 
 export default en;

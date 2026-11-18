@@ -1815,6 +1815,7 @@ const ko: Record<DictKey, string> = {
   'tq.qrPrint': "인쇄",
   'tq.qrRenew': "QR 재발급",
   'tq.qrRenewConfirm': "이 테이블의 QR을 재발급할까요? 이전에 인쇄한 QR은 작동하지 않습니다.",
+  'tq.qrDownload': "다운로드",
 };
 
 export default ko;

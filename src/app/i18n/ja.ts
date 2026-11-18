@@ -1815,6 +1815,7 @@ const ja: Record<DictKey, string> = {
   'tq.qrPrint': "印刷",
   'tq.qrRenew': "QRを再発行",
   'tq.qrRenewConfirm': "このテーブルのQRを再発行しますか？以前印刷したQRは使えなくなります。",
+  'tq.qrDownload': "ダウンロード",
 };
 
 export default ja;

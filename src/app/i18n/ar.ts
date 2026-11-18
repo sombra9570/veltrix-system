@@ -1815,6 +1815,7 @@ const ar: Record<DictKey, string> = {
   'tq.qrPrint': "طباعة",
   'tq.qrRenew': "تجديد الرمز",
   'tq.qrRenewConfirm': "تجديد رمز هذه الطاولة؟ سيتوقف الرمز المطبوع سابقًا عن العمل.",
+  'tq.qrDownload': "تنزيل",
 };
 
 export default ar;

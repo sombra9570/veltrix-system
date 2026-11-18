@@ -1815,6 +1815,7 @@ const hi: Record<DictKey, string> = {
   'tq.qrPrint': "प्रिंट",
   'tq.qrRenew': "QR नया करें",
   'tq.qrRenewConfirm': "इस टेबल का QR नया करें? पहले छपा QR काम करना बंद कर देगा।",
+  'tq.qrDownload': "डाउनलोड",
 };
 
 export default hi;

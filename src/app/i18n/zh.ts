@@ -1815,6 +1815,7 @@ const zh: Record<DictKey, string> = {
   'tq.qrPrint': "打印",
   'tq.qrRenew': "更换二维码",
   'tq.qrRenewConfirm': "更换此桌的二维码？之前打印的二维码将失效。",
+  'tq.qrDownload': "下载",
 };
 
 export default zh;
