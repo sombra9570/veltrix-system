@@ -1756,6 +1756,23 @@ const ar: Record<DictKey, string> = {
   'rep.sendTo': "إرسال إلى",
   'rep.send': "إرسال",
   'rep.saveDraft': "حفظ المسودة",
+  'nav.help': "المساعدة",
+  'help.title': "المساعدة والدعم",
+  'help.sub': "أخبرنا بمشكلتك أو سؤالك وسيرد فريقنا هنا.",
+  'help.new': "طلب جديد",
+  'help.empty': "لم ترسل أي طلبات بعد.",
+  'help.sent': "تم إرسال الطلب. سنرد هنا.",
+  'help.limit': "لديك طلبات مفتوحة كثيرة. انتظر الرد أو أغلقها.",
+  'help.subject': "الموضوع",
+  'help.body': "ماذا تحتاج؟",
+  'help.send': "إرسال",
+  'help.team': "فريق Veltrix",
+  'help.you': "أنت",
+  'help.replyPh': "اكتب ردك…",
+  'help.reply': "رد",
+  'help.st.open': "بانتظار الرد",
+  'help.st.answered': "تم الرد",
+  'help.st.closed': "مغلق",
 };
 
 export default ar;

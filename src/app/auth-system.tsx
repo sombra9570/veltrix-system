@@ -13,7 +13,7 @@ import { supabase, rpc } from '../lib/supabase';
 import { COUNTRIES, CountryCode, TaxRegimeId, BusinessSectorId } from './language-selector';
 
 export type UserRole = 'superadmin' | 'owner' | 'cashier' | 'vendor' | 'collector' | 'supervisor' | 'waiter' | 'kitchen' | 'technician'
-  | 'storekeeper' | 'accountant' | 'director' | 'secretary' | 'none'; // none: sin acceso activo (usuario desactivado o empresa sin terminar)
+  | 'storekeeper' | 'accountant' | 'director' | 'secretary' | 'support' | 'none'; // none: sin acceso activo (usuario desactivado o empresa sin terminar)
 
 // Panel de inicio de cada rol (un solo botón "Ingresar" para todos)
 export function homeForRole(role: UserRole): string {
@@ -28,6 +28,7 @@ export function homeForRole(role: UserRole): string {
     case 'technician': return '/dashboard/workshop';
     case 'storekeeper': return '/dashboard/storekeeper';
     case 'accountant': return '/dashboard/accountant';
+    case 'support': return '/dashboard/admin/soporte';
     case 'director': return '/dashboard/director';
     case 'secretary': return '/dashboard/secretary';
     case 'vendor': return '/dashboard/vendor';
@@ -220,15 +221,17 @@ async function loadAuthImpl(): Promise<ActiveSession | null> {
       return null;
     }
 
-    const [{ data: admin }, { data: profile }, { data: myMems }] = await Promise.all([
+    const [{ data: admin }, { data: profile }, { data: myMems }, staffRes] = await Promise.all([
       supabase.from('platform_admins').select('user_id').eq('user_id', user.id).maybeSingle(),
       supabase.from('profiles').select('id, full_name, email, org_id').eq('id', user.id).maybeSingle(),
       supabase.from('memberships').select('role, company_id, org_id, extra_roles, custom_roles(also_roles)').eq('user_id', user.id)
         .eq('is_active', true).is('deleted_at', null),
+      supabase.rpc('is_platform_staff'),
     ]);
 
     const roles = (myMems ?? []).map((m) => m.role as string);
     const role: UserRole = admin ? 'superadmin'
+      : staffRes.data === true ? 'support'
       : roles.includes('owner') ? 'owner'
       : ((roles[0] ?? 'none') as UserRole);
 

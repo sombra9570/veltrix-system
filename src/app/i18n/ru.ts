@@ -1756,6 +1756,23 @@ const ru: Record<DictKey, string> = {
   'rep.sendTo': "Отправить",
   'rep.send': "Отправить",
   'rep.saveDraft': "Сохранить черновик",
+  'nav.help': "Помощь",
+  'help.title': "Помощь и поддержка",
+  'help.sub': "Опишите проблему или вопрос, наша команда ответит здесь.",
+  'help.new': "Новое обращение",
+  'help.empty': "Вы ещё не отправляли обращений.",
+  'help.sent': "Обращение отправлено. Мы ответим здесь.",
+  'help.limit': "Слишком много открытых обращений. Дождитесь ответа или закройте их.",
+  'help.subject': "Тема",
+  'help.body': "Что вам нужно?",
+  'help.send': "Отправить",
+  'help.team': "Команда Veltrix",
+  'help.you': "Вы",
+  'help.replyPh': "Напишите ответ…",
+  'help.reply': "Ответить",
+  'help.st.open': "Ожидает",
+  'help.st.answered': "Отвечено",
+  'help.st.closed': "Закрыто",
 };
 
 export default ru;

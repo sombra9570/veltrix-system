@@ -1765,6 +1765,23 @@ const es = {
   'rep.sendTo': "Enviar a",
   'rep.send': "Enviar",
   'rep.saveDraft': "Guardar borrador",
+  'nav.help': "Ayuda",
+  'help.title': "Ayuda y soporte",
+  'help.sub': "Cuéntanos tu problema o duda y nuestro equipo te responde aquí.",
+  'help.new': "Nueva consulta",
+  'help.empty': "Aún no has enviado consultas.",
+  'help.sent': "Consulta enviada. Te responderemos aquí.",
+  'help.limit': "Tienes demasiadas consultas abiertas. Espera la respuesta o ciérralas.",
+  'help.subject': "Asunto",
+  'help.body': "¿Qué necesitas?",
+  'help.send': "Enviar",
+  'help.team': "Equipo Veltrix",
+  'help.you': "Tú",
+  'help.replyPh': "Escribe tu respuesta…",
+  'help.reply': "Responder",
+  'help.st.open': "En espera",
+  'help.st.answered': "Respondida",
+  'help.st.closed': "Cerrada",
 };
 
 export default es;

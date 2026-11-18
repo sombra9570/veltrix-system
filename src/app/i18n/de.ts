@@ -1756,6 +1756,23 @@ const de: Record<DictKey, string> = {
   'rep.sendTo': "Senden an",
   'rep.send': "Senden",
   'rep.saveDraft': "Entwurf speichern",
+  'nav.help': "Hilfe",
+  'help.title': "Hilfe & Support",
+  'help.sub': "Schildern Sie Ihr Problem oder Ihre Frage, unser Team antwortet hier.",
+  'help.new': "Neue Anfrage",
+  'help.empty': "Sie haben noch keine Anfragen gesendet.",
+  'help.sent': "Anfrage gesendet. Wir antworten hier.",
+  'help.limit': "Sie haben zu viele offene Anfragen. Warten Sie auf Antwort oder schließen Sie sie.",
+  'help.subject': "Betreff",
+  'help.body': "Was brauchen Sie?",
+  'help.send': "Senden",
+  'help.team': "Veltrix-Team",
+  'help.you': "Sie",
+  'help.replyPh': "Antwort schreiben…",
+  'help.reply': "Antworten",
+  'help.st.open': "Wartet",
+  'help.st.answered': "Beantwortet",
+  'help.st.closed': "Geschlossen",
 };
 
 export default de;

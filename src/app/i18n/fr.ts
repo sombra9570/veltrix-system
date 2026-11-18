@@ -1756,6 +1756,23 @@ const fr: Record<DictKey, string> = {
   'rep.sendTo': "Envoyer à",
   'rep.send': "Envoyer",
   'rep.saveDraft': "Enregistrer le brouillon",
+  'nav.help': "Aide",
+  'help.title': "Aide et assistance",
+  'help.sub': "Décrivez votre problème ou question, notre équipe vous répondra ici.",
+  'help.new': "Nouvelle demande",
+  'help.empty': "Vous n'avez encore envoyé aucune demande.",
+  'help.sent': "Demande envoyée. Nous répondrons ici.",
+  'help.limit': "Vous avez trop de demandes ouvertes. Attendez une réponse ou fermez-les.",
+  'help.subject': "Objet",
+  'help.body': "De quoi avez-vous besoin ?",
+  'help.send': "Envoyer",
+  'help.team': "Équipe Veltrix",
+  'help.you': "Vous",
+  'help.replyPh': "Écrivez votre réponse…",
+  'help.reply': "Répondre",
+  'help.st.open': "En attente",
+  'help.st.answered': "Répondue",
+  'help.st.closed': "Fermée",
 };
 
 export default fr;

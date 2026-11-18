@@ -1756,6 +1756,23 @@ const pt: Record<DictKey, string> = {
   'rep.sendTo': "Enviar para",
   'rep.send': "Enviar",
   'rep.saveDraft': "Salvar rascunho",
+  'nav.help': "Ajuda",
+  'help.title': "Ajuda e suporte",
+  'help.sub': "Conte seu problema ou dúvida e nossa equipe responderá aqui.",
+  'help.new': "Nova consulta",
+  'help.empty': "Você ainda não enviou consultas.",
+  'help.sent': "Consulta enviada. Responderemos aqui.",
+  'help.limit': "Você tem muitas consultas abertas. Aguarde a resposta ou feche-as.",
+  'help.subject': "Assunto",
+  'help.body': "O que você precisa?",
+  'help.send': "Enviar",
+  'help.team': "Equipe Veltrix",
+  'help.you': "Você",
+  'help.replyPh': "Escreva sua resposta…",
+  'help.reply': "Responder",
+  'help.st.open': "Em espera",
+  'help.st.answered': "Respondida",
+  'help.st.closed': "Fechada",
 };
 
 export default pt;

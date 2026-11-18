@@ -1756,6 +1756,23 @@ const zh: Record<DictKey, string> = {
   'rep.sendTo': "发送给",
   'rep.send': "发送",
   'rep.saveDraft': "保存草稿",
+  'nav.help': "帮助",
+  'help.title': "帮助与支持",
+  'help.sub': "告诉我们您的问题，团队会在这里回复。",
+  'help.new': "新咨询",
+  'help.empty': "您还没有发送过咨询。",
+  'help.sent': "咨询已发送，我们会在这里回复。",
+  'help.limit': "您有太多未结咨询。请等待回复或关闭它们。",
+  'help.subject': "主题",
+  'help.body': "您需要什么？",
+  'help.send': "发送",
+  'help.team': "Veltrix 团队",
+  'help.you': "您",
+  'help.replyPh': "输入回复…",
+  'help.reply': "回复",
+  'help.st.open': "等待中",
+  'help.st.answered': "已回复",
+  'help.st.closed': "已关闭",
 };
 
 export default zh;

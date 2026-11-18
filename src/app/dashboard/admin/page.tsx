@@ -275,6 +275,12 @@ export default function GlobalCoreAdminPage() {
             >
               {busy ? 'Actualizando…' : '↻ Actualizar'}
             </button>
+            <a
+              href="/dashboard/admin/soporte"
+              className="bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/20 text-xs font-semibold px-4 py-2.5 rounded-lg cursor-pointer"
+            >
+              🎧 Servicio al cliente
+            </a>
             <button
               onClick={logout}
               className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-semibold px-4 py-2.5 rounded-lg cursor-pointer"

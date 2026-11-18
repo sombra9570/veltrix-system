@@ -1756,6 +1756,23 @@ const hi: Record<DictKey, string> = {
   'rep.sendTo': "भेजें",
   'rep.send': "भेजें",
   'rep.saveDraft': "मसौदा सहेजें",
+  'nav.help': "सहायता",
+  'help.title': "सहायता और सपोर्ट",
+  'help.sub': "अपनी समस्या या सवाल बताइए, हमारी टीम यहीं जवाब देगी।",
+  'help.new': "नया अनुरोध",
+  'help.empty': "आपने अभी तक कोई अनुरोध नहीं भेजा।",
+  'help.sent': "अनुरोध भेजा गया। हम यहीं जवाब देंगे।",
+  'help.limit': "आपके बहुत अनुरोध खुले हैं। जवाब का इंतज़ार करें या उन्हें बंद करें।",
+  'help.subject': "विषय",
+  'help.body': "आपको क्या चाहिए?",
+  'help.send': "भेजें",
+  'help.team': "Veltrix टीम",
+  'help.you': "आप",
+  'help.replyPh': "अपना जवाब लिखें…",
+  'help.reply': "जवाब दें",
+  'help.st.open': "प्रतीक्षा में",
+  'help.st.answered': "उत्तर दिया गया",
+  'help.st.closed': "बंद",
 };
 
 export default hi;

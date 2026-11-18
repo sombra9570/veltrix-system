@@ -1756,6 +1756,23 @@ const ja: Record<DictKey, string> = {
   'rep.sendTo': "送信先",
   'rep.send': "送信",
   'rep.saveDraft': "下書きを保存",
+  'nav.help': "ヘルプ",
+  'help.title': "ヘルプとサポート",
+  'help.sub': "問題やご質問をお知らせください。チームがここで返信します。",
+  'help.new': "新しい問い合わせ",
+  'help.empty': "まだ問い合わせはありません。",
+  'help.sent': "問い合わせを送信しました。ここで返信します。",
+  'help.limit': "未完了の問い合わせが多すぎます。返信を待つか閉じてください。",
+  'help.subject': "件名",
+  'help.body': "ご用件は？",
+  'help.send': "送信",
+  'help.team': "Veltrix チーム",
+  'help.you': "あなた",
+  'help.replyPh': "返信を入力…",
+  'help.reply': "返信",
+  'help.st.open': "待機中",
+  'help.st.answered': "回答済み",
+  'help.st.closed': "終了",
 };
 
 export default ja;

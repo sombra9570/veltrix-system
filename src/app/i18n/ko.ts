@@ -1756,6 +1756,23 @@ const ko: Record<DictKey, string> = {
   'rep.sendTo': "보낼 곳",
   'rep.send': "보내기",
   'rep.saveDraft': "초안 저장",
+  'nav.help': "도움말",
+  'help.title': "도움말 및 지원",
+  'help.sub': "문제나 질문을 알려주시면 팀이 여기에서 답변합니다.",
+  'help.new': "새 문의",
+  'help.empty': "아직 보낸 문의가 없습니다.",
+  'help.sent': "문의를 보냈습니다. 여기에서 답변드립니다.",
+  'help.limit': "열린 문의가 너무 많습니다. 답변을 기다리거나 닫아 주세요.",
+  'help.subject': "제목",
+  'help.body': "무엇이 필요하신가요?",
+  'help.send': "보내기",
+  'help.team': "Veltrix 팀",
+  'help.you': "나",
+  'help.replyPh': "답변 입력…",
+  'help.reply': "답변",
+  'help.st.open': "대기 중",
+  'help.st.answered': "답변됨",
+  'help.st.closed': "종료됨",
 };
 
 export default ko;

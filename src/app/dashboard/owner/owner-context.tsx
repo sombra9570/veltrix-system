@@ -64,6 +64,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports' },
   { href: '/dashboard/owner/informes', icon: '📑', label: 'nav.informes' },
   { href: '/dashboard/owner/indicadores', icon: '🌎', label: 'nav.indicators' },
+  { href: '/dashboard/owner/ayuda', icon: '🎧', label: 'nav.help' },
   { href: '/dashboard/owner/plan', icon: '💳', label: 'nav.plan' },
   { href: '/dashboard/owner/invitar', icon: '🎁', label: 'nav.invite' },
 ];
