@@ -39,9 +39,9 @@ Todo lo demás exige sesión.
 ## 4. Cambios de esta revisión
 
 - [x] `set_owner_roles`, `bootstrap_company`, `enforce_plan_roles`: ya no se pueden llamar sin sesión.
-- [ ] `set_branch_stock`: revisar el permiso **antes** de crear el almacén por defecto (hoy lo crea y recién después revisa).
-- [ ] `guard_profile_org` (control interno): quitar acceso sin sesión.
-- [ ] `perm_catalog`: fijar `search_path` (aviso menor de Supabase).
+- [x] `set_branch_stock`: revisar el permiso **antes** de crear el almacén por defecto (056).
+- [x] `guard_profile_org` (control interno): sin acceso directo (056).
+- [x] `perm_catalog`: `search_path` fijo (056).
 - [ ] Supabase → Authentication: activar "protección de contraseñas filtradas" (lo hace el dueño en el panel).
 
 ## 5. Riesgo bajo aceptado
