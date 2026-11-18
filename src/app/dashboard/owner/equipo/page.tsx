@@ -9,9 +9,11 @@ import { Sheet } from '../../sheet';
 import type { DictKey } from '../../../i18n/es';
 import { suggestedRoles } from '../../../business-catalog';
 
-const ROLES = ['supervisor', 'cashier', 'vendor', 'collector', 'waiter', 'kitchen', 'technician', 'storekeeper', 'accountant', 'secretary', 'director'] as const;
+const ROLES = ['supervisor', 'cashier', 'vendor', 'collector', 'waiter', 'kitchen', 'technician', 'storekeeper', 'accountant', 'secretary', 'director', 'reception', 'delivery'] as const;
 // Roles que solo tienen sentido si el módulo de su rubro está activo
 const ROLE_MODULE: Partial<Record<(typeof ROLES)[number], string>> = { collector: 'field_collection', waiter: 'restaurant', kitchen: 'restaurant', technician: 'workshop', storekeeper: 'inventory' };
+// Delivery necesita tienda, restaurante o cobranza en ruta (se valida también en el servidor)
+const DELIVERY_MODULES = ['retail', 'restaurant', 'field_collection'];
 
 type Branch = { id: string; name: string; company_id: string };
 type Member = { id: string; user_id: string; role: string; branch_id: string | null; is_active: boolean; custom_role_id: string | null };
@@ -24,7 +26,7 @@ export default function TeamPage() {
   const limitedPlan = ['basic', 'starter', 'pro'].includes(overview?.org.plan_code ?? '');
   // En planes chicos solo se ofrecen los cargos propios del nicho del negocio
   const nicheRoles: string[] | null = limitedPlan && niches.length ? suggestedRoles(niches) : null;
-  const roles = ROLES.filter((r) => (!(['secretary', 'director'] as string[]).includes(r) || ['pro', 'enterprise', 'enterprise_plus'].includes(overview?.org.plan_code ?? '')) && (!ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!)) && (!nicheRoles || nicheRoles.includes(r) || r === 'secretary' || r === 'director'));
+  const roles = ROLES.filter((r) => (!(['secretary', 'director'] as string[]).includes(r) || ['pro', 'enterprise', 'enterprise_plus'].includes(overview?.org.plan_code ?? '')) && (!ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!)) && (r !== 'delivery' || modules.length === 0 || modules.some((m) => DELIVERY_MODULES.includes(m))) && (!nicheRoles || nicheRoles.includes(r) || r === 'secretary' || r === 'director' || r === 'reception'));
   const { t } = useT();
   const roleLabel = (r: string) => t(`role.${r}` as DictKey);
 

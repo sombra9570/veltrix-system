@@ -88,7 +88,7 @@ export const catKey = (id: string) => `cat.${id}` as DictKey;
 export const modKey = (m: ModuleCode) => `mod.${m}` as DictKey;
 
 // Cargos que suelen hacer falta según los módulos del rubro (se muestran marcados y el cliente los ajusta)
-export const TEAM_ROLES = ['cashier', 'vendor', 'waiter', 'kitchen', 'collector', 'supervisor', 'storekeeper', 'accountant', 'technician'] as const;
+export const TEAM_ROLES = ['cashier', 'vendor', 'waiter', 'kitchen', 'collector', 'supervisor', 'storekeeper', 'accountant', 'technician', 'reception', 'delivery'] as const;
 export type TeamRole = (typeof TEAM_ROLES)[number];
 
 export function suggestedRoles(categoryIds: string[]): TeamRole[] {
@@ -99,6 +99,8 @@ export function suggestedRoles(categoryIds: string[]): TeamRole[] {
   if (mods.has('restaurant')) { r.add('waiter'); r.add('kitchen'); r.add('cashier'); }
   if (mods.has('workshop')) { r.add('technician'); r.add('cashier'); }
   if (mods.has('inventory')) r.add('storekeeper');
+  if (mods.has('retail') || mods.has('restaurant') || mods.has('distribution')) r.add('delivery');
+  if (mods.has('workshop')) r.add('reception');
   if (mods.has('field_collection')) { r.add('collector'); r.add('supervisor'); }
   return TEAM_ROLES.filter((x) => r.has(x));
 }

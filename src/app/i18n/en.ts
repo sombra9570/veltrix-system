@@ -1780,6 +1780,8 @@ const en: Record<DictKey, string> = {
   'home.need.b3': "Whether you need invoicing and AI help",
   'home.need.b4': "Which plan fits your case",
   'chat.retention': "Chat messages are deleted automatically after {n} days according to your plan, so they don't fill up your space. Save anything important before then. Your sales, inventory, customers and finances are never deleted automatically.",
+  'role.reception': "Reception",
+  'role.delivery': "Delivery driver",
 };
 
 export default en;

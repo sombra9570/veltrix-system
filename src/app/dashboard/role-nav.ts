@@ -69,6 +69,18 @@ export const ROLE_NAV = {
   { href: '/dashboard/cashier/ventas', icon: '🧾', label: 'nav.mySales' },
   { href: '/dashboard/cashier/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
+  reception: [
+  { href: '/dashboard/cashier', icon: '💵', label: 'nav.cash' },
+  { href: '/dashboard/cashier/vender', icon: '🛒', label: 'nav.pos' },
+  { href: '/dashboard/cashier/ventas', icon: '🧾', label: 'nav.mySales' },
+  { href: '/dashboard/cashier/clientes', icon: '🤝', label: 'nav.customers' },
+  { href: '/dashboard/cashier/mensajes', icon: '💬', label: 'nav.messages' },
+] as NavItem[],
+  delivery: [
+  { href: '/dashboard/collector', icon: '🛵', label: 'nav.route' },
+  { href: '/dashboard/collector/despacho', icon: '🚚', label: 'nav.dispatch' },
+  { href: '/dashboard/collector/mensajes', icon: '💬', label: 'nav.messages' },
+] as NavItem[],
   technician: [
   { href: '/dashboard/workshop', icon: '🔧', label: 'nav.workshop' },
   { href: '/dashboard/workshop/mensajes', icon: '💬', label: 'nav.messages' },

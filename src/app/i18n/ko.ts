@@ -1780,6 +1780,8 @@ const ko: Record<DictKey, string> = {
   'home.need.b3': "청구서 발행과 AI 도움이 필요한지",
   'home.need.b4': "어떤 요금제가 맞는지",
   'chat.retention': "채팅 메시지는 요금제에 따라 {n}일 후 자동 삭제되어 공간을 차지하지 않습니다. 중요한 내용은 미리 저장하세요. 판매, 재고, 고객, 재무 데이터는 절대 자동 삭제되지 않습니다.",
+  'role.reception': "접수",
+  'role.delivery': "배달원",
 };
 
 export default ko;

@@ -1780,6 +1780,8 @@ const it: Record<DictKey, string> = {
   'home.need.b3': "Se ti serve fatturazione e aiuto IA",
   'home.need.b4': "Quale piano si adatta al tuo caso",
   'chat.retention': "I messaggi della chat vengono eliminati automaticamente dopo {n} giorni in base al tuo piano, per non occupare spazio. Salva prima ciò che è importante. Vendite, magazzino, clienti e finanze non vengono mai eliminati automaticamente.",
+  'role.reception': "Reception",
+  'role.delivery': "Fattorino",
 };
 
 export default it;

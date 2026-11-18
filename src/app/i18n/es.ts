@@ -1789,6 +1789,8 @@ const es = {
   'home.need.b3': "Si necesitas facturación y ayuda de IA",
   'home.need.b4': "Qué plan encaja con tu caso",
   'chat.retention': "Los mensajes del chat se borran solos a los {n} días según tu plan, para no llenar tu espacio. Si necesitas guardar algo importante, cópialo o expórtalo antes. Tus ventas, inventario, clientes y finanzas nunca se borran solos.",
+  'role.reception': "Recepción",
+  'role.delivery': "Delivery (repartidor)",
 };
 
 export default es;
