@@ -16,8 +16,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Veltrix System',
+  metadataBase: new URL('https://www.veltrixsystem.app'),
+  title: { default: 'Veltrix System — control de ventas, caja e inventario para tu negocio', template: '%s | Veltrix System' },
   description: 'Control financiero para tu negocio: ventas, caja, inventario, créditos y cobranza.',
+  alternates: { canonical: '/' },
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: 'website', url: '/', siteName: 'Veltrix System', locale: 'es_LA',
+    title: 'Veltrix System — control de ventas, caja e inventario',
+    description: 'Ventas, caja, inventario, créditos y cobranza en un solo sistema, para negocios de 1 a 100 trabajadores.',
+  },
   applicationName: 'Veltrix',
   appleWebApp: { capable: true, title: 'Veltrix', statusBarStyle: 'black-translucent' },
   icons: {
