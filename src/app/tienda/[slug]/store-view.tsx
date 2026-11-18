@@ -11,6 +11,9 @@ import { Spinner } from '../../spinner';
 type Product = { id: string; name: string; price: number; type: string; description: string | null; photo: string | null; unit: string; available: boolean };
 type Store = { slug: string; name: string; description: string | null; whatsapp: string | null; logo: string | null; currency: string; products: Product[] };
 type Line = { p: Product; qty: number };
+type Zone = { id: string; name: string; fee: number; free_over: number | null; eta_min: number };
+type DInfo = { enabled: boolean; zones?: Zone[] };
+type DStatus = { status: 'pending' | 'accepted' | 'rejected'; reject_reason: string | null; subtotal: number; fee: number; total: number; eta_min: number | null; zone: string | null; delivery_status: 'pending' | 'dispatched' | 'delivered' | 'failed' | null };
 
 /** Tienda pública: catálogo, carrito y pedido por WhatsApp. No guarda nada en la base. */
 export function StoreView({ slug }: { slug: string }) {
@@ -23,11 +26,42 @@ export function StoreView({ slug }: { slug: string }) {
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
   const CART_KEY = `vx_store_cart_${slug}`;
+  const DREQ_KEY = `vx_store_dreq_${slug}`;
+  const [dinfo, setDinfo] = useState<DInfo | null>(null);
+  const [dMode, setDMode] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [reference, setReference] = useState('');
+  const [zoneId, setZoneId] = useState('');
+  const [pay, setPay] = useState<'qr' | 'cash'>('cash');
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [dBusy, setDBusy] = useState(false);
+  const [dErr, setDErr] = useState('');
+  const [dReq, setDReq] = useState<string | null>(null);
+  const [dStatus, setDStatus] = useState<DStatus | null>(null);
 
   useEffect(() => {
     supabase.rpc('public_store', { p_slug: slug }).then(({ data }) => setStore((data as Store | null) ?? null));
     try { setCart(JSON.parse(localStorage.getItem(CART_KEY) ?? '[]')); } catch { /* */ }
-  }, [slug, CART_KEY]);
+    supabase.rpc('public_delivery_info', { p_slug: slug }).then(({ data }) => setDinfo((data as DInfo | null) ?? null));
+    try { setDReq(localStorage.getItem(DREQ_KEY)); } catch { /* */ }
+  }, [slug, CART_KEY, DREQ_KEY]);
+
+  // Seguimiento del pedido de delivery en curso
+  useEffect(() => {
+    if (!dReq) return;
+    let stop = false;
+    const tick = async () => {
+      const { data } = await supabase.rpc('public_delivery_status', { p_request: dReq });
+      if (stop) return;
+      const s = data as DStatus | null;
+      if (!s) { try { localStorage.removeItem(DREQ_KEY); } catch { /* */ } setDReq(null); return; }
+      setDStatus(s);
+    };
+    tick();
+    const id = setInterval(() => { if (document.visibilityState === 'visible') tick(); }, 6000);
+    return () => { stop = true; clearInterval(id); };
+  }, [dReq, DREQ_KEY]);
   useEffect(() => { try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch { /* */ } }, [cart, CART_KEY]);
 
   const fmt = (n: number) => {
@@ -48,6 +82,32 @@ export function StoreView({ slug }: { slug: string }) {
   const change = (id: string, d: number) => setCart((c) => c.map((l) => (l.p.id === id ? { ...l, qty: l.qty + d } : l)).filter((l) => l.qty > 0));
   const total = cart.reduce((s, l) => s + l.qty * Number(l.p.price), 0);
   const units = cart.reduce((s, l) => s + l.qty, 0);
+
+  const zone = dinfo?.zones?.find((z) => z.id === zoneId);
+  const dFee = zone ? (zone.free_over != null && total >= Number(zone.free_over) ? 0 : Number(zone.fee)) : 0;
+  const useMyLocation = () => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition((pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }), () => setDErr(t('dl.noLocation')), { enableHighAccuracy: true, timeout: 10000 });
+  };
+  const sendDelivery = async () => {
+    if (!cart.length || dBusy) return;
+    if (!zoneId) { setDErr(t('dl.pickZone')); return; }
+    setDBusy(true); setDErr('');
+    const { data, error } = await supabase.rpc('public_delivery_order', {
+      p_slug: slug, p_items: cart.map((l) => ({ product_id: l.p.id, qty: l.qty })), p_zone: zoneId, p_name: name, p_phone: phone,
+      p_address: address, p_reference: reference, p_lat: coords?.lat ?? null, p_lng: coords?.lng ?? null, p_notes: note, p_pay: pay,
+    });
+    setDBusy(false);
+    if (error) {
+      const m = error.message;
+      setDErr(/PRODUCT_UNAVAILABLE/.test(m) ? t('tq.errUnavailable') : /TOO_MANY/.test(m) ? t('dl.errMany') : /PHONE|DATA/.test(m) ? t('dl.errData') : t('err.generic'));
+      return;
+    }
+    const id = data as string;
+    try { localStorage.setItem(DREQ_KEY, id); } catch { /* */ }
+    setDStatus(null); setDReq(id); setCart([]); setOpen(false); setDMode(false);
+  };
+  const dAgain = () => { try { localStorage.removeItem(DREQ_KEY); } catch { /* */ } setDReq(null); setDStatus(null); };
 
   const sendWhatsApp = () => {
     if (!store?.whatsapp || !cart.length) return;
@@ -86,6 +146,34 @@ export function StoreView({ slug }: { slug: string }) {
   }
 
   const logo = storeImageUrl(store.logo);
+
+  if (dReq) {
+    const ds = dStatus?.delivery_status;
+    return (
+      <main className="grid min-h-dvh place-items-center bg-slate-50 p-5 text-center dark:bg-slate-950">
+        <div className={`w-full max-w-sm space-y-4 rounded-2xl p-6 ${ui.card}`}>
+          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{store.name}</p>
+          {!dStatus || dStatus.status === 'pending' ? (
+            <><p className="text-5xl">⏳</p><h1 className="text-lg font-extrabold">{t('tq.sent')}</h1><p className={`text-sm ${ui.muted}`}>{t('dl.waiting')}</p></>
+          ) : dStatus.status === 'rejected' ? (
+            <><p className="text-5xl">🙏</p><h1 className="text-lg font-extrabold">{t('tq.rejected')}</h1>
+              {dStatus.reject_reason && <p className={`text-sm ${ui.muted}`}>{dStatus.reject_reason}</p>}
+              <button type="button" onClick={dAgain} className={ui.btnPrimary}>{t('tq.again')}</button></>
+          ) : (
+            <>
+              <p className="text-5xl">{ds === 'delivered' ? '🎉' : ds === 'failed' ? '⚠️' : ds === 'dispatched' ? '🛵' : '👨‍🍳'}</p>
+              <h1 className="text-lg font-extrabold">{ds === 'delivered' ? t('dl.cDelivered') : ds === 'failed' ? t('dl.cFailed') : ds === 'dispatched' ? t('dl.cOnWay') : t('dl.cPreparing')}</h1>
+              {dStatus.eta_min && ds !== 'delivered' && ds !== 'failed' && <p className={`text-sm ${ui.muted}`}>{t('dl.cEta', { n: dStatus.eta_min })}</p>}
+              <p className="text-xl font-extrabold">{t('tq.payTotal')}: {fmt(dStatus.total)}</p>
+              <p className={`text-xs ${ui.muted}`}>{t('dl.fee')}: {dStatus.fee > 0 ? fmt(dStatus.fee) : t('dl.free')}</p>
+              <p className="text-sm font-semibold">{t('tq.payCashTitle')}</p>
+              {(ds === 'delivered' || ds === 'failed') && <button type="button" onClick={dAgain} className={ui.btnPrimary}>{t('tq.again')}</button>}
+            </>
+          )}
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-dvh bg-slate-50 pb-28 dark:bg-slate-950">
@@ -202,6 +290,36 @@ export function StoreView({ slug }: { slug: string }) {
             </div>
             <input value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder={t('shop2.yourName')} className={ui.input} />
             <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} rows={2} placeholder={t('shop2.noteHint')} className={ui.input} />
+            {dinfo?.enabled && (
+              <div className="space-y-3 rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
+                <button type="button" onClick={() => setDMode(!dMode)} className={`${ui.btnPrimary} w-full`}>🛵 {t('dl.orderDelivery')}</button>
+                {dMode && (
+                  <div className="space-y-3">
+                    <select value={zoneId} onChange={(e) => setZoneId(e.target.value)} className={ui.input}>
+                      <option value="">{t('dl.pickZone')}</option>
+                      {(dinfo.zones ?? []).map((z) => <option key={z.id} value={z.id}>{z.name} · {Number(z.fee) > 0 ? fmt(Number(z.fee)) : t('dl.free')} · ~{z.eta_min} min</option>)}
+                    </select>
+                    <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" maxLength={20} placeholder={t('dl.phone')} className={ui.input} />
+                    <input value={address} onChange={(e) => setAddress(e.target.value)} maxLength={200} placeholder={t('dl.address')} className={ui.input} />
+                    <input value={reference} onChange={(e) => setReference(e.target.value)} maxLength={150} placeholder={t('dl.reference')} className={ui.input} />
+                    <button type="button" onClick={useMyLocation} className={`${ui.btnGhost} w-full !py-2 text-sm`}>{coords ? `✅ ${t('dl.locationSet')}` : `📍 ${t('dl.useLocation')}`}</button>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(['cash', 'qr'] as const).map((m) => (
+                        <button key={m} type="button" onClick={() => setPay(m)} className={`rounded-xl border-2 py-2 text-sm font-bold cursor-pointer ${pay === m ? 'border-blue-600 bg-blue-50 dark:bg-blue-500/10' : 'border-slate-300 dark:border-slate-700'}`}>
+                          {m === 'qr' ? `📲 ${t('tq.payQr')}` : `💵 ${t('tq.payCash')}`}
+                        </button>
+                      ))}
+                    </div>
+                    {zone && (
+                      <div className="flex justify-between text-sm"><span>{t('dl.fee')}</span><span className="font-bold">{dFee > 0 ? fmt(dFee) : t('dl.free')}</span></div>
+                    )}
+                    <div className="flex justify-between text-lg font-extrabold"><span>{t('pos.total')}</span><span>{fmt(total + dFee)}</span></div>
+                    {dErr && <p className="rounded-xl border border-red-300 bg-red-50 p-2 text-sm font-semibold text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">{dErr}</p>}
+                    <button type="button" disabled={dBusy} onClick={sendDelivery} className={`${ui.btnPrimary} w-full`}>{dBusy ? t('common.wait') : t('tq.send')}</button>
+                  </div>
+                )}
+              </div>
+            )}
             {store.whatsapp ? (
               <button type="button" onClick={sendWhatsApp} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-base font-bold text-white cursor-pointer hover:brightness-95">
                 💬 {t('shop2.order')}

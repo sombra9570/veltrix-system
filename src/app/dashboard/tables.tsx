@@ -8,6 +8,7 @@ import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 import { money, parseAmount } from './format';
 import { QrRequests, TableQrCard } from './table-qr';
+import { DeliveryRequests, DeliveryBoard, DeliverySetup } from './delivery';
 
 type Branch = { id: string; name: string; company: string; currency: string };
 type Table = {
@@ -100,6 +101,8 @@ export function TablesScreen({ manage = false }: { manage?: boolean }) {
       {manage && setup && <SetupPanel branchId={branchId} tables={tables} onChanged={loadBoard} flash={flash} />}
 
       <QrRequests branchId={branchId} currency={branch?.currency ?? 'USD'} onChanged={loadBoard} flash={flash} />
+      <DeliveryRequests branchId={branchId} currency={branch?.currency ?? 'USD'} onChanged={loadBoard} flash={flash} />
+      <DeliveryBoard branchId={branchId} currency={branch?.currency ?? 'USD'} flash={flash} />
 
       {tables.filter((x) => x.active).length === 0 && !setup && (
         <Card><p className={`text-sm ${ui.muted}`}>{manage ? t('rest.noTablesOwner') : t('rest.noTables')}</p></Card>
@@ -417,6 +420,7 @@ function SetupPanel({ branchId, tables, onChanged, flash }: {
           {products.length === 0 && <li className={`py-2 text-sm ${ui.muted}`}>{t('prod.empty')}</li>}
         </ul>
       </Card>
+      <DeliverySetup branchId={branchId} flash={flash} />
       <TableQrCard branchId={branchId} flash={flash} />
     </div>
   );

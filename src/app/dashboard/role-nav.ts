@@ -78,6 +78,7 @@ export const ROLE_NAV = {
 ] as NavItem[],
   delivery: [
   { href: '/dashboard/collector', icon: '🛵', label: 'nav.route' },
+  { href: '/dashboard/collector/entregas', icon: '🛵', label: 'dl.nav' },
   { href: '/dashboard/collector/despacho', icon: '🚚', label: 'nav.dispatch' },
   { href: '/dashboard/collector/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
