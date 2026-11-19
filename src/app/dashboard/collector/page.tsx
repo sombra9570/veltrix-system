@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { rpc } from '../../../lib/supabase';
+import { rpc, supabase } from '../../../lib/supabase';
 import { Card } from '../shell';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
@@ -14,6 +14,10 @@ import { CreditCard, applyPayment, freqOf, type Credit, type Freq, type Method }
 import { LoanForm, RATING_DOT, type LoanPolicy } from './loan-form';
 import { DaysTable, type DayRow } from './days-table';
 import { CutForm } from './cut-form';
+import { SignalButton } from './signal';
+import { NearbyScreen } from './nearby';
+import { NewClient } from './new-client';
+import { SettingsScreen, payQrUrl } from './settings';
 
 /* ------------------------------------------------------------------
  * Cobrador de calle: trabaja SIN internet.
@@ -27,6 +31,7 @@ type Customer = {
   id: string; name: string; phone: string | null; address: string | null; lat: number | null; lng: number | null;
   balance: number; overdue: number; due_today: number; next_due: string | null; visited_today: boolean;
   credits?: Credit[];
+  tax_id?: string | null; g_name?: string | null; g_phone?: string | null; g_lat?: number | null; g_lng?: number | null; paid_today?: boolean;
   rating?: string;
   last_visit?: { at: string; result: VisitResult; notes: string | null; promise_date: string | null; promise_amount: number | null } | null;
 };
@@ -37,8 +42,10 @@ type Route = {
   fund_balance?: number; fund_float?: number;
   period?: Period; liquidations?: Liquidation[]; days?: DayRow[]; can_liquidate?: boolean; can_invest?: boolean;
   policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_interest?: boolean;
+  can_expenses?: boolean; can_portfolio?: boolean; can_settings?: boolean; pay_qr?: string | null; pay_qr_note?: string | null; org_id?: string; notices_unread?: number;
   customers: Customer[]; settlements: Settlement[];
 };
+type Screen = 'home' | 'near' | 'list' | 'pending' | 'newclient' | 'settings';
 type Period = { since: string | null; opening: number; investments: number; withdrawals: number; collected_cash: number;
   collected_digital: number; lent: number; collector_expenses: number; expected: number };
 type Liquidation = { id: string; created_at: string; expected: number; counted: number; difference: number; closing: number;
@@ -120,6 +127,15 @@ export default function CollectorPage() {
   useEffect(() => { setLimit(25); }, [freq, routeId, view]);
   useEffect(() => { const v = load<string>('vx_col_view', 'list'); if (v === 'cards' || v === 'list') setView(v); }, []);
   const pickView = (v: 'cards' | 'list') => { setView(v); save('vx_col_view', v); };
+  const [q, setQ] = useState('');
+  const [screen, setScreen] = useState<Screen>('home');
+  const [hist, setHist] = useState<Screen[]>([]);
+  const [geoOn, setGeoOn] = useState(true);
+  useEffect(() => { setGeoOn(load<boolean>('vx_col_geo', true)); }, []);
+  const go = (sc: Screen) => { setHist((h) => [...h, screen]); setScreen(sc); setSel(null); setPanel(null); };
+  const back = () => { setHist((h) => { const n = [...h]; setScreen(n.pop() ?? 'home'); return n; }); setSel(null); setPanel(null); };
+  const menu = () => { setHist([]); setScreen('home'); setSel(null); setPanel(null); };
+  const logout = async () => { await supabase.auth.signOut().catch(() => undefined); window.location.href = '/'; };
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   // Último cobro, para ofrecer el comprobante por WhatsApp
   const [receipt, setReceipt] = useState<{ phone: string; text: string } | null>(null);
@@ -264,7 +280,7 @@ export default function CollectorPage() {
                 }
               }
               return {
-                ...c, visited_today: true, credits,
+                ...c, visited_today: true, paid_today: true, credits,
                 balance: Math.max(0, Number(c.balance) - paid),
                 overdue: Math.max(0, Number(c.overdue) - paid),
                 due_today: Math.max(0, Number(c.due_today) - Math.max(0, paid - Number(c.overdue))),
@@ -297,7 +313,7 @@ export default function CollectorPage() {
     const at = new Date().toISOString();
     enqueue({ kind: 'payment', id, at, route: route.id, customer, method, amount, order });
     flash(true, online ? t('col.paySaved') : t('col.savedOffline'));
-    getPosition().then((pos) => {
+    if (geoOn) getPosition().then((pos) => {
       if (!pos) return;
       const q = load<Op[]>(QUEUE_KEY, []);
       if (q.some((o) => o.id === id)) {
@@ -339,30 +355,75 @@ export default function CollectorPage() {
   if (!route) return null;
 
   const pendingRoute = queue.filter((q) => q.route === route.id).length;
-  const visited = route.customers.filter((c) => c.visited_today).length;
   const loans = Number(route.unsettled_loans ?? 0);
   const inHand = Number(route.unsettled_cash) - Number(route.unsettled_expenses) - loans;
   const fund = route.fund_balance === undefined ? null : Number(route.fund_balance);
   const opening = fund === null ? 0 : fund - inHand;
   const todayRow = route.days?.find((d) => d.day === route.today);
   const shownAll = freq === 'all' ? route.customers : route.customers.filter((c) => c.credits?.some((k) => freqOf(k) === freq));
-  const shown = shownAll.slice(0, limit);
+  const qn = q.trim().toLowerCase();
+  const shownAllQ = qn ? shownAll.filter((c) => c.name.toLowerCase().includes(qn) || (c.tax_id ?? '').toLowerCase().includes(qn)) : shownAll;
+  const shownQ = shownAllQ.slice(0, limit);
+  const pendingCustomers = route.customers
+    .filter((c) => !c.paid_today && Number(c.overdue) + Number(c.due_today) > 0.004)
+    .sort((x, y) => Number(y.overdue) - Number(x.overdue));
+  const sigState = !online ? 'off' : queue.length > 0 || rejected.length > 0 ? 'pending' : 'ok';
+  const weekCollected = Number(route.unsettled_cash) + Number(route.unsettled_digital);
+  const dayCollected = Number(todayRow?.cash ?? 0) + Number(todayRow?.digital ?? 0);
+  const portfolio = route.customers.reduce((sum, c) => sum + Number(c.balance), 0);
+  const unread = Number(route.notices_unread ?? 0);
+  const openCustomer = (id: string) => { const c = route.customers.find((x) => x.id === id); if (c) { setSel(c); setPanel(null); } };
+  const canExpenses = route.can_expenses !== false;
+  const stat = (label: string, value: string, cls = '') => (
+    <Card className="!p-3">
+      <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{label}</p>
+      <p className={`whitespace-nowrap text-sm font-extrabold sm:text-base ${cls}`}>{value}</p>
+    </Card>
+  );
+  const tile = (icon: string, label: string, onClick: () => void, badge?: number, disabled = false) => (
+    <button type="button" onClick={onClick} disabled={disabled}
+      className={`relative flex min-h-24 flex-col items-center justify-center gap-1 rounded-2xl p-3 text-center text-sm font-bold cursor-pointer disabled:opacity-50 ${ui.card}`}>
+      <span className="text-3xl">{icon}</span>
+      <span className="leading-tight">{label}</span>
+      {!!badge && badge > 0 && <span className="absolute right-2 top-2 min-w-5 rounded-full bg-red-600 px-1.5 text-[11px] font-bold text-white">{badge}</span>}
+    </button>
+  );
+  const custRow = (c: Customer) => (
+    <li key={c.id}>
+      <button type="button" onClick={() => { setSel(c); setPanel(null); }}
+        className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer ${ui.card}`}>
+        <span className="text-xl">{c.paid_today ? '✅' : Number(c.overdue) > 0 ? '🔴' : Number(c.due_today) > 0 ? '🟡' : '⚪'}</span>
+        <div className="min-w-0 flex-1">
+          <p className="break-words font-bold leading-tight">{c.name}</p>
+          <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
+        </div>
+        <p className="shrink-0 whitespace-nowrap text-sm font-extrabold">{fmt(Number(c.overdue) + Number(c.due_today))}</p>
+      </button>
+    </li>
+  );
 
   return (
     <div className="space-y-4">
-      {/* Estado de conexión y sincronización */}
-      <div className={`flex flex-wrap items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold ${online ? okBox : 'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300'}`}>
-        <span>{online ? `🟢 ${t('col.online')}` : `🟠 ${t('col.offline')}`}</span>
-        <span className="flex-1 text-xs font-normal">
-          {queue.length > 0 ? t('col.pending', { n: queue.length }) : t('col.synced')}
-          {' · '}{t('col.updated', { time: new Date(day.generated_at).toLocaleTimeString(lang, { hour: '2-digit', minute: '2-digit' }) })}
-        </span>
-        {online && (
-          <button type="button" onClick={() => flush(true)} disabled={syncing} className="rounded-lg border border-current px-2.5 py-1 text-xs cursor-pointer disabled:opacity-50">
-            {syncing ? '…' : `↻ ${t('col.sync')}`}
-          </button>
+      {/* Encabezado fijo: nombre, antena, menú, atrás y salir */}
+      <div className="sticky top-0 z-30 -mx-1 flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/95 px-2 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
+        {screen !== 'home' && (
+          <button type="button" onClick={back} aria-label={t('cx.back')} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">←</button>
         )}
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-extrabold">🛵 {route.name || userName}</p>
+          <p className={`truncate text-[11px] ${ui.muted}`}>{userName} · {route.branch}</p>
+        </div>
+        <SignalButton state={sigState} pending={queue.length} syncing={syncing} onClick={() => { if (online) void flush(true); }} />
+        {screen !== 'home' && (
+          <button type="button" onClick={menu} aria-label={t('cx.menu')} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">☰</button>
+        )}
+        <button type="button" onClick={logout} aria-label={t('shell.logout')} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">⏻</button>
       </div>
+      {day.routes.length > 1 && screen === 'home' && (
+        <select value={routeId} onChange={(e) => setRouteId(e.target.value)} className={`${ui.input} !w-auto`}>
+          {day.routes.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+        </select>
+      )}
 
       {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? okBox : errBox}`}>{msg.text}</p>}
       {rejected.length > 0 && (
@@ -398,81 +459,75 @@ export default function CollectorPage() {
         </div>
       )}
 
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-xl font-extrabold sm:text-2xl">🛵 {route.name}</h1>
-          <p className={`text-sm ${ui.muted}`}>{route.branch} · {t('col.visited', { n: visited, total: route.customers.length })}</p>
+
+      {screen === 'home' && (
+        <>
+          {fund !== null && (
+            <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-3">
+              {!!route.period?.investments && stat(t('cx.sum.invest'), fmt(Number(route.period.investments)))}
+              {stat(t('cx.sum.prev'), fmt(opening))}
+              {stat(t('cx.sum.current'), fmt(fund), fund < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400')}
+              {stat(`${t('cx.sum.collected')} · ${t('cx.sum.day')}`, fmt(dayCollected))}
+              {stat(`${t('cx.sum.collected')} · ${t('cx.sum.week')}`, fmt(weekCollected))}
+              {stat(`${t('cx.sum.lent')} · ${t('cx.sum.day')}`, fmt(Number(todayRow?.lent ?? 0)), 'text-violet-600 dark:text-violet-400')}
+              {stat(`${t('cx.sum.lent')} · ${t('cx.sum.week')}`, fmt(loans), 'text-violet-600 dark:text-violet-400')}
+              {stat(t('cx.sum.expenses'), fmt(Number(route.unsettled_expenses)), 'text-red-600 dark:text-red-400')}
+              {route.can_portfolio && stat(t('cx.sum.portfolio'), fmt(portfolio))}
+            </div>
+          )}
+          {fund === null && (
+            <div className="grid grid-cols-3 gap-2 text-center">
+              {stat(t('col.cash'), fmt(Number(route.unsettled_cash)))}
+              {stat(t('col.expenses'), fmt(Number(route.unsettled_expenses)), 'text-red-600 dark:text-red-400')}
+              {stat(t('col.toDeliver'), fmt(inHand), 'text-emerald-600 dark:text-emerald-400')}
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {tile('📍', t('cx.nearby'), () => go('near'))}
+            {tile('👥', t('cx.list'), () => go('list'))}
+            {tile('⏳', t('cx.pending'), () => go('pending'), pendingCustomers.length)}
+            {tile('🧑‍💼', t('cx.newClient'), () => go('newclient'))}
+            {route.can_loan && route.policy && tile('💸', t('cx.newLoan'), () => { setSel(null); setPanel('loan'); }, 0, !online)}
+            {canExpenses && tile('⛽', t('cx.expenses'), () => { setSel(null); setPanel('expense'); })}
+            {route.can_settings && tile('⚙️', t('cx.settings'), () => go('settings'), unread)}
+            {route.can_liquidate && tile('🏁', t('cx.settle'), () => { setSel(null); setPanel('settle'); })}
+          </div>
+        </>
+      )}
+
+      {screen === 'near' && (
+        <NearbyScreen customers={route.customers} onOpen={openCustomer} />
+      )}
+
+      {screen === 'pending' && (
+        <div className="space-y-2">
+          <h2 className="font-bold">⏳ {t('cx.pend.title', { n: pendingCustomers.length })}</h2>
+          {pendingCustomers.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('cx.pend.none')}</p></Card>}
+          <ul className="space-y-2">{pendingCustomers.map(custRow)}</ul>
         </div>
-        {day.routes.length > 1 && (
-          <select value={routeId} onChange={(e) => setRouteId(e.target.value)} className={`${ui.input} !w-auto`}>
-            {day.routes.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
-          </select>
-        )}
-      </div>
-
-      {/* Caja de la ruta: lo que hay para prestar y lo que llevo encima */}
-      {fund !== null && (
-        <Card className="!p-4">
-          <div className="flex items-baseline justify-between gap-2">
-            <p className={`text-xs font-bold uppercase ${ui.muted}`}>💼 {t('fund.title')}</p>
-            <p className={`text-2xl font-extrabold ${fund < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'}`}>{fmt(fund)}</p>
-          </div>
-          <p className={`mt-1 text-[11px] ${ui.muted}`}>{t('liq.formula')}</p>
-        </Card>
       )}
-      {fund !== null && route.days && (
-        <Card className="!p-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-bold">📅 {t('day.today')}</p>
-            <span className={`text-[11px] ${ui.muted}`}>{t('day.auto')}</span>
-          </div>
-          <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.cash')}</p><p className="whitespace-nowrap text-sm font-extrabold sm:text-base">{fmt(todayRow?.cash ?? 0)}</p></div>
-            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('loan.lent')}</p><p className="whitespace-nowrap text-sm font-extrabold sm:text-base text-violet-600 dark:text-violet-400">{fmt(todayRow?.lent ?? 0)}</p></div>
-            <div><p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.expenses')}</p><p className="whitespace-nowrap text-sm font-extrabold sm:text-base text-red-600 dark:text-red-400">{fmt(todayRow?.expenses ?? 0)}</p></div>
-          </div>
-        </Card>
-      )}
-      {fund !== null && <p className={`text-xs font-bold uppercase ${ui.muted}`}>{t('day.sinceLiq')}</p>}
-      <div className={`grid gap-2 text-center ${fund !== null ? 'grid-cols-2 sm:grid-cols-4' : loans !== 0 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-3'}`}>
-        {fund !== null && (
-          <Card className="!p-3">
-            <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('liq.opening')}</p>
-            <p className="whitespace-nowrap text-sm font-extrabold sm:text-base">{fmt(opening)}</p>
-          </Card>
-        )}
-        <Card className="!p-3">
-          <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.cash')}</p>
-          <p className="whitespace-nowrap text-sm font-extrabold sm:text-base">{fmt(route.unsettled_cash)}</p>
-        </Card>
-        {(fund !== null || loans !== 0) && (
-          <Card className="!p-3">
-            <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('loan.lent')}</p>
-            <p className="whitespace-nowrap text-sm font-extrabold sm:text-base text-violet-600 dark:text-violet-400">{fmt(loans)}</p>
-          </Card>
-        )}
-        <Card className="!p-3">
-          <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.expenses')}</p>
-          <p className="whitespace-nowrap text-sm font-extrabold sm:text-base text-red-600 dark:text-red-400">{fmt(route.unsettled_expenses)}</p>
-        </Card>
-        {fund === null && (
-          <Card className="!p-3">
-            <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{t('col.toDeliver')}</p>
-            <p className="whitespace-nowrap text-sm font-extrabold sm:text-base text-emerald-600 dark:text-emerald-400">{fmt(inHand)}</p>
-          </Card>
-        )}
-      </div>
 
-      {route.can_loan && route.policy && (
-        <button type="button" onClick={() => { setSel(null); setPanel('loan'); }} disabled={!online} className={`${ui.btnPrimary} w-full py-3`}>
-          💸 {t('loan.title')}{!online ? ` · ${t('loan.needsSignal')}` : ''}
-        </button>
+      {screen === 'newclient' && (
+        <NewClient routeId={route.id} orgId={route.org_id ?? ''} online={online} canLoan={!!route.can_loan && !!route.policy}
+          onSaved={async () => { await refresh(); }}
+          onLoan={() => { setPanel('loan'); }} />
       )}
-      <div className="grid grid-cols-2 gap-2">
-        <button type="button" onClick={() => { setSel(null); setPanel('expense'); }} className={ui.btnGhost}>⛽ {t('col.addExpense')}</button>
-        <button type="button" onClick={() => { setSel(null); setPanel('settle'); }} className={ui.btnGhost}>{fund !== null ? `📋 ${t('liq.summary')}` : `🏁 ${t('col.settle')}`}</button>
-      </div>
 
+      {screen === 'settings' && (
+        <SettingsScreen routeId={route.id} payQr={route.pay_qr ?? null} payQrNote={route.pay_qr_note ?? null}
+          geoOn={geoOn} onGeo={(v) => { setGeoOn(v); save('vx_col_geo', v); }} fmt={fmt} online={online}
+          onNoticesRead={() => { void refresh(); }}
+          perms={[
+            ['perm.loans.create', !!route.can_loan], ['perm.loans.customers', route.can_customers !== false],
+            ['perm.loans.interest', !!route.can_interest], ['perm.routes.liquidate', !!route.can_liquidate],
+            ['perm.routes.invest', !!route.can_invest], ['perm.collector.expenses', canExpenses],
+            ['perm.collector.portfolio', !!route.can_portfolio], ['perm.collector.settings', !!route.can_settings],
+          ] as [DictKey, boolean][]} />
+      )}
+
+      {screen === 'list' && (
+        <>
+          <input type="search" placeholder={t('cx.search')} value={q} onChange={(e) => setQ(e.target.value)} className={ui.input} />
       {/* Vista: tarjetas o lista, y frecuencia de cobro */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex rounded-xl border border-slate-300 p-0.5 dark:border-slate-700" role="tablist">
@@ -500,8 +555,8 @@ export default function CollectorPage() {
       {/* Tarjetas de cobro */}
       {view === 'cards' && (
         <div className="space-y-3">
-          {shown.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('col.noCustomers')}</p></Card>}
-          {shown.map((c) => (
+          {shownQ.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('col.noCustomers')}</p></Card>}
+          {shownQ.map((c) => (
             <Card key={c.id} className={`space-y-3 ${c.visited_today ? 'opacity-80' : ''}`}>
               <div className="flex items-start gap-3">
                 <span className="text-xl">{c.visited_today ? '✅' : Number(c.overdue) > 0 ? '🔴' : Number(c.due_today) > 0 ? '🟡' : '⚪'}</span>
@@ -516,14 +571,14 @@ export default function CollectorPage() {
               {(c.credits ?? []).length === 0 && <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>}
             </Card>
           ))}
-          <ShowMore rest={shownAll.length - shown.length} onClick={() => setLimit((x) => x + 25)} />
+          <ShowMore rest={shownAllQ.length - shownQ.length} onClick={() => setLimit((x) => x + 25)} />
         </div>
       )}
 
       {/* Clientes del día: primero los vencidos */}
       {view === 'list' && <ul className="space-y-2">
-        {shown.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('col.noCustomers')}</p></Card>}
-        {shown.map((c) => (
+        {shownQ.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('col.noCustomers')}</p></Card>}
+        {shownQ.map((c) => (
           <li key={c.id}>
             <button type="button" onClick={() => { setSel(c); setPanel(null); }}
               className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer ${ui.card} ${c.visited_today ? 'opacity-60' : ''} ${sel?.id === c.id ? 'ring-2 ring-blue-500' : ''}`}>
@@ -541,7 +596,10 @@ export default function CollectorPage() {
           </li>
         ))}
       </ul>}
-      {view === 'list' && <ShowMore rest={shownAll.length - shown.length} onClick={() => setLimit((x) => x + 25)} />}
+      {view === 'list' && <ShowMore rest={shownAllQ.length - shownQ.length} onClick={() => setLimit((x) => x + 25)} />}
+
+        </>
+      )}
 
       {/* Hoja inferior: cliente / gasto / rendición */}
       {(sel || panel) && (
@@ -553,7 +611,7 @@ export default function CollectorPage() {
             </div>
 
             {sel && !panel && (
-              <CustomerSheet c={selNow ?? sel} fmt={fmt} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
+              <CustomerSheet c={selNow ?? sel} fmt={fmt} qr={route.pay_qr ?? null} online={online} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
                 cards={<Credits c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />} />
             )}
             {sel && panel === 'pay' && (
@@ -656,16 +714,29 @@ function Credits({ c, filter, today, policy, fmt, onSave }: {
   );
 }
 
-function CustomerSheet({ c, fmt, onPay, onVisit, cards }: { c: Customer; fmt: (n: number) => string; onPay: () => void; onVisit: () => void; cards: ReactNode }) {
+function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, cards }: { c: Customer; fmt: (n: number) => string; qr: string | null; online: boolean; onPay: () => void; onVisit: () => void; cards: ReactNode }) {
   const { t, lang } = useT();
   const map = c.lat != null && c.lng != null
     ? `https://maps.google.com/?q=${c.lat},${c.lng}`
     : c.address ? `https://maps.google.com/?q=${encodeURIComponent(c.address)}` : null;
+  const sendQr = async () => {
+    const phone = c.phone?.replace(/[^\d]/g, '') ?? '';
+    if (!qr || phone.length < 7) return;
+    const url = await payQrUrl(qr);
+    if (!url) return;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(t('cx.cs.qrMsg', { name: c.name, url }))}`, '_blank', 'noopener');
+  };
+  const gMap = c.g_lat != null && c.g_lng != null ? `https://maps.google.com/?q=${c.g_lat},${c.g_lng}` : null;
   return (
     <div className="space-y-4">
       <div>
         <h2 className="text-lg font-bold">{c.name}</h2>
         <p className={`text-sm ${ui.muted}`}>{c.address ?? '—'}</p>
+        {c.tax_id && <p className={`text-xs ${ui.muted}`}>{t('cx.cs.ci')}: {c.tax_id}</p>}
+        {(c.g_name || c.g_phone) && (
+          <p className={`text-xs ${ui.muted}`}>{t('cx.cs.guarantor')}: {c.g_name ?? '—'}{c.g_phone ? ` · ${c.g_phone}` : ''}
+            {gMap && <> · <a href={gMap} target="_blank" rel="noopener noreferrer" className="underline">📍</a></>}</p>
+        )}
       </div>
       <div className="grid grid-cols-3 gap-2 text-center">
         <div className="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/50">
@@ -686,6 +757,7 @@ function CustomerSheet({ c, fmt, onPay, onVisit, cards }: { c: Customer; fmt: (n
         {c.phone ? <a href={`tel:${c.phone}`} className={ui.btnGhost}>📞 {t('col.call')}</a> : <span />}
         {map ? <a href={map} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>📍 {t('col.map')}</a> : <span />}
       </div>
+      {qr && c.phone && <button type="button" onClick={sendQr} disabled={!online} className={`${ui.btnGhost} w-full`}>📲 {t('cx.cs.sendQr')}</button>}
       <div className="grid grid-cols-2 gap-2">
         <button type="button" onClick={onVisit} className={ui.btnGhost}>📝 {t('col.visit')}</button>
         <button type="button" onClick={onPay} className={`${ui.btnPrimary} py-3`}>💵 {t('col.collect')}</button>

@@ -100,3 +100,9 @@ Panel del dueño · Caja · POS · Clientes y crédito · Cobrador offline · Re
 Tienda online · Mensajes del equipo · Ayuda · Veltrix IA (falta la clave) · Ventas · Caja del dueño ·
 Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar empresas de prueba · Permisos por rol/usuario · Nueva portada · Mi plan y cobros (falta conectar claves) · Páginas legales · Panel supervisor · Préstamos en calle y caja de ruta · Demo Dfg coorp cargada · Roles filtrados por módulos
 - Auditoría BD (19 nov, cierre): 62 índices de claves foráneas simples agregados y política custom_roles_read optimizada (mig. 070). Quedan sin índice 36 FK compuestas (org+empresa+sucursal), solo afectan al borrar sucursales. Logs de Postgres de 24 h: sin errores reales (solo mis pruebas). Advertencias de seguridad restantes son de diseño: funciones públicas (QR, tienda, planes) y RPC con permisos internos. 15 tablas con 2 políticas de lectura (lectura+escritura) se pueden unir cuando haya volumen.
+
+## Panel del cobrador de calle (rehecho, 19 nov)
+- Encabezado fijo: nombre/ruta, antena (verde sincronizado / amarillo sin internet / rojo pendiente; al tocarla sube), menú, atrás, cerrar sesión.
+- Pantalla principal con resumen (inversión, caja anterior/actual, cobrado y prestado día/semana, gastos, cartera si hay permiso) y botones: cercanos (100 m), lista, pendientes, cliente nuevo, crédito nuevo, gastos, ajustes, liquidar.
+- Migración 071 (columnas de garante, avisos de ruta, permisos collector.portfolio y collector.settings).
+- Falta: verificar en pantalla con una "Ruta prueba" asignada a Diego; interfaz del administrador para enviar avisos (RPC admin_route_notice ya existe); push real.

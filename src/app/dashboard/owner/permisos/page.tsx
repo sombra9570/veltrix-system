@@ -20,7 +20,7 @@ type Data = {
 const ROLE_KEYS: Record<string, string[]> = {
   cashier: ['cash.see_expected', 'cash.movements', 'customers.view_docs', 'payments.reverse', 'sales.cancel_request'],
   vendor: ['sales.credit', 'customers.edit', 'customers.view_docs', 'payments.reverse', 'sales.cancel_request'],
-  collector: ['collector.expenses', 'loans.create', 'loans.customers', 'loans.interest', 'loans.cancel', 'loans.reschedule', 'payments.reverse', 'routes.liquidate', 'routes.invest'],
+  collector: ['collector.expenses', 'collector.portfolio', 'collector.settings', 'loans.create', 'loans.customers', 'loans.interest', 'loans.cancel', 'loans.reschedule', 'payments.reverse', 'routes.liquidate', 'routes.invest'],
   storekeeper: ['products.edit', 'products.price', 'products.delete', 'inv.receive', 'inv.adjust', 'inv.out', 'inv.transfer', 'inv.see_cost'],
   accountant: ['reports.export', 'inv.see_cost'],
   technician: ['customers.edit', 'customers.view_docs'],
