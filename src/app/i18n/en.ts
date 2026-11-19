@@ -1931,6 +1931,7 @@ const en: Record<DictKey, string> = {
   'err.cashOver': "The cash amount is higher than allowed for this order.",
   'err.requestDone': "This request was already handled. Refresh the list.",
   'err.tooMany': "Too many attempts in a row. Wait a moment.",
+  'col.rejectedTitle': "{n} record(s) rejected by the server",
 };
 
 export default en;

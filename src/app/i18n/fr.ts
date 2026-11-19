@@ -1931,6 +1931,7 @@ const fr: Record<DictKey, string> = {
   'err.cashOver': "Le montant en espèces dépasse ce qui est autorisé pour cette commande.",
   'err.requestDone': "Cette demande a déjà été traitée. Actualisez la liste.",
   'err.tooMany': "Trop de tentatives d'affilée. Patientez un instant.",
+  'col.rejectedTitle': "{n} enregistrement(s) refusé(s) par le serveur",
 };
 
 export default fr;

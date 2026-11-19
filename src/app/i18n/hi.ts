@@ -1931,6 +1931,7 @@ const hi: Record<DictKey, string> = {
   'err.cashOver': "नकद राशि इस ऑर्डर के लिए अनुमत सीमा से अधिक है।",
   'err.requestDone': "यह अनुरोध पहले ही निपटाया जा चुका है। सूची रीफ़्रेश करें।",
   'err.tooMany': "लगातार बहुत प्रयास हो गए। कृपया थोड़ा रुकें।",
+  'col.rejectedTitle': "सर्वर ने {n} रिकॉर्ड अस्वीकार किए",
 };
 
 export default hi;

@@ -1931,6 +1931,7 @@ const ru: Record<DictKey, string> = {
   'err.cashOver': "Сумма наличных превышает допустимую для этого заказа.",
   'err.requestDone': "Этот запрос уже обработан. Обновите список.",
   'err.tooMany': "Слишком много попыток подряд. Подождите немного.",
+  'col.rejectedTitle': "Записей, отклонённых сервером: {n}",
 };
 
 export default ru;

@@ -8,6 +8,7 @@ import type { DictKey } from '../../i18n/es';
 import { money, parseAmount } from '../format';
 import { useStaff } from '../staff-context';
 import { useSync } from '../sync';
+import { isNetworkError } from '../offline-sales';
 import { ShowMore } from '../paged';
 import { CreditCard, applyPayment, freqOf, type Credit, type Freq, type Method } from './credit-card';
 import { LoanForm, RATING_DOT, type LoanPolicy } from './loan-form';
@@ -101,9 +102,12 @@ export default function CollectorPage() {
   const { userId, userName } = useStaff();
   const DAY_KEY = `vx_collector_day_${userId}`;
   const QUEUE_KEY = `vx_collector_queue_${userId}`;
+  const REJ_KEY = `vx_collector_rejected_${userId}`;
 
   const [day, setDay] = useState<Day | null>(null);
   const [queue, setQueue] = useState<Op[]>([]);
+  // Registros que el servidor no aceptó: NO se pierden, quedan aquí hasta reintentar o descartar
+  const [rejected, setRejected] = useState<(Op & { reason: string })[]>([]);
   const [online, setOnline] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [routeId, setRouteId] = useState('');
@@ -129,6 +133,7 @@ export default function CollectorPage() {
     const d = d0 ? normalizeDay(d0) : null;
     if (d) { setDay(d); setRouteId((r) => r || d.routes[0]?.id || ''); }
     setQueue(load<Op[]>(QUEUE_KEY, []));
+    setRejected(load<(Op & { reason: string })[]>(REJ_KEY, []));
     setOnline(navigator.onLine);
     const on = () => setOnline(true);
     const off = () => setOnline(false);
@@ -179,8 +184,12 @@ export default function CollectorPage() {
           await new Promise((r) => setTimeout(r, 150)); // de a uno, sin saturar la señal
         } catch (err) {
           const m = (err as Error).message;
-          // Sin señal: se reintenta más tarde. Rechazo real (p. ej. monto mayor a la deuda): se descarta y se avisa.
-          if (/fetch|network|Failed|Load failed/i.test(m) || !navigator.onLine) break;
+          // Sin señal o corte por tiempo: se reintenta más tarde (el identificador evita duplicar).
+          // Rechazo real (p. ej. monto mayor a la deuda): NO se pierde, queda en "rechazados" para revisar.
+          if (isNetworkError(m) || !navigator.onLine) break;
+          const rej = [...load<(Op & { reason: string })[]>(REJ_KEY, []).filter((o) => o.id !== op.id), { ...op, reason: m }];
+          save(REJ_KEY, rej);
+          setRejected(rej);
           flash(false, `${t('col.rejected')}: ${m}`);
         }
         pending = load<Op[]>(QUEUE_KEY, []).filter((o) => o.id !== op.id);
@@ -193,7 +202,24 @@ export default function CollectorPage() {
     }
     // Solo vuelve a descargar el día si se envió algo o si se pidió
     if (sent > 0 || force) await refresh();
-  }, [QUEUE_KEY, refresh, t]);
+  }, [QUEUE_KEY, REJ_KEY, refresh, t]);
+
+  const retryRejected = (id: string) => {
+    const r = load<(Op & { reason: string })[]>(REJ_KEY, []);
+    const item = r.find((o) => o.id === id);
+    if (!item) return;
+    const { reason: _reason, ...op } = item;
+    void _reason;
+    const rest = r.filter((o) => o.id !== id);
+    save(REJ_KEY, rest); setRejected(rest);
+    const q = [...load<Op[]>(QUEUE_KEY, []), op as Op];
+    save(QUEUE_KEY, q); setQueue(q);
+    if (navigator.onLine) flush();
+  };
+  const discardRejected = (id: string) => {
+    const rest = load<(Op & { reason: string })[]>(REJ_KEY, []).filter((o) => o.id !== id);
+    save(REJ_KEY, rest); setRejected(rest);
+  };
 
   // Al abrir y al volver la señal: envía lo pendiente y actualiza el día.
   // Si quedó algo sin enviar, reintenta cada 5 min (solo si hay pendientes).
@@ -339,6 +365,28 @@ export default function CollectorPage() {
       </div>
 
       {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? okBox : errBox}`}>{msg.text}</p>}
+      {rejected.length > 0 && (
+        <div className={`space-y-2 rounded-xl border p-3 text-sm ${errBox}`}>
+          <h2 className="font-bold">⚠️ {t('col.rejectedTitle', { n: rejected.length })}</h2>
+          <p className="text-xs">{t('pos.rejectedHint')}</p>
+          <ul className="space-y-2">
+            {rejected.map((r) => (
+              <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white/60 p-2 dark:bg-black/20">
+                <span className="min-w-0 text-xs">
+                  <b>{r.kind === 'visit' ? '📍' : r.kind === 'expense' ? '🧾' : '💵'}{' '}
+                    {r.kind === 'visit' ? '' : fmt(r.amount)}</b>{' · '}
+                  {new Date(r.at).toLocaleString(lang, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                  <br />{r.reason}
+                </span>
+                <span className="flex gap-2">
+                  <button type="button" onClick={() => retryRejected(r.id)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>↻ {t('pos.retry')}</button>
+                  <button type="button" onClick={() => discardRejected(r.id)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>🗑️ {t('pos.discard')}</button>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {receipt && (
         <div className={`flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3 text-sm ${okBox}`}>
           <span className="font-semibold">{t('rcpt.offer')}</span>

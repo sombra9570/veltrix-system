@@ -1931,6 +1931,7 @@ const de: Record<DictKey, string> = {
   'err.cashOver': "Der Barbetrag übersteigt das für diese Bestellung Erlaubte.",
   'err.requestDone': "Diese Anfrage wurde bereits bearbeitet. Liste aktualisieren.",
   'err.tooMany': "Zu viele Versuche hintereinander. Bitte kurz warten.",
+  'col.rejectedTitle': "{n} Eintrag/Einträge vom Server abgelehnt",
 };
 
 export default de;

@@ -1940,6 +1940,7 @@ const es = {
   'err.cashOver': "El efectivo indicado supera lo permitido para este pedido.",
   'err.requestDone': "Esta solicitud ya fue atendida. Actualiza la lista.",
   'err.tooMany': "Demasiados intentos seguidos. Espera un momento.",
+  'col.rejectedTitle': "{n} registro(s) rechazado(s) por el servidor",
 };
 
 export default es;

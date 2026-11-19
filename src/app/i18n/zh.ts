@@ -1931,6 +1931,7 @@ const zh: Record<DictKey, string> = {
   'err.cashOver': "现金金额超过此订单允许的上限。",
   'err.requestDone': "此请求已处理。请刷新列表。",
   'err.tooMany': "连续尝试次数过多，请稍候。",
+  'col.rejectedTitle': "服务器拒绝了 {n} 条记录",
 };
 
 export default zh;

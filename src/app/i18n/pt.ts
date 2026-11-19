@@ -1931,6 +1931,7 @@ const pt: Record<DictKey, string> = {
   'err.cashOver': "O valor em dinheiro é maior que o permitido para este pedido.",
   'err.requestDone': "Esta solicitação já foi atendida. Atualize a lista.",
   'err.tooMany': "Muitas tentativas seguidas. Aguarde um momento.",
+  'col.rejectedTitle': "{n} registro(s) rejeitado(s) pelo servidor",
 };
 
 export default pt;

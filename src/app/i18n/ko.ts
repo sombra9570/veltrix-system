@@ -1931,6 +1931,7 @@ const ko: Record<DictKey, string> = {
   'err.cashOver': "현금 금액이 이 주문에 허용된 한도를 초과합니다.",
   'err.requestDone': "이 요청은 이미 처리되었습니다. 목록을 새로고침하세요.",
   'err.tooMany': "연속 시도가 너무 많습니다. 잠시 기다려 주세요.",
+  'col.rejectedTitle': "서버가 거부한 기록 {n}건",
 };
 
 export default ko;

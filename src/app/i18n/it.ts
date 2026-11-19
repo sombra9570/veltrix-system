@@ -1931,6 +1931,7 @@ const it: Record<DictKey, string> = {
   'err.cashOver': "L'importo in contanti supera quello consentito per questo ordine.",
   'err.requestDone': "Questa richiesta è già stata gestita. Aggiorna l'elenco.",
   'err.tooMany': "Troppi tentativi di fila. Attendi un momento.",
+  'col.rejectedTitle': "{n} registrazione/i rifiutata/e dal server",
 };
 
 export default it;

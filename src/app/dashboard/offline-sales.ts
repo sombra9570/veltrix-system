@@ -32,4 +32,4 @@ export const cacheBranches = (user: string, v: unknown) => write(`vx_pos_branche
 /** Falla de señal o del servidor (se reintenta), distinta de un rechazo de negocio (stock, tope, permiso) */
 export const isNetworkError = (msg: string) =>
   (typeof navigator !== 'undefined' && !navigator.onLine) ||
-  /fetch|network|timeout|timed out|abort|failed|load failed|502|503|504|gateway|upstream/i.test(msg);
+  /fetch|network|timeout|timed out|abort|load failed|bad gateway|gateway time-?out|service unavailable|upstream/i.test(msg);

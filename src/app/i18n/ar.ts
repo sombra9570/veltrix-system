@@ -1931,6 +1931,7 @@ const ar: Record<DictKey, string> = {
   'err.cashOver': "مبلغ النقد أعلى من المسموح لهذا الطلب.",
   'err.requestDone': "تمت معالجة هذا الطلب بالفعل. حدّث القائمة.",
   'err.tooMany': "محاولات كثيرة متتالية. انتظر قليلاً.",
+  'col.rejectedTitle': "سجلات رفضها الخادم: {n}",
 };
 
 export default ar;

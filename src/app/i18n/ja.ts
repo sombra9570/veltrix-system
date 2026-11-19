@@ -1931,6 +1931,7 @@ const ja: Record<DictKey, string> = {
   'err.cashOver': "現金の金額がこの注文で許可されている額を超えています。",
   'err.requestDone': "このリクエストはすでに処理されています。一覧を更新してください。",
   'err.tooMany': "連続した試行が多すぎます。しばらくお待ちください。",
+  'col.rejectedTitle': "サーバーに拒否された記録: {n} 件",
 };
 
 export default ja;
