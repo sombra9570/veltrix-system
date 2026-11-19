@@ -1932,6 +1932,8 @@ const pt: Record<DictKey, string> = {
   'err.requestDone': "Esta solicitação já foi atendida. Atualize a lista.",
   'err.tooMany': "Muitas tentativas seguidas. Aguarde um momento.",
   'col.rejectedTitle': "{n} registro(s) rejeitado(s) pelo servidor",
+  'card.hDate': "Data",
+  'card.hValue': "Valor da parcela",
 };
 
 export default pt;

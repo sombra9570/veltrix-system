@@ -1932,6 +1932,8 @@ const ar: Record<DictKey, string> = {
   'err.requestDone': "تمت معالجة هذا الطلب بالفعل. حدّث القائمة.",
   'err.tooMany': "محاولات كثيرة متتالية. انتظر قليلاً.",
   'col.rejectedTitle': "سجلات رفضها الخادم: {n}",
+  'card.hDate': "التاريخ",
+  'card.hValue': "قيمة كل قسط",
 };
 
 export default ar;

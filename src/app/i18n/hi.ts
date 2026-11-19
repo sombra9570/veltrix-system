@@ -1932,6 +1932,8 @@ const hi: Record<DictKey, string> = {
   'err.requestDone': "यह अनुरोध पहले ही निपटाया जा चुका है। सूची रीफ़्रेश करें।",
   'err.tooMany': "लगातार बहुत प्रयास हो गए। कृपया थोड़ा रुकें।",
   'col.rejectedTitle': "सर्वर ने {n} रिकॉर्ड अस्वीकार किए",
+  'card.hDate': "तारीख",
+  'card.hValue': "प्रति किस्त राशि",
 };
 
 export default hi;

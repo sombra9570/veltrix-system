@@ -1932,6 +1932,8 @@ const zh: Record<DictKey, string> = {
   'err.requestDone': "此请求已处理。请刷新列表。",
   'err.tooMany': "连续尝试次数过多，请稍候。",
   'col.rejectedTitle': "服务器拒绝了 {n} 条记录",
+  'card.hDate': "日期",
+  'card.hValue': "每期金额",
 };
 
 export default zh;

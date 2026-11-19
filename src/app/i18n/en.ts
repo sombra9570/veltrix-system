@@ -1932,6 +1932,8 @@ const en: Record<DictKey, string> = {
   'err.requestDone': "This request was already handled. Refresh the list.",
   'err.tooMany': "Too many attempts in a row. Wait a moment.",
   'col.rejectedTitle': "{n} record(s) rejected by the server",
+  'card.hDate': "Date",
+  'card.hValue': "Amount per installment",
 };
 
 export default en;

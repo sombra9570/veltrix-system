@@ -1941,6 +1941,8 @@ const es = {
   'err.requestDone': "Esta solicitud ya fue atendida. Actualiza la lista.",
   'err.tooMany': "Demasiados intentos seguidos. Espera un momento.",
   'col.rejectedTitle': "{n} registro(s) rechazado(s) por el servidor",
+  'card.hDate': "Fecha",
+  'card.hValue': "Valor de cada cuota",
 };
 
 export default es;

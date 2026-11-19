@@ -1932,6 +1932,8 @@ const ru: Record<DictKey, string> = {
   'err.requestDone': "Этот запрос уже обработан. Обновите список.",
   'err.tooMany': "Слишком много попыток подряд. Подождите немного.",
   'col.rejectedTitle': "Записей, отклонённых сервером: {n}",
+  'card.hDate': "Дата",
+  'card.hValue': "Сумма взноса",
 };
 
 export default ru;

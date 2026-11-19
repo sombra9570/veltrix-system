@@ -640,11 +640,14 @@ function Credits({ c, filter, today, policy, fmt, onSave }: {
             </p>
           )}
           {all.length > 1 && (
-            <p className="text-xs font-bold">
-              💳 {t('card.creditN', { n: all.indexOf(k) + 1, total: all.length })}
-              <span className={`font-normal ${ui.muted}`}> · {new Date(k.created).toLocaleDateString(lang)} · {fmt(Number(k.total))}</span>
-            </p>
+            <p className="text-xs font-bold">💳 {t('card.creditN', { n: all.indexOf(k) + 1, total: all.length })}</p>
           )}
+          {/* Encabezado como la tarjeta de papel: fecha, valor de cada cuota y total */}
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1 rounded-lg bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800/50">
+            <p><span className={ui.muted}>{t('card.hDate')}: </span><span className="font-bold">{new Date(k.created).toLocaleDateString(lang)}</span></p>
+            <p className="text-right"><span className={ui.muted}>{t('card.hValue')}: </span><span className="font-bold">{fmt(Number(k.installments[0]?.amount ?? 0))}</span></p>
+            <p className="col-span-2"><span className={ui.muted}>{t('loan.count')}: </span><span className="font-bold">{k.installments.length}</span><span className={ui.muted}> · {t(`card.f.${f}` as DictKey)} · </span><span className="font-bold">{fmt(Number(k.total))}</span></p>
+          </div>
           <CreditCard credit={k} today={today} fmt={fmt} onSave={(amount, method) => onSave(k.id, amount, method)} />
         </div>
         );

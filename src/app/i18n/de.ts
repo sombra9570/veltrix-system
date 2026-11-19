@@ -1932,6 +1932,8 @@ const de: Record<DictKey, string> = {
   'err.requestDone': "Diese Anfrage wurde bereits bearbeitet. Liste aktualisieren.",
   'err.tooMany': "Zu viele Versuche hintereinander. Bitte kurz warten.",
   'col.rejectedTitle': "{n} Eintrag/Einträge vom Server abgelehnt",
+  'card.hDate': "Datum",
+  'card.hValue': "Betrag pro Rate",
 };
 
 export default de;

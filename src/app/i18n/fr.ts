@@ -1932,6 +1932,8 @@ const fr: Record<DictKey, string> = {
   'err.requestDone': "Cette demande a déjà été traitée. Actualisez la liste.",
   'err.tooMany': "Trop de tentatives d'affilée. Patientez un instant.",
   'col.rejectedTitle': "{n} enregistrement(s) refusé(s) par le serveur",
+  'card.hDate': "Date",
+  'card.hValue': "Montant par échéance",
 };
 
 export default fr;

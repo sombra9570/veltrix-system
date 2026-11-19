@@ -1932,6 +1932,8 @@ const ja: Record<DictKey, string> = {
   'err.requestDone': "このリクエストはすでに処理されています。一覧を更新してください。",
   'err.tooMany': "連続した試行が多すぎます。しばらくお待ちください。",
   'col.rejectedTitle': "サーバーに拒否された記録: {n} 件",
+  'card.hDate': "日付",
+  'card.hValue': "1回の金額",
 };
 
 export default ja;

@@ -1932,6 +1932,8 @@ const it: Record<DictKey, string> = {
   'err.requestDone': "Questa richiesta è già stata gestita. Aggiorna l'elenco.",
   'err.tooMany': "Troppi tentativi di fila. Attendi un momento.",
   'col.rejectedTitle': "{n} registrazione/i rifiutata/e dal server",
+  'card.hDate': "Data",
+  'card.hValue': "Importo della rata",
 };
 
 export default it;

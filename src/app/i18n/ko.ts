@@ -1932,6 +1932,8 @@ const ko: Record<DictKey, string> = {
   'err.requestDone': "이 요청은 이미 처리되었습니다. 목록을 새로고침하세요.",
   'err.tooMany': "연속 시도가 너무 많습니다. 잠시 기다려 주세요.",
   'col.rejectedTitle': "서버가 거부한 기록 {n}건",
+  'card.hDate': "날짜",
+  'card.hValue': "회차당 금액",
 };
 
 export default ko;
