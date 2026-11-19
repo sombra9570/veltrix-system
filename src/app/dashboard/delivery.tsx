@@ -6,6 +6,7 @@ import { ui } from '../site-header';
 import { useSync } from './sync';
 import { useT } from '../i18n';
 import { money, shortTime, parseAmount } from './format';
+import { friendlyError } from './owner/owner-context';
 import { DeliveryMap, directionsUrl, type MapPoint } from './delivery-map';
 import { uploadSaleFile, useSignedUrls } from './sale-files';
 import { compressImage } from './image';
@@ -60,7 +61,7 @@ export function DeliveryRequests({ branchId, currency, onChanged, flash }: {
     if (reason === null) return;
     setBusy(r.id);
     try { await rpc('delivery_request_resolve', { p_request: r.id, p_accept: false, p_reason: reason }); flash(true, t('tq.rejectedOk')); await load(); }
-    catch { flash(false, t('err.generic')); }
+    catch (e) { flash(false, friendlyError((e as Error).message, t)); }
     setBusy('');
   };
 
@@ -137,7 +138,7 @@ export function DeliveryBoard({ branchId, currency, flash, showEmpty = false, dr
   const assign = async (o: Del, driverId: string) => {
     setBusy(o.id);
     try { await rpc('delivery_assign', { p_order: o.id, p_driver: driverId }); flash(true, t('dl.assigned')); await load(); }
-    catch { flash(false, t('err.generic')); }
+    catch (e) { flash(false, friendlyError((e as Error).message, t)); }
     setBusy('');
   };
   const pts: MapPoint[] = list.filter((o) => o.lat != null && o.lng != null && o.status !== 'delivered' && o.status !== 'failed')
@@ -234,17 +235,17 @@ export function DeliverySetup({ branchId, flash }: { branchId: string; flash: Fl
   useEffect(() => { load(); }, [load]);
 
   const toggle = async () => {
-    try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: !enabled, p_zone: null })); } catch { flash(false, t('err.generic')); }
+    try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: !enabled, p_zone: null })); } catch (e) { flash(false, friendlyError((e as Error).message, t)); }
   };
   const changeMode = async (m: 'none' | 'fee' | 'full') => {
-    try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: null, p_zone: null, p_cash_mode: m })); } catch { flash(false, t('err.generic')); }
+    try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: null, p_zone: null, p_cash_mode: m })); } catch (e) { flash(false, friendlyError((e as Error).message, t)); }
   };
   const saveLimit = async () => {
     const n = parseAmount(limit);
-    try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: null, p_zone: null, p_cash_limit: Number.isFinite(n) && n > 0 ? n : 0 })); } catch { flash(false, t('err.generic')); }
+    try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: null, p_zone: null, p_cash_limit: Number.isFinite(n) && n > 0 ? n : 0 })); } catch (e) { flash(false, friendlyError((e as Error).message, t)); }
   };
   const save = async (z: Partial<Zone> & { name: string }) => {
-    try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: null, p_zone: z })); return true; } catch { flash(false, t('err.generic')); return false; }
+    try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: null, p_zone: z })); return true; } catch (e) { flash(false, friendlyError((e as Error).message, t)); return false; }
   };
   const add = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -468,7 +469,7 @@ export function CourierBoard({ branchId, orgId, currency, flash, manager = false
       } });
       setF({ kind: 'purchase', title: '', details: '', pickup: '', drop: '', budget: '' });
       await load();
-    } catch { flash(false, t('err.generic')); }
+    } catch (e) { flash(false, friendlyError((e as Error).message, t)); }
     setBusy('');
   };
   const act = async (x: Task, action: 'take' | 'cancel') => {
@@ -483,7 +484,7 @@ export function CourierBoard({ branchId, orgId, currency, flash, manager = false
       const path = photo ? await uploadSaleFile(orgId, branchId, 'task', await compressImage(photo)) : null;
       await rpc('courier_task_set', { p_task: x.id, p_action: 'done', p_data: { spent: parseAmount(fin.spent) || 0, returned: parseAmount(fin.returned) || 0, note: fin.note, receipt_path: path } });
       setOpen(''); setFin({ spent: '', returned: '', note: '' }); setPhoto(null); await load();
-    } catch { flash(false, t('err.generic')); }
+    } catch (e) { flash(false, friendlyError((e as Error).message, t)); }
     setBusy('');
   };
 

@@ -1926,6 +1926,11 @@ const ko: Record<DictKey, string> = {
   'dl.rFailed': "건 실패",
   'dl.rCash': "수금",
   'dl.rPending': "미제출",
+  'err.taken': "다른 사람이 이미 이 주문 또는 작업을 가져갔습니다. 목록을 새로고침하세요.",
+  'err.invalidData': "유효하지 않은 데이터가 있습니다. 확인 후 다시 시도하세요.",
+  'err.cashOver': "현금 금액이 이 주문에 허용된 한도를 초과합니다.",
+  'err.requestDone': "이 요청은 이미 처리되었습니다. 목록을 새로고침하세요.",
+  'err.tooMany': "연속 시도가 너무 많습니다. 잠시 기다려 주세요.",
 };
 
 export default ko;

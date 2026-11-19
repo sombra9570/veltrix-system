@@ -1926,6 +1926,11 @@ const zh: Record<DictKey, string> = {
   'dl.rFailed': "单失败",
   'dl.rCash': "已收现金",
   'dl.rPending': "未上交",
+  'err.taken': "此订单或任务已被他人接手。请刷新列表。",
+  'err.invalidData': "部分数据无效。请检查后重试。",
+  'err.cashOver': "现金金额超过此订单允许的上限。",
+  'err.requestDone': "此请求已处理。请刷新列表。",
+  'err.tooMany': "连续尝试次数过多，请稍候。",
 };
 
 export default zh;

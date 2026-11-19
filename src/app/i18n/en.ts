@@ -1926,6 +1926,11 @@ const en: Record<DictKey, string> = {
   'dl.rFailed': "failed",
   'dl.rCash': "collected",
   'dl.rPending': "not handed in",
+  'err.taken': "Someone else already took this order or task. Refresh the list.",
+  'err.invalidData': "Some data is not valid. Check it and try again.",
+  'err.cashOver': "The cash amount is higher than allowed for this order.",
+  'err.requestDone': "This request was already handled. Refresh the list.",
+  'err.tooMany': "Too many attempts in a row. Wait a moment.",
 };
 
 export default en;

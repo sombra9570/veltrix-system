@@ -1926,6 +1926,11 @@ const de: Record<DictKey, string> = {
   'dl.rFailed': "fehlgeschlagen",
   'dl.rCash': "kassiert",
   'dl.rPending': "nicht abgegeben",
+  'err.taken': "Jemand anderes hat diese Bestellung oder Aufgabe bereits übernommen. Liste aktualisieren.",
+  'err.invalidData': "Einige Daten sind ungültig. Prüfen Sie sie und versuchen Sie es erneut.",
+  'err.cashOver': "Der Barbetrag übersteigt das für diese Bestellung Erlaubte.",
+  'err.requestDone': "Diese Anfrage wurde bereits bearbeitet. Liste aktualisieren.",
+  'err.tooMany': "Zu viele Versuche hintereinander. Bitte kurz warten.",
 };
 
 export default de;

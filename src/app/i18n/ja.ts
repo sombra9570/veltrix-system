@@ -1926,6 +1926,11 @@ const ja: Record<DictKey, string> = {
   'dl.rFailed': "件失敗",
   'dl.rCash': "回収",
   'dl.rPending': "未納",
+  'err.taken': "この注文またはタスクはすでに他の人が受け取りました。一覧を更新してください。",
+  'err.invalidData': "無効なデータがあります。確認してもう一度お試しください。",
+  'err.cashOver': "現金の金額がこの注文で許可されている額を超えています。",
+  'err.requestDone': "このリクエストはすでに処理されています。一覧を更新してください。",
+  'err.tooMany': "連続した試行が多すぎます。しばらくお待ちください。",
 };
 
 export default ja;

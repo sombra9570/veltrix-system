@@ -1926,6 +1926,11 @@ const fr: Record<DictKey, string> = {
   'dl.rFailed': "échecs",
   'dl.rCash': "encaissé",
   'dl.rPending': "non remis",
+  'err.taken': "Quelqu'un d'autre a déjà pris cette commande ou tâche. Actualisez la liste.",
+  'err.invalidData': "Certaines données ne sont pas valides. Vérifiez-les et réessayez.",
+  'err.cashOver': "Le montant en espèces dépasse ce qui est autorisé pour cette commande.",
+  'err.requestDone': "Cette demande a déjà été traitée. Actualisez la liste.",
+  'err.tooMany': "Trop de tentatives d'affilée. Patientez un instant.",
 };
 
 export default fr;
