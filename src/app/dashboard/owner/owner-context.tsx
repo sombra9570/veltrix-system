@@ -89,7 +89,7 @@ export function friendlyError(msg: string, t: (k: DictKey) => string): string {
   if (msg.includes('PLAN_ROLES_LIMIT')) return t('err.limitRoles');
   if (/TASK_TAKEN|DELIVERY_TAKEN/.test(msg)) return t('err.taken');
   if (/CASH_OVER_LIMIT|CASH_NOT_ALLOWED/.test(msg)) return t('err.cashOver');
-  if (/REQUEST_NOT_PENDING|REQUEST_NOT_FOUND|CASH_NOT_PENDING|LOAN_NOT_PENDING/.test(msg)) return t('err.requestDone');
+  if (/REQUEST_NOT_PENDING|REQUEST_NOT_FOUND|CASH_NOT_PENDING|LOAN_NOT_PENDING|REVERSAL_EXISTS/.test(msg)) return t('err.requestDone');
   if (msg.includes('TOO_MANY_REQUESTS')) return t('err.tooMany');
   if (/[A-Z]+_INVALID/.test(msg)) return t('err.invalidData');
   if (/suspendida/i.test(msg)) return t('err.suspended');
