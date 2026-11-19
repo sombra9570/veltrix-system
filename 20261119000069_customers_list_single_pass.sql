@@ -1,0 +1,3 @@
+-- customers_list: antes llamaba customer_open_balance/customer_overdue por cada cliente (hasta 300 veces,
+-- cada una recorriendo pedidos y cuotas). Ahora calcula saldo y mora de todos en una sola pasada (lateral join).
+-- Prueba con ~4.800 pedidos/42.000 cuotas: 574 ms -> 18 ms, resultado idéntico. Texto completo vive en la BD.
