@@ -1,0 +1,6 @@
+-- Veltrix · 064 · Cobros: se bloquea cada cuota mientras se cobra, para que dos cobros simultáneos
+-- (caja + cobrador, doble toque) no puedan pasarse del saldo. Aplicada en Supabase como
+-- "payments_lock_installments_against_double_charge". Cambios respecto a la versión anterior:
+--  * register_payment: el bucle de cuotas usa FOR UPDATE OF i y calcula el saldo después de bloquear.
+--  * validate_allocation: bloquea la cuota (PERFORM ... FOR UPDATE) antes de verificar el saldo.
+-- (El texto completo de ambas funciones está en la base; este archivo documenta el cambio.)

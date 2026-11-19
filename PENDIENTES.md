@@ -91,6 +91,7 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - Costos fijos antes del primer cliente que paga: Supabase Pro (~$25/mes, servidor siempre encendido), Vercel Pro ($20/usuario/mes; el plan gratis es solo no comercial y se pausa al pasar límites), MapTiler Flex (~$25/mes). Activar aviso de gasto máximo en Vercel y Supabase. Verificar en qué plan está hoy cada uno.
 - Revisado y correcto: las 28 tablas con RLS sin políticas solo se tocan por funciones o por el servidor (intencional); admin_purge_org exige superadmin, nombre exacto y no permite borrar la propia organización.
 - Estado de planes: Supabase, Vercel y MapTiler están en gratis. Pasar Supabase y Vercel a Pro (~$45/mes, con copias de seguridad) el día que arranque el primer piloto real.
+- Dinero revisado (19 nov): 10 verificaciones de consistencia sin fallas en los datos actuales; corregido riesgo de doble cobro simultáneo sobre una cuota (mig. 064). Pendiente revisar liquidación de rutas, cierre de caja y reversos con el mismo criterio.
 - Por revisar: ~95 índices de llaves foráneas restantes (tablas pequeñas), política custom_roles_read (rendimiento), logs de base de datos, pruebas de carga con muchos usuarios, consistencia código/BD y textos sin traducir.
 
 ## Hecho
