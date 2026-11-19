@@ -1,4 +1,5 @@
 'use client';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { rpc, supabase } from '../../../lib/supabase';
 import { Card } from '../shell';
@@ -15,7 +16,8 @@ import { LoanForm, RATING_DOT, type LoanPolicy } from './loan-form';
 import { DaysTable, type DayRow } from './days-table';
 import { CutForm } from './cut-form';
 import { SignalButton } from './signal';
-import { NearbyScreen } from './nearby';
+import { MenuTile } from './tiles';
+import { NearbyScreen, NEAR_METERS, distanceM } from './nearby';
 import { NewClient } from './new-client';
 import { SettingsScreen, payQrUrl } from './settings';
 
@@ -127,6 +129,8 @@ export default function CollectorPage() {
   useEffect(() => { setLimit(25); }, [freq, routeId, view]);
   useEffect(() => { const v = load<string>('vx_col_view', 'list'); if (v === 'cards' || v === 'list') setView(v); }, []);
   const pickView = (v: 'cards' | 'list') => { setView(v); save('vx_col_view', v); };
+  const router = useRouter();
+  const [nearCount, setNearCount] = useState<number | null>(null);
   const [q, setQ] = useState('');
   const [screen, setScreen] = useState<Screen>('home');
   const [hist, setHist] = useState<Screen[]>([]);
@@ -345,6 +349,19 @@ export default function CollectorPage() {
   const selNow = sel ? route?.customers.find((x) => x.id === sel.id) ?? sel : null;
   const fmt = (n: number) => money(Number(n), route?.currency ?? 'USD', lang);
 
+  // Cuántos clientes hay a menos de 100 m (se calcula al abrir la pantalla principal)
+  const nearList = day?.routes.find((r) => r.id === routeId)?.customers;
+  useEffect(() => {
+    if (screen !== 'home' || !nearList) return;
+    let live = true;
+    getPosition().then((pos) => {
+      if (!live) return;
+      if (!pos) { setNearCount(null); return; }
+      setNearCount(nearList.filter((c) => c.lat != null && c.lng != null && distanceM(pos, { lat: c.lat, lng: c.lng }) <= NEAR_METERS).length);
+    });
+    return () => { live = false; };
+  }, [screen, nearList]);
+
   /* ---------- Pantallas ---------- */
   if (!day) {
     return <Card><p className={`text-sm ${ui.muted}`}>{online ? t('common.wait') : t('col.noDataOffline')}</p></Card>;
@@ -367,14 +384,6 @@ export default function CollectorPage() {
   const unread = Number(route.notices_unread ?? 0);
   const openCustomer = (id: string) => { const c = route.customers.find((x) => x.id === id); if (c) { setSel(c); setPanel(null); } };
   const canExpenses = route.can_expenses !== false;
-  const tile = (icon: string, label: string, onClick: () => void, badge?: number, disabled = false) => (
-    <button type="button" onClick={onClick} disabled={disabled}
-      className={`relative flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl p-3 text-center text-sm font-bold leading-tight cursor-pointer disabled:opacity-50 ${ui.card}`}>
-      <span className="text-3xl leading-none">{icon}</span>
-      <span className="line-clamp-2">{label}</span>
-      {!!badge && badge > 0 && <span className="absolute right-2 top-2 min-w-5 rounded-full bg-red-600 px-1.5 text-[11px] font-bold text-white">{badge}</span>}
-    </button>
-  );
   const custRow = (c: Customer) => (
     <li key={c.id}>
       <button type="button" onClick={() => { setSel(c); setPanel(null); }}
@@ -449,17 +458,15 @@ export default function CollectorPage() {
 
       {screen === 'home' && (
         <>
-          <div>
           <div className="mx-auto grid max-w-xl grid-cols-2 gap-3">
-            {tile('📍', t('cx.nearby'), () => go('near'))}
-            {tile('👥', t('cx.list'), () => go('list'))}
-            {tile('⏳', t('cx.pending'), () => go('pending'), pendingCustomers.length)}
-            {tile('🧑‍💼', t('cx.newClient'), () => go('newclient'))}
-            {route.can_loan && route.policy && tile('💸', t('cx.newLoan'), () => { setSel(null); setPanel('loan'); }, 0, !online)}
-            {canExpenses && tile('⛽', t('cx.expenses'), () => { setSel(null); setPanel('expense'); })}
-            {route.can_settings && tile('⚙️', t('cx.settings'), () => go('settings'), unread)}
-            {route.can_liquidate && tile('🏁', t('cx.settle'), () => { setSel(null); setPanel('settle'); })}
-          </div>
+            <MenuTile icon="pin" tone="blue" label={`${t('cx.nearby')}${nearCount === null ? '' : ` (${nearCount})`}`} onClick={() => go('near')} />
+            <MenuTile icon="clock" tone="amber" label={`${t('cx.pending')} (${pendingCustomers.length})`} onClick={() => go('pending')} />
+            <MenuTile icon="users" tone="plain" label={`${t('cx.list')} (${route.customers.length})`} onClick={() => go('list')} />
+            <MenuTile icon="userPlus" tone="blue" label={t('cx.newClient')} onClick={() => go('newclient')} />
+            <MenuTile icon="wallet" tone="plain" label={t('nav.routeInfo')} onClick={() => router.push('/dashboard/collector/info')} />
+            {canExpenses && <MenuTile icon="receipt" tone="amber" label={t('cx.expenses')} onClick={() => { setSel(null); setPanel('expense'); }} />}
+            {route.can_liquidate && <MenuTile icon="refresh" tone="blue" label={t('cx.settle')} onClick={() => { setSel(null); setPanel('settle'); }} />}
+            {route.can_settings && <MenuTile icon="sliders" tone="plain" label={`${t('cx.settings')}${unread > 0 ? ` (${unread})` : ''}`} onClick={() => go('settings')} />}
           </div>
         </>
       )}
