@@ -61,10 +61,13 @@ export function StaffProvider({
     const extra: NavItem[] = [];
     for (const r of also) for (const n of ((ROLE_NAV as Record<string, NavItem[]>)[r] ?? [])) {
       if (n.label === 'nav.messages' || seen.has(n.label)) continue;
-      seen.add(n.label); extra.push(n);
+      seen.add(n.label); extra.push({ ...n, group: `role.${r}` as DictKey });
     }
     const chat = own.filter((n) => n.label === 'nav.messages');
-    return [...own.filter((n) => n.label !== 'nav.messages'), ...extra, ...chat];
+    const mine = own.filter((n) => n.label !== 'nav.messages');
+    // Con funciones de varios roles, el menú se separa por rol; con uno solo no hace falta
+    if (extra.length === 0) return [...mine, ...chat];
+    return [...mine.map((n) => ({ ...n, group: `role.${session.role}` as DictKey })), ...extra, ...chat];
   })().filter((n) => !n.module || (modules ?? []).includes(n.module));
 
   const company = companies.find((c) => c.id === session.companyId);

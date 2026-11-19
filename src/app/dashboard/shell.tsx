@@ -64,8 +64,10 @@ export function AppShell({
       <ul className="flex-1 space-y-0.5 overflow-y-auto px-3">
         {nav.map((item, i) => {
           const active = pathname === item.href;
-          const heading = item.group && item.group !== nav[i - 1]?.group ? (
-            <li aria-hidden className={`px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 ${i === 0 ? 'pt-1' : 'pt-4'}`}>{t(item.group)}</li>
+          const heading = item.group !== nav[i - 1]?.group && (item.group || i > 0) ? (
+            item.group
+              ? <li aria-hidden className={`px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 ${i === 0 ? 'pt-1' : 'pt-4'}`}>{t(item.group)}</li>
+              : <li aria-hidden className="mx-3 my-2 border-t border-slate-200 dark:border-slate-800" />
           ) : null;
           const base = 'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition';
           if (item.soon) {

@@ -23,7 +23,7 @@ export function homeForRole(role: UserRole): string {
     case 'supervisor': return '/dashboard/supervisor';
     case 'cashier': return '/dashboard/cashier';
     case 'reception': return '/dashboard/cashier';
-    case 'delivery': return '/dashboard/collector';
+    case 'delivery': return '/dashboard/collector/entregas';
     case 'collector': return '/dashboard/collector';
     case 'waiter': return '/dashboard/waiter';
     case 'kitchen': return '/dashboard/kitchen';
