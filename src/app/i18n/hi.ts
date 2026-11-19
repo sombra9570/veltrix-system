@@ -1910,6 +1910,12 @@ const hi: Record<DictKey, string> = {
   'roles.limitReached': "आप अपने प्लान की भूमिका सीमा तक पहुँच गए हैं।",
   'dl.mapStreet': "सड़कें",
   'dl.mapSat': "सैटेलाइट",
+  'nav.g.today': "आज",
+  'nav.g.sell': "बिक्री और वसूली",
+  'nav.g.business': "मेरा व्यवसाय",
+  'nav.g.reports': "रिपोर्ट",
+  'nav.g.team': "टीम",
+  'nav.g.account': "खाता",
 };
 
 export default hi;

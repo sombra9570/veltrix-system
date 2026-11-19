@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { rpc } from '../../lib/supabase';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -11,7 +11,7 @@ import { useSync, SyncButton, NetBanner } from './sync';
 import { loadAuth } from '../auth-system';
 import type { DictKey } from '../i18n/es';
 
-export type NavItem = { href: string; icon: string; label: DictKey; soon?: boolean; module?: string };
+export type NavItem = { href: string; icon: string; label: DictKey; soon?: boolean; module?: string; group?: DictKey };
 
 /**
  * Estructura común de todos los paneles: menú lateral (en celular, desplegable),
@@ -62,12 +62,15 @@ export function AppShell({
       </div>
 
       <ul className="flex-1 space-y-0.5 overflow-y-auto px-3">
-        {nav.map((item) => {
+        {nav.map((item, i) => {
           const active = pathname === item.href;
+          const heading = item.group && item.group !== nav[i - 1]?.group ? (
+            <li aria-hidden className={`px-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 ${i === 0 ? 'pt-1' : 'pt-4'}`}>{t(item.group)}</li>
+          ) : null;
           const base = 'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition';
           if (item.soon) {
             return (
-              <li key={item.href}>
+              <Fragment key={item.href}>{heading}<li>
                 <span className={`${base} cursor-not-allowed text-slate-400 dark:text-slate-600`}>
                   <span className="text-base">{item.icon}</span>
                   <span className="flex-1">{t(item.label)}</span>
@@ -75,11 +78,11 @@ export function AppShell({
                     {t('nav.soon')}
                   </span>
                 </span>
-              </li>
+              </li></Fragment>
             );
           }
           return (
-            <li key={item.href}>
+            <Fragment key={item.href}>{heading}<li>
               <Link
                 href={item.href}
                 onClick={() => setOpen(false)}
@@ -95,7 +98,7 @@ export function AppShell({
                   <span className={`grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-bold ${active ? 'bg-white text-blue-700' : 'bg-blue-600 text-white'}`}>{unread > 99 ? '99+' : unread}</span>
                 )}
               </Link>
-            </li>
+            </li></Fragment>
           );
         })}
       </ul>

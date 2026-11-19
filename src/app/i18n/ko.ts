@@ -1910,6 +1910,12 @@ const ko: Record<DictKey, string> = {
   'roles.limitReached': "요금제의 역할 한도에 도달했습니다.",
   'dl.mapStreet': "지도",
   'dl.mapSat': "위성",
+  'nav.g.today': "오늘",
+  'nav.g.sell': "판매 및 수금",
+  'nav.g.business': "내 사업",
+  'nav.g.reports': "보고서",
+  'nav.g.team': "팀",
+  'nav.g.account': "계정",
 };
 
 export default ko;

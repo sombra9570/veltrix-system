@@ -1910,6 +1910,12 @@ const ru: Record<DictKey, string> = {
   'roles.limitReached': "Достигнут максимум ролей вашего тарифа.",
   'dl.mapStreet': "Карта",
   'dl.mapSat': "Спутник",
+  'nav.g.today': "Сегодня",
+  'nav.g.sell': "Продажи и касса",
+  'nav.g.business': "Мой бизнес",
+  'nav.g.reports': "Отчёты",
+  'nav.g.team': "Команда",
+  'nav.g.account': "Аккаунт",
 };
 
 export default ru;

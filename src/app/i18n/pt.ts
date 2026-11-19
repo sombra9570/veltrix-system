@@ -1910,6 +1910,12 @@ const pt: Record<DictKey, string> = {
   'roles.limitReached': "Você atingiu o máximo de papéis do plano.",
   'dl.mapStreet': "Ruas",
   'dl.mapSat': "Satélite",
+  'nav.g.today': "Hoje",
+  'nav.g.sell': "Vender e receber",
+  'nav.g.business': "Meu negócio",
+  'nav.g.reports': "Relatórios",
+  'nav.g.team': "Equipe",
+  'nav.g.account': "Conta",
 };
 
 export default pt;

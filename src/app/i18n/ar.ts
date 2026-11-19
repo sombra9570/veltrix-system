@@ -1910,6 +1910,12 @@ const ar: Record<DictKey, string> = {
   'roles.limitReached': "وصلت إلى الحد الأقصى للأدوار في خطتك.",
   'dl.mapStreet': "الشوارع",
   'dl.mapSat': "قمر صناعي",
+  'nav.g.today': "اليوم",
+  'nav.g.sell': "البيع والتحصيل",
+  'nav.g.business': "عملي",
+  'nav.g.reports': "التقارير",
+  'nav.g.team': "الفريق",
+  'nav.g.account': "الحساب",
 };
 
 export default ar;

@@ -1910,6 +1910,12 @@ const de: Record<DictKey, string> = {
   'roles.limitReached': "Sie haben das Rollenlimit Ihres Plans erreicht.",
   'dl.mapStreet': "Karte",
   'dl.mapSat': "Satellit",
+  'nav.g.today': "Heute",
+  'nav.g.sell': "Verkaufen & kassieren",
+  'nav.g.business': "Mein Geschäft",
+  'nav.g.reports': "Berichte",
+  'nav.g.team': "Team",
+  'nav.g.account': "Konto",
 };
 
 export default de;

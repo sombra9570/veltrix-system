@@ -1910,6 +1910,12 @@ const zh: Record<DictKey, string> = {
   'roles.limitReached': "已达到套餐的角色上限。",
   'dl.mapStreet': "街道",
   'dl.mapSat': "卫星",
+  'nav.g.today': "今天",
+  'nav.g.sell': "销售与收款",
+  'nav.g.business': "我的业务",
+  'nav.g.reports': "报表",
+  'nav.g.team': "团队",
+  'nav.g.account': "账户",
 };
 
 export default zh;

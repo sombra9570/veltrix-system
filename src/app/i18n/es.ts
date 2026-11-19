@@ -1919,6 +1919,12 @@ const es = {
   'roles.limitReached': "Llegaste al máximo de roles de tu plan.",
   'dl.mapStreet': "Calles",
   'dl.mapSat': "Satélite",
+  'nav.g.today': "Hoy",
+  'nav.g.sell': "Vender y cobrar",
+  'nav.g.business': "Mi negocio",
+  'nav.g.reports': "Reportes",
+  'nav.g.team': "Equipo",
+  'nav.g.account': "Cuenta",
 };
 
 export default es;

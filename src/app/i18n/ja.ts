@@ -1910,6 +1910,12 @@ const ja: Record<DictKey, string> = {
   'roles.limitReached': "プランのロール上限に達しました。",
   'dl.mapStreet': "地図",
   'dl.mapSat': "衛星",
+  'nav.g.today': "今日",
+  'nav.g.sell': "販売と回収",
+  'nav.g.business': "マイビジネス",
+  'nav.g.reports': "レポート",
+  'nav.g.team': "チーム",
+  'nav.g.account': "アカウント",
 };
 
 export default ja;
