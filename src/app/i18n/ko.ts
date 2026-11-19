@@ -1908,6 +1908,8 @@ const ko: Record<DictKey, string> = {
   'roles.pickHint': "요금제에 따라 최대 {n}개 역할을 고르세요. ⭐는 시작 화면입니다.",
   'roles.count': "{a}/{b}개 역할",
   'roles.limitReached': "요금제의 역할 한도에 도달했습니다.",
+  'dl.mapStreet': "지도",
+  'dl.mapSat': "위성",
 };
 
 export default ko;

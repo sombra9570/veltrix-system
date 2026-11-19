@@ -1908,6 +1908,8 @@ const ja: Record<DictKey, string> = {
   'roles.pickHint': "プランに応じて最大{n}個のロールを選べます。⭐は開始画面です。",
   'roles.count': "{a}/{b} ロール",
   'roles.limitReached': "プランのロール上限に達しました。",
+  'dl.mapStreet': "地図",
+  'dl.mapSat': "衛星",
 };
 
 export default ja;

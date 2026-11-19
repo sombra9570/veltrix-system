@@ -1917,6 +1917,8 @@ const es = {
   'roles.pickHint': "Elige hasta {n} roles según tu plan. La ⭐ marca la pantalla con la que inicia.",
   'roles.count': "{a} de {b} roles",
   'roles.limitReached': "Llegaste al máximo de roles de tu plan.",
+  'dl.mapStreet': "Calles",
+  'dl.mapSat': "Satélite",
 };
 
 export default es;

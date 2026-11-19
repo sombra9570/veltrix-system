@@ -1908,6 +1908,8 @@ const fr: Record<DictKey, string> = {
   'roles.pickHint': "Choisissez jusqu'à {n} rôles selon votre plan. La ⭐ marque l'écran de départ.",
   'roles.count': "{a} sur {b} rôles",
   'roles.limitReached': "Vous avez atteint le maximum de rôles du plan.",
+  'dl.mapStreet': "Plan",
+  'dl.mapSat': "Satellite",
 };
 
 export default fr;

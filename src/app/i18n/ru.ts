@@ -1908,6 +1908,8 @@ const ru: Record<DictKey, string> = {
   'roles.pickHint': "Выберите до {n} ролей по вашему тарифу. ⭐ отмечает стартовый экран.",
   'roles.count': "{a} из {b} ролей",
   'roles.limitReached': "Достигнут максимум ролей вашего тарифа.",
+  'dl.mapStreet': "Карта",
+  'dl.mapSat': "Спутник",
 };
 
 export default ru;

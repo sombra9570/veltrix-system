@@ -1908,6 +1908,8 @@ const pt: Record<DictKey, string> = {
   'roles.pickHint': "Escolha até {n} papéis conforme seu plano. A ⭐ marca a tela inicial.",
   'roles.count': "{a} de {b} papéis",
   'roles.limitReached': "Você atingiu o máximo de papéis do plano.",
+  'dl.mapStreet': "Ruas",
+  'dl.mapSat': "Satélite",
 };
 
 export default pt;
