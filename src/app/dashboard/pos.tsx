@@ -445,7 +445,7 @@ export function PosScreen() {
 
       <div className="grid gap-5 lg:grid-cols-3">
         {/* Catálogo */}
-        <div className="space-y-3 lg:col-span-2">
+        <div className="min-w-0 space-y-3 lg:col-span-2">
           <input
             type="search"
             value={query}

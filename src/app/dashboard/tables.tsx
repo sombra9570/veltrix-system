@@ -111,7 +111,7 @@ export function TablesScreen({ manage = false }: { manage?: boolean }) {
       )}
 
       <div className="grid gap-5 lg:grid-cols-5">
-        <div className={`space-y-4 lg:col-span-3 ${order ? 'max-lg:hidden' : ''}`}>
+        <div className={`min-w-0 space-y-4 lg:col-span-3 ${order ? 'max-lg:hidden' : ''}`}>
           {areas.map((area) => (
             <div key={area}>
               {area && <p className={`mb-2 text-xs font-bold uppercase tracking-wide ${ui.muted}`}>{area}</p>}
@@ -147,7 +147,7 @@ export function TablesScreen({ manage = false }: { manage?: boolean }) {
         </div>
 
         {order && (
-          <div className="lg:col-span-2">
+          <div className="min-w-0 lg:col-span-2">
             <OrderPanel order={order} branchId={branchId} fmt={fmt}
               onClose={() => setOrder(null)}
               onChanged={async () => { await loadOrder(order.id); await loadBoard(); }}

@@ -122,7 +122,7 @@ export function WorkshopScreen() {
       </div>
 
       <div className="grid gap-5 lg:grid-cols-5">
-        <ul className={`space-y-2 lg:col-span-2 ${detail ? 'max-lg:hidden' : ''}`}>
+        <ul className={`min-w-0 space-y-2 lg:col-span-2 ${detail ? 'max-lg:hidden' : ''}`}>
           {orders.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('shop.empty')}</p></Card>}
           {orders.map((o) => (
             <li key={o.id}>
@@ -143,7 +143,7 @@ export function WorkshopScreen() {
         </ul>
 
         {detail && board && (
-          <div className="lg:col-span-3">
+          <div className="min-w-0 lg:col-span-3">
             <OrderDetail d={detail} technicians={board.technicians} branchId={branchId} fmt={(n) => fmt(n, detail.currency)}
               onClose={() => setDetail(null)}
               onChanged={async () => { await open(detail.id); await load(); }} flash={flash} />

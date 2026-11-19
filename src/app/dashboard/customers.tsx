@@ -282,7 +282,7 @@ export function CustomersScreen() {
 
       <div className="grid gap-5 lg:grid-cols-5">
         {/* Lista */}
-        <div className={`space-y-3 lg:col-span-2 ${detail ? 'max-lg:hidden' : ''}`}>
+        <div className={`min-w-0 space-y-3 lg:col-span-2 ${detail ? 'max-lg:hidden' : ''}`}>
           <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('cust.search')} className={ui.input} />
           <Card className="!p-0 overflow-hidden">
             {rows.length === 0 ? (
@@ -300,7 +300,7 @@ export function CustomersScreen() {
                         <p className="truncate font-semibold">{r.name}</p>
                         <p className={`truncate text-xs ${ui.muted}`}>{[r.tax_id, r.phone].filter(Boolean).join(' · ') || '—'}</p>
                       </div>
-                      <div className="text-right">
+                      <div className="shrink-0 text-right">
                         <p className="text-sm font-bold">{fmt(r.balance)}</p>
                         {statusPill(r)}
                       </div>
@@ -315,7 +315,7 @@ export function CustomersScreen() {
 
         {/* Ficha */}
         {detail && (
-          <div className="space-y-4 lg:col-span-3">
+          <div className="min-w-0 space-y-4 lg:col-span-3">
             <Card className="space-y-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
