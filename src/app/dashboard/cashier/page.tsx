@@ -8,6 +8,7 @@ import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
 import { money, shortTime, parseAmount } from '../format';
 import { QrPayBox, attachPaymentProof, useShiftQr } from '../sale-files';
+import { RestaurantInbox } from '../delivery';
 
 type Method = 'cash' | 'qr_transfer' | 'card';
 type MovType = 'expense' | 'withdrawal' | 'deposit' | 'change_fund';
@@ -95,6 +96,8 @@ export default function CashierPage() {
       {msg && (
         <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? okBox : errBox}`}>{msg.text}</p>
       )}
+
+      <RestaurantInbox />
 
       {!s ? (
         <OpenShift home={home} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />

@@ -12,7 +12,7 @@ import { Card } from './shell';
 const BUCKET = 'sale-files';
 
 /** Sube una imagen (ya comprimida o un PNG chico como la firma) y devuelve la ruta */
-export async function uploadSaleFile(orgId: string, branchId: string, kind: 'qr' | 'pay' | 'wo', blob: Blob): Promise<string> {
+export async function uploadSaleFile(orgId: string, branchId: string, kind: 'qr' | 'pay' | 'wo' | 'task', blob: Blob): Promise<string> {
   const ext = blob.type === 'image/webp' ? 'webp' : blob.type === 'image/png' ? 'png' : 'jpg';
   const path = `${orgId}/${branchId}/${kind}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const up = await supabase.storage.from(BUCKET).upload(path, blob, { contentType: blob.type });
