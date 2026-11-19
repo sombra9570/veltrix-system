@@ -1,0 +1,5 @@
+-- Veltrix · 068 · Pedidos públicos (QR de mesa y tienda delivery): un doble toque o reintento con señal lenta
+-- no crea solicitudes duplicadas. Aplicada en Supabase como "public_orders_dedupe_double_tap". Cambios:
+--  * public_table_order: si hay una solicitud pendiente idéntica (misma mesa, mismos platos, mismo nombre) de los últimos 2 min, devuelve esa.
+--  * public_delivery_order: igual (mismo teléfono, platos y dirección, últimos 3 min).
+-- (El texto completo de las funciones está en la base; este archivo documenta el cambio.)
