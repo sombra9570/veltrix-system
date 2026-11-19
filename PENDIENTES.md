@@ -86,6 +86,11 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [ ] Guiones de videos cortos (cobro offline, cierre de caja a ciegas)
 - [ ] Caso de éxito con números reales de los pilotos
 
+## Auditoría de calidad y costos (19 nov 2026)
+- Hecho: funciones internas cerradas para usuarios sin sesión (mig. 062); índices en tablas de más movimiento (mig. 063); delivery con límite de efectivo, asignación y reporte (mig. 061).
+- Costos fijos antes del primer cliente que paga: Supabase Pro (~$25/mes, servidor siempre encendido), Vercel Pro ($20/usuario/mes; el plan gratis es solo no comercial y se pausa al pasar límites), MapTiler Flex (~$25/mes). Activar aviso de gasto máximo en Vercel y Supabase. Verificar en qué plan está hoy cada uno.
+- Por revisar: 28 tablas con RLS sin políticas (acceso solo por funciones; confirmar que es intencional), ~95 índices de llaves foráneas restantes (tablas pequeñas), política custom_roles_read (rendimiento), restringir admin_purge_org, logs de base de datos, pruebas de carga con muchos usuarios, consistencia código/BD y textos sin traducir.
+
 ## Hecho
 Panel del dueño · Caja · POS · Clientes y crédito · Cobrador offline · Restaurante · Taller ·
 Tienda online · Mensajes del equipo · Ayuda · Veltrix IA (falta la clave) · Ventas · Caja del dueño ·
