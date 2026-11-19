@@ -44,7 +44,7 @@ type Route = {
   fund_balance?: number; fund_float?: number;
   period?: Period; liquidations?: Liquidation[]; days?: DayRow[]; can_liquidate?: boolean; can_invest?: boolean;
   policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_interest?: boolean;
-  can_expenses?: boolean; can_portfolio?: boolean; can_settings?: boolean; pay_qr?: string | null; pay_qr_note?: string | null; org_id?: string; notices_unread?: number;
+  can_expenses?: boolean; can_portfolio?: boolean; can_settings?: boolean; pay_qr?: string | null; pay_qr_note?: string | null; org_id?: string; branch_id?: string; own_qr?: boolean; notices_unread?: number;
   customers: Customer[]; settlements: Settlement[];
 };
 type Screen = 'home' | 'near' | 'list' | 'pending' | 'newclient' | 'settings';
@@ -466,7 +466,7 @@ export default function CollectorPage() {
             <MenuTile icon="wallet" tone="plain" label={t('nav.routeInfo')} onClick={() => router.push('/dashboard/collector/info')} />
             {canExpenses && <MenuTile icon="receipt" tone="amber" label={t('cx.expenses')} onClick={() => { setSel(null); setPanel('expense'); }} />}
             {route.can_liquidate && <MenuTile icon="refresh" tone="blue" label={t('cx.settle')} onClick={() => { setSel(null); setPanel('settle'); }} />}
-            {route.can_settings && <MenuTile icon="sliders" tone="plain" label={`${t('cx.settings')}${unread > 0 ? ` (${unread})` : ''}`} onClick={() => go('settings')} />}
+            {<MenuTile icon="sliders" tone="plain" label={`${t('cx.settings')}${unread > 0 ? ` (${unread})` : ''}`} onClick={() => go('settings')} />
           </div>
         </>
       )}
@@ -490,7 +490,8 @@ export default function CollectorPage() {
       )}
 
       {screen === 'settings' && (
-        <SettingsScreen routeId={route.id} payQr={route.pay_qr ?? null} payQrNote={route.pay_qr_note ?? null}
+        <SettingsScreen routeId={route.id} orgId={route.org_id ?? ''} branchId={route.branch_id ?? ''} ownQr={!!route.own_qr}
+          canLoan={!!route.can_loan && !!route.policy} onLoan={() => setPanel('loan')} onQrChanged={refresh} payQr={route.pay_qr ?? null} payQrNote={route.pay_qr_note ?? null}
           geoOn={geoOn} onGeo={(v) => { setGeoOn(v); save('vx_col_geo', v); }} fmt={fmt} online={online}
           onNoticesRead={() => { void refresh(); }}
           perms={[

@@ -2015,6 +2015,13 @@ const ar: Record<DictKey, string> = {
   "perm.collector.settings": "استخدام إعدادات اللوحة",
   "perm.collector.settings.d": "يفتح الإعدادات: الإشعارات ورمز QR والتقارير.",
   "nav.routeInfo": "معلومات المسار",
+  "cx.set.qrUpload": "رفع أو تغيير رمز QR الخاص بي",
+  "cx.set.qrNote": "نص بجانب الرمز (اختياري)",
+  "cx.set.qrSaved": "تم الحفظ.",
+  "cx.set.qrRemove": "إزالة رمز QR الخاص بي",
+  "cx.set.lang": "اللغة والبلد",
+  "cx.set.loans": "القروض",
+  "cx.set.loansHint": "إذا سمح المسؤول، يمكنك تغيير الفائدة والأقساط عند إنشاء القرض.",
 };
 
 export default ar;

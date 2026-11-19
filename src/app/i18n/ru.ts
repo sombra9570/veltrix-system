@@ -2015,6 +2015,13 @@ const ru: Record<DictKey, string> = {
   "perm.collector.settings": "Использовать настройки панели",
   "perm.collector.settings.d": "Открывает настройки: уведомления, QR и отчёты.",
   "nav.routeInfo": "Информация о маршруте",
+  "cx.set.qrUpload": "Загрузить или заменить мой QR",
+  "cx.set.qrNote": "Текст рядом с QR (необязательно)",
+  "cx.set.qrSaved": "Сохранено.",
+  "cx.set.qrRemove": "Удалить мой QR",
+  "cx.set.lang": "Язык и страна",
+  "cx.set.loans": "Кредиты",
+  "cx.set.loansHint": "Если администратор разрешил, при создании кредита можно менять процент и взносы.",
 };
 
 export default ru;

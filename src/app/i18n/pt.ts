@@ -2015,6 +2015,13 @@ const pt: Record<DictKey, string> = {
   "perm.collector.settings": "Usar os ajustes do painel",
   "perm.collector.settings.d": "Abre a tela de ajustes: avisos, QR de pagamento e relatórios.",
   "nav.routeInfo": "Informações da rota",
+  "cx.set.qrUpload": "Enviar ou trocar meu QR",
+  "cx.set.qrNote": "Texto junto ao QR (opcional)",
+  "cx.set.qrSaved": "Salvo.",
+  "cx.set.qrRemove": "Remover meu QR",
+  "cx.set.lang": "Idioma e país",
+  "cx.set.loans": "Créditos",
+  "cx.set.loansHint": "Se o administrador permitir, você pode alterar juros e parcelas ao criar um crédito.",
 };
 
 export default pt;

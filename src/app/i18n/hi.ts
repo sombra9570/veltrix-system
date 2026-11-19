@@ -2015,6 +2015,13 @@ const hi: Record<DictKey, string> = {
   "perm.collector.settings": "पैनल सेटिंग्स उपयोग करें",
   "perm.collector.settings.d": "सेटिंग्स खोलता है: सूचनाएँ, भुगतान QR और रिपोर्ट।",
   "nav.routeInfo": "रूट की जानकारी",
+  "cx.set.qrUpload": "मेरा QR अपलोड/बदलें",
+  "cx.set.qrNote": "QR के साथ टेक्स्ट (वैकल्पिक)",
+  "cx.set.qrSaved": "सहेजा गया।",
+  "cx.set.qrRemove": "मेरा QR हटाएँ",
+  "cx.set.lang": "भाषा और देश",
+  "cx.set.loans": "ऋण",
+  "cx.set.loansHint": "व्यवस्थापक अनुमति दे तो ऋण बनाते समय ब्याज और किस्तें बदल सकते हैं।",
 };
 
 export default hi;

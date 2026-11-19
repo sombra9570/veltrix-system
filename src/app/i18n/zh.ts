@@ -2015,6 +2015,13 @@ const zh: Record<DictKey, string> = {
   "perm.collector.settings": "使用面板设置",
   "perm.collector.settings.d": "打开设置：通知、付款二维码和报告。",
   "nav.routeInfo": "路线信息",
+  "cx.set.qrUpload": "上传或更换我的二维码",
+  "cx.set.qrNote": "二维码旁的文字（可选）",
+  "cx.set.qrSaved": "已保存。",
+  "cx.set.qrRemove": "移除我的二维码",
+  "cx.set.lang": "语言与国家",
+  "cx.set.loans": "贷款",
+  "cx.set.loansHint": "若管理员允许，创建贷款时可修改利息和期数。",
 };
 
 export default zh;

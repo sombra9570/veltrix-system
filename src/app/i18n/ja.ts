@@ -2015,6 +2015,13 @@ const ja: Record<DictKey, string> = {
   "perm.collector.settings": "パネル設定を使う",
   "perm.collector.settings.d": "設定画面を開きます：お知らせ、支払いQR、レポート。",
   "nav.routeInfo": "ルート情報",
+  "cx.set.qrUpload": "QRをアップロード／変更",
+  "cx.set.qrNote": "QRの横に表示する文（任意）",
+  "cx.set.qrSaved": "保存しました。",
+  "cx.set.qrRemove": "QRを削除",
+  "cx.set.lang": "言語と国",
+  "cx.set.loans": "ローン",
+  "cx.set.loansHint": "管理者が許可すれば、作成時に金利と回数を変更できます。",
 };
 
 export default ja;

@@ -2015,6 +2015,13 @@ const it: Record<DictKey, string> = {
   "perm.collector.settings": "Usare le impostazioni del pannello",
   "perm.collector.settings.d": "Apre le impostazioni: avvisi, QR di pagamento e report.",
   "nav.routeInfo": "Informazioni sul giro",
+  "cx.set.qrUpload": "Carica o cambia il mio QR",
+  "cx.set.qrNote": "Testo accanto al QR (facoltativo)",
+  "cx.set.qrSaved": "Salvato.",
+  "cx.set.qrRemove": "Rimuovi il mio QR",
+  "cx.set.lang": "Lingua e paese",
+  "cx.set.loans": "Crediti",
+  "cx.set.loansHint": "Se l’amministratore lo consente, puoi modificare interesse e rate alla creazione.",
 };
 
 export default it;

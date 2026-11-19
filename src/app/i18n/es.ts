@@ -2024,6 +2024,13 @@ const es = {
   "perm.collector.settings": "Usar los ajustes del panel",
   "perm.collector.settings.d": "Abre la pantalla de ajustes: avisos, QR de pago y reportes.",
   "nav.routeInfo": "Información de la ruta",
+  "cx.set.qrUpload": "Subir o cambiar mi QR",
+  "cx.set.qrNote": "Texto junto al QR (opcional)",
+  "cx.set.qrSaved": "Guardado.",
+  "cx.set.qrRemove": "Quitar mi QR",
+  "cx.set.lang": "Idioma y país",
+  "cx.set.loans": "Créditos",
+  "cx.set.loansHint": "Si el administrador lo permite, al crear un crédito puedes cambiar el interés y las cuotas.",
 };
 
 export default es;

@@ -2015,6 +2015,13 @@ const de: Record<DictKey, string> = {
   "perm.collector.settings": "Panel-Einstellungen nutzen",
   "perm.collector.settings.d": "Öffnet die Einstellungen: Hinweise, Zahlungs-QR, Berichte.",
   "nav.routeInfo": "Routeninformationen",
+  "cx.set.qrUpload": "Meinen QR hochladen oder ändern",
+  "cx.set.qrNote": "Text neben dem QR (optional)",
+  "cx.set.qrSaved": "Gespeichert.",
+  "cx.set.qrRemove": "Meinen QR entfernen",
+  "cx.set.lang": "Sprache und Land",
+  "cx.set.loans": "Kredite",
+  "cx.set.loansHint": "Wenn der Administrator es erlaubt, kannst du Zins und Raten beim Anlegen ändern.",
 };
 
 export default de;

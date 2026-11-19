@@ -2015,6 +2015,13 @@ const ko: Record<DictKey, string> = {
   "perm.collector.settings": "패널 설정 사용",
   "perm.collector.settings.d": "설정 화면을 엽니다: 알림, 결제 QR, 보고서.",
   "nav.routeInfo": "경로 정보",
+  "cx.set.qrUpload": "내 QR 올리기/변경",
+  "cx.set.qrNote": "QR 옆 문구(선택)",
+  "cx.set.qrSaved": "저장되었습니다.",
+  "cx.set.qrRemove": "내 QR 삭제",
+  "cx.set.lang": "언어 및 국가",
+  "cx.set.loans": "대출",
+  "cx.set.loansHint": "관리자가 허용하면 대출 생성 시 이자와 회차를 변경할 수 있습니다.",
 };
 
 export default ko;

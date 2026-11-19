@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import { supabase, rpc } from '../../../lib/supabase';
 import { Card } from '../shell';
-import { ui } from '../../site-header';
+import { ui, RegionSelectors } from '../../site-header';
+import { compressImage, extFor } from '../image';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
 
@@ -23,14 +24,45 @@ export async function payQrUrl(path: string, seconds = 3 * 86400): Promise<strin
  *  - reportes de todas las liquidaciones,
  *  - preferencias del teléfono.
  */
-export function SettingsScreen({ routeId, perms, payQr, payQrNote, geoOn, onGeo, fmt, online, onNoticesRead }: {
-  routeId: string; perms: [DictKey, boolean][]; payQr: string | null; payQrNote: string | null;
+export function SettingsScreen({ routeId, orgId, branchId, ownQr, canLoan, onLoan, onQrChanged, perms, payQr, payQrNote, geoOn, onGeo, fmt, online, onNoticesRead }: {
+  routeId: string; orgId: string; branchId: string; ownQr: boolean; canLoan: boolean; onLoan: () => void; onQrChanged: () => void | Promise<void>; perms: [DictKey, boolean][]; payQr: string | null; payQrNote: string | null;
   geoOn: boolean; onGeo: (v: boolean) => void; fmt: (n: number) => string; online: boolean; onNoticesRead: () => void;
 }) {
   const { t, lang } = useT();
   const [notices, setNotices] = useState<Notice[] | null>(null);
   const [liqs, setLiqs] = useState<Liq[] | null>(null);
   const [qrUrl, setQrUrl] = useState<string | null>(null);
+  const [note, setNote] = useState(payQrNote ?? '');
+  const [busy, setBusy] = useState(false);
+  const [qrMsg, setQrMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  useEffect(() => { setNote(payQrNote ?? ''); }, [payQrNote]);
+
+  // El cobrador sube su propio QR (imagen) y un texto opcional; se usa para enviarlo por WhatsApp
+  const saveQr = async (file: File | null) => {
+    if (busy) return;
+    setBusy(true); setQrMsg(null);
+    try {
+      let path: string | null = ownQr ? (payQr ?? null) : null;
+      if (file) {
+        const blob = await compressImage(file);
+        path = `${orgId}/${branchId}/qr/route-${routeId}-${Date.now()}.${extFor(blob)}`;
+        const { error } = await supabase.storage.from('sale-files').upload(path, blob, { contentType: blob.type, upsert: false });
+        if (error) throw new Error(error.message);
+      }
+      await rpc('collector_set_qr', { p_route: routeId, p_path: path ?? '', p_note: note });
+      await onQrChanged();
+      setQrMsg({ ok: true, text: t('cx.set.qrSaved') });
+    } catch (e) {
+      setQrMsg({ ok: false, text: (e as Error).message || t('err.generic') });
+    } finally { setBusy(false); }
+  };
+  const removeQr = async () => {
+    if (busy) return;
+    setBusy(true); setQrMsg(null);
+    try { await rpc('collector_set_qr', { p_route: routeId, p_path: '', p_note: '' }); await onQrChanged(); setQrMsg({ ok: true, text: t('cx.set.qrSaved') }); }
+    catch (e) { setQrMsg({ ok: false, text: (e as Error).message || t('err.generic') }); }
+    finally { setBusy(false); }
+  };
 
   useEffect(() => {
     let dead = false;
@@ -97,7 +129,33 @@ export function SettingsScreen({ routeId, perms, payQr, payQrNote, geoOn, onGeo,
               <p className={`mt-1 text-xs ${ui.muted}`}>{t('cx.set.qrHint')}</p>
             </div>
           ) : <p className={`text-sm ${ui.muted}`}>{online ? t('common.wait') : t('cx.set.qrOffline')}</p>}
+        <input value={note} onChange={(e) => setNote(e.target.value)} placeholder={t('cx.set.qrNote')} maxLength={120} className={ui.input} />
+        <label className={`${ui.btnPrimary} w-full cursor-pointer text-center ${!online || busy ? 'pointer-events-none opacity-50' : ''}`}>
+          {busy ? t('common.wait') : `📷 ${t('cx.set.qrUpload')}`}
+          <input type="file" accept="image/*" className="hidden" disabled={!online || busy}
+            onChange={(e) => { const f = e.target.files?.[0] ?? null; e.target.value = ''; if (f) void saveQr(f); }} />
+        </label>
+        {ownQr && (
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" onClick={() => void saveQr(null)} disabled={!online || busy} className={ui.btnGhost}>{t('prod.save')}</button>
+            <button type="button" onClick={removeQr} disabled={!online || busy} className={ui.btnGhost}>🗑️ {t('cx.set.qrRemove')}</button>
+          </div>
+        )}
+        {qrMsg && <p className={`text-sm font-semibold ${qrMsg.ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>{qrMsg.text}</p>}
       </Card>
+
+      <Card className="space-y-2">
+        <p className="font-bold">🌐 {t('cx.set.lang')}</p>
+        <RegionSelectors stacked />
+      </Card>
+
+      {canLoan && (
+        <Card className="space-y-2">
+          <p className="font-bold">💸 {t('cx.set.loans')}</p>
+          <p className={`text-xs ${ui.muted}`}>{t('cx.set.loansHint')}</p>
+          <button type="button" onClick={onLoan} disabled={!online} className={ui.btnGhost}>{t('cx.newLoan')}</button>
+        </Card>
+      )}
 
       <Card className="space-y-2">
         <p className="font-bold">📋 {t('cx.set.reports')}</p>
