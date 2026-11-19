@@ -375,17 +375,17 @@ export default function CollectorPage() {
   const openCustomer = (id: string) => { const c = route.customers.find((x) => x.id === id); if (c) { setSel(c); setPanel(null); } };
   const canExpenses = route.can_expenses !== false;
   const stat = (label: string, value: string, cls = '') => (
-    <Card className="!p-3">
-      <p className={`text-[11px] font-semibold uppercase ${ui.muted}`}>{label}</p>
-      <p className={`whitespace-nowrap text-sm font-extrabold sm:text-base ${cls}`}>{value}</p>
+    <Card className="!p-2.5">
+      <p className={`text-[10px] font-semibold uppercase leading-tight ${ui.muted}`}>{label}</p>
+      <p className={`whitespace-nowrap text-[13px] font-extrabold ${cls}`}>{value}</p>
     </Card>
   );
   const tile = (icon: string, label: string, onClick: () => void, badge?: number, disabled = false) => (
     <button type="button" onClick={onClick} disabled={disabled}
-      className={`relative flex min-h-24 flex-col items-center justify-center gap-1 rounded-2xl p-3 text-center text-sm font-bold cursor-pointer disabled:opacity-50 ${ui.card}`}>
-      <span className="text-3xl">{icon}</span>
-      <span className="leading-tight">{label}</span>
-      {!!badge && badge > 0 && <span className="absolute right-2 top-2 min-w-5 rounded-full bg-red-600 px-1.5 text-[11px] font-bold text-white">{badge}</span>}
+      className="relative flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-xl border border-slate-200 bg-white px-1 py-1.5 text-center text-[11px] font-bold leading-tight cursor-pointer disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800">
+      <span className="text-xl leading-none">{icon}</span>
+      <span className="line-clamp-2">{label}</span>
+      {!!badge && badge > 0 && <span className="absolute right-1 top-0.5 min-w-4 rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">{badge}</span>}
     </button>
   );
   const custRow = (c: Customer) => (
@@ -463,7 +463,7 @@ export default function CollectorPage() {
       {screen === 'home' && (
         <>
           {fund !== null && (
-            <div className="grid grid-cols-2 gap-2 text-center sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-2 text-center min-[420px]:grid-cols-3">
               {!!route.period?.investments && stat(t('cx.sum.invest'), fmt(Number(route.period.investments)))}
               {stat(t('cx.sum.prev'), fmt(opening))}
               {stat(t('cx.sum.current'), fmt(fund), fund < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400')}
@@ -482,7 +482,9 @@ export default function CollectorPage() {
               {stat(t('col.toDeliver'), fmt(inHand), 'text-emerald-600 dark:text-emerald-400')}
             </div>
           )}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="h-44" />
+          <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-slate-50/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
+          <div className="mx-auto grid max-w-xl grid-cols-4 gap-1.5 p-2">
             {tile('📍', t('cx.nearby'), () => go('near'))}
             {tile('👥', t('cx.list'), () => go('list'))}
             {tile('⏳', t('cx.pending'), () => go('pending'), pendingCustomers.length)}
@@ -492,6 +494,7 @@ export default function CollectorPage() {
             {route.can_settings && tile('⚙️', t('cx.settings'), () => go('settings'), unread)}
             {route.can_liquidate && tile('🏁', t('cx.settle'), () => { setSel(null); setPanel('settle'); })}
           </div>
+          </nav>
         </>
       )}
 
@@ -603,11 +606,12 @@ export default function CollectorPage() {
 
       {/* Hoja inferior: cliente / gasto / rendición */}
       {(sel || panel) && (
-        <div className="fixed inset-x-0 top-0 z-40 h-dvh">
-          <div className="absolute inset-0 bg-black/50" onClick={() => { setSel(null); setPanel(null); }} />
-          <div className="absolute inset-x-0 bottom-0 mx-auto max-h-[90dvh] max-w-xl overflow-y-auto overscroll-contain rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] dark:bg-slate-900">
-            <div className="mb-3 flex justify-end">
-              <button type="button" onClick={() => { setSel(null); setPanel(null); }} aria-label={t('pos.close')} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+        <div className="fixed inset-0 z-40 overflow-y-auto overscroll-contain bg-white dark:bg-slate-900">
+          <div className="mx-auto max-w-xl p-4 pb-[calc(2rem+env(safe-area-inset-bottom))]">
+            <div className="sticky top-0 z-10 -mx-4 mb-3 flex items-center gap-2 border-b border-slate-200 bg-white/95 px-4 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
+              <button type="button" onClick={() => { if (sel && panel) setPanel(null); else { setSel(null); setPanel(null); } }} aria-label={t('cx.back')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">←</button>
+              <span className="min-w-0 flex-1 truncate text-sm font-bold">{sel?.name ?? route.name}</span>
+              <button type="button" onClick={() => { setSel(null); setPanel(null); menu(); }} aria-label={t('cx.menu')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">☰</button>
             </div>
 
             {sel && !panel && (
