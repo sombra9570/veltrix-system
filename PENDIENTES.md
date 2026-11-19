@@ -1,7 +1,7 @@
 # Veltrix · Pendientes
 
 Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece algo nuevo.
-Última revisión: 18 nov 2026.
+Última revisión: 19 nov 2026.
 
 ## A. Necesitan que intervenga el dueño (claves, cuentas, DNS, pagos)
 
@@ -37,6 +37,16 @@ Lista viva de lo que falta. Se actualiza cada vez que algo se termina o aparece 
 - [x] Orden de despacho: vendedor → caja → almacenero ve qué entregar (migración 054)
 - [x] Taller: fotos de recepción, firma del cliente y estado por WhatsApp (migración 057)
 - [x] QR del negocio en pantalla al cobrar + foto del comprobante (migración 057; QR Simple dinámico requiere convenio bancario)
+- [x] Delivery: efectivo del repartidor (modo ninguno / solo envío / todo), recepción en caja con turno abierto, encargos y mensajería, mapa con calles y satélite (migración 060, foto del estado vivo)
+- [x] Equipo: editar rol/sucursal de un trabajador (`set_member_role`) y roles propios con los roles que cubren, según el plan
+- [x] Menú del dueño agrupado: Hoy / Vender y cobrar / Mi negocio / Reportes / Equipo / Cuenta
+- [x] Mapa MapTiler (`NEXT_PUBLIC_MAPTILER_KEY` en Vercel). OJO: el plan gratis de MapTiler es solo no comercial → pasar a Flex (25 USD/mes) cuando cobre el primer cliente
+- [ ] Menú y pantalla de inicio claros para cada rol (repartidor, caja, mesero, cocina): 3–4 opciones; hace falta crear cuentas de prueba de repartidor y caja
+- [ ] Delivery: QR de pago para el cliente, asignar pedido a un repartidor concreto y ver su posición en vivo
+- [ ] Restaurante, etapa 3: stock y disponibilidad de platos y bebidas
+- [ ] Prueba piloto Enterprise y estado de solo lectura "pendiente de pago" al terminar la prueba
+- [ ] Limitar `admin_purge_org` a pedidos del cliente (no se borran datos de clientes sin su consentimiento; solo los mensajes del chat se borran solos)
+- [ ] Migraciones aplicadas por MCP sin archivo en el repo (permissions_phase1/2, custom_roles, plan_custom_roles_v2, roles_*, delivery_zones_orders, etc.): volcar su estado como se hizo en la 060
 - [ ] Demo pública que se reinicia cada noche (no usar las cuentas de auditoría)
 - [ ] Sección de seguridad y 4 rubros en la portada; más roles en la vitrina; video de 60–120 s
 - [ ] Reporte consolidado de todas las empresas en una moneda (USD u otra) con tipo de cambio del día — ADICIONAL: se mantiene la vista por empresa y por sucursal en su moneda
