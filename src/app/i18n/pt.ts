@@ -1904,6 +1904,10 @@ const pt: Record<DictKey, string> = {
   'team.edit': "Editar",
   'team.editSaved': "Alterações salvas",
   'team.editCustomHint': "Com um papel próprio, o cargo base vem desse papel.",
+  'roles.pick': "Papéis que cobre",
+  'roles.pickHint': "Escolha até {n} papéis conforme seu plano. A ⭐ marca a tela inicial.",
+  'roles.count': "{a} de {b} papéis",
+  'roles.limitReached': "Você atingiu o máximo de papéis do plano.",
 };
 
 export default pt;

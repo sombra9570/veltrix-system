@@ -21,7 +21,11 @@ export function CustomRoles({ keys }: { keys: string[] }) {
   const baseRoles = BASE_ROLES.filter((r) => roleAvailable(r, modules));
   const k = (key: string) => t(key as DictKey);
   const [list, setList] = useState<CustomRole[]>([]);
-  const [edit, setEdit] = useState<{ id: string | null; name: string; base: string; also: string[]; perms: Record<string, boolean> } | null>(null);
+  const [edit, setEdit] = useState<{ id: string | null; name: string; roles: string[]; perms: Record<string, boolean> } | null>(null);
+  // Cuántos roles puede combinar un rol propio según el plan (la base de datos también lo exige)
+  const [rules, setRules] = useState<{ combo: number; custom: number; big: number }>({ combo: 2, custom: 1, big: 0 });
+  useEffect(() => { if (orgId) rpc<{ combo: number; custom: number; big: number }>('plan_role_rules', { p_org: orgId }).then((r) => { if (r) setRules(r); }).catch(() => undefined); }, [orgId]);
+  const maxPick = rules.big > 0 ? baseRoles.length : rules.combo;
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
@@ -36,7 +40,7 @@ export function CustomRoles({ keys }: { keys: string[] }) {
     if (!edit) return;
     setBusy(true); setErr('');
     try {
-      await rpc('custom_role_save', { p_org: orgId, p_id: edit.id, p_name: edit.name, p_base: edit.base, p_also: edit.also.filter((r) => r !== edit.base), p_perms: edit.perms });
+      await rpc('custom_role_save', { p_org: orgId, p_id: edit.id, p_name: edit.name, p_base: edit.roles[0], p_also: edit.roles.slice(1), p_perms: edit.perms });
       setEdit(null); await load();
     } catch (e) { setErr(friendlyError((e as Error).message, t)); }
     finally { setBusy(false); }
@@ -61,17 +65,17 @@ export function CustomRoles({ keys }: { keys: string[] }) {
           <h2 className="font-bold">🧩 {t('roles.title')}</h2>
           <p className={`text-xs ${ui.muted}`}>{t('roles.hint')}</p>
         </div>
-        <button type="button" className={ui.btnPrimary} onClick={() => { setErr(''); setEdit({ id: null, name: '', base: 'cashier', also: [], perms: {} }); }}>+ {t('roles.new')}</button>
+        <button type="button" className={ui.btnPrimary} onClick={() => { setErr(''); setEdit({ id: null, name: '', roles: [], perms: {} }); }}>+ {t('roles.new')}</button>
       </div>
       {err && !edit && <p className="mt-3 rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">{err}</p>}
       {list.length === 0 ? <p className={`mt-3 text-sm ${ui.muted}`}>{t('roles.empty')}</p> : (
         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
           {list.map((r) => (
             <li key={r.id}>
-              <button type="button" onClick={() => { setErr(''); setEdit({ id: r.id, name: r.name, base: r.base_role, also: r.also_roles ?? [], perms: r.permissions ?? {} }); }}
+              <button type="button" onClick={() => { setErr(''); setEdit({ id: r.id, name: r.name, roles: [r.base_role, ...(r.also_roles ?? [])], perms: r.permissions ?? {} }); }}
                 className="w-full rounded-xl border border-slate-200 p-3 text-start cursor-pointer hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50">
                 <p className="font-semibold">{r.name}</p>
-                <p className={`text-xs ${ui.muted}`}>{k(`role.${r.base_role}`)}{(r.also_roles ?? []).length > 0 ? ` + ${r.also_roles.map((x) => k(`role.${x}`)).join(', ')}` : ''}</p>
+                <p className={`text-xs ${ui.muted}`}>{[r.base_role, ...(r.also_roles ?? [])].map((x) => k(`role.${x}`)).join(' + ')}</p>
                 <p className={`text-xs ${ui.muted}`}>{t('roles.members', { n: r.members })}</p>
               </button>
             </li>
@@ -88,27 +92,28 @@ export function CustomRoles({ keys }: { keys: string[] }) {
               <input className={ui.input} value={edit.name} maxLength={40} onChange={(e) => setEdit({ ...edit, name: e.target.value })} />
             </div>
             <div>
-              <label className={ui.label}>{t('roles.base')}</label>
-              <select className={ui.input} value={edit.base} onChange={(e) => setEdit({ ...edit, base: e.target.value, also: edit.also.filter((r) => r !== e.target.value) })}>
-                {baseRoles.map((r) => <option key={r} value={r}>{k(`role.${r}`)}</option>)}
-              </select>
-              <p className={`mt-1 text-xs ${ui.muted}`}>{t('roles.baseHint')}</p>
-            </div>
-            <div>
-              <p className={ui.label}>{t('roles.also')}</p>
-              <p className={`mb-2 text-xs ${ui.muted}`}>{t('roles.alsoHint')}</p>
+              <p className={ui.label}>{t('roles.pick')} · <span className={ui.muted}>{t('roles.count', { a: edit.roles.length, b: maxPick })}</span></p>
+              <p className={`mb-2 text-xs ${ui.muted}`}>{t('roles.pickHint', { n: rules.big > 0 ? baseRoles.length : rules.combo })}</p>
               <div className="flex flex-wrap gap-2">
-                {baseRoles.filter((r) => r !== edit.base).map((r) => {
-                  const on = edit.also.includes(r);
+                {baseRoles.map((r) => {
+                  const idx = edit.roles.indexOf(r);
+                  const on = idx >= 0;
+                  const full = !on && edit.roles.length >= maxPick;
                   return (
-                    <button key={r} type="button" aria-pressed={on}
-                      onClick={() => setEdit({ ...edit, also: on ? edit.also.filter((x) => x !== r) : [...edit.also, r] })}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-semibold cursor-pointer ${on ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 dark:border-slate-700'}`}>
-                      {k(`role.${r}`)}
-                    </button>
+                    <span key={r} className="inline-flex items-center">
+                      <button type="button" aria-pressed={on} disabled={full}
+                        onClick={() => setEdit({ ...edit, roles: on ? edit.roles.filter((x) => x !== r) : [...edit.roles, r] })}
+                        className={`rounded-full border px-3 py-1.5 text-xs font-semibold cursor-pointer disabled:opacity-40 ${on ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 dark:border-slate-700'}`}>
+                        {on && idx === 0 ? '⭐ ' : ''}{k(`role.${r}`)}
+                      </button>
+                      {on && idx > 0 && (
+                        <button type="button" aria-label="⭐" onClick={() => setEdit({ ...edit, roles: [r, ...edit.roles.filter((x) => x !== r)] })} className="ms-1 cursor-pointer text-sm opacity-60 hover:opacity-100">☆</button>
+                      )}
+                    </span>
                   );
                 })}
               </div>
+              {edit.roles.length >= maxPick && <p className={`mt-2 text-xs ${ui.muted}`}>{t('roles.limitReached')}</p>}
             </div>
             <div>
               <p className={ui.label}>{t('roles.perms')}</p>
@@ -133,7 +138,7 @@ export function CustomRoles({ keys }: { keys: string[] }) {
             </div>
             {err && <p className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">{err}</p>}
             <div className="flex flex-wrap gap-2">
-              <button type="button" disabled={busy || edit.name.trim().length < 2} onClick={save} className={ui.btnPrimary}>{busy ? t('common.wait') : t('roles.save')}</button>
+              <button type="button" disabled={busy || edit.name.trim().length < 2 || edit.roles.length === 0} onClick={save} className={ui.btnPrimary}>{busy ? t('common.wait') : t('roles.save')}</button>
               {edit.id && <button type="button" disabled={busy} onClick={() => remove(edit.id!)} className={ui.btnGhost}>🗑️ {t('roles.delete')}</button>}
             </div>
           </div>

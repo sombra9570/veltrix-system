@@ -1904,6 +1904,10 @@ const fr: Record<DictKey, string> = {
   'team.edit': "Modifier",
   'team.editSaved': "Modifications enregistrées",
   'team.editCustomHint': "Avec un rôle personnalisé, le poste de base vient de ce rôle.",
+  'roles.pick': "Rôles couverts",
+  'roles.pickHint': "Choisissez jusqu'à {n} rôles selon votre plan. La ⭐ marque l'écran de départ.",
+  'roles.count': "{a} sur {b} rôles",
+  'roles.limitReached': "Vous avez atteint le maximum de rôles du plan.",
 };
 
 export default fr;

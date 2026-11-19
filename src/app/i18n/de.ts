@@ -1904,6 +1904,10 @@ const de: Record<DictKey, string> = {
   'team.edit': "Bearbeiten",
   'team.editSaved': "Änderungen gespeichert",
   'team.editCustomHint': "Bei einer eigenen Rolle bestimmt diese Rolle die Basisposition.",
+  'roles.pick': "Abgedeckte Rollen",
+  'roles.pickHint': "Wählen Sie je nach Plan bis zu {n} Rollen. Der ⭐ markiert den Startbildschirm.",
+  'roles.count': "{a} von {b} Rollen",
+  'roles.limitReached': "Sie haben das Rollenlimit Ihres Plans erreicht.",
 };
 
 export default de;

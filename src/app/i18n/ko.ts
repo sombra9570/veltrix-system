@@ -1904,6 +1904,10 @@ const ko: Record<DictKey, string> = {
   'team.edit': "수정",
   'team.editSaved': "변경 저장됨",
   'team.editCustomHint': "커스텀 역할을 쓰면 기본 직책은 그 역할이 정합니다.",
+  'roles.pick': "담당 역할",
+  'roles.pickHint': "요금제에 따라 최대 {n}개 역할을 고르세요. ⭐는 시작 화면입니다.",
+  'roles.count': "{a}/{b}개 역할",
+  'roles.limitReached': "요금제의 역할 한도에 도달했습니다.",
 };
 
 export default ko;

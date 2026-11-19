@@ -1904,6 +1904,10 @@ const hi: Record<DictKey, string> = {
   'team.edit': "संपादित करें",
   'team.editSaved': "बदलाव सहेजे गए",
   'team.editCustomHint': "अपनी भूमिका चुनने पर बेस पद उसी भूमिका से तय होता है।",
+  'roles.pick': "जिन भूमिकाओं को कवर करता है",
+  'roles.pickHint': "अपने प्लान के अनुसार अधिकतम {n} भूमिकाएँ चुनें। ⭐ शुरुआती स्क्रीन दर्शाता है।",
+  'roles.count': "{b} में से {a} भूमिकाएँ",
+  'roles.limitReached': "आप अपने प्लान की भूमिका सीमा तक पहुँच गए हैं।",
 };
 
 export default hi;

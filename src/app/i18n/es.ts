@@ -1913,6 +1913,10 @@ const es = {
   'team.edit': "Editar",
   'team.editSaved': "Cambios guardados",
   'team.editCustomHint': "Con un rol propio, el cargo base lo define ese rol.",
+  'roles.pick': "Roles que cubre",
+  'roles.pickHint': "Elige hasta {n} roles según tu plan. La ⭐ marca la pantalla con la que inicia.",
+  'roles.count': "{a} de {b} roles",
+  'roles.limitReached': "Llegaste al máximo de roles de tu plan.",
 };
 
 export default es;

@@ -29,6 +29,7 @@ export default function TeamPage() {
   const roles = ROLES.filter((r) => (!(['secretary', 'director'] as string[]).includes(r) || ['pro', 'enterprise', 'enterprise_plus'].includes(overview?.org.plan_code ?? '')) && (!ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!)) && (r !== 'delivery' || modules.length === 0 || modules.some((m) => DELIVERY_MODULES.includes(m))) && (!nicheRoles || nicheRoles.includes(r) || r === 'secretary' || r === 'director' || r === 'reception'));
   const { t } = useT();
   const roleLabel = (r: string) => t(`role.${r}` as DictKey);
+  const coverage = (c: { base_role: string; also_roles: string[] }) => [c.base_role, ...(c.also_roles ?? [])].map(roleLabel).join(' + ');
 
   const [branches, setBranches] = useState<Branch[]>([]);
   const [rows, setRows] = useState<Row[]>([]);
@@ -36,7 +37,7 @@ export default function TeamPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'cashier', branchId: '' });
   const [ownerRoles, setOwnerRoles] = useState<string[]>([]);
-  const [customRoles, setCustomRoles] = useState<{ id: string; name: string }[]>([]);
+  const [customRoles, setCustomRoles] = useState<{ id: string; name: string; base_role: string; also_roles: string[] }[]>([]);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -74,7 +75,7 @@ export default function TeamPage() {
       const { data: me } = await supabase.from('memberships').select('extra_roles').eq('org_id', orgId).eq('role', 'owner').is('deleted_at', null).limit(1);
       setOwnerRoles(((me ?? [])[0]?.extra_roles as string[] | undefined) ?? []);
     } catch { setOwnerRoles([]); }
-    try { setCustomRoles((await rpc<{ id: string; name: string }[]>('custom_roles_list', { p_org: orgId })) ?? []); } catch { setCustomRoles([]); }
+    try { setCustomRoles((await rpc<{ id: string; name: string; base_role: string; also_roles: string[] }[]>('custom_roles_list', { p_org: orgId })) ?? []); } catch { setCustomRoles([]); }
     setBranches(bs);
     setRows([...byUser.values()].sort((a, b2) => Number(b2.active) - Number(a.active) || a.name.localeCompare(b2.name)));
     setForm((f) => ({ ...f, branchId: f.branchId || bs[0]?.id || '' }));
@@ -238,7 +239,7 @@ export default function TeamPage() {
                 {roles.map((r) => <option key={r} value={r}>{roleLabel(r)}</option>)}
                 {customRoles.length > 0 && (
                   <optgroup label={`🧩 ${t('roles.title')}`}>
-                    {customRoles.map((c) => <option key={c.id} value={`custom:${c.id}`}>{c.name}</option>)}
+                    {customRoles.map((c) => <option key={c.id} value={`custom:${c.id}`}>{c.name} — {coverage(c)}</option>)}
                   </optgroup>
                 )}
               </select>
@@ -281,7 +282,7 @@ export default function TeamPage() {
                     {r.email}
                   </p>
                   <p className={`truncate text-xs ${ui.muted}`}>
-                    {r.roles.map(roleLabel).join(', ')}{r.customRoleId ? ` · 🧩 ${customRoles.find((c) => c.id === r.customRoleId)?.name ?? ''}` : ''} · {r.branchIds.map(branchName).join(', ')}
+                    {(() => { const c = r.customRoleId ? customRoles.find((x) => x.id === r.customRoleId) : undefined; return c ? `🧩 ${c.name} (${coverage(c)})` : r.roles.map(roleLabel).join(', '); })()} · {r.branchIds.map(branchName).join(', ')}
                   </p>
                 </div>
                 <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
@@ -322,9 +323,9 @@ export default function TeamPage() {
                 <label className={ui.label}>🧩 {t('roles.assign')}</label>
                 <select className={ui.input} value={ed.custom} onChange={(e) => setEd({ ...ed, custom: e.target.value })}>
                   <option value="">{t('roles.none')}</option>
-                  {customRoles.map((c) => <option key={c.id} value={c.id}>🧩 {c.name}</option>)}
+                  {customRoles.map((c) => <option key={c.id} value={c.id}>🧩 {c.name} — {coverage(c)}</option>)}
                 </select>
-                {ed.custom && <p className={`mt-1 text-xs ${ui.muted}`}>{t('team.editCustomHint')}</p>}
+                {ed.custom && (() => { const c = customRoles.find((x) => x.id === ed.custom); return c ? <p className={`mt-1 text-xs ${ui.muted}`}>{coverage(c)}</p> : null; })()}
               </div>
             )}
             {ed.row.membershipIds.length === 1 && branches.length > 1 && (

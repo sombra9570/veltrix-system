@@ -1904,6 +1904,10 @@ const zh: Record<DictKey, string> = {
   'team.edit': "编辑",
   'team.editSaved': "已保存",
   'team.editCustomHint': "使用自定义角色时，基础职位由该角色决定。",
+  'roles.pick': "覆盖的角色",
+  'roles.pickHint': "按套餐最多选 {n} 个角色。⭐ 标记起始页面。",
+  'roles.count': "{a}/{b} 个角色",
+  'roles.limitReached': "已达到套餐的角色上限。",
 };
 
 export default zh;

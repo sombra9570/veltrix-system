@@ -1904,6 +1904,10 @@ const it: Record<DictKey, string> = {
   'team.edit': "Modifica",
   'team.editSaved': "Modifiche salvate",
   'team.editCustomHint': "Con un ruolo personalizzato, la mansione base è definita da quel ruolo.",
+  'roles.pick': "Ruoli che copre",
+  'roles.pickHint': "Scegli fino a {n} ruoli in base al piano. La ⭐ indica la schermata iniziale.",
+  'roles.count': "{a} di {b} ruoli",
+  'roles.limitReached': "Hai raggiunto il massimo di ruoli del piano.",
 };
 
 export default it;

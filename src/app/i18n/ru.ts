@@ -1904,6 +1904,10 @@ const ru: Record<DictKey, string> = {
   'team.edit': "Изменить",
   'team.editSaved': "Изменения сохранены",
   'team.editCustomHint': "При собственной роли базовая должность задаётся этой ролью.",
+  'roles.pick': "Охватываемые роли",
+  'roles.pickHint': "Выберите до {n} ролей по вашему тарифу. ⭐ отмечает стартовый экран.",
+  'roles.count': "{a} из {b} ролей",
+  'roles.limitReached': "Достигнут максимум ролей вашего тарифа.",
 };
 
 export default ru;

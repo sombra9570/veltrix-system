@@ -1904,6 +1904,10 @@ const ar: Record<DictKey, string> = {
   'team.edit': "تعديل",
   'team.editSaved': "تم حفظ التغييرات",
   'team.editCustomHint': "عند استخدام دور خاص يتحدد المنصب الأساسي من هذا الدور.",
+  'roles.pick': "الأدوار التي يغطيها",
+  'roles.pickHint': "اختر حتى {n} أدوار حسب خطتك. النجمة ⭐ تحدد شاشة البدء.",
+  'roles.count': "{a} من {b} أدوار",
+  'roles.limitReached': "وصلت إلى الحد الأقصى للأدوار في خطتك.",
 };
 
 export default ar;

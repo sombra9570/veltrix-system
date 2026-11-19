@@ -1904,6 +1904,10 @@ const ja: Record<DictKey, string> = {
   'team.edit': "編集",
   'team.editSaved': "変更を保存しました",
   'team.editCustomHint': "独自ロールを使うと、基本の役職はそのロールで決まります。",
+  'roles.pick': "担当するロール",
+  'roles.pickHint': "プランに応じて最大{n}個のロールを選べます。⭐は開始画面です。",
+  'roles.count': "{a}/{b} ロール",
+  'roles.limitReached': "プランのロール上限に達しました。",
 };
 
 export default ja;
