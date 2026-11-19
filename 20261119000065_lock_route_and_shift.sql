@@ -1,0 +1,7 @@
+-- Veltrix · 065 · Bloqueos contra doble cierre y cobros durante el cierre de caja.
+-- Aplicada en Supabase como "lock_route_and_shift_against_double_close". Cambios:
+--  * close_route: la ruta se lee con FOR NO KEY UPDATE (dos cierres simultáneos no duplican la entrega al fondo).
+--  * liquidate_route: igual (el corte de caja no duplica faltante/sobrante).
+--  * register_payment: el turno de caja se lee con FOR SHARE; close_shift lo bloquea exclusivo,
+--    así un cobro no puede entrar a un turno que se está cerrando.
+-- (El texto completo de las funciones está en la base; este archivo documenta el cambio.)
