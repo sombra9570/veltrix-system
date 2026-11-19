@@ -466,7 +466,7 @@ export default function CollectorPage() {
             <MenuTile icon="wallet" tone="plain" label={t('nav.routeInfo')} onClick={() => router.push('/dashboard/collector/info')} />
             {canExpenses && <MenuTile icon="receipt" tone="amber" label={t('cx.expenses')} onClick={() => { setSel(null); setPanel('expense'); }} />}
             {route.can_liquidate && <MenuTile icon="refresh" tone="blue" label={t('cx.settle')} onClick={() => { setSel(null); setPanel('settle'); }} />}
-            {<MenuTile icon="sliders" tone="plain" label={`${t('cx.settings')}${unread > 0 ? ` (${unread})` : ''}`} onClick={() => go('settings')} />
+            <MenuTile icon="sliders" tone="plain" label={`${t('cx.settings')}${unread > 0 ? ` (${unread})` : ''}`} onClick={() => go('settings')} />
           </div>
         </>
       )}
