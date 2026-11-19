@@ -1925,6 +1925,16 @@ const es = {
   'nav.g.reports': "Reportes",
   'nav.g.team': "Equipo",
   'nav.g.account': "Cuenta",
+  'dl.cashLimit': "Límite de efectivo por repartidor (0 = sin límite)",
+  'dl.limitReached': "Ya llevas el efectivo permitido. Entrégalo en caja antes de tomar otro pedido.",
+  'dl.holding': "Llevas {held} de {limit} permitidos",
+  'dl.assignTo': "Asignar a…",
+  'dl.assigned': "Pedido asignado",
+  'dl.report': "Repartidores · últimos 7 días",
+  'dl.rDelivered': "entregas",
+  'dl.rFailed': "fallidas",
+  'dl.rCash': "cobrado",
+  'dl.rPending': "sin entregar",
 };
 
 export default es;

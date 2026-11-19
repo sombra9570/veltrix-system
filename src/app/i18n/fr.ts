@@ -1916,6 +1916,16 @@ const fr: Record<DictKey, string> = {
   'nav.g.reports': "Rapports",
   'nav.g.team': "Équipe",
   'nav.g.account': "Compte",
+  'dl.cashLimit': "Plafond d'espèces par livreur (0 = sans limite)",
+  'dl.limitReached': "Vous portez déjà le maximum d'espèces. Remettez-les en caisse avant de prendre une autre commande.",
+  'dl.holding': "Vous portez {held} sur {limit} autorisés",
+  'dl.assignTo': "Attribuer à…",
+  'dl.assigned': "Commande attribuée",
+  'dl.report': "Livreurs · 7 derniers jours",
+  'dl.rDelivered': "livraisons",
+  'dl.rFailed': "échecs",
+  'dl.rCash': "encaissé",
+  'dl.rPending': "non remis",
 };
 
 export default fr;

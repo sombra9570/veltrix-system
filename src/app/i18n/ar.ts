@@ -1916,6 +1916,16 @@ const ar: Record<DictKey, string> = {
   'nav.g.reports': "التقارير",
   'nav.g.team': "الفريق",
   'nav.g.account': "الحساب",
+  'dl.cashLimit': "حد النقد لكل سائق (0 = بلا حد)",
+  'dl.limitReached': "تحمل بالفعل النقد المسموح به. سلّمه في الصندوق قبل أخذ طلب آخر.",
+  'dl.holding': "تحمل {held} من {limit} المسموح",
+  'dl.assignTo': "تعيين إلى…",
+  'dl.assigned': "تم تعيين الطلب",
+  'dl.report': "السائقون · آخر 7 أيام",
+  'dl.rDelivered': "توصيلات",
+  'dl.rFailed': "فاشلة",
+  'dl.rCash': "محصّل",
+  'dl.rPending': "غير مسلَّم",
 };
 
 export default ar;

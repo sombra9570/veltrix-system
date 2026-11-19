@@ -1916,6 +1916,16 @@ const hi: Record<DictKey, string> = {
   'nav.g.reports': "रिपोर्ट",
   'nav.g.team': "टीम",
   'nav.g.account': "खाता",
+  'dl.cashLimit': "प्रति डिलीवरी कर्मी नकद सीमा (0 = कोई सीमा नहीं)",
+  'dl.limitReached': "आपके पास पहले से अनुमत नकद है। दूसरा ऑर्डर लेने से पहले उसे काउंटर पर जमा करें।",
+  'dl.holding': "अनुमत {limit} में से {held} आपके पास",
+  'dl.assignTo': "इन्हें सौंपें…",
+  'dl.assigned': "ऑर्डर सौंप दिया गया",
+  'dl.report': "डिलीवरी कर्मी · पिछले 7 दिन",
+  'dl.rDelivered': "डिलीवरी",
+  'dl.rFailed': "असफल",
+  'dl.rCash': "वसूला",
+  'dl.rPending': "जमा नहीं",
 };
 
 export default hi;

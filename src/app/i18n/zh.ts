@@ -1916,6 +1916,16 @@ const zh: Record<DictKey, string> = {
   'nav.g.reports': "报表",
   'nav.g.team': "团队",
   'nav.g.account': "账户",
+  'dl.cashLimit': "每位配送员现金上限（0 = 不限）",
+  'dl.limitReached': "您携带的现金已达上限。请先到收银台上交，再接新订单。",
+  'dl.holding': "已携带 {held}，上限 {limit}",
+  'dl.assignTo': "分配给…",
+  'dl.assigned': "订单已分配",
+  'dl.report': "配送员 · 近 7 天",
+  'dl.rDelivered': "单已送达",
+  'dl.rFailed': "单失败",
+  'dl.rCash': "已收现金",
+  'dl.rPending': "未上交",
 };
 
 export default zh;

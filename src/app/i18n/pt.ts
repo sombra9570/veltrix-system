@@ -1916,6 +1916,16 @@ const pt: Record<DictKey, string> = {
   'nav.g.reports': "Relatórios",
   'nav.g.team': "Equipe",
   'nav.g.account': "Conta",
+  'dl.cashLimit': "Limite de dinheiro por entregador (0 = sem limite)",
+  'dl.limitReached': "Você já leva o dinheiro permitido. Entregue-o no caixa antes de pegar outro pedido.",
+  'dl.holding': "Você leva {held} de {limit} permitidos",
+  'dl.assignTo': "Atribuir a…",
+  'dl.assigned': "Pedido atribuído",
+  'dl.report': "Entregadores · últimos 7 dias",
+  'dl.rDelivered': "entregas",
+  'dl.rFailed': "falhas",
+  'dl.rCash': "cobrado",
+  'dl.rPending': "não entregue",
 };
 
 export default pt;

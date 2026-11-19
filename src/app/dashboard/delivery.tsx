@@ -101,12 +101,20 @@ export function DeliveryBoard({ branchId, currency, flash, showEmpty = false, dr
   const [list, setList] = useState<Del[]>([]);
   const [busy, setBusy] = useState('');
   const [showMap, setShowMap] = useState(false);
+  // drivers = null: quien mira es un repartidor (no puede asignar); si no, es la lista a la que se puede asignar
+  const [drivers, setDrivers] = useState<{ id: string; name: string }[] | null>(null);
+  const [mine, setMine] = useState<{ held: number; limit: number | null } | null>(null);
   const fmt = (n: number) => money(Number(n), currency, lang);
   const load = useCallback(async () => {
     if (!branchId) return;
     try { setList(await rpc<Del[]>('delivery_orders_list', { p_branch: branchId, p_done: tab === 'done' }) ?? []); } catch { /* */ }
+    try { setMine(await rpc<{ held: number; limit: number | null }>('delivery_my_cash', { p_branch: branchId })); } catch { setMine(null); }
   }, [branchId, tab]);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    if (!branchId) return;
+    rpc<{ id: string; name: string }[]>('delivery_drivers', { p_branch: branchId }).then((d) => setDrivers(d ?? [])).catch(() => setDrivers(null));
+  }, [branchId]);
   useSync(load, 10_000);
 
   const setStatus = async (o: Del, st: 'dispatched' | 'delivered' | 'failed') => {
@@ -121,9 +129,15 @@ export function DeliveryBoard({ branchId, currency, flash, showEmpty = false, dr
     try { await rpc('delivery_set_status', { p_order: o.id, p_status: st, p_collected: collected }); await load(); }
     catch (e) {
       const m = (e as Error).message;
-      flash(false, /TAKEN/.test(m) ? t('dl.taken') : /OVER_LIMIT/.test(m) ? t('cash.exceeds') : t('err.generic'));
+      flash(false, /CASH_LIMIT/.test(m) ? t('dl.limitReached') : /TAKEN/.test(m) ? t('dl.taken') : /OVER_LIMIT/.test(m) ? t('cash.exceeds') : t('err.generic'));
       await load();
     }
+    setBusy('');
+  };
+  const assign = async (o: Del, driverId: string) => {
+    setBusy(o.id);
+    try { await rpc('delivery_assign', { p_order: o.id, p_driver: driverId }); flash(true, t('dl.assigned')); await load(); }
+    catch { flash(false, t('err.generic')); }
     setBusy('');
   };
   const pts: MapPoint[] = list.filter((o) => o.lat != null && o.lng != null && o.status !== 'delivered' && o.status !== 'failed')
@@ -147,6 +161,11 @@ export function DeliveryBoard({ branchId, currency, flash, showEmpty = false, dr
           <button type="button" onClick={() => setShowMap((v) => !v)} className={`${ui.btnGhost} !py-1.5 text-sm`}>🗺️ {t('dl.mapTitle')}</button>
           <Link href="/dashboard/collector/mensajes" className={`${ui.btnGhost} !py-1.5 text-sm`}>💬 {t('dl.msgCo')}</Link>
         </div>
+      )}
+      {driver && drivers === null && mine && mine.limit != null && (
+        <p className={`rounded-xl px-3 py-2 text-sm font-semibold ${Number(mine.held) >= Number(mine.limit) ? 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300' : 'bg-slate-100 dark:bg-slate-800'}`}>
+          💵 {t('dl.holding', { held: fmt(Number(mine.held)), limit: fmt(Number(mine.limit)) })}
+        </p>
       )}
       {driver && showMap && <DeliveryMap points={pts} />}
       {list.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('dl.empty')}</p>}
@@ -173,6 +192,12 @@ export function DeliveryBoard({ branchId, currency, flash, showEmpty = false, dr
                 <p className="mt-1 text-sm font-extrabold">{due > 0 ? `💵 ${t('dl.collect')}: ${fmt(due)}` : o.cash_mode !== 'none' && Number(o.total) - Number(o.paid) <= 0 ? `✅ ${t('dl.paid')}` : ''}</p>
               )}
               <p className={`text-xs ${ui.muted}`}>{shortTime(o.at, lang)}{o.eta_min ? ` · ~${o.eta_min} min` : ''}{o.driver ? ` · 🛵 ${o.driver}` : ''}</p>
+              {o.status === 'pending' && drivers && drivers.length > 0 && (
+                <select defaultValue="" disabled={busy === o.id} onChange={(e) => { if (e.target.value) assign(o, e.target.value); }} className={`${ui.input} mt-2 !py-2 text-sm`}>
+                  <option value="">{t('dl.assignTo')}</option>
+                  {drivers.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+                </select>
+              )}
               {o.status === 'pending' && (
                 <button type="button" disabled={busy === o.id} onClick={() => setStatus(o, 'dispatched')} className={`${ui.btnPrimary} mt-2 w-full !py-2 text-sm`}>🛵 {t('dl.take')}</button>
               )}
@@ -196,9 +221,13 @@ export function DeliverySetup({ branchId, flash }: { branchId: string; flash: Fl
   const [enabled, setEnabled] = useState(false);
   const [cashMode, setCashMode] = useState<'none' | 'fee' | 'full'>('none');
   const [zones, setZones] = useState<Zone[]>([]);
+  const [limit, setLimit] = useState('');
   const [f, setF] = useState({ name: '', fee: '', free_over: '', eta: '40' });
 
-  const apply = (d: { enabled: boolean; cash_mode?: 'none' | 'fee' | 'full'; zones: Zone[] }) => { setEnabled(!!d.enabled); setCashMode(d.cash_mode ?? 'none'); setZones(d.zones ?? []); };
+  const apply = (d: { enabled: boolean; cash_mode?: 'none' | 'fee' | 'full'; cash_limit?: number | null; zones: Zone[] }) => {
+    setEnabled(!!d.enabled); setCashMode(d.cash_mode ?? 'none'); setZones(d.zones ?? []);
+    setLimit(d.cash_limit != null ? String(Number(d.cash_limit)) : '');
+  };
   const load = useCallback(async () => {
     try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: null, p_zone: null })); } catch { /* */ }
   }, [branchId]);
@@ -209,6 +238,10 @@ export function DeliverySetup({ branchId, flash }: { branchId: string; flash: Fl
   };
   const changeMode = async (m: 'none' | 'fee' | 'full') => {
     try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: null, p_zone: null, p_cash_mode: m })); } catch { flash(false, t('err.generic')); }
+  };
+  const saveLimit = async () => {
+    const n = parseAmount(limit);
+    try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: null, p_zone: null, p_cash_limit: Number.isFinite(n) && n > 0 ? n : 0 })); } catch { flash(false, t('err.generic')); }
   };
   const save = async (z: Partial<Zone> & { name: string }) => {
     try { apply(await rpc('delivery_admin', { p_branch: branchId, p_enabled: null, p_zone: z })); return true; } catch { flash(false, t('err.generic')); return false; }
@@ -236,6 +269,11 @@ export function DeliverySetup({ branchId, flash }: { branchId: string; flash: Fl
           <option value="full">{t('dl.cashFull')}</option>
         </select>
       </label>
+      {cashMode !== 'none' && (
+        <label className="block text-sm font-semibold">{t('dl.cashLimit')}
+          <input inputMode="decimal" value={limit} onChange={(e) => setLimit(e.target.value)} onBlur={saveLimit} placeholder="0" className={`${ui.input} mt-1`} />
+        </label>
+      )}
       <form onSubmit={add} className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         <input required value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder={t('dl.zoneName')} className={`${ui.input} col-span-2`} />
         <input inputMode="decimal" value={f.fee} onChange={(e) => setF({ ...f, fee: e.target.value })} placeholder={t('dl.zoneFee')} className={ui.input} />
@@ -256,6 +294,36 @@ export function DeliverySetup({ branchId, flash }: { branchId: string; flash: Fl
 }
 
 type Br = { id: string; name: string; company: string; currency: string; enabled: boolean; org_id: string; cash_mode: string };
+
+type DriverRow = { driver_id: string; name: string; delivered: number; failed: number; active: number; cash_collected: number; cash_pending: number };
+
+/** Resumen por repartidor de la última semana (solo lo ve quien administra o atiende la caja). */
+function DriverReport({ branchId, currency }: { branchId: string; currency: string }) {
+  const { t, lang } = useT();
+  const [rows, setRows] = useState<DriverRow[]>([]);
+  useEffect(() => {
+    if (!branchId) return;
+    rpc<DriverRow[]>('delivery_driver_report', { p_branch: branchId, p_days: 7 }).then((r) => setRows(r ?? [])).catch(() => setRows([]));
+  }, [branchId]);
+  if (rows.length === 0) return null;
+  const fmt = (n: number) => money(Number(n), currency, lang);
+  return (
+    <Card className="space-y-2">
+      <h2 className="font-bold">📊 {t('dl.report')}</h2>
+      <ul className="divide-y divide-slate-200 dark:divide-slate-800">
+        {rows.map((r) => (
+          <li key={r.driver_id} className="py-2 text-sm">
+            <p className="font-semibold">🛵 {r.name}</p>
+            <p className={`text-xs ${ui.muted}`}>
+              ✅ {r.delivered} {t('dl.rDelivered')} · ❌ {r.failed} {t('dl.rFailed')} · 💵 {fmt(Number(r.cash_collected))} {t('dl.rCash')}
+              {Number(r.cash_pending) > 0 && ` · ⚠️ ${fmt(Number(r.cash_pending))} ${t('dl.rPending')}`}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
 
 /** Pantalla del repartidor. */
 export function DeliveryScreen() {
@@ -281,6 +349,7 @@ export function DeliveryScreen() {
       {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'}`}>{msg.text}</p>}
       <DeliveryBoard branchId={branchId} currency={br?.currency ?? 'USD'} flash={flash} showEmpty driver />
       <CourierBoard branchId={branchId} orgId={br?.org_id ?? ''} currency={br?.currency ?? 'USD'} flash={flash} />
+      <DriverReport branchId={branchId} currency={br?.currency ?? 'USD'} />
     </div>
   );
 }

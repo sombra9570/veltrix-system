@@ -1916,6 +1916,16 @@ const de: Record<DictKey, string> = {
   'nav.g.reports': "Berichte",
   'nav.g.team': "Team",
   'nav.g.account': "Konto",
+  'dl.cashLimit': "Bargeldlimit pro Fahrer (0 = kein Limit)",
+  'dl.limitReached': "Du trägst bereits das erlaubte Bargeld. Gib es an der Kasse ab, bevor du eine weitere Bestellung nimmst.",
+  'dl.holding': "Du trägst {held} von {limit} erlaubt",
+  'dl.assignTo': "Zuweisen an…",
+  'dl.assigned': "Bestellung zugewiesen",
+  'dl.report': "Fahrer · letzte 7 Tage",
+  'dl.rDelivered': "Lieferungen",
+  'dl.rFailed': "fehlgeschlagen",
+  'dl.rCash': "kassiert",
+  'dl.rPending': "nicht abgegeben",
 };
 
 export default de;

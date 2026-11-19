@@ -1916,6 +1916,16 @@ const ja: Record<DictKey, string> = {
   'nav.g.reports': "レポート",
   'nav.g.team': "チーム",
   'nav.g.account': "アカウント",
+  'dl.cashLimit': "配達員ごとの現金上限（0 = 上限なし）",
+  'dl.limitReached': "許可された現金をすでに持っています。次の注文を受ける前にレジへ納めてください。",
+  'dl.holding': "許可 {limit} のうち {held} を所持",
+  'dl.assignTo': "担当を割り当て…",
+  'dl.assigned': "注文を割り当てました",
+  'dl.report': "配達員 · 直近7日間",
+  'dl.rDelivered': "件配達",
+  'dl.rFailed': "件失敗",
+  'dl.rCash': "回収",
+  'dl.rPending': "未納",
 };
 
 export default ja;

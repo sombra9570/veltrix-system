@@ -1916,6 +1916,16 @@ const ko: Record<DictKey, string> = {
   'nav.g.reports': "보고서",
   'nav.g.team': "팀",
   'nav.g.account': "계정",
+  'dl.cashLimit': "배달원별 현금 한도(0 = 제한 없음)",
+  'dl.limitReached': "허용된 현금을 이미 소지하고 있습니다. 다른 주문을 받기 전에 계산대에 제출하세요.",
+  'dl.holding': "허용 {limit} 중 {held} 소지",
+  'dl.assignTo': "담당자 지정…",
+  'dl.assigned': "주문이 배정되었습니다",
+  'dl.report': "배달원 · 최근 7일",
+  'dl.rDelivered': "건 배달",
+  'dl.rFailed': "건 실패",
+  'dl.rCash': "수금",
+  'dl.rPending': "미제출",
 };
 
 export default ko;

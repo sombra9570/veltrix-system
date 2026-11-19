@@ -1916,6 +1916,16 @@ const it: Record<DictKey, string> = {
   'nav.g.reports': "Report",
   'nav.g.team': "Squadra",
   'nav.g.account': "Account",
+  'dl.cashLimit': "Limite di contanti per fattorino (0 = nessun limite)",
+  'dl.limitReached': "Hai già con te il contante consentito. Consegnalo in cassa prima di prendere un altro ordine.",
+  'dl.holding': "Hai {held} su {limit} consentiti",
+  'dl.assignTo': "Assegna a…",
+  'dl.assigned': "Ordine assegnato",
+  'dl.report': "Fattorini · ultimi 7 giorni",
+  'dl.rDelivered': "consegne",
+  'dl.rFailed': "fallite",
+  'dl.rCash': "incassato",
+  'dl.rPending': "non consegnato",
 };
 
 export default it;

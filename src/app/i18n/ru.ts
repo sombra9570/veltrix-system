@@ -1916,6 +1916,16 @@ const ru: Record<DictKey, string> = {
   'nav.g.reports': "Отчёты",
   'nav.g.team': "Команда",
   'nav.g.account': "Аккаунт",
+  'dl.cashLimit': "Лимит наличных на курьера (0 = без лимита)",
+  'dl.limitReached': "У вас уже максимум наличных. Сдайте их в кассу, прежде чем брать новый заказ.",
+  'dl.holding': "У вас {held} из {limit} допустимых",
+  'dl.assignTo': "Назначить…",
+  'dl.assigned': "Заказ назначен",
+  'dl.report': "Курьеры · последние 7 дней",
+  'dl.rDelivered': "доставок",
+  'dl.rFailed': "неудачных",
+  'dl.rCash': "собрано",
+  'dl.rPending': "не сдано",
 };
 
 export default ru;

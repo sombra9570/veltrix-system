@@ -1916,6 +1916,16 @@ const en: Record<DictKey, string> = {
   'nav.g.reports': "Reports",
   'nav.g.team': "Team",
   'nav.g.account': "Account",
+  'dl.cashLimit': "Cash limit per driver (0 = no limit)",
+  'dl.limitReached': "You are already carrying the allowed cash. Hand it in at the register before taking another order.",
+  'dl.holding': "Carrying {held} of {limit} allowed",
+  'dl.assignTo': "Assign to…",
+  'dl.assigned': "Order assigned",
+  'dl.report': "Drivers · last 7 days",
+  'dl.rDelivered': "deliveries",
+  'dl.rFailed': "failed",
+  'dl.rCash': "collected",
+  'dl.rPending': "not handed in",
 };
 
 export default en;
