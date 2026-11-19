@@ -338,7 +338,7 @@ export default function TeamPage() {
             {edMsg && <p className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">{edMsg}</p>}
             <div className="flex gap-2">
               <button type="button" onClick={() => setEd(null)} className={`${ui.btnGhost} flex-1`}>{t('cash.cancel')}</button>
-              <button type="submit" disabled={edBusy} className={`${ui.btnPrimary} flex-1`}>{edBusy ? t('common.wait') : t('team.pwSave')}</button>
+              <button type="submit" disabled={edBusy} className={`${ui.btnPrimary} flex-1`}>{edBusy ? t('common.wait') : t('prod.save')}</button>
             </div>
           </form>
         </Sheet>
