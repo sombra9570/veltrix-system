@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase, rpc } from '../../lib/supabase';
 import { Card } from './shell';
 import { ui } from '../site-header';
@@ -174,6 +174,8 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
   const [disc, setDisc] = useState('');
   const [closing, setClosing] = useState(false);
   const [busy, setBusy] = useState(false);
+  // Identificador del envío a cocina: si se reintenta tras un corte de señal, el servidor no repite los platos
+  const sendKey = useRef<{ k: string; sig: string } | null>(null);
 
   useEffect(() => {
     rpc<Product[]>('pos_catalog', { p_branch: branchId }).then((c) => setCatalog(c ?? [])).catch(() => setCatalog([]));
@@ -206,7 +208,11 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
     if (!adding.length) return;
     setBusy(true);
     try {
-      await rpc('add_table_items', { p_order: order.id, p_items: adding.map((l) => ({ product_id: l.product.id, qty: l.qty, notes: l.notes })) });
+      const items = adding.map((l) => ({ product_id: l.product.id, qty: l.qty, notes: l.notes }));
+      const sig = order.id + JSON.stringify(items);
+      if (!sendKey.current || sendKey.current.sig !== sig) sendKey.current = { k: crypto.randomUUID(), sig };
+      await rpc('add_table_items', { p_order: order.id, p_client: sendKey.current.k, p_items: items });
+      sendKey.current = null;
       setAdding([]);
       await onChanged();
     } catch { flash(false, t('err.generic')); } finally { setBusy(false); }
