@@ -355,11 +355,7 @@ export default function CollectorPage() {
   if (!route) return null;
 
   const pendingRoute = queue.filter((q) => q.route === route.id).length;
-  const loans = Number(route.unsettled_loans ?? 0);
-  const inHand = Number(route.unsettled_cash) - Number(route.unsettled_expenses) - loans;
   const fund = route.fund_balance === undefined ? null : Number(route.fund_balance);
-  const opening = fund === null ? 0 : fund - inHand;
-  const todayRow = route.days?.find((d) => d.day === route.today);
   const shownAll = freq === 'all' ? route.customers : route.customers.filter((c) => c.credits?.some((k) => freqOf(k) === freq));
   const qn = q.trim().toLowerCase();
   const shownAllQ = qn ? shownAll.filter((c) => c.name.toLowerCase().includes(qn) || (c.tax_id ?? '').toLowerCase().includes(qn)) : shownAll;
@@ -368,24 +364,15 @@ export default function CollectorPage() {
     .filter((c) => !c.paid_today && Number(c.overdue) + Number(c.due_today) > 0.004)
     .sort((x, y) => Number(y.overdue) - Number(x.overdue));
   const sigState = !online ? 'off' : queue.length > 0 || rejected.length > 0 ? 'pending' : 'ok';
-  const weekCollected = Number(route.unsettled_cash) + Number(route.unsettled_digital);
-  const dayCollected = Number(todayRow?.cash ?? 0) + Number(todayRow?.digital ?? 0);
-  const portfolio = route.customers.reduce((sum, c) => sum + Number(c.balance), 0);
   const unread = Number(route.notices_unread ?? 0);
   const openCustomer = (id: string) => { const c = route.customers.find((x) => x.id === id); if (c) { setSel(c); setPanel(null); } };
   const canExpenses = route.can_expenses !== false;
-  const stat = (label: string, value: string, cls = '') => (
-    <Card className="!p-2.5">
-      <p className={`text-[10px] font-semibold uppercase leading-tight ${ui.muted}`}>{label}</p>
-      <p className={`whitespace-nowrap text-[13px] font-extrabold ${cls}`}>{value}</p>
-    </Card>
-  );
   const tile = (icon: string, label: string, onClick: () => void, badge?: number, disabled = false) => (
     <button type="button" onClick={onClick} disabled={disabled}
-      className="relative flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-xl border border-slate-200 bg-white px-1 py-1.5 text-center text-[11px] font-bold leading-tight cursor-pointer disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800">
-      <span className="text-xl leading-none">{icon}</span>
+      className={`relative flex min-h-28 flex-col items-center justify-center gap-2 rounded-2xl p-3 text-center text-sm font-bold leading-tight cursor-pointer disabled:opacity-50 ${ui.card}`}>
+      <span className="text-3xl leading-none">{icon}</span>
       <span className="line-clamp-2">{label}</span>
-      {!!badge && badge > 0 && <span className="absolute right-1 top-0.5 min-w-4 rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">{badge}</span>}
+      {!!badge && badge > 0 && <span className="absolute right-2 top-2 min-w-5 rounded-full bg-red-600 px-1.5 text-[11px] font-bold text-white">{badge}</span>}
     </button>
   );
   const custRow = (c: Customer) => (
@@ -405,7 +392,7 @@ export default function CollectorPage() {
   return (
     <div className="space-y-4">
       {/* Encabezado fijo: nombre, antena, menú, atrás y salir */}
-      <div className="sticky top-0 z-30 -mx-1 flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/95 px-2 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
+      <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-2 py-2 dark:border-slate-800 dark:bg-slate-900">
         {screen !== 'home' && (
           <button type="button" onClick={back} aria-label={t('cx.back')} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">←</button>
         )}
@@ -462,29 +449,8 @@ export default function CollectorPage() {
 
       {screen === 'home' && (
         <>
-          {fund !== null && (
-            <div className="grid grid-cols-2 gap-2 text-center min-[420px]:grid-cols-3">
-              {!!route.period?.investments && stat(t('cx.sum.invest'), fmt(Number(route.period.investments)))}
-              {stat(t('cx.sum.prev'), fmt(opening))}
-              {stat(t('cx.sum.current'), fmt(fund), fund < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400')}
-              {stat(`${t('cx.sum.collected')} · ${t('cx.sum.day')}`, fmt(dayCollected))}
-              {stat(`${t('cx.sum.collected')} · ${t('cx.sum.week')}`, fmt(weekCollected))}
-              {stat(`${t('cx.sum.lent')} · ${t('cx.sum.day')}`, fmt(Number(todayRow?.lent ?? 0)), 'text-violet-600 dark:text-violet-400')}
-              {stat(`${t('cx.sum.lent')} · ${t('cx.sum.week')}`, fmt(loans), 'text-violet-600 dark:text-violet-400')}
-              {stat(t('cx.sum.expenses'), fmt(Number(route.unsettled_expenses)), 'text-red-600 dark:text-red-400')}
-              {route.can_portfolio && stat(t('cx.sum.portfolio'), fmt(portfolio))}
-            </div>
-          )}
-          {fund === null && (
-            <div className="grid grid-cols-3 gap-2 text-center">
-              {stat(t('col.cash'), fmt(Number(route.unsettled_cash)))}
-              {stat(t('col.expenses'), fmt(Number(route.unsettled_expenses)), 'text-red-600 dark:text-red-400')}
-              {stat(t('col.toDeliver'), fmt(inHand), 'text-emerald-600 dark:text-emerald-400')}
-            </div>
-          )}
-          <div className="h-44" />
-          <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-slate-50/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
-          <div className="mx-auto grid max-w-xl grid-cols-4 gap-1.5 p-2">
+          <div>
+          <div className="mx-auto grid max-w-xl grid-cols-2 gap-3">
             {tile('📍', t('cx.nearby'), () => go('near'))}
             {tile('👥', t('cx.list'), () => go('list'))}
             {tile('⏳', t('cx.pending'), () => go('pending'), pendingCustomers.length)}
@@ -494,7 +460,7 @@ export default function CollectorPage() {
             {route.can_settings && tile('⚙️', t('cx.settings'), () => go('settings'), unread)}
             {route.can_liquidate && tile('🏁', t('cx.settle'), () => { setSel(null); setPanel('settle'); })}
           </div>
-          </nav>
+          </div>
         </>
       )}
 
@@ -607,8 +573,8 @@ export default function CollectorPage() {
       {/* Hoja inferior: cliente / gasto / rendición */}
       {(sel || panel) && (
         <div className="fixed inset-0 z-40 overflow-y-auto overscroll-contain bg-white dark:bg-slate-900">
-          <div className="mx-auto max-w-xl p-4 pb-[calc(2rem+env(safe-area-inset-bottom))]">
-            <div className="sticky top-0 z-10 -mx-4 mb-3 flex items-center gap-2 border-b border-slate-200 bg-white/95 px-4 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95">
+          <div className="mx-auto max-w-xl px-4 pb-[calc(2rem+env(safe-area-inset-bottom))]">
+            <div className="sticky top-0 z-10 -mx-4 mb-3 flex items-center gap-2 border-b border-slate-200 bg-white px-4 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))] dark:border-slate-800 dark:bg-slate-900">
               <button type="button" onClick={() => { if (sel && panel) setPanel(null); else { setSel(null); setPanel(null); } }} aria-label={t('cx.back')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">←</button>
               <span className="min-w-0 flex-1 truncate text-sm font-bold">{sel?.name ?? route.name}</span>
               <button type="button" onClick={() => { setSel(null); setPanel(null); menu(); }} aria-label={t('cx.menu')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">☰</button>

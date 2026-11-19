@@ -2014,6 +2014,7 @@ const hi: Record<DictKey, string> = {
   "perm.collector.portfolio.d": "कलेक्टर पैनल में कुल बकाया दिखाता है।",
   "perm.collector.settings": "पैनल सेटिंग्स उपयोग करें",
   "perm.collector.settings.d": "सेटिंग्स खोलता है: सूचनाएँ, भुगतान QR और रिपोर्ट।",
+  "nav.routeInfo": "रूट की जानकारी",
 };
 
 export default hi;

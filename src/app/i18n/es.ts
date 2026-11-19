@@ -2023,6 +2023,7 @@ const es = {
   "perm.collector.portfolio.d": "Muestra el total por cobrar en el panel del cobrador.",
   "perm.collector.settings": "Usar los ajustes del panel",
   "perm.collector.settings.d": "Abre la pantalla de ajustes: avisos, QR de pago y reportes.",
+  "nav.routeInfo": "Información de la ruta",
 };
 
 export default es;

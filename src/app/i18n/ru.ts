@@ -2014,6 +2014,7 @@ const ru: Record<DictKey, string> = {
   "perm.collector.portfolio.d": "Показывает общую сумму к получению.",
   "perm.collector.settings": "Использовать настройки панели",
   "perm.collector.settings.d": "Открывает настройки: уведомления, QR и отчёты.",
+  "nav.routeInfo": "Информация о маршруте",
 };
 
 export default ru;

@@ -2014,6 +2014,7 @@ const fr: Record<DictKey, string> = {
   "perm.collector.portfolio.d": "Affiche le total à encaisser sur le panneau.",
   "perm.collector.settings": "Utiliser les réglages du panneau",
   "perm.collector.settings.d": "Ouvre les réglages : avis, QR de paiement et rapports.",
+  "nav.routeInfo": "Informations de la tournée",
 };
 
 export default fr;

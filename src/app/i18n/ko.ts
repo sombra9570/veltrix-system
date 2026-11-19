@@ -2014,6 +2014,7 @@ const ko: Record<DictKey, string> = {
   "perm.collector.portfolio.d": "수금원 화면에 총 채권을 표시합니다.",
   "perm.collector.settings": "패널 설정 사용",
   "perm.collector.settings.d": "설정 화면을 엽니다: 알림, 결제 QR, 보고서.",
+  "nav.routeInfo": "경로 정보",
 };
 
 export default ko;

@@ -2014,6 +2014,7 @@ const ja: Record<DictKey, string> = {
   "perm.collector.portfolio.d": "集金画面に回収予定総額を表示します。",
   "perm.collector.settings": "パネル設定を使う",
   "perm.collector.settings.d": "設定画面を開きます：お知らせ、支払いQR、レポート。",
+  "nav.routeInfo": "ルート情報",
 };
 
 export default ja;

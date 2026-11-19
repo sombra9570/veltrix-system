@@ -2014,6 +2014,7 @@ const en: Record<DictKey, string> = {
   "perm.collector.portfolio.d": "Shows the total receivable on the collector panel.",
   "perm.collector.settings": "Use panel settings",
   "perm.collector.settings.d": "Opens the settings screen: notices, payment QR and reports.",
+  "nav.routeInfo": "Route information",
 };
 
 export default en;

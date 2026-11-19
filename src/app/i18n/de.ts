@@ -2014,6 +2014,7 @@ const de: Record<DictKey, string> = {
   "perm.collector.portfolio.d": "Zeigt den Gesamtbetrag im Einzugs-Panel.",
   "perm.collector.settings": "Panel-Einstellungen nutzen",
   "perm.collector.settings.d": "Öffnet die Einstellungen: Hinweise, Zahlungs-QR, Berichte.",
+  "nav.routeInfo": "Routeninformationen",
 };
 
 export default de;

@@ -2014,6 +2014,7 @@ const pt: Record<DictKey, string> = {
   "perm.collector.portfolio.d": "Mostra o total a receber no painel do cobrador.",
   "perm.collector.settings": "Usar os ajustes do painel",
   "perm.collector.settings.d": "Abre a tela de ajustes: avisos, QR de pagamento e relatórios.",
+  "nav.routeInfo": "Informações da rota",
 };
 
 export default pt;

@@ -29,6 +29,7 @@ export const ROLE_NAV = {
 ] as NavItem[],
   collector: [
   { href: '/dashboard/collector', icon: '🛵', label: 'nav.route', module: 'field_collection' },
+  { href: '/dashboard/collector/info', icon: 'ℹ️', label: 'nav.routeInfo', module: 'field_collection' },
   { href: '/dashboard/collector/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   storekeeper: [
@@ -79,6 +80,7 @@ export const ROLE_NAV = {
   delivery: [
   { href: '/dashboard/collector/entregas', icon: '🛵', label: 'dl.nav' },
   { href: '/dashboard/collector', icon: '🛵', label: 'nav.route', module: 'field_collection' },
+  { href: '/dashboard/collector/info', icon: 'ℹ️', label: 'nav.routeInfo', module: 'field_collection' },
   { href: '/dashboard/collector/despacho', icon: '🚚', label: 'nav.dispatch' },
   { href: '/dashboard/collector/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],

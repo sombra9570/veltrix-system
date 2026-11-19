@@ -2014,6 +2014,7 @@ const zh: Record<DictKey, string> = {
   "perm.collector.portfolio.d": "在收款员面板显示应收总额。",
   "perm.collector.settings": "使用面板设置",
   "perm.collector.settings.d": "打开设置：通知、付款二维码和报告。",
+  "nav.routeInfo": "路线信息",
 };
 
 export default zh;

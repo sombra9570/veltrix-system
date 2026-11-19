@@ -2014,6 +2014,7 @@ const ar: Record<DictKey, string> = {
   "perm.collector.portfolio.d": "يعرض إجمالي المستحقات في لوحة المحصّل.",
   "perm.collector.settings": "استخدام إعدادات اللوحة",
   "perm.collector.settings.d": "يفتح الإعدادات: الإشعارات ورمز QR والتقارير.",
+  "nav.routeInfo": "معلومات المسار",
 };
 
 export default ar;
