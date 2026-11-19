@@ -1,5 +1,5 @@
 'use client';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { rpc } from '../../lib/supabase';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -14,11 +14,28 @@ import type { DictKey } from '../i18n/es';
 export type NavItem = { href: string; icon: string; label: DictKey; soon?: boolean; module?: string; group?: DictKey };
 
 /**
+ * Ranura de la barra superior: cada pantalla puede poner ahí su título, el botón atrás
+ * y sus botones (por ejemplo la antena del cobrador), sin abrir una segunda barra.
+ */
+export type HeaderSlot = {
+  title?: string; subtitle?: string; onBack?: () => void; onTitle?: () => void;
+  extra?: ReactNode; hideSync?: boolean; logout?: boolean;
+};
+const SlotCtx = createContext<(s: HeaderSlot | null) => void>(() => undefined);
+export function useHeaderSlot(slot: HeaderSlot | null, deps: unknown[]) {
+  const set = useContext(SlotCtx);
+  const ref = useRef(slot);
+  ref.current = slot;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { set(ref.current); return () => set(null); }, [set, ...deps]);
+}
+
+/**
  * Estructura común de todos los paneles: menú lateral (en celular, desplegable),
  * barra superior y contenido al centro.
  */
 export function AppShell({
-  nav, orgName, userName, roleLabel, onLogout, children, banner,
+  nav, orgName, userName, roleLabel, onLogout, children, banner, help = false,
 }: {
   nav: NavItem[];
   orgName: string;
@@ -27,11 +44,13 @@ export function AppShell({
   onLogout: () => void;
   children: React.ReactNode;
   banner?: React.ReactNode;
+  help?: boolean;
 }) {
   const pathname = usePathname();
   const { t } = useT();
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
+  const [slot, setSlot] = useState<HeaderSlot | null>(null);
 
   // Mensajes sin leer del equipo (insignia en "Mensajes")
   const loadUnread = () => rpc<number>('chat_unread_total').then((n) => setUnread(n ?? 0)).catch(() => {});
@@ -121,6 +140,7 @@ export function AppShell({
   );
 
   return (
+    <SlotCtx.Provider value={setSlot}>
     <div className="flex min-h-dvh bg-slate-50 dark:bg-slate-950">
       {/* Menú lateral fijo en pantallas grandes */}
       <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white lg:block dark:border-slate-800 dark:bg-slate-900/60">
@@ -146,12 +166,25 @@ export function AppShell({
             ☰
             {unread > 0 && <span className="absolute -end-1 -top-1 h-3 w-3 rounded-full bg-blue-600 ring-2 ring-white dark:ring-slate-950" />}
           </button>
-          <p className="truncate text-sm font-bold text-slate-900 lg:hidden dark:text-white">{orgName}</p>
+          {slot?.onBack && (
+            <button type="button" onClick={slot.onBack} aria-label={t('cx.back')}
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">←</button>
+          )}
+          <button type="button" onClick={slot?.onTitle} disabled={!slot?.onTitle}
+            className={`min-w-0 text-left ${slot ? '' : 'lg:hidden'} ${slot?.onTitle ? 'cursor-pointer' : 'cursor-default'}`}>
+            <span className="block truncate text-sm font-bold text-slate-900 dark:text-white">{slot?.title ?? orgName}</span>
+            {slot?.subtitle && <span className="block truncate text-[11px] text-slate-500 dark:text-slate-400">{slot.subtitle}</span>}
+          </button>
           <div className="ml-auto flex items-center gap-2 rtl:ml-0 rtl:mr-auto">
+            {slot?.extra}
             <div className="hidden sm:block"><RegionSelectors /></div>
-            <SyncButton />
-            <HelpButton />
+            {!slot?.hideSync && <SyncButton />}
+            {help && <HelpButton />}
             <ThemeToggle />
+            {slot?.logout && (
+              <button type="button" onClick={onLogout} aria-label={t('shell.logout')}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">⏻</button>
+            )}
           </div>
         </header>
 
@@ -160,6 +193,7 @@ export function AppShell({
         <main className="mx-auto w-full min-w-0 max-w-[1600px] flex-1 px-4 pt-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 md:p-8">{children}</main>
       </div>
     </div>
+    </SlotCtx.Provider>
   );
 }
 

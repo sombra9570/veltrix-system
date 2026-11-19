@@ -195,6 +195,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
         userName={session.name || session.email}
         roleLabel={t('role.owner')}
         onLogout={logout}
+        help
         banner={banner}
       >
         {children}

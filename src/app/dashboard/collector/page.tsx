@@ -1,8 +1,8 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { rpc, supabase } from '../../../lib/supabase';
-import { Card } from '../shell';
+import { rpc } from '../../../lib/supabase';
+import { Card, useHeaderSlot } from '../shell';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
@@ -139,7 +139,6 @@ export default function CollectorPage() {
   const go = (sc: Screen) => { setHist((h) => [...h, screen]); setScreen(sc); setSel(null); setPanel(null); };
   const back = () => { setHist((h) => { const n = [...h]; setScreen(n.pop() ?? 'home'); return n; }); setSel(null); setPanel(null); };
   const menu = () => { setHist([]); setScreen('home'); setSel(null); setPanel(null); };
-  const logout = async () => { await supabase.auth.signOut().catch(() => undefined); window.location.href = '/'; };
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   // Último cobro, para ofrecer el comprobante por WhatsApp
   const [receipt, setReceipt] = useState<{ phone: string; text: string } | null>(null);
@@ -349,6 +348,19 @@ export default function CollectorPage() {
   const selNow = sel ? route?.customers.find((x) => x.id === sel.id) ?? sel : null;
   const fmt = (n: number) => money(Number(n), route?.currency ?? 'USD', lang);
 
+  // Barra superior única de la app: nombre de la ruta, atrás y antena (sin segunda barra)
+  const slotRoute = day?.routes.find((r) => r.id === routeId);
+  const act = useRef({ back, menu, flush });
+  act.current = { back, menu, flush };
+  const sigNow = !online ? 'off' : queue.length > 0 || rejected.length > 0 ? 'pending' : 'ok';
+  useHeaderSlot(slotRoute ? {
+    title: `🛵 ${slotRoute.name}`, subtitle: `${userName} · ${slotRoute.branch}`,
+    onBack: screen !== 'home' ? () => act.current.back() : undefined,
+    onTitle: screen !== 'home' ? () => act.current.menu() : undefined,
+    extra: <SignalButton state={sigNow} pending={queue.length} syncing={syncing} onClick={() => { if (online) void act.current.flush(true); }} />,
+    hideSync: true, logout: true,
+  } : null, [slotRoute?.name, slotRoute?.branch, userName, screen, sigNow, queue.length, syncing, online]);
+
   // Cuántos clientes hay a menos de 100 m (se calcula al abrir la pantalla principal)
   const nearList = day?.routes.find((r) => r.id === routeId)?.customers;
   useEffect(() => {
@@ -380,7 +392,6 @@ export default function CollectorPage() {
   const pendingCustomers = route.customers
     .filter((c) => !c.paid_today && Number(c.overdue) + Number(c.due_today) > 0.004)
     .sort((x, y) => Number(y.overdue) - Number(x.overdue));
-  const sigState = !online ? 'off' : queue.length > 0 || rejected.length > 0 ? 'pending' : 'ok';
   const unread = Number(route.notices_unread ?? 0);
   const openCustomer = (id: string) => { const c = route.customers.find((x) => x.id === id); if (c) { setSel(c); setPanel(null); } };
   const canExpenses = route.can_expenses !== false;
@@ -400,21 +411,6 @@ export default function CollectorPage() {
 
   return (
     <div className="space-y-4">
-      {/* Encabezado fijo: nombre, antena, menú, atrás y salir */}
-      <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-2 py-2 dark:border-slate-800 dark:bg-slate-900">
-        {screen !== 'home' && (
-          <button type="button" onClick={back} aria-label={t('cx.back')} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">←</button>
-        )}
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-extrabold">🛵 {route.name || userName}</p>
-          <p className={`truncate text-[11px] ${ui.muted}`}>{userName} · {route.branch}</p>
-        </div>
-        <SignalButton state={sigState} pending={queue.length} syncing={syncing} onClick={() => { if (online) void flush(true); }} />
-        {screen !== 'home' && (
-          <button type="button" onClick={menu} aria-label={t('cx.menu')} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">☰</button>
-        )}
-        <button type="button" onClick={logout} aria-label={t('shell.logout')} className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">⏻</button>
-      </div>
       {day.routes.length > 1 && screen === 'home' && (
         <select value={routeId} onChange={(e) => setRouteId(e.target.value)} className={`${ui.input} !w-auto`}>
           {day.routes.map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
