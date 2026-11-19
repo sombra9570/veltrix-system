@@ -1,0 +1,4 @@
+-- Índices para las claves foráneas simples que faltaban (62 índices fk_*, tablas pequeñas) y
+-- custom_roles_read con (select auth.uid()) para que se evalúe una sola vez por consulta.
+-- Se omitieron las FK compuestas (org, company, branch): solo importan al borrar sucursales/empresas.
+-- El script que las creó recorre pg_constraint y hace create index if not exists fk_<constraint>.
