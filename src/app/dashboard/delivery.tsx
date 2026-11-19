@@ -339,7 +339,7 @@ export function RestaurantInbox() {
       {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-red-300 bg-red-50 text-red-700'}`}>{msg.text}</p>}
       {branches.map((b) => (
         <div key={b.id} className="space-y-3" aria-label={`${t('dl.board')} ${b.name}`}>
-          <QrRequests branchId={b.id} currency={b.currency} flash={flash} />
+          <QrRequests branchId={b.id} currency={b.currency} onChanged={() => {}} flash={flash} />
           {b.enabled && <DeliveryRequests branchId={b.id} currency={b.currency} flash={flash} />}
           <CashReceive branchId={b.id} currency={b.currency} flash={flash} />
         </div>
