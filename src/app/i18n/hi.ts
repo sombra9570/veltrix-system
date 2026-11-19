@@ -1901,6 +1901,9 @@ const hi: Record<DictKey, string> = {
   'cr.st.taken': "जारी",
   'cr.st.done': "हो गया",
   'cr.st.cancelled': "रद्द",
+  'team.edit': "संपादित करें",
+  'team.editSaved': "बदलाव सहेजे गए",
+  'team.editCustomHint': "अपनी भूमिका चुनने पर बेस पद उसी भूमिका से तय होता है।",
 };
 
 export default hi;

@@ -1901,6 +1901,9 @@ const zh: Record<DictKey, string> = {
   'cr.st.taken': "进行中",
   'cr.st.done': "已完成",
   'cr.st.cancelled': "已取消",
+  'team.edit': "编辑",
+  'team.editSaved': "已保存",
+  'team.editCustomHint': "使用自定义角色时，基础职位由该角色决定。",
 };
 
 export default zh;

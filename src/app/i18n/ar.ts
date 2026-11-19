@@ -1901,6 +1901,9 @@ const ar: Record<DictKey, string> = {
   'cr.st.taken': "جارية",
   'cr.st.done': "تم",
   'cr.st.cancelled': "ملغى",
+  'team.edit': "تعديل",
+  'team.editSaved': "تم حفظ التغييرات",
+  'team.editCustomHint': "عند استخدام دور خاص يتحدد المنصب الأساسي من هذا الدور.",
 };
 
 export default ar;

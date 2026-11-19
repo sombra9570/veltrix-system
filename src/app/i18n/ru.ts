@@ -1901,6 +1901,9 @@ const ru: Record<DictKey, string> = {
   'cr.st.taken': "В работе",
   'cr.st.done': "Готово",
   'cr.st.cancelled': "Отменено",
+  'team.edit': "Изменить",
+  'team.editSaved': "Изменения сохранены",
+  'team.editCustomHint': "При собственной роли базовая должность задаётся этой ролью.",
 };
 
 export default ru;

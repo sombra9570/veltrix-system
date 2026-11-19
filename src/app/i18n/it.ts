@@ -1901,6 +1901,9 @@ const it: Record<DictKey, string> = {
   'cr.st.taken': "In corso",
   'cr.st.done': "Fatto",
   'cr.st.cancelled': "Annullato",
+  'team.edit': "Modifica",
+  'team.editSaved': "Modifiche salvate",
+  'team.editCustomHint': "Con un ruolo personalizzato, la mansione base è definita da quel ruolo.",
 };
 
 export default it;

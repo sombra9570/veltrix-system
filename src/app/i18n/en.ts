@@ -1901,6 +1901,9 @@ const en: Record<DictKey, string> = {
   'cr.st.taken': "In progress",
   'cr.st.done': "Done",
   'cr.st.cancelled': "Cancelled",
+  'team.edit': "Edit",
+  'team.editSaved': "Changes saved",
+  'team.editCustomHint': "With a custom role, the base position comes from that role.",
 };
 
 export default en;

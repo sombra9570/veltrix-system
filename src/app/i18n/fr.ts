@@ -1901,6 +1901,9 @@ const fr: Record<DictKey, string> = {
   'cr.st.taken': "En cours",
   'cr.st.done': "Terminé",
   'cr.st.cancelled': "Annulé",
+  'team.edit': "Modifier",
+  'team.editSaved': "Modifications enregistrées",
+  'team.editCustomHint': "Avec un rôle personnalisé, le poste de base vient de ce rôle.",
 };
 
 export default fr;

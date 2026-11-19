@@ -1910,6 +1910,9 @@ const es = {
   'cr.st.taken': "En curso",
   'cr.st.done': "Hecho",
   'cr.st.cancelled': "Cancelado",
+  'team.edit': "Editar",
+  'team.editSaved': "Cambios guardados",
+  'team.editCustomHint': "Con un rol propio, el cargo base lo define ese rol.",
 };
 
 export default es;

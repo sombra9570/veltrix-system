@@ -1901,6 +1901,9 @@ const ko: Record<DictKey, string> = {
   'cr.st.taken': "진행 중",
   'cr.st.done': "완료",
   'cr.st.cancelled': "취소됨",
+  'team.edit': "수정",
+  'team.editSaved': "변경 저장됨",
+  'team.editCustomHint': "커스텀 역할을 쓰면 기본 직책은 그 역할이 정합니다.",
 };
 
 export default ko;

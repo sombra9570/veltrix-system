@@ -114,13 +114,24 @@ export default function TeamPage() {
     }
   };
 
-  // Cambiar la contraseña de un trabajador (el administrador la escribe y se la entrega)
-  const assignRole = async (r: Row, roleId: string) => {
-    setMsg(null);
+  // Editar cargo, rol propio y sucursal de un trabajador
+  const [ed, setEd] = useState<{ row: Row; role: string; custom: string; branchId: string } | null>(null);
+  const [edBusy, setEdBusy] = useState(false);
+  const [edMsg, setEdMsg] = useState<string | null>(null);
+  const openEdit = (r: Row) => { setEd({ row: r, role: r.roles[0] ?? 'cashier', custom: r.customRoleId ?? '', branchId: r.branchIds[0] ?? '' }); setEdMsg(null); };
+  const saveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ed) return;
+    setEdBusy(true); setEdMsg(null);
     try {
-      for (const m of r.membershipIds) await rpc('set_member_custom_role', { p_membership: m, p_role: roleId || null });
-      await load();
-    } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
+      const single = ed.row.membershipIds.length === 1;
+      for (const m of ed.row.membershipIds) {
+        await rpc('set_member_role', { p_membership: m, p_role: ed.custom ? null : ed.role, p_custom: ed.custom || null, p_branch: single && ed.branchId ? ed.branchId : null });
+      }
+      setEd(null); setMsg({ ok: true, text: t('team.editSaved') });
+      await Promise.all([load(), reload()]);
+    } catch (err) { setEdMsg(friendlyError(err instanceof Error ? err.message : '', t)); }
+    setEdBusy(false);
   };
   const [pw, setPw] = useState<{ row: Row; value: string } | null>(null);
   const [pwBusy, setPwBusy] = useState(false);
@@ -270,21 +281,16 @@ export default function TeamPage() {
                     {r.email}
                   </p>
                   <p className={`truncate text-xs ${ui.muted}`}>
-                    {r.roles.map(roleLabel).join(', ')} · {r.branchIds.map(branchName).join(', ')}
+                    {r.roles.map(roleLabel).join(', ')}{r.customRoleId ? ` · 🧩 ${customRoles.find((c) => c.id === r.customRoleId)?.name ?? ''}` : ''} · {r.branchIds.map(branchName).join(', ')}
                   </p>
                 </div>
-                {customRoles.length > 0 && (
-                  <select aria-label={t('roles.assign')} className={`${ui.input} !w-auto !py-1.5 text-xs`} value={r.customRoleId ?? ''} onChange={(e) => assignRole(r, e.target.value)}>
-                    <option value="">{t('roles.none')}</option>
-                    {customRoles.map((c) => <option key={c.id} value={c.id}>🧩 {c.name}</option>)}
-                  </select>
-                )}
                 <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
                 <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${r.active
                   ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
                   : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
                   {r.active ? t('team.active') : t('team.inactive')}
                 </span>
+                <button type="button" onClick={() => openEdit(r)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>✏️ {t('team.edit')}</button>
                 <button type="button" onClick={() => { setPw({ row: r, value: '' }); setPwMsg(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>🔑 {t('team.pwChange')}</button>
                 <button type="button" onClick={() => toggle(r)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>
                   {r.active ? t('team.deactivate') : t('team.activate')}
@@ -295,6 +301,48 @@ export default function TeamPage() {
           </ul>
         )}
       </Card>
+
+      {ed && (
+        <Sheet onClose={() => setEd(null)} label={t('pos.close')}>
+          <form onSubmit={saveEdit} className="space-y-4">
+            <div>
+              <h2 className="text-lg font-extrabold">✏️ {t('team.edit')}</h2>
+              <p className={`text-sm ${ui.muted}`}>{ed.row.name || ed.row.email}</p>
+            </div>
+            {!ed.custom && (
+              <div>
+                <label className={ui.label}>{t('team.role')}</label>
+                <select className={ui.input} value={ed.role} onChange={(e) => setEd({ ...ed, role: e.target.value })}>
+                  {[...new Set([...roles, ...ed.row.roles])].map((r) => <option key={r} value={r}>{roleLabel(r)}</option>)}
+                </select>
+              </div>
+            )}
+            {customRoles.length > 0 && (
+              <div>
+                <label className={ui.label}>🧩 {t('roles.assign')}</label>
+                <select className={ui.input} value={ed.custom} onChange={(e) => setEd({ ...ed, custom: e.target.value })}>
+                  <option value="">{t('roles.none')}</option>
+                  {customRoles.map((c) => <option key={c.id} value={c.id}>🧩 {c.name}</option>)}
+                </select>
+                {ed.custom && <p className={`mt-1 text-xs ${ui.muted}`}>{t('team.editCustomHint')}</p>}
+              </div>
+            )}
+            {ed.row.membershipIds.length === 1 && branches.length > 1 && (
+              <div>
+                <label className={ui.label}>{t('team.branch')}</label>
+                <select className={ui.input} value={ed.branchId} onChange={(e) => setEd({ ...ed, branchId: e.target.value })}>
+                  {branches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+              </div>
+            )}
+            {edMsg && <p className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">{edMsg}</p>}
+            <div className="flex gap-2">
+              <button type="button" onClick={() => setEd(null)} className={`${ui.btnGhost} flex-1`}>{t('cash.cancel')}</button>
+              <button type="submit" disabled={edBusy} className={`${ui.btnPrimary} flex-1`}>{edBusy ? t('common.wait') : t('team.pwSave')}</button>
+            </div>
+          </form>
+        </Sheet>
+      )}
 
       {pw && (
         <Sheet onClose={() => setPw(null)} label={t('pos.close')}>

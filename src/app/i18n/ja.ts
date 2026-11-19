@@ -1901,6 +1901,9 @@ const ja: Record<DictKey, string> = {
   'cr.st.taken': "進行中",
   'cr.st.done': "完了",
   'cr.st.cancelled': "キャンセル",
+  'team.edit': "編集",
+  'team.editSaved': "変更を保存しました",
+  'team.editCustomHint': "独自ロールを使うと、基本の役職はそのロールで決まります。",
 };
 
 export default ja;

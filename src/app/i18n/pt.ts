@@ -1901,6 +1901,9 @@ const pt: Record<DictKey, string> = {
   'cr.st.taken': "Em andamento",
   'cr.st.done': "Feito",
   'cr.st.cancelled': "Cancelado",
+  'team.edit': "Editar",
+  'team.editSaved': "Alterações salvas",
+  'team.editCustomHint': "Com um papel próprio, o cargo base vem desse papel.",
 };
 
 export default pt;

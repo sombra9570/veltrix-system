@@ -1901,6 +1901,9 @@ const de: Record<DictKey, string> = {
   'cr.st.taken': "Läuft",
   'cr.st.done': "Erledigt",
   'cr.st.cancelled': "Storniert",
+  'team.edit': "Bearbeiten",
+  'team.editSaved': "Änderungen gespeichert",
+  'team.editCustomHint': "Bei einer eigenen Rolle bestimmt diese Rolle die Basisposition.",
 };
 
 export default de;
