@@ -190,3 +190,51 @@ export function PurgeKeyPanel({ onDone }: { onDone: (msg: string) => void }) {
     </div>
   );
 }
+
+// Borrado automático de empresas suspendidas que no renovaron: muestra el estado y quién se borraría, y se enciende o apaga con la clave
+type AutoRow = { org_id: string; name: string; suspended_since: string; delete_on: string };
+export function AutoPurgePanel({ onDone }: { onDone: (msg: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [st, setSt] = useState<{ enabled: boolean; days: number; list: AutoRow[] } | null>(null);
+  const [key, setKey] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState('');
+  const day = (iso: string) => new Date(iso).toLocaleDateString();
+  const show = async () => {
+    setOpen(true); setMsg('');
+    const r = await call({ action: 'auto_status' });
+    if (r.ok) setSt(r.data as unknown as { enabled: boolean; days: number; list: AutoRow[] }); else setMsg(explain(r.data));
+  };
+  const close = () => { setOpen(false); setKey(''); setMsg(''); };
+  const toggle = async () => {
+    if (!st) return;
+    setBusy(true); setMsg('');
+    const r = await call({ action: 'auto_set', enabled: !st.enabled, key });
+    setBusy(false);
+    if (!r.ok) { setMsg(explain(r.data)); return; }
+    close(); onDone(!st.enabled ? '⏱️ Borrado automático ENCENDIDO.' : '⏱️ Borrado automático apagado.');
+  };
+  if (!open) return <button type="button" onClick={show} className={ghostBtn}>⏱️ Borrado automático</button>;
+  return (
+    <div className="max-w-sm space-y-2">
+      {!st ? <p className="text-[11px] text-slate-300">Cargando…</p> : (<>
+        <p className="text-[11px] text-slate-300">
+          Estado: <b className={st.enabled ? 'text-red-300' : 'text-emerald-300'}>{st.enabled ? 'ENCENDIDO' : 'apagado'}</b>. Borra las empresas suspendidas por falta de renovación {st.days} días después de la suspensión, sin pedir la clave. No toca empresas piloto.
+        </p>
+        {st.list.length === 0 ? <p className="text-[11px] text-slate-400">Ninguna empresa suspendida por ahora.</p> : (
+          <ul className="space-y-1 text-[11px] text-slate-300">
+            {st.list.map((o) => <li key={o.org_id}>• {o.name}: suspendida el {day(o.suspended_since)} → se borraría el {day(o.delete_on)}</li>)}
+          </ul>
+        )}
+        <label className="block text-[11px] text-slate-300">Clave de borrado para {st.enabled ? 'apagarlo' : 'encenderlo'}
+          <input type="password" value={key} onChange={(e) => setKey(e.target.value)} className={field} autoComplete="off" />
+        </label>
+        {msg && <p className="text-[11px] font-semibold text-red-300">{msg}</p>}
+        <div className="flex gap-2">
+          <button type="button" disabled={busy || key.length < 10} onClick={toggle} className={dangerBtn}>{busy ? 'Guardando…' : st.enabled ? 'Apagar' : 'Encender'}</button>
+          <button type="button" disabled={busy} onClick={close} className={ghostBtn}>Cerrar</button>
+        </div>
+      </>)}
+    </div>
+  );
+}

@@ -2,7 +2,8 @@
 // Pasos: 1) pedir el borrado y ver el resumen, 2) escribir el nombre exacto, la clave de borrado (10-12 caracteres) y la palabra BORRAR.
 // La clave se guarda solo como hash; 5 fallos seguidos bloquean 30 minutos; cada intento queda en purge_log.
 // Borra la base (admin_purge_org), los archivos de todos los almacenamientos y las cuentas de acceso del personal.
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+import { listAll, removeFiles, buckets } from '../../../../lib/purge-files';
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -11,37 +12,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function fail(status: number, error: string, extra: Record<string, unknown> = {}) { return Response.json({ error, ...extra }, { status }); }
 
-type Body = { action?: string; org?: string; request?: string; name?: string; key?: string; newKey?: string; phrase?: string };
-
-// Todos los archivos (recursivo) bajo una carpeta de un almacenamiento
-async function listAll(admin: SupabaseClient, bucket: string, prefix: string): Promise<string[]> {
-  const out: string[] = [];
-  const walk = async (dir: string) => {
-    for (let offset = 0; ; offset += 1000) {
-      const { data, error } = await admin.storage.from(bucket).list(dir, { limit: 1000, offset });
-      if (error || !data || data.length === 0) return;
-      for (const it of data) {
-        const path = dir ? `${dir}/${it.name}` : it.name;
-        if (it.id) out.push(path); else await walk(path);
-      }
-      if (data.length < 1000) return;
-    }
-  };
-  await walk(prefix);
-  return out;
-}
-
-async function removeFiles(admin: SupabaseClient, bucket: string, paths: string[]) {
-  for (let i = 0; i < paths.length; i += 100) {
-    const { error } = await admin.storage.from(bucket).remove(paths.slice(i, i + 100));
-    if (error) throw new Error(error.message);
-  }
-}
-
-async function buckets(admin: SupabaseClient): Promise<string[]> {
-  const { data } = await admin.storage.listBuckets();
-  return (data ?? []).map((b) => b.id);
-}
+type Body = { action?: string; enabled?: boolean; org?: string; request?: string; name?: string; key?: string; newKey?: string; phrase?: string };
 
 export async function POST(request: Request) {
   if (!url || !anonKey || !serviceKey) return fail(500, 'Faltan las claves de Supabase');
@@ -136,6 +107,18 @@ export async function POST(request: Request) {
       }
       await log(null, null, 'sweep', failed.length === 0, `archivos ${removed}${failed.length ? `, fallaron: ${failed.join('; ')}` : ''}`);
       return Response.json({ files_removed: removed, files_failed: failed });
+    }
+    case 'auto_status': {
+      const { data: cfg } = await admin.rpc('auto_purge_settings_get');
+      const { data: list } = await admin.rpc('auto_purge_candidates', { p_all: true });
+      return Response.json({ ...(cfg as object), list: list ?? [] });
+    }
+    case 'auto_set': {
+      const bad = await checkKey(body.key, 'auto_set', null, null);
+      if (bad) return bad;
+      const { error } = await admin.rpc('auto_purge_settings_set', { p_actor: actor, p_enabled: !!body.enabled });
+      if (error) return fail(400, error.message);
+      return Response.json({ ok: true });
     }
     default:
       return fail(400, 'Acción inválida');

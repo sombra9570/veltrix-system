@@ -1,0 +1,4 @@
+-- Borrado automático de empresas suspendidas sin renovar. Aplicada vía migración "auto_purge_expired_orgs". Nace APAGADO.
+-- purge_auto_settings (enabled=false, days=120 mínimo 90, según los términos: conservación de al menos 90 días + aviso).
+-- auto_purge_candidates / auto_purge_settings_get/set / auto_purge_org: solo service_role. No toca empresas piloto ni de un superadmin.
+-- Corre desde /api/admin/auto-purge (cron de Vercel diario, requiere CRON_SECRET); máximo 3 empresas por corrida; sin clave.

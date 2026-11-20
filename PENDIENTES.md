@@ -163,3 +163,4 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Borra base, cuentas de acceso del personal y archivos de todos los almacenamientos. Botón "Limpiar archivos de empresas ya borradas" para restos antiguos.
 - Pendiente: pantalla para cambiar la clave (la función purge_key_set ya lo permite con la clave actual); revisar cuentas de acceso sin empresa.
 - Sin verificar en pantalla.
+- Borrado automático por falta de renovación: construido y APAGADO (120 días tras la suspensión). Para que corra hace falta CRON_SECRET en Vercel (lo pone Diego) y encenderlo con la clave desde el panel. Falta el aviso por correo antes de borrar (depende de la decisión del correo de respaldo/Resend).
