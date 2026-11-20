@@ -6,6 +6,7 @@ export const ROLE_NAV = {
   { href: '/dashboard/vendor', icon: '🛒', label: 'nav.pos' },
   { href: '/dashboard/vendor/ventas', icon: '🧾', label: 'nav.mySales' },
   { href: '/dashboard/vendor/clientes', icon: '🤝', label: 'nav.customers' },
+  { href: '/dashboard/vendor/tienda', icon: '🛍️', label: 'nav.store' },
   { href: '/dashboard/vendor/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   kitchen: [
@@ -23,6 +24,7 @@ export const ROLE_NAV = {
   { href: '/dashboard/supervisor/caja', icon: '💵', label: 'nav.cash', group: 'nav.g.sell' },
   { href: '/dashboard/supervisor/despacho', icon: '🚚', label: 'nav.dispatch', module: 'retail', group: 'nav.g.sell' },
   { href: '/dashboard/supervisor/clientes', icon: '🤝', label: 'nav.customers', group: 'nav.g.sell' },
+  { href: '/dashboard/supervisor/tienda', icon: '🛍️', label: 'nav.store', module: 'retail,restaurant', group: 'nav.g.business' },
   { href: '/dashboard/supervisor/inventario', icon: '📦', label: 'nav.inventory', module: 'inventory', group: 'nav.g.business' },
   { href: '/dashboard/supervisor/reportes', icon: '📈', label: 'nav.reports', group: 'nav.g.reports' },
   { href: '/dashboard/supervisor/mensajes', icon: '💬', label: 'nav.messages' },
@@ -68,6 +70,7 @@ export const ROLE_NAV = {
   { href: '/dashboard/cashier', icon: '💵', label: 'nav.cash' },
   { href: '/dashboard/cashier/vender', icon: '🛒', label: 'nav.pos' },
   { href: '/dashboard/cashier/ventas', icon: '🧾', label: 'nav.mySales' },
+  { href: '/dashboard/cashier/tienda', icon: '🛍️', label: 'nav.store' },
   { href: '/dashboard/cashier/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   reception: [

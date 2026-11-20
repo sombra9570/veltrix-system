@@ -31,11 +31,18 @@ export function StaffProvider({
   const { loaded, session, companies, logout } = useVeltrixAuth();
   // Rubros activos de la empresa: lo que no ocupa no aparece en el menú
   const [modules, setModules] = useState<string[] | null>(null);
+  const [storeOk, setStoreOk] = useState(false);
   const uid = session?.userId;
+  const cid = session?.companyId;
   useEffect(() => {
     if (!uid) return;
     rpc<string[]>('my_modules').then((m) => setModules(m ?? [])).catch(() => setModules([]));
   }, [uid]);
+  // La tienda virtual solo aparece si el rubro la usa y el administrador le dio algún permiso de tienda a este usuario
+  useEffect(() => {
+    if (!uid || !cid) return;
+    rpc<boolean>('my_store_access', { p_company: cid }).then((b) => setStoreOk(!!b)).catch(() => setStoreOk(false));
+  }, [uid, cid]);
   // Panel al que pertenece este usuario; si apunta aquí mismo (o a ingresar con sesión) no se redirige: evita bucles
   const target = session ? homeForRole(session.role) : '/ingresar';
   // Un rol propio también cubre las funciones de otros roles: puede entrar a sus pantallas
@@ -69,7 +76,7 @@ export function StaffProvider({
     if (extra.length === 0) return [...mine, ...chat];
     return [...mine.map((n) => ({ ...n, group: `role.${session.role}` as DictKey })), ...extra, ...chat];
   })();
-  const menu = menuRaw.filter((n) => navHas(modules, n.module))
+  const menu = menuRaw.filter((n) => navHas(modules, n.module)).filter((n) => !n.href.endsWith('/tienda') || storeOk)
     // Cada rol ve solo lo de su rubro. Supervisor de cobranza en calle: únicamente sus rutas, reportes, mensajes y ajustes
     // (lista cerrada, no de exclusión: así nada de otros rubros se cuela, ni siquiera mientras carga el rubro).
     .filter((n) => {

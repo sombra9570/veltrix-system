@@ -31,6 +31,7 @@ type Ctx = {
   modules: string[];
   /** Cargos que el dueño confirmó al registrar la empresa (vacío = sin restricción) */
   teamRoles: string[];
+  storeEnabled: boolean;
   /** Rubros que eligió el dueño al registrar la empresa */
   categories: string[];
   refreshTeamRoles: () => Promise<void>;
@@ -113,6 +114,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [denied, setDenied] = useState(false);
   const [modules, setModules] = useState<string[]>([]);
+  const [storeEnabled, setStoreEnabled] = useState(false);
   const [teamRoles, setTeamRoles] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [routes, setRoutes] = useState<{ id: string; name: string }[]>([]);
@@ -123,6 +125,11 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
     if (!session || session.role !== 'owner') return;
     rpc<string[]>('my_modules').then((m) => setModules(m ?? [])).catch(() => setModules([]));
   }, [session]);
+
+  useEffect(() => {
+    if (!orgId) return;
+    rpc<boolean>('store_enabled', { p_org: orgId }).then((b) => setStoreEnabled(!!b)).catch(() => setStoreEnabled(false));
+  }, [orgId]);
 
   const refreshTeamRoles = useCallback(async () => {
     if (!orgId) return;
@@ -222,12 +229,13 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   if (banner) banner = <Link href="/dashboard/owner/plan" className="block hover:opacity-95">{banner}</Link>;
 
   return (
-    <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name, modules, teamRoles, categories, refreshTeamRoles, cobranza }}>
+    <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name, modules, teamRoles, storeEnabled, categories, refreshTeamRoles, cobranza }}>
       <AppShell
         nav={NAV
           .filter((n) => navHas(modules, n.module) && (!n.href.endsWith('/informes') || ['pro', 'enterprise', 'enterprise_plus'].includes(o?.plan_code ?? ''))
             && !(cobranza && ['/clientes', '/prestamos', '/caja'].some((x) => n.href.endsWith(x))))
           .filter((n) => !n.href.endsWith('/supervisores') || cobranza)
+          .filter((n) => !n.href.endsWith('/tienda') || storeEnabled)
           .map((n) => (n.href.endsWith('/rutas') ? { ...n, children: routes.map((r) => ({ href: `/dashboard/owner/ruta?r=${r.id}`, label: r.name })) }
             : n.href.endsWith('/supervisores') ? { ...n, children: sups.map((x) => ({ href: `/dashboard/owner/supervisor?s=${x.membership_id}`, label: x.name })) } : n))
           .map((n) => (cobranza && n.group === 'nav.g.sell' ? { ...n, group: 'nav.g.routesSup' as const } : n))}

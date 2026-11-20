@@ -1,0 +1,1 @@
+-- Tienda: permisos store.create_product/photo/publish/edit_info (perm_catalog, perm_default solo almacenero y supervisor), store_enabled(org) por rubro, store_perm, store_create_product, my_store_access; store_admin devuelve perms.

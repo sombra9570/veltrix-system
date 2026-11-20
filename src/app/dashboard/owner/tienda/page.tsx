@@ -7,12 +7,14 @@ import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { money } from '../../format';
 import { PhotoSlot } from '../../photo-picker';
+import { StoreProductForm } from './product-form';
 import { compressImage, extFor, storeImageUrl, makeThumb, thumbPath } from '../../image';
 
 type Company = { id: string; legal_name: string };
 type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean; variants?: number };
 type Store = { id: string; company_id: string; branch_id: string; slug: string; name: string; description: string | null; whatsapp: string | null; logo_path: string | null; own_qr_path?: string | null; is_published: boolean };
-type Admin = { store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
+type Admin = {
+  perms?: { create: boolean; photo: boolean; publish: boolean; edit: boolean }; store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
 
 const BUCKET = 'store-images';
 const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
@@ -24,6 +26,8 @@ function storeError(msg: string, t: (k: DictKey) => string) {
   if (msg.includes('STORE_SLUG_INVALID')) return t('store.slugInvalid');
   if (msg.includes('STORE_SLUG_TAKEN')) return t('store.slugTaken');
   if (msg.includes('STORE_NEEDS_WHATSAPP')) return t('store.needsWhatsapp');
+  if (msg.includes('PERM_DENIED')) return t('err.permDenied');
+  if (msg.includes('MODEL_EXISTS')) return t('sp.exists');
   if (msg.includes('STORE_PHOTO_REQUIRED')) return t('store.photoRequired');
   if (msg.includes('PLAN_LIMIT_STORE')) return t('store.limit');
   if (/row-level|storage/i.test(msg)) return t('cust.uploadFailed');
@@ -40,6 +44,7 @@ export default function StoreAdminPage() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [origin, setOrigin] = useState('');
+  const [newOpen, setNewOpen] = useState(false);
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -197,6 +202,8 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
   };
 
   if (!data || !form) return <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p>;
+  const pm = data.perms ?? { create: true, photo: true, publish: true, edit: true };
+  const pe = pm.edit;
   const published = data.products.filter((p) => p.in_store).length;
   const logo = storeImageUrl(data.store.logo_path);
 
@@ -220,6 +227,7 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
         {/* Datos de la tienda */}
         <Card className="lg:col-span-3">
           <form onSubmit={save} className="grid gap-4 sm:grid-cols-2">
+          <fieldset disabled={!pe} className="contents">
             <div className="flex items-center gap-4 sm:col-span-2">
               <PhotoSlot current={logo} onFile={(f) => setLogo(f)} busy={busy} size="h-20 w-20" icon="🏪" />
               <p className={`text-xs ${ui.muted}`}>{t('store.logoHint')}</p>
@@ -260,6 +268,7 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
               </span>
             </label>
             <button type="submit" disabled={busy} className={`${ui.btnPrimary} sm:col-span-2`}>{busy ? t('common.wait') : t('prod.save')}</button>
+          </fieldset>
           </form>
         </Card>
 
@@ -311,7 +320,16 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
           </span>
         </div>
         <p className={`text-xs ${ui.muted}`}>{t('store.photoHint')}</p>
-        {data.products.some((p) => !p.in_store && p.active && p.photo) && (
+        {pm.create && !newOpen && (
+          <button type="button" onClick={() => setNewOpen(true)} className={`${ui.btnPrimary} w-full`}>➕ {t('sp.new')}</button>
+        )}
+        {pm.create && newOpen && (
+          <StoreProductForm orgId={orgId} companyId={companyId} currency={data.currency} canPublish={pm.publish}
+            onCancel={() => setNewOpen(false)}
+            onError={(m) => flash(false, storeError(m, t))}
+            onDone={(n) => { setNewOpen(false); flash(true, t('sp.created', { n })); load(); }} />
+        )}
+        {pm.publish && data.products.some((p) => !p.in_store && p.active && p.photo) && (
           <button type="button" disabled={busy} onClick={addAll} className={`${ui.btnGhost} w-full cursor-pointer`}>➕ {t('store.addAll')}</button>
         )}
         {data.products.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('prod.empty')}</p>}
@@ -320,18 +338,21 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
             const img = storeImageUrl(p.photo);
             return (
               <li key={p.id} className={`flex flex-wrap items-center gap-3 py-3 ${p.active ? '' : 'opacity-50'}`}>
-                <PhotoSlot current={img} onFile={(f) => setPhoto(p, f)} busy={busy} />
+                {pm.photo ? <PhotoSlot current={img} onFile={(f) => setPhoto(p, f)} busy={busy} /> : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <span className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">{img ? <img src={img} alt="" className="h-full w-full object-cover" /> : '📷'}</span>
+                )}
                 <div className="min-w-0 flex-1 basis-40">
                   <p className="truncate font-semibold">{p.name}</p>
                   <p className={`text-xs ${ui.muted}`}>{fmt(p.price)}{(p.variants ?? 1) > 1 && <> · {t('store.variants', { n: p.variants ?? 1 })}</>}</p>
                   {!p.photo && <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">📷 {t('store.needsPhoto')}</p>}
-                  {p.in_store && (
+                  {p.in_store && pm.publish && (
                     <input defaultValue={p.description ?? ''} placeholder={t('store.productDesc')} maxLength={300}
                       onBlur={(e) => { if (e.target.value !== (p.description ?? '')) toggle(p, e.target.value); }}
                       className={`${ui.input} mt-1 !py-1.5 text-xs`} />
                   )}
                 </div>
-                <button type="button" disabled={!p.in_store && !p.photo} onClick={() => toggle(p)}
+                <button type="button" disabled={!pm.publish || (!p.in_store && !p.photo)} onClick={() => toggle(p)}
                   className={`shrink-0 rounded-full disabled:cursor-not-allowed disabled:opacity-40 px-3 py-1.5 text-xs font-bold transition cursor-pointer ${p.in_store ? 'bg-emerald-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
                   {p.in_store ? `✓ ${t('store.inStore')}` : t('store.addToStore')}
                 </button>
