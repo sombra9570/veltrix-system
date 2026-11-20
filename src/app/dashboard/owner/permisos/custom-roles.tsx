@@ -17,8 +17,8 @@ const BASE_ROLES = ['cashier', 'vendor', 'supervisor', 'collector', 'waiter', 't
 /** Roles propios: un nombre + pantalla principal + otras funciones que cubre + permisos finos */
 export function CustomRoles({ keys }: { keys: string[] }) {
   const { t } = useT();
-  const { orgId, modules } = useOwner();
-  const baseRoles = BASE_ROLES.filter((r) => roleAvailable(r, modules));
+  const { orgId, modules, teamRoles } = useOwner();
+  const baseRoles = BASE_ROLES.filter((r) => roleAvailable(r, modules) && (teamRoles.length === 0 || teamRoles.includes(r)));
   const k = (key: string) => t(key as DictKey);
   const [list, setList] = useState<CustomRole[]>([]);
   const [edit, setEdit] = useState<{ id: string | null; name: string; roles: string[]; perms: Record<string, boolean> } | null>(null);

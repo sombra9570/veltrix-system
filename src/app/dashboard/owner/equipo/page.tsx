@@ -21,12 +21,11 @@ type Person = { id: string; full_name: string | null; email: string | null };
 type Row = { userId: string; name: string; email: string; roles: string[]; branchIds: string[]; active: boolean; membershipIds: string[]; customRoleId: string | null };
 
 export default function TeamPage() {
-  const { orgId, reload, overview, modules } = useOwner();
+  const { orgId, reload, overview, modules, teamRoles } = useOwner();
   const [niches, setNiches] = useState<string[]>([]);
-  const [chosen, setChosen] = useState<string[]>([]);
   // En planes chicos solo se ofrecen los cargos propios del nicho del negocio
   // Primero los cargos que el dueño confirmó al registrarse; si no hay, los del nicho
-  const nicheRoles: string[] | null = chosen.length ? chosen : niches.length ? suggestedRoles(niches) : null;
+  const nicheRoles: string[] | null = teamRoles.length ? teamRoles : niches.length ? suggestedRoles(niches) : null;
   const roles = ROLES.filter((r) => (!(['secretary', 'director'] as string[]).includes(r) || ['pro', 'enterprise', 'enterprise_plus'].includes(overview?.org.plan_code ?? '')) && (!ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!)) && (r !== 'delivery' || modules.length === 0 || modules.some((m) => DELIVERY_MODULES.includes(m))) && (!nicheRoles || nicheRoles.includes(r) || r === 'secretary' || r === 'director'));
   const { t } = useT();
   const roleLabel = (r: string) => t(`role.${r}` as DictKey);
@@ -70,10 +69,8 @@ export default function TeamPage() {
     }
     try {
       const { data: ob } = await supabase.from('organizations').select('onboarding').eq('id', orgId).limit(1);
-      const onb = (ob ?? [])[0]?.onboarding as { categories?: string[]; roles?: string[] } | null;
-      setNiches(onb?.categories ?? []);
-      setChosen(onb?.roles ?? []);
-    } catch { setNiches([]); setChosen([]); }
+      setNiches(((ob ?? [])[0]?.onboarding as { categories?: string[] } | null)?.categories ?? []);
+    } catch { setNiches([]); }
     try {
       const { data: me } = await supabase.from('memberships').select('extra_roles').eq('org_id', orgId).eq('role', 'owner').is('deleted_at', null).limit(1);
       setOwnerRoles(((me ?? [])[0]?.extra_roles as string[] | undefined) ?? []);

@@ -37,7 +37,7 @@ function Toggle({ on, onChange, label, disabled }: { on: boolean; onChange: (v: 
 
 export default function PermissionsPage() {
   const { t } = useT();
-  const { orgId, modules, cobranza } = useOwner();
+  const { orgId, modules, cobranza, teamRoles } = useOwner();
   const [d, setD] = useState<Data | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -110,7 +110,7 @@ export default function PermissionsPage() {
 
           {/* Por rol */}
           <div className="grid gap-4 lg:grid-cols-3">
-            {Object.entries(ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (!cobranza || role === 'cashier' || role === 'collector')).map(([role, allKeys]) => { const keys = allKeys.filter((x) => keyAvailable(x, modules) && !(cobranza && role === 'cashier' && !x.startsWith('cash.'))); return (
+            {Object.entries(ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (teamRoles.length === 0 || teamRoles.includes(role) || (d?.users ?? []).some((u) => u.role === role)) && (!cobranza || role === 'cashier' || role === 'collector')).map(([role, allKeys]) => { const keys = allKeys.filter((x) => keyAvailable(x, modules) && !(cobranza && role === 'cashier' && !x.startsWith('cash.'))); return (
               <Card key={role}>
                 <h2 className="font-bold">{cobranza && role === 'cashier' ? t('rt.liquidator') : k(`role.${role}`)}</h2>
                 <p className={`mb-3 text-xs ${ui.muted}`}>{t('perm.roleHint')}</p>
