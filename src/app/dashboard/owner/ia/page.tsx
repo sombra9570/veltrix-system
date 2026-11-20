@@ -137,6 +137,7 @@ export default function AiPage() {
             </form>
           </Card>
           <p className={`text-xs ${ui.muted}`}>🔒 {t('ai.privacy')}</p>
+          <p className={`text-xs ${ui.muted}`}>⚠️ {t('ai.disclaimer')}</p>
         </>
       )}
     </div>

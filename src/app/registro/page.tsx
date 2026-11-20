@@ -17,6 +17,7 @@ import {
   type Sells, type Tri, type Group, type Specifics,
 } from './quiz-logic';
 
+const TERMS_VERSION = '2026-11';
 const STEP_KEYS: QKey[] = ['step.sells', 'step.rubro', 'step.team', 'step.details', 'step.summary', 'step.account'];
 const LAST = STEP_KEYS.length - 1;
 
@@ -48,6 +49,7 @@ function TriRow({ q, value, onChange, unsureLabel }: { q: string; value: Tri | n
 /** Formulario para quien no sabe qué necesita (o prefiere ayuda): lo atiende servicio al cliente. */
 function HelpForm({ auto, answers, onBack }: { auto: boolean; answers: Record<string, unknown>; onBack: () => void }) {
   const qq = useQ();
+  const [accepted, setAccepted] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -233,6 +235,7 @@ export default function RegistroPage() {
       if (!/^\S+@\S+\.\S+$/.test(email.trim())) return t('val.email');
       if (pass1.length < 8) return t('val.passMin');
       if (pass1 !== pass2) return t('val.passMatch');
+      if (!accepted) return t('legal.acceptRequired');
     }
     return '';
   };
@@ -269,6 +272,7 @@ export default function RegistroPage() {
           tables, delivery, credit, invoice, ai: wantAi, plan: plan?.code ?? null, categories: allCats, unsure: unsureList,
         } });
       } catch { /* el diagnóstico es un extra: no frena el registro */ }
+      try { await rpc('accept_terms', { p_version: TERMS_VERSION }); } catch { /* queda sin fecha; se pide de nuevo al entrar */ }
     }
     setBusy(false);
     if (ok) router.push('/dashboard/owner');
@@ -593,12 +597,15 @@ export default function RegistroPage() {
           )}
 
           {!helpMode && step === LAST && (
-            <p className={`mt-5 text-xs ${ui.muted}`}>
-              {t('legal.acceptPre')}{' '}
-              <Link href="/terminos" target="_blank" className="font-semibold underline">{t('legal.terms')}</Link>{' '}
-              {t('legal.and')}{' '}
-              <Link href="/privacidad" target="_blank" className="font-semibold underline">{t('legal.privacy')}</Link>.
-            </p>
+            <label className={`mt-5 flex cursor-pointer items-start gap-2 text-xs ${ui.muted}`}>
+              <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>
+                {t('legal.acceptCheck')} (
+                <Link href="/terminos" target="_blank" className="font-semibold underline">{t('legal.terms')}</Link>
+                {' · '}
+                <Link href="/privacidad" target="_blank" className="font-semibold underline">{t('legal.privacy')}</Link>)
+              </span>
+            </label>
           )}
 
           {!helpMode && (

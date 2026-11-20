@@ -124,3 +124,8 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Registro por preguntas (qué vende → cuántos negocios → sucursales → rubro por grupos compatibles → equipo → detalles → resumen → cuenta), "No estoy seguro" en cada pregunta; 3 o más dudas = formulario de ayuda (tabla `support_leads`) en vez de crear empresa. 12 idiomas.
 - Superadmin/servicio al cliente: campanita (solicitudes, empresas nuevas, mensajes de clientes) y pestaña "Solicitudes".
 - Falta: push real con la app cerrada, correo de respaldo (Resend gratis: verificar dominio en Porkbun), separar de verdad varios negocios en un mismo administrador.
+
+## Aceptación de términos y aviso de IA (20 nov, migración 088)
+- Registro: casilla obligatoria "Acepto Términos y Privacidad"; al crear la empresa se llama `accept_terms('2026-11')` y queda `organizations.accepted_terms_at` + `terms_version`.
+- Panel IA: aviso "verifica las cifras con tu contador" en los 12 idiomas.
+- Falta: textos legales con precios reales ($12/$25/$49/$129/$235) y revisión de abogado (Bolivia y Colombia, Ley 1581).
