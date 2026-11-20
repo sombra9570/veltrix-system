@@ -2143,6 +2143,7 @@ const ar: Record<DictKey, string> = {
   "card.delInstHint": "القسط {n}: سيُلغى آخر دفع غطّاه. حذف؟",
   "card.delInst": "حذف القسط {n}",
   "card.delInstDone": "تم حذف القسط {n}.",
+  "sup.navRoutesOnly": "المسارات",
 };
 
 export default ar;

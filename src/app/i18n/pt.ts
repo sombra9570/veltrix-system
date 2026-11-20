@@ -2143,6 +2143,7 @@ const pt: Record<DictKey, string> = {
   "card.delInstHint": "Parcela {n}: será revertido o último pagamento que a cobriu. Apagar?",
   "card.delInst": "Apagar parcela {n}",
   "card.delInstDone": "Parcela {n} apagada.",
+  "sup.navRoutesOnly": "Rotas",
 };
 
 export default pt;

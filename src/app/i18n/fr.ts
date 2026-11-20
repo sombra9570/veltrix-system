@@ -2143,6 +2143,7 @@ const fr: Record<DictKey, string> = {
   "card.delInstHint": "Échéance {n} : le dernier paiement qui la couvrait sera annulé. Supprimer ?",
   "card.delInst": "Supprimer l'échéance {n}",
   "card.delInstDone": "Échéance {n} supprimée.",
+  "sup.navRoutesOnly": "Itinéraires",
 };
 
 export default fr;

@@ -2152,6 +2152,7 @@ const es = {
   "card.delInstHint": "Cuota {n}: se revertirá el último cobro que la cubrió. ¿Borrar?",
   "card.delInst": "Borrar cuota {n}",
   "card.delInstDone": "Cuota {n} borrada.",
+  "sup.navRoutesOnly": "Rutas",
 };
 
 export default es;

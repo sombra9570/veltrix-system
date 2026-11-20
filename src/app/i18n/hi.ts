@@ -2143,6 +2143,7 @@ const hi: Record<DictKey, string> = {
   "card.delInstHint": "किस्त {n}: उसे कवर करने वाला अंतिम भुगतान रद्द होगा। हटाएँ?",
   "card.delInst": "किस्त {n} हटाएँ",
   "card.delInstDone": "किस्त {n} हटाई गई।",
+  "sup.navRoutesOnly": "रूट",
 };
 
 export default hi;

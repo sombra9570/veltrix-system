@@ -50,7 +50,7 @@ export function useHeaderSlot(slot: HeaderSlot | null, deps: unknown[]) {
   useEffect(() => { set(ref.current); return () => set(null); }, [set, ...deps]);
 }
 
-/** Menú de pantallas grandes: franja compacta bajo la barra superior (no le quita ancho al contenido) */
+/** Menú del celular: franja compacta bajo la barra superior (no le quita espacio a la pantalla principal) */
 function DesktopNav({ nav, pathname, unread }: { nav: NavItem[]; pathname: string; unread: number }) {
   const { t } = useT();
   const [dd, setDd] = useState<{ href: string; left: number; top: number } | null>(null);
@@ -64,7 +64,7 @@ function DesktopNav({ nav, pathname, unread }: { nav: NavItem[]; pathname: strin
   }, [dd]);
   const open = nav.find((n) => n.href === dd?.href);
   return (
-    <div className="hidden border-b border-slate-200 bg-white/90 backdrop-blur lg:block dark:border-slate-800 dark:bg-slate-950/90">
+    <div className="border-b border-slate-200 bg-white/90 backdrop-blur sm:hidden dark:border-slate-800 dark:bg-slate-950/90">
       <ul className="flex items-center gap-1 overflow-x-auto px-4 py-1.5 [scrollbar-width:thin]">
         {nav.map((item, i) => {
           const active = pathname === item.href || (!!item.children && pathname.startsWith(item.href + '/'));
@@ -231,7 +231,12 @@ export function AppShell({
   return (
     <SlotCtx.Provider value={setSlot}>
     <div className="flex min-h-dvh bg-slate-50 dark:bg-slate-950">
-      {/* Menú desplegable en celular y tableta; en pantallas grandes el menú va en una franja bajo la barra superior */}
+      {/* Menú lateral fijo en computador y tableta ancha */}
+      <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white lg:block dark:border-slate-800 dark:bg-slate-900/60">
+        <div className="sticky top-0 h-dvh">{menu}</div>
+      </aside>
+
+      {/* Menú desplegable en celular y tableta */}
       {open && (
         <div className="fixed inset-x-0 top-0 z-40 h-dvh lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
@@ -256,7 +261,7 @@ export function AppShell({
               className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">←</button>
           )}
           <button type="button" onClick={slot?.onTitle} disabled={!slot?.onTitle}
-            className={`min-w-0 text-left ${slot?.onTitle ? 'cursor-pointer' : 'cursor-default'}`}>
+            className={`min-w-0 text-left ${slot ? '' : 'lg:hidden'} ${slot?.onTitle ? 'cursor-pointer' : 'cursor-default'}`}>
             <span className="block truncate text-sm font-bold text-slate-900 dark:text-white">{slot?.title ?? orgName}</span>
             {slot?.subtitle && <span className="block truncate text-[11px] text-slate-500 dark:text-slate-400">{slot.subtitle}</span>}
           </button>
@@ -266,11 +271,6 @@ export function AppShell({
             {!slot?.hideSync && <SyncButton />}
             {help && <HelpButton />}
             <ThemeToggle />
-            <span className="hidden max-w-40 truncate text-end text-[11px] leading-tight text-slate-500 xl:block dark:text-slate-400"><b className="block truncate text-slate-900 dark:text-white">{userName}</b>{roleLabel}</span>
-            {!slot?.logout && (
-              <button type="button" onClick={onLogout} aria-label={t('shell.logout')} title={t('shell.logout')}
-                className="hidden h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer lg:grid dark:border-slate-700">⏻</button>
-            )}
             {slot?.logout && (
               <button type="button" onClick={onLogout} aria-label={t('shell.logout')}
                 className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">⏻</button>

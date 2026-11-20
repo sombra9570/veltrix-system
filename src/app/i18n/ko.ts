@@ -2143,6 +2143,7 @@ const ko: Record<DictKey, string> = {
   "card.delInstHint": "{n}회차: 이를 충당한 마지막 수금이 취소됩니다. 삭제할까요?",
   "card.delInst": "{n}회차 삭제",
   "card.delInstDone": "{n}회차를 삭제했습니다.",
+  "sup.navRoutesOnly": "경로",
 };
 
 export default ko;

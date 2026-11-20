@@ -77,7 +77,9 @@ export function StaffProvider({
       if (modules === null) return false;
       const cobranza = modules.includes('field_collection') && !modules.some((m) => ['retail', 'restaurant', 'workshop'].includes(m));
       return !cobranza || ['/dashboard/supervisor', '/dashboard/supervisor/reportes', '/dashboard/supervisor/mensajes', '/dashboard/supervisor/ajustes'].includes(n.href);
-    });
+
+    })
+    .map((n) => (session.role === 'supervisor' && n.label === 'sup.navRoutes' && modules && !modules.some((m) => ['retail', 'restaurant', 'workshop'].includes(m)) ? { ...n, label: 'sup.navRoutesOnly' as DictKey } : n));
 
   const company = companies.find((c) => c.id === session.companyId);
   return (

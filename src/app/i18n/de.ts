@@ -2143,6 +2143,7 @@ const de: Record<DictKey, string> = {
   "card.delInstHint": "Rate {n}: die letzte Zahlung dafür wird rückgängig gemacht. Löschen?",
   "card.delInst": "Rate {n} löschen",
   "card.delInstDone": "Rate {n} gelöscht.",
+  "sup.navRoutesOnly": "Routen",
 };
 
 export default de;

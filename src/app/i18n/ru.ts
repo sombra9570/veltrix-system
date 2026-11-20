@@ -2143,6 +2143,7 @@ const ru: Record<DictKey, string> = {
   "card.delInstHint": "Взнос {n}: последний платёж по нему будет отменён. Удалить?",
   "card.delInst": "Удалить взнос {n}",
   "card.delInstDone": "Взнос {n} удалён.",
+  "sup.navRoutesOnly": "Маршруты",
 };
 
 export default ru;

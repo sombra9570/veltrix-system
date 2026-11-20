@@ -2143,6 +2143,7 @@ const it: Record<DictKey, string> = {
   "card.delInstHint": "Rata {n}: verrà annullato l'ultimo pagamento che la copriva. Eliminare?",
   "card.delInst": "Elimina rata {n}",
   "card.delInstDone": "Rata {n} eliminata.",
+  "sup.navRoutesOnly": "Percorsi",
 };
 
 export default it;

@@ -2143,6 +2143,7 @@ const ja: Record<DictKey, string> = {
   "card.delInstHint": "{n}回目：それを充当した最後の入金が取り消されます。削除しますか？",
   "card.delInst": "{n}回目を削除",
   "card.delInstDone": "{n}回目を削除しました。",
+  "sup.navRoutesOnly": "ルート",
 };
 
 export default ja;

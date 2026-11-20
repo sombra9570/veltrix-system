@@ -2143,6 +2143,7 @@ const zh: Record<DictKey, string> = {
   "card.delInstHint": "第 {n} 期：将撤销最近一次覆盖它的收款。删除？",
   "card.delInst": "删除第 {n} 期",
   "card.delInstDone": "第 {n} 期已删除。",
+  "sup.navRoutesOnly": "路线",
 };
 
 export default zh;
