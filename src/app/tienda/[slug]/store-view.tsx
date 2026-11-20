@@ -10,10 +10,8 @@ import { storeImageUrl, storeThumbUrl } from '../../dashboard/image';
 import { Spinner } from '../../spinner';
 
 type Product = { id: string; name: string; price: number; type: string; description: string | null; photo: string | null; unit: string; available: boolean; model?: string | null; size?: string | null; color?: string | null };
-type Store = { slug: string; name: string; description: string | null; whatsapp: string | null; logo: string | null; theme?: string; currency: string; products: Product[] };
+type Store = { slug: string; name: string; description: string | null; whatsapp: string | null; logo: string | null; theme?: string; address?: string | null; map_url?: string | null; currency: string; products: Product[] };
 type Line = { p: Product; qty: number };
-type Zone = { id: string; name: string; fee: number; free_over: number | null; eta_min: number };
-type DInfo = { enabled: boolean; zones?: Zone[] };
 type DStatus = { status: 'pending' | 'accepted' | 'rejected'; reject_reason: string | null; subtotal: number; fee: number; total: number; eta_min: number | null; zone: string | null; delivery_status: 'pending' | 'dispatched' | 'delivered' | 'failed' | null };
 
 /** Tienda pública: catálogo, carrito y pedido por WhatsApp. No guarda nada en la base. */
@@ -27,17 +25,12 @@ export function StoreView({ slug }: { slug: string }) {
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
   const [sel, setSel] = useState<Record<string, { size?: string; color?: string }>>({});
-  const [pMode, setPMode] = useState(false);
   const th = resolveTheme(store?.theme);
   const CART_KEY = `vx_store_cart_${slug}`;
   const DREQ_KEY = `vx_store_dreq_${slug}`;
-  const [dinfo, setDinfo] = useState<DInfo | null>(null);
-  const [dMode, setDMode] = useState(false);
   const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [reference, setReference] = useState('');
-  const [zoneId, setZoneId] = useState('');
   const [pay, setPay] = useState<'qr' | 'cash'>('cash');
+  const [method, setMethod] = useState<'pickup' | 'delivery'>('pickup');
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [dBusy, setDBusy] = useState(false);
   const [dErr, setDErr] = useState('');
@@ -47,7 +40,6 @@ export function StoreView({ slug }: { slug: string }) {
   useEffect(() => {
     supabase.rpc('public_store', { p_slug: slug }).then(({ data }) => setStore((data as Store | null) ?? null));
     try { setCart(JSON.parse(localStorage.getItem(CART_KEY) ?? '[]')); } catch { /* */ }
-    supabase.rpc('public_delivery_info', { p_slug: slug }).then(({ data }) => setDinfo((data as DInfo | null) ?? null));
     try { setDReq(localStorage.getItem(DREQ_KEY)); } catch { /* */ }
   }, [slug, CART_KEY, DREQ_KEY]);
 
@@ -91,61 +83,41 @@ export function StoreView({ slug }: { slug: string }) {
   const total = cart.reduce((s, l) => s + l.qty * Number(l.p.price), 0);
   const units = cart.reduce((s, l) => s + l.qty, 0);
 
-  const zone = dinfo?.zones?.find((z) => z.id === zoneId);
-  const dFee = zone ? (zone.free_over != null && total >= Number(zone.free_over) ? 0 : Number(zone.fee)) : 0;
   const useMyLocation = () => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition((pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }), () => setDErr(t('dl.noLocation')), { enableHighAccuracy: true, timeout: 10000 });
   };
-  const sendDelivery = async () => {
-    if (!cart.length || dBusy) return;
-    if (!zoneId) { setDErr(t('dl.pickZone')); return; }
-    setDBusy(true); setDErr('');
-    const { data, error } = await supabase.rpc('public_delivery_order', {
-      p_slug: slug, p_items: cart.map((l) => ({ product_id: l.p.id, qty: l.qty })), p_zone: zoneId, p_name: name, p_phone: phone,
-      p_address: address, p_reference: reference, p_lat: coords?.lat ?? null, p_lng: coords?.lng ?? null, p_notes: note, p_pay: pay,
-    });
-    setDBusy(false);
-    if (error) {
-      const m = error.message;
-      setDErr(/PRODUCT_UNAVAILABLE/.test(m) ? t('tq.errUnavailable') : /TOO_MANY/.test(m) ? t('dl.errMany') : /PHONE|DATA/.test(m) ? t('dl.errData') : t('err.generic'));
-      return;
-    }
-    const id = data as string;
-    try { localStorage.setItem(DREQ_KEY, id); } catch { /* */ }
-    setDStatus(null); setDReq(id); setCart([]); setOpen(false); setDMode(false);
-  };
-  const sendPickup = async () => {
-    if (!cart.length || dBusy) return;
-    setDBusy(true); setDErr('');
-    const { data, error } = await supabase.rpc('public_store_pickup', {
-      p_slug: slug, p_items: cart.map((l) => ({ product_id: l.p.id, qty: l.qty })), p_name: name, p_phone: phone, p_notes: note, p_pay: pay,
-    });
-    setDBusy(false);
-    if (error) {
-      const m = error.message;
-      setDErr(/PRODUCT_UNAVAILABLE/.test(m) ? t('tq.errUnavailable') : /TOO_MANY/.test(m) ? t('dl.errMany') : /PHONE|DATA/.test(m) ? t('dl.errData') : t('err.generic'));
-      return;
-    }
-    try { localStorage.setItem(DREQ_KEY, data as string); localStorage.setItem(`${DREQ_KEY}_pk`, '1'); } catch { /* */ }
-    setDStatus(null); setDReq(data as string); setCart([]); setOpen(false); setPMode(false);
-  };
   const isPickup = (() => { try { return localStorage.getItem(`${DREQ_KEY}_pk`) === '1'; } catch { return false; } })();
   const dAgain = () => { try { localStorage.removeItem(DREQ_KEY); localStorage.removeItem(`${DREQ_KEY}_pk`); } catch { /* */ } setDReq(null); setDStatus(null); };
 
-  const sendWhatsApp = () => {
-    if (!store?.whatsapp || !cart.length) return;
-    const lines = cart.map((l) => `• ${l.qty} × ${l.p.name} — ${fmt(l.qty * Number(l.p.price))}`).join('\n');
-    const text = [
-      t('shop2.waHello', { store: store.name }),
-      '',
-      lines,
-      '',
-      `${t('pos.total')}: ${fmt(total)}`,
-      name.trim() ? `${t('shop2.waName')}: ${name.trim()}` : '',
-      note.trim() ? `${t('shop2.waNote')}: ${note.trim()}` : '',
-    ].filter((x, i, a) => x !== '' || (a[i - 1] ?? '') !== '').join('\n');
-    window.open(`https://wa.me/${store.whatsapp}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+  // Registra el pedido (para que el negocio lo vea y descuente stock al aceptarlo) y abre WhatsApp con el detalle
+  const sendOrder = async () => {
+    if (!store || !cart.length || dBusy) return;
+    setDBusy(true); setDErr('');
+    const { data, error } = await supabase.rpc('public_store_pickup', {
+      p_slug: slug, p_items: cart.map((l) => ({ product_id: l.p.id, qty: l.qty })), p_name: name, p_phone: phone, p_notes: note, p_pay: pay,
+      p_kind: method, p_lat: method === 'delivery' ? coords?.lat ?? null : null, p_lng: method === 'delivery' ? coords?.lng ?? null : null,
+    });
+    setDBusy(false);
+    if (error) {
+      const m = error.message;
+      setDErr(/PRODUCT_UNAVAILABLE/.test(m) ? t('tq.errUnavailable') : /TOO_MANY/.test(m) ? t('dl.errMany') : /PHONE|DATA/.test(m) ? t('dl.errData') : t('err.generic'));
+      return;
+    }
+    if (store.whatsapp) {
+      const lines = cart.map((l) => `• ${l.qty} × ${l.p.name} — ${fmt(l.qty * Number(l.p.price))}`).join('\n');
+      const text = [
+        t('shop2.waHello', { store: store.name }), '', lines, '', `${t('pos.total')}: ${fmt(total)}`,
+        `${t('pk.payLabel')}: ${pay === 'qr' ? t('tq.payQr') : t('tq.payCash')}`,
+        `${t('pk.methodLabel')}: ${method === 'pickup' ? t('pk.pickup') : t('pk.delivery')}`,
+        method === 'delivery' && coords ? `📍 https://maps.google.com/?q=${coords.lat},${coords.lng}` : method === 'delivery' ? t('pk.sendLoc') : '',
+        `${t('shop2.waName')}: ${name.trim()}`, `${t('dl.phone')}: ${phone.trim()}`,
+        note.trim() ? `${t('shop2.waNote')}: ${note.trim()}` : '',
+      ].filter((x, i, a) => x !== '' || (a[i - 1] ?? '') !== '').join('\n');
+      window.open(`https://wa.me/${store.whatsapp}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+    }
+    try { localStorage.setItem(DREQ_KEY, data as string); if (method === 'pickup') localStorage.setItem(`${DREQ_KEY}_pk`, '1'); else localStorage.removeItem(`${DREQ_KEY}_pk`); } catch { /* */ }
+    setDStatus(null); setDReq(data as string); setCart([]); setOpen(false);
   };
 
   const shareStore = async () => {
@@ -185,6 +157,7 @@ export function StoreView({ slug }: { slug: string }) {
               <button type="button" onClick={dAgain} className={ui.btnPrimary}>{t('tq.again')}</button></>
           ) : isPickup ? (
             <><p className="text-5xl">🏬</p><h1 className="text-lg font-extrabold">{t('pk.accepted')}</h1>
+              {(store.address || store.map_url) && <p className="text-sm">📍 {store.address} {store.map_url && <a href={store.map_url} target="_blank" rel="noopener noreferrer" className="font-bold text-blue-600 underline">{t('pk.openMap')}</a>}</p>}
               <p className="text-xl font-extrabold">{t('tq.payTotal')}: {fmt(dStatus.total)}</p>
               <button type="button" onClick={dAgain} className={ui.btnPrimary}>{t('tq.again')}</button></>
           ) : (
@@ -377,61 +350,43 @@ export function StoreView({ slug }: { slug: string }) {
             </div>
             <input value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder={t('shop2.yourName')} className={ui.input} />
             <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} rows={2} placeholder={t('shop2.noteHint')} className={ui.input} />
-            <div className="space-y-3 rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
-              <button type="button" onClick={() => { setPMode(!pMode); setDMode(false); }} className={`${ui.btnPrimary} w-full`}>🏬 {t('pk.order')}</button>
-              {pMode && (
-                <div className="space-y-3">
-                  <p className={`text-xs ${ui.muted}`}>{t('pk.hint')}</p>
-                  <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" maxLength={20} placeholder={t('dl.phone')} className={ui.input} />
-                  <div className="grid grid-cols-2 gap-2">
-                    {(['cash', 'qr'] as const).map((m) => (
-                      <button key={m} type="button" onClick={() => setPay(m)} className={`rounded-xl border-2 py-2 text-sm font-bold cursor-pointer ${pay === m ? 'border-blue-600 bg-blue-50 dark:bg-blue-500/10' : 'border-slate-300 dark:border-slate-700'}`}>
-                        {m === 'qr' ? `📲 ${t('tq.payQr')}` : `💵 ${t('tq.payCash')}`}
-                      </button>
-                    ))}
-                  </div>
-                  {dErr && <p className="rounded-xl border border-red-300 bg-red-50 p-2 text-sm font-semibold text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">{dErr}</p>}
-                  <button type="button" disabled={dBusy} onClick={sendPickup} className={`${ui.btnPrimary} w-full`}>{dBusy ? t('common.wait') : t('pk.send')}</button>
-                </div>
-              )}
+            <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" maxLength={20} placeholder={t('dl.phone')} className={ui.input} />
+            <div>
+              <p className={ui.label}>{t('pk.methodLabel')}</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(['pickup', 'delivery'] as const).map((m) => (
+                  <button key={m} type="button" onClick={() => setMethod(m)} className={`rounded-xl border-2 py-2.5 text-sm font-bold cursor-pointer ${method === m ? 'border-blue-600 bg-blue-50 dark:bg-blue-500/10' : 'border-slate-300 dark:border-slate-700'}`}>
+                    {m === 'pickup' ? `🏬 ${t('pk.pickup')}` : `🛵 ${t('pk.delivery')}`}
+                  </button>
+                ))}
+              </div>
             </div>
-            {dinfo?.enabled && (
-              <div className="space-y-3 rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
-                <button type="button" onClick={() => { setDMode(!dMode); setPMode(false); }} className={`${ui.btnPrimary} w-full`}>🛵 {t('dl.orderDelivery')}</button>
-                {dMode && (
-                  <div className="space-y-3">
-                    <select value={zoneId} onChange={(e) => setZoneId(e.target.value)} className={ui.input}>
-                      <option value="">{t('dl.pickZone')}</option>
-                      {(dinfo.zones ?? []).map((z) => <option key={z.id} value={z.id}>{z.name} · {Number(z.fee) > 0 ? fmt(Number(z.fee)) : t('dl.free')} · ~{z.eta_min} min</option>)}
-                    </select>
-                    <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" maxLength={20} placeholder={t('dl.phone')} className={ui.input} />
-                    <input value={address} onChange={(e) => setAddress(e.target.value)} maxLength={200} placeholder={t('dl.address')} className={ui.input} />
-                    <input value={reference} onChange={(e) => setReference(e.target.value)} maxLength={150} placeholder={t('dl.reference')} className={ui.input} />
-                    <button type="button" onClick={useMyLocation} className={`${ui.btnGhost} w-full !py-2 text-sm`}>{coords ? `✅ ${t('dl.locationSet')}` : `📍 ${t('dl.useLocation')}`}</button>
-                    <div className="grid grid-cols-2 gap-2">
-                      {(['cash', 'qr'] as const).map((m) => (
-                        <button key={m} type="button" onClick={() => setPay(m)} className={`rounded-xl border-2 py-2 text-sm font-bold cursor-pointer ${pay === m ? 'border-blue-600 bg-blue-50 dark:bg-blue-500/10' : 'border-slate-300 dark:border-slate-700'}`}>
-                          {m === 'qr' ? `📲 ${t('tq.payQr')}` : `💵 ${t('tq.payCash')}`}
-                        </button>
-                      ))}
-                    </div>
-                    {zone && (
-                      <div className="flex justify-between text-sm"><span>{t('dl.fee')}</span><span className="font-bold">{dFee > 0 ? fmt(dFee) : t('dl.free')}</span></div>
-                    )}
-                    <div className="flex justify-between text-lg font-extrabold"><span>{t('pos.total')}</span><span>{fmt(total + dFee)}</span></div>
-                    {dErr && <p className="rounded-xl border border-red-300 bg-red-50 p-2 text-sm font-semibold text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">{dErr}</p>}
-                    <button type="button" disabled={dBusy} onClick={sendDelivery} className={`${ui.btnPrimary} w-full`}>{dBusy ? t('common.wait') : t('tq.send')}</button>
-                  </div>
-                )}
+            {method === 'pickup' ? (
+              (store.address || store.map_url) && (
+                <p className="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800">📍 {store.address}{' '}
+                  {store.map_url && <a href={store.map_url} target="_blank" rel="noopener noreferrer" className="font-bold text-blue-600 underline dark:text-blue-400">{t('pk.openMap')}</a>}</p>
+              )
+            ) : (
+              <div className="space-y-2">
+                <p className={`text-xs ${ui.muted}`}>{t('pk.deliveryHint')}</p>
+                <button type="button" onClick={useMyLocation} className={`${ui.btnGhost} w-full !py-2 text-sm`}>{coords ? `✅ ${t('dl.locationSet')}` : `📍 ${t('dl.useLocation')}`}</button>
               </div>
             )}
-            {store.whatsapp ? (
-              <button type="button" onClick={sendWhatsApp} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-base font-bold text-white cursor-pointer hover:brightness-95">
-                💬 {t('shop2.order')}
-              </button>
-            ) : (
-              <p className={`text-center text-sm ${ui.muted}`}>{t('shop2.noWhatsapp')}</p>
-            )}
+            <div>
+              <p className={ui.label}>{t('pk.payLabel')}</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(['cash', 'qr'] as const).map((m) => (
+                  <button key={m} type="button" onClick={() => setPay(m)} className={`rounded-xl border-2 py-2.5 text-sm font-bold cursor-pointer ${pay === m ? 'border-blue-600 bg-blue-50 dark:bg-blue-500/10' : 'border-slate-300 dark:border-slate-700'}`}>
+                    {m === 'qr' ? `📲 ${t('tq.payQr')}` : `💵 ${t('tq.payCash')}`}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {dErr && <p className="rounded-xl border border-red-300 bg-red-50 p-2 text-sm font-semibold text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">{dErr}</p>}
+            <button type="button" disabled={dBusy || name.trim().length < 2 || phone.trim().length < 6} onClick={sendOrder}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-base font-bold text-white cursor-pointer hover:brightness-95 disabled:opacity-50">
+              💬 {dBusy ? t('common.wait') : t('pk.sendOrder')}
+            </button>
             <button type="button" onClick={() => setCart([])} className={`w-full text-xs font-semibold ${ui.muted} hover:underline cursor-pointer`}>{t('pos.clear')}</button>
           </div>
         </div>

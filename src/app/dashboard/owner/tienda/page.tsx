@@ -11,7 +11,7 @@ import { compressImage, extFor, storeImageUrl, storeThumbUrl, makeThumb, thumbPa
 
 type Company = { id: string; legal_name: string };
 type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean; variants?: number };
-type Store = { id: string; company_id: string; branch_id: string; slug: string; name: string; description: string | null; whatsapp: string | null; logo_path: string | null; own_qr_path?: string | null; is_published: boolean; theme?: string; admin_bg?: string };
+type Store = { id: string; company_id: string; branch_id: string; slug: string; name: string; description: string | null; whatsapp: string | null; logo_path: string | null; own_qr_path?: string | null; is_published: boolean; theme?: string; admin_bg?: string; address?: string | null; map_url?: string | null };
 type Admin = {
   perms?: { photo: boolean; publish: boolean; edit: boolean }; store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
 
@@ -78,6 +78,7 @@ export default function StoreAdminPage() {
         p_company: companyId, p_slug: form.slug, p_name: form.name, p_description: form.description,
         p_whatsapp: form.whatsapp, p_branch: form.branch_id, p_published: form.is_published,
       });
+      await rpc('set_store_location', { p_company: companyId, p_address: form.address ?? '', p_url: form.map_url ?? '' });
       flash(true, t('store.saved'));
       await load();
       setEditing(false);
@@ -252,6 +253,14 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
             <div>
               <label className={ui.label}>{t('store.whatsapp')}</label>
               <input type="tel" inputMode="tel" value={form.whatsapp ?? ''} placeholder="+591 70000000" onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} className={ui.input} />
+            </div>
+            <div className="sm:col-span-2">
+              <label className={ui.label}>📍 {t('store.addressLabel')}</label>
+              <input value={form.address ?? ''} maxLength={200} onChange={(e) => setForm({ ...form, address: e.target.value })} className={ui.input} />
+            </div>
+            <div className="sm:col-span-2">
+              <label className={ui.label}>🗺️ {t('store.mapUrlLabel')}</label>
+              <input type="url" value={form.map_url ?? ''} maxLength={400} placeholder="https://maps.google.com/..." onChange={(e) => setForm({ ...form, map_url: e.target.value })} className={ui.input} />
             </div>
             <div className="sm:col-span-2">
               <label className={ui.label}>🔒 {t('store.link')}</label>
