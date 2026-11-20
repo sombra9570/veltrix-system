@@ -1,0 +1,1 @@
+-- business_growth(p_org,p_gran,p_n): curvas por dia/semana/mes (ventas, cantidad, cobrado, prestado neto, gastos) solo para administrador/superadmin.

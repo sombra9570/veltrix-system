@@ -7,6 +7,7 @@ import { Card, UsageBar } from '../shell';
 import { ApprovalsTray } from '../approvals';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
+import { GrowthCurves } from './growth';
 
 function money(amount: number, currency: string, lang: string) {
   try {
@@ -148,6 +149,7 @@ function CobranzaHome() {
         <Card><p className={lbl}>{t('cx.sum.portfolio')}</p>
           <p className="mt-2 text-2xl font-extrabold">{money(sum((f) => Number(f.portfolio)), cur, lang)}</p></Card>
       </div>
+      <GrowthCurves />
       <GrowthCard />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {funds === null ? <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p> : funds.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('routes.empty')}</p></Card> : funds.map((f) => (
@@ -220,6 +222,8 @@ function GenericHome() {
           </p>
         </Card>
       </div>
+
+      <GrowthCurves />
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* USO DEL PLAN */}
