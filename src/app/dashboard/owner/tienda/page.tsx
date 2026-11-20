@@ -7,14 +7,13 @@ import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { money } from '../../format';
 import { PhotoSlot } from '../../photo-picker';
-import { StoreProductForm } from './product-form';
 import { compressImage, extFor, storeImageUrl, storeThumbUrl, makeThumb, thumbPath } from '../../image';
 
 type Company = { id: string; legal_name: string };
 type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean; variants?: number };
 type Store = { id: string; company_id: string; branch_id: string; slug: string; name: string; description: string | null; whatsapp: string | null; logo_path: string | null; own_qr_path?: string | null; is_published: boolean };
 type Admin = {
-  perms?: { create: boolean; photo: boolean; publish: boolean; edit: boolean }; store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
+  perms?: { photo: boolean; publish: boolean; edit: boolean }; store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
 
 const BUCKET = 'store-images';
 const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
@@ -44,7 +43,6 @@ export default function StoreAdminPage() {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [origin, setOrigin] = useState('');
-  const [newOpen, setNewOpen] = useState(false);
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
@@ -112,14 +110,6 @@ export default function StoreAdminPage() {
     try {
       await rpc('set_store_qr', { p_company: companyId, p_path: null });
       await removeOld(data.store.own_qr_path);
-      await load();
-    } catch (err) { flash(false, storeError((err as Error).message, t)); } finally { setBusy(false); }
-  };
-  const addAll = async () => {
-    setBusy(true);
-    try {
-      const n = await rpc<number>('store_add_all', { p_company: companyId });
-      flash(true, t('store.addedAll', { n }));
       await load();
     } catch (err) { flash(false, storeError((err as Error).message, t)); } finally { setBusy(false); }
   };
@@ -204,7 +194,7 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
   };
 
   if (!data || !form) return <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p>;
-  const pm = data.perms ?? { create: true, photo: true, publish: true, edit: true };
+  const pm = data.perms ?? { photo: true, publish: true, edit: true };
   const pe = pm.edit;
   const showForm = pe && (editing || !data.store.whatsapp);
   const published = data.products.filter((p) => p.in_store).length;
@@ -299,18 +289,6 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
           </span>
         </div>
         <p className={`text-xs ${ui.muted}`}>{t('store.photoHint')}</p>
-        {pm.create && !newOpen && (
-          <button type="button" onClick={() => setNewOpen(true)} className={`${ui.btnPrimary} w-full`}>➕ {t('sp.new')}</button>
-        )}
-        {pm.create && newOpen && (
-          <StoreProductForm orgId={orgId} companyId={companyId} currency={data.currency} canPublish={pm.publish}
-            onCancel={() => setNewOpen(false)}
-            onError={(m) => flash(false, storeError(m, t))}
-            onDone={(n) => { setNewOpen(false); flash(true, t('sp.created', { n })); load(); }} />
-        )}
-        {pm.publish && data.products.some((p) => !p.in_store && p.active && p.photo) && (
-          <button type="button" disabled={busy} onClick={addAll} className={`${ui.btnGhost} w-full cursor-pointer`}>➕ {t('store.addAll')}</button>
-        )}
         {data.products.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('prod.empty')}</p>}
         <ul className="divide-y divide-slate-200 dark:divide-slate-800">
           {data.products.map((p) => {
