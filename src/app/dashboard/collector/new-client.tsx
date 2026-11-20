@@ -12,14 +12,16 @@ type Gps = { lat: number; lng: number } | null;
 
 /** Ubicación precisa del teléfono (hasta 15 s) */
 function readGps(): Promise<Gps> {
-  return new Promise((resolve) => {
+  const once = (high: boolean, timeout: number, maxAge: number) => new Promise<Gps>((resolve) => {
     if (!('geolocation' in navigator)) return resolve(null);
     navigator.geolocation.getCurrentPosition(
       (p) => resolve({ lat: +p.coords.latitude.toFixed(6), lng: +p.coords.longitude.toFixed(6) }),
       () => resolve(null),
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
+      { enableHighAccuracy: high, timeout, maximumAge: maxAge },
     );
   });
+  // Celular: GPS preciso. Computador (sin GPS): si falla, se reintenta con la ubicación aproximada de la red.
+  return once(true, 10000, 0).then((g) => g ?? once(false, 15000, 60000));
 }
 
 function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) => void; label: string }) {
