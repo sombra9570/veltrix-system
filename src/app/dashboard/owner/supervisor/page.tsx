@@ -73,14 +73,14 @@ function SupervisorScreen() {
           <ul className="space-y-3">
             {PERMS.map((key) => {
               const v = sup.permissions?.[key];
-              const val = v === undefined ? 'inherit' : v ? 'yes' : 'no';
+              const val = v === true ? 'yes' : 'no';
               return (
                 <li key={key} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <p className="min-w-0 text-sm font-semibold">{t(`perm.${key}` as DictKey)}</p>
-                  <div className="grid shrink-0 grid-cols-3 gap-1 rounded-xl border border-slate-300 p-1 dark:border-slate-700">
-                    {([['inherit', t('perm.inherit')], ['yes', t('perm.yes')], ['no', t('perm.no')]] as const).map(([opt, label]) => (
+                  <div className="grid shrink-0 grid-cols-2 gap-1 rounded-xl border border-slate-300 p-1 dark:border-slate-700">
+                    {([['yes', t('perm.yes')], ['no', t('perm.no')]] as const).map(([opt, label]) => (
                       <button key={opt} type="button" disabled={busy}
-                        onClick={() => run(() => rpc('supervisor_set_permission', { p_membership: sid, p_key: key, p_value: opt === 'inherit' ? null : opt === 'yes' }))}
+                        onClick={() => run(() => rpc('supervisor_set_permission', { p_membership: sid, p_key: key, p_value: opt === 'yes' }))}
                         className={`rounded-lg px-2 py-1 text-xs font-semibold cursor-pointer ${val === opt ? 'bg-blue-600 text-white' : ''}`}>{label}</button>
                     ))}
                   </div>
