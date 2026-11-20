@@ -2133,6 +2133,16 @@ const pt: Record<DictKey, string> = {
   "ss.qrRemove": "Remover QR",
   "rep.received": "Recebidos",
   "rep.none": "Ainda não há relatórios.",
+  "sr.title": "Avaliar cliente",
+  "sr.excellent": "Excelente",
+  "sr.good": "Bom",
+  "sr.bad": "Ruim",
+  "sr.clavo": "Caloteiro",
+  "sr.volado": "Fugitivo",
+  "sr.suspicious": "Suspeito",
+  "card.delInstHint": "Parcela {n}: será revertido o último pagamento que a cobriu. Apagar?",
+  "card.delInst": "Apagar parcela {n}",
+  "card.delInstDone": "Parcela {n} apagada.",
 };
 
 export default pt;

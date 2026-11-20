@@ -2133,6 +2133,16 @@ const ko: Record<DictKey, string> = {
   "ss.qrRemove": "QR 삭제",
   "rep.received": "받은 항목",
   "rep.none": "아직 보고서가 없습니다.",
+  "sr.title": "고객 평가",
+  "sr.excellent": "우수",
+  "sr.good": "양호",
+  "sr.bad": "나쁨",
+  "sr.clavo": "상습 연체",
+  "sr.volado": "잠적",
+  "sr.suspicious": "의심",
+  "card.delInstHint": "{n}회차: 이를 충당한 마지막 수금이 취소됩니다. 삭제할까요?",
+  "card.delInst": "{n}회차 삭제",
+  "card.delInstDone": "{n}회차를 삭제했습니다.",
 };
 
 export default ko;

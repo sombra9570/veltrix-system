@@ -2133,6 +2133,16 @@ const ru: Record<DictKey, string> = {
   "ss.qrRemove": "Удалить QR",
   "rep.received": "Полученные",
   "rep.none": "Отчётов пока нет.",
+  "sr.title": "Оценить клиента",
+  "sr.excellent": "Отлично",
+  "sr.good": "Хорошо",
+  "sr.bad": "Плохо",
+  "sr.clavo": "Неплательщик",
+  "sr.volado": "Сбежал",
+  "sr.suspicious": "Подозрительный",
+  "card.delInstHint": "Взнос {n}: последний платёж по нему будет отменён. Удалить?",
+  "card.delInst": "Удалить взнос {n}",
+  "card.delInstDone": "Взнос {n} удалён.",
 };
 
 export default ru;

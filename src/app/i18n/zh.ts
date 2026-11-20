@@ -2133,6 +2133,16 @@ const zh: Record<DictKey, string> = {
   "ss.qrRemove": "移除二维码",
   "rep.received": "已收到",
   "rep.none": "暂无报告。",
+  "sr.title": "评价客户",
+  "sr.excellent": "优秀",
+  "sr.good": "良好",
+  "sr.bad": "差",
+  "sr.clavo": "赖账",
+  "sr.volado": "跑路",
+  "sr.suspicious": "可疑",
+  "card.delInstHint": "第 {n} 期：将撤销最近一次覆盖它的收款。删除？",
+  "card.delInst": "删除第 {n} 期",
+  "card.delInstDone": "第 {n} 期已删除。",
 };
 
 export default zh;

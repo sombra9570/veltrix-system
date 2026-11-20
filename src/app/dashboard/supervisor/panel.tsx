@@ -18,14 +18,19 @@ import { RATING_DOT } from '../collector/loan-form';
 
 /* Panel del supervisor de cobranza: sus rutas asignadas; cada acción queda grabada y al terminar se envía el reporte al administrador */
 type RawCredit = { id: string; created: string; total: number; every_days: number | null; i?: [number, string, number, number, string | null][] };
-type Cust = { id: string; name: string; phone: string | null; address: string | null; tax_id: string | null; lat: number | null; lng: number | null; rating: string; balance: number; overdue: number; credits: Credit[];
+type Cust = { id: string; name: string; phone: string | null; address: string | null; tax_id: string | null; lat: number | null; lng: number | null; rating: string; sup_rating: string | null; balance: number; overdue: number; credits: Credit[];
   due_today: number; paid_today: boolean; visited_today: boolean; next_due: string | null;
   last_visit: { at: string; result: string; notes: string | null; promise_date: string | null } | null };
 type RouteLite = { id: string; name: string; collector: string | null; locked: boolean; currency: string; customers: number; supervising: boolean };
 type Detail = {
   id: string; name: string; locked: boolean; collector: string | null; currency: string; balance: number; period: Period; portfolio: number;
   liquidations: { id: string; created_at: string; closing: number; difference: number }[];
-  can_liquidate: boolean; supervising: boolean; customers: Cust[]; org_id: string; today: string; can_customers: boolean;
+  can_liquidate: boolean; supervising: boolean; customers: Cust[]; org_id: string; today: string; can_customers: boolean; can_delete_installments: boolean;
+};
+const SUP_RATINGS = ['excellent', 'good', 'bad', 'clavo', 'volado', 'suspicious'] as const;
+const SR_TONE: Record<string, string> = {
+  excellent: 'bg-emerald-600 text-white', good: 'bg-lime-500 text-white', bad: 'bg-orange-500 text-white',
+  clavo: 'bg-red-600 text-white', volado: 'bg-slate-700 text-white', suspicious: 'bg-purple-600 text-white',
 };
 type Screen = 'home' | 'list' | 'pending' | 'newclient' | 'map' | 'info' | 'liq' | 'notes' | 'rate';
 const toCredit = (k: RawCredit): Credit => ({
@@ -41,6 +46,23 @@ function Stars({ onPick, label }: { onPick: (n: number) => void; label: string }
       {[1, 2, 3, 4, 5].map((n) => (
         <button key={n} type="button" onClick={() => { setV(n); onPick(n); }} className={`text-2xl cursor-pointer ${n <= v ? 'text-amber-500' : 'text-slate-300 dark:text-slate-600'}`} aria-label={String(n)}>★</button>
       ))}
+    </div>
+  );
+}
+
+function RateRow({ cur, busy, onPick }: { cur: string | null; busy: boolean; onPick: (r: string) => void }) {
+  const { t } = useT();
+  return (
+    <div className="space-y-1">
+      <p className="text-xs font-semibold">⭐ {t('sr.title')}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {SUP_RATINGS.map((r) => (
+          <button key={r} type="button" disabled={busy} onClick={() => onPick(r)}
+            className={`rounded-full px-3 py-1 text-xs font-bold cursor-pointer disabled:opacity-50 ${cur === r ? SR_TONE[r] : 'border border-slate-300 dark:border-slate-700'}`}>
+            {t(`sr.${r}` as DictKey)}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -93,6 +115,11 @@ export default function SupPanel() {
     finally { setBusy(false); }
   };
   const log = (action: string, detail: Record<string, unknown> = {}) => rpc('sup_log', { p_route: rid, p_action: action, p_detail: detail });
+  const rate = (c: Cust, r: string) => run(async () => { await rpc('sup_rate_customer', { p_route: rid, p_customer: c.id, p_rating: r }); setSel((x) => (x && x.id === c.id ? { ...x, sup_rating: r } : x)); }, t('sp.done'));
+  const reverse = async (order: string, n: number) => {
+    try { await rpc('collector_delete_installment', { p_order: order, p_n: n }); if (rid) await loadRoute(rid); setMsg({ ok: true, text: t('card.delInstDone', { n }) }); }
+    catch (e) { const m = (e as Error).message; setMsg({ ok: false, text: m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic') }); }
+  };
 
   const box = (ok: boolean) => ok ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300'
     : 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
@@ -203,7 +230,8 @@ export default function SupPanel() {
                 </div>
                 <button type="button" onClick={() => { setSel(c); setPhone(c.phone ?? ''); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>👤 {t('card.profile')}</button>
               </div>
-              <Credits locked c={c} filter={freq} today={today} fmt={m} onSave={() => undefined} />
+              <Credits locked onReverse={d.can_delete_installments ? reverse : undefined} c={c} filter={freq} today={today} fmt={m} onSave={() => undefined} />
+              <RateRow cur={c.sup_rating} busy={busy} onPick={(r) => rate(c, r)} />
             </Card>
           ))}
           <ShowMore rest={listAll.length - list.length} onClick={() => setLimit((x) => x + 25)} />
@@ -243,7 +271,7 @@ export default function SupPanel() {
               <button type="button" disabled={busy} onClick={() => run(() => log('verify_customer', { customer: sel.name }), t('sp.done'))} className={`${ui.btnGhost} !py-2 text-xs`}>✔ {t('sp.verifyCust')}</button>
               <button type="button" disabled={busy} onClick={() => run(() => log('verify_credit', { customer: sel.name }), t('sp.done'))} className={`${ui.btnGhost} !py-2 text-xs`}>✔ {t('sp.verifyCredit')}</button>
             </div>
-            <Stars label={t('sp.rate')} onPick={(n) => run(() => log('rate_customer', { customer: sel.name, score: n }), t('sp.done'))} />
+            <RateRow cur={sel.sup_rating} busy={busy} onPick={(r) => rate(sel, r)} />
             <div className="flex gap-2">
               <input inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t('sp.phone')} className={ui.input} />
               <button type="button" disabled={busy || !phone.trim() || phone.trim() === (sel.phone ?? '')}
@@ -255,7 +283,7 @@ export default function SupPanel() {
           {sel.credits.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('card.noCards')}</p></Card> : sel.credits.map((k) => (
             <Card key={k.id}>
               <p className={`mb-2 text-xs ${ui.muted}`}>{new Date(k.created).toLocaleDateString(lang)} · {m(k.total)}</p>
-              <CreditCard credit={k} today={today} fmt={m} onSave={() => undefined} readOnly />
+              <CreditCard credit={k} today={today} fmt={m} onSave={() => undefined} readOnly onReverse={d.can_delete_installments ? (n) => reverse(k.id, n) : undefined} />
             </Card>
           ))}
         </div>

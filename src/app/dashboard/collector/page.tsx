@@ -45,7 +45,7 @@ type Route = {
   fund_balance?: number; fund_float?: number;
   period?: Period; liquidations?: Liquidation[]; days?: DayRow[]; can_liquidate?: boolean; can_invest?: boolean;
   policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_interest?: boolean;
-  can_expenses?: boolean; can_portfolio?: boolean; can_settings?: boolean; can_delete_credits?: boolean; can_delete_customers?: boolean; commission_pct?: number; locked?: boolean; max_loan?: number; pay_qr?: string | null; pay_qr_note?: string | null; org_id?: string; branch_id?: string; own_qr?: boolean; notices_unread?: number;
+  can_expenses?: boolean; can_portfolio?: boolean; can_settings?: boolean; can_delete_credits?: boolean; can_delete_customers?: boolean; can_delete_installments?: boolean; commission_pct?: number; locked?: boolean; max_loan?: number; pay_qr?: string | null; pay_qr_note?: string | null; org_id?: string; branch_id?: string; own_qr?: boolean; notices_unread?: number;
   customers: Customer[]; settlements: Settlement[];
 };
 type Screen = 'home' | 'near' | 'list' | 'pending' | 'newclient' | 'settings';
@@ -146,6 +146,15 @@ export default function CollectorPage() {
   const flushing = useRef(false);
 
   const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 5000); };
+  // Borrar cuota (revertir un cobro): solo con señal y si el administrador lo permitió en la ruta
+  const reverseInst = async (order: string, n: number) => {
+    if (!navigator.onLine) { flash(false, t('loan.e.offline')); return; }
+    try { await rpc('collector_delete_installment', { p_order: order, p_n: n }); await refresh(); flash(true, t('card.delInstDone', { n })); }
+    catch (e) {
+      const m = (e as Error).message;
+      flash(false, m.includes('ROUTE_LOCKED') ? t('sp.lockedInfo') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic'));
+    }
+  };
 
   // Lo guardado en el teléfono aparece al instante, aun sin señal
   useEffect(() => {
@@ -556,7 +565,7 @@ export default function CollectorPage() {
                 </div>
                 <button type="button" onClick={() => { setSel(c); setPanel(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>👤 {t('card.profile')}</button>
               </div>
-              <Credits locked={!!route.locked} c={c} filter={freq} today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
+              <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? reverseInst : undefined} c={c} filter={freq} today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
               {(c.credits ?? []).length === 0 && <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>}
             </Card>
           ))}
@@ -603,7 +612,7 @@ export default function CollectorPage() {
             {sel && !panel && (
               <CustomerSheet locked={!!route.locked} c={selNow ?? sel} fmt={fmt} qr={route.pay_qr ?? null} online={online} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
                 cards={<>
-                  <Credits locked={!!route.locked} c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
+                  <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? reverseInst : undefined} c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
                   <DeleteActions c={selNow ?? sel} canCredits={!!route.can_delete_credits} canCustomer={!!route.can_delete_customers} online={online}
                     onDone={() => { setSel(null); setPanel(null); refresh(); }} />
                 </>} />

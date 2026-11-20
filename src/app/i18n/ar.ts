@@ -2133,6 +2133,16 @@ const ar: Record<DictKey, string> = {
   "ss.qrRemove": "إزالة QR",
   "rep.received": "المستلمة",
   "rep.none": "لا توجد تقارير بعد.",
+  "sr.title": "تقييم العميل",
+  "sr.excellent": "ممتاز",
+  "sr.good": "جيد",
+  "sr.bad": "سيئ",
+  "sr.clavo": "متهرب من الدفع",
+  "sr.volado": "هارب",
+  "sr.suspicious": "مشبوه",
+  "card.delInstHint": "القسط {n}: سيُلغى آخر دفع غطّاه. حذف؟",
+  "card.delInst": "حذف القسط {n}",
+  "card.delInstDone": "تم حذف القسط {n}.",
 };
 
 export default ar;

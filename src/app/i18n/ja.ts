@@ -2133,6 +2133,16 @@ const ja: Record<DictKey, string> = {
   "ss.qrRemove": "QRを削除",
   "rep.received": "受信",
   "rep.none": "レポートはまだありません。",
+  "sr.title": "顧客を評価",
+  "sr.excellent": "優秀",
+  "sr.good": "良い",
+  "sr.bad": "悪い",
+  "sr.clavo": "踏み倒し",
+  "sr.volado": "夜逃げ",
+  "sr.suspicious": "不審",
+  "card.delInstHint": "{n}回目：それを充当した最後の入金が取り消されます。削除しますか？",
+  "card.delInst": "{n}回目を削除",
+  "card.delInstDone": "{n}回目を削除しました。",
 };
 
 export default ja;

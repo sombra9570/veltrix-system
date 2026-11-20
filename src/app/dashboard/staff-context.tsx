@@ -69,9 +69,14 @@ export function StaffProvider({
     if (extra.length === 0) return [...mine, ...chat];
     return [...mine.map((n) => ({ ...n, group: `role.${session.role}` as DictKey })), ...extra, ...chat];
   })().filter((n) => navHas(modules, n.module))
-    // Supervisor de una empresa de cobranza: sus rutas, reportes, mensajes y ajustes
-    .filter((n) => !(session.role === 'supervisor' && (modules ?? []).includes('field_collection') && !(modules ?? []).some((m) => ['retail', 'restaurant', 'workshop'].includes(m))
-      && ['/prestamos', '/caja', '/clientes', '/ventas', '/inventario', '/mesas', '/cocina', '/taller', '/despacho'].some((x) => n.href.endsWith(x))));
+    // Cada rol ve solo lo de su rubro. Supervisor de cobranza en calle: únicamente sus rutas, reportes, mensajes y ajustes
+    // (lista cerrada, no de exclusión: así nada de otros rubros se cuela, ni siquiera mientras carga el rubro).
+    .filter((n) => {
+      if (session.role !== 'supervisor') return true;
+      if (modules === null) return false;
+      const cobranza = modules.includes('field_collection') && !modules.some((m) => ['retail', 'restaurant', 'workshop'].includes(m));
+      return !cobranza || ['/dashboard/supervisor', '/dashboard/supervisor/reportes', '/dashboard/supervisor/mensajes', '/dashboard/supervisor/ajustes'].includes(n.href);
+    });
 
   const company = companies.find((c) => c.id === session.companyId);
   return (

@@ -2133,6 +2133,16 @@ const hi: Record<DictKey, string> = {
   "ss.qrRemove": "QR हटाएँ",
   "rep.received": "प्राप्त",
   "rep.none": "अभी कोई रिपोर्ट नहीं।",
+  "sr.title": "ग्राहक रेटिंग",
+  "sr.excellent": "उत्कृष्ट",
+  "sr.good": "अच्छा",
+  "sr.bad": "खराब",
+  "sr.clavo": "भुगतान से बचने वाला",
+  "sr.volado": "फ़रार",
+  "sr.suspicious": "संदिग्ध",
+  "card.delInstHint": "किस्त {n}: उसे कवर करने वाला अंतिम भुगतान रद्द होगा। हटाएँ?",
+  "card.delInst": "किस्त {n} हटाएँ",
+  "card.delInstDone": "किस्त {n} हटाई गई।",
 };
 
 export default hi;

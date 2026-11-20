@@ -38,9 +38,11 @@ export function applyPayment(c: Credit, amount: number, at: string): Credit {
   return { ...c, installments };
 }
 
-export function CreditCard({ credit, today, fmt, onSave, readOnly = false }: {
+export function CreditCard({ credit, today, fmt, onSave, readOnly = false, onReverse }: {
   credit: Credit; today: string; fmt: (n: number) => string;
   onSave: (amount: number, method: Method) => void; readOnly?: boolean;
+  /** Borrar cuota = revertir un cobro ya hecho; solo si quien mira tiene ese permiso */
+  onReverse?: (n: number) => Promise<void> | void;
 }) {
   const { t, lang } = useT();
   const list = useMemo(() => [...credit.installments].sort((a, b) => a.n - b.n), [credit]);
@@ -48,6 +50,8 @@ export function CreditCard({ credit, today, fmt, onSave, readOnly = false }: {
   const [upTo, setUpTo] = useState(-1);          // índice de la última casilla seleccionada
   const [abono, setAbono] = useState<string | null>(null);
   const [method, setMethod] = useState<Method>('cash');
+  const [revN, setRevN] = useState<number | null>(null);
+  const [revBusy, setRevBusy] = useState(false);
 
   const open = list.reduce((s, i) => s + Math.max(0, bal(i)), 0);
   const paidCount = list.filter((i) => bal(i) <= 0).length;
@@ -88,7 +92,7 @@ export function CreditCard({ credit, today, fmt, onSave, readOnly = false }: {
             : late ? 'border-red-400 bg-white text-red-600 dark:bg-slate-900 dark:text-red-400'
             : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900';
           return (
-            <button key={i.id} type="button" onClick={() => tap(idx)} disabled={was}
+            <button key={i.id} type="button" onClick={() => (was ? setRevN((v) => (v === i.n ? null : i.n)) : tap(idx))} disabled={was && !onReverse}
               title={`${t('card.inst', { n: i.n })} · ${fmt(Number(i.amount))}`}
               className={`relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-lg border-2 text-center leading-tight transition cursor-pointer disabled:cursor-default ${cls}`}>
               {partial && !selected && !willFill && (
@@ -102,6 +106,18 @@ export function CreditCard({ credit, today, fmt, onSave, readOnly = false }: {
           );
         })}
       </div>
+
+      {onReverse && revN !== null && (
+        <div className="space-y-2 rounded-xl border border-red-300 bg-red-50 p-3 text-sm dark:border-red-500/30 dark:bg-red-500/10">
+          <p className="font-semibold text-red-700 dark:text-red-300">{t('card.delInstHint', { n: revN })}</p>
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" disabled={revBusy} onClick={() => setRevN(null)} className={`${ui.btnGhost} !py-2 text-xs`}>✕ {t('card.cancel')}</button>
+            <button type="button" disabled={revBusy}
+              onClick={async () => { setRevBusy(true); try { await onReverse(revN); } finally { setRevBusy(false); setRevN(null); } }}
+              className="rounded-xl bg-red-600 px-3 py-2 text-xs font-bold text-white cursor-pointer disabled:opacity-50">🗑️ {t('card.delInst', { n: revN })}</button>
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-3 text-[11px] text-slate-500">
         <span>🟩 {t('card.legPaid')}</span><span>🟦 {t('card.legSel')}</span><span>🟨 {t('card.legPartial')}</span><span className="text-red-500">▢ {t('card.legLate')}</span>

@@ -2142,6 +2142,16 @@ const es = {
   "ss.qrRemove": "Quitar QR",
   "rep.received": "Recibidos",
   "rep.none": "Aún no hay reportes.",
+  "sr.title": "Calificar cliente",
+  "sr.excellent": "Excelente",
+  "sr.good": "Bueno",
+  "sr.bad": "Malo",
+  "sr.clavo": "Clavo",
+  "sr.volado": "Volado",
+  "sr.suspicious": "Sospechoso",
+  "card.delInstHint": "Cuota {n}: se revertirá el último cobro que la cubrió. ¿Borrar?",
+  "card.delInst": "Borrar cuota {n}",
+  "card.delInstDone": "Cuota {n} borrada.",
 };
 
 export default es;

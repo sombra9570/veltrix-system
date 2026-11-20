@@ -1,0 +1,5 @@
+-- Documentación (aplicada vía MCP):
+--  * customer_sup_ratings + sup_rate_customer(route, customer, rating): excellent/good/bad/clavo/volado/suspicious, queda en el registro de supervisión.
+--  * sup_route_detail: sup_rating por cliente y can_delete_installments.
+--  * sup_finish: el reporte al administrador agrega "Calificación de clientes (dada por el supervisor)" y no repite esas líneas en el registro.
+--  * collector_delete_installment(order, n): borrar cuota = revertir el último cobro que la cubrió (permiso collector.delete_installments; cobrador, supervisor o administrador).
