@@ -68,6 +68,14 @@ export function OutForm({ branchId, items, onDone, flash }: {
   const [product, setProduct] = useState('');
   const [qty, setQty] = useState('');
   const [reason, setReason] = useState<string>('waste');
+  // Solo se ofrecen los motivos que este usuario tiene permitidos
+  const [allowed, setAllowed] = useState<string[] | null>(null);
+  useEffect(() => {
+    let on = true;
+    Promise.all(REASONS.map((r) => rpc<boolean>('has_perm', { p_key: `inv.out_${r}`, p_branch: branchId }).then((ok) => (ok ? r : null)).catch(() => r)))
+      .then((x) => { if (!on) return; const ok = x.filter(Boolean) as string[]; setAllowed(ok); if (ok.length && !ok.includes(reason)) setReason(ok[0]); });
+    return () => { on = false; };
+  }, [branchId]); // eslint-disable-line react-hooks/exhaustive-deps
   const [ev, setEv] = useState<Evidence>(emptyEvidence());
   const [busy, setBusy] = useState(false);
   const sel = items.find((i) => i.id === product);
@@ -79,7 +87,7 @@ export function OutForm({ branchId, items, onDone, flash }: {
     try {
       const label = t(`ev.r.${reason}` as DictKey);
       const photoPath = await uploadEvidencePhoto(branchId, 'out', ev);
-      await rpc('inv_out', { p_branch: branchId, p_product: sel.id, p_qty: q, p_reason: ev.note ? `${label}: ${ev.note}` : label });
+      await rpc('inv_out', { p_branch: branchId, p_product: sel.id, p_qty: q, p_reason: ev.note ? `${label}: ${ev.note}` : label, p_kind: reason });
       await addEvidence(branchId, 'out', ev, photoPath, `${q} ${sel.unit} · ${sel.name} · ${label}`);
       setProduct(''); setQty(''); setEv(emptyEvidence());
       flash(true, t('ev.outSaved'));
@@ -112,7 +120,7 @@ export function OutForm({ branchId, items, onDone, flash }: {
         <div className="sm:col-span-3">
           <label className={ui.label}>{t('ev.reason')}</label>
           <select className={ui.input} value={reason} onChange={(e) => setReason(e.target.value)}>
-            {REASONS.map((r) => <option key={r} value={r}>{t(`ev.r.${r}` as DictKey)}</option>)}
+            {REASONS.filter((r) => !allowed || allowed.includes(r)).map((r) => <option key={r} value={r}>{t(`ev.r.${r}` as DictKey)}</option>)}
           </select>
         </div>
       </div>

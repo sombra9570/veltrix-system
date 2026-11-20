@@ -18,12 +18,12 @@ type Data = {
 // Qué permisos tienen sentido para cada rol (los demás no se muestran para no confundir)
 // Permisos delegables por rol (el dueño y el supervisor ya lo tienen todo en su sucursal)
 const ROLE_KEYS: Record<string, string[]> = {
-  cashier: ['cash.see_expected', 'cash.movements', 'customers.view_docs', 'payments.reverse', 'sales.cancel_request'],
-  vendor: ['sales.credit', 'customers.edit', 'customers.view_docs', 'payments.reverse', 'sales.cancel_request'],
+  cashier: ['cash.see_expected', 'cash.expense', 'cash.withdraw', 'cash.deposit', 'cash.change_fund', 'customers.view_docs', 'customers.upload_docs', 'payments.reverse', 'sales.cancel_request'],
+  vendor: ['sales.credit', 'customers.create', 'customers.edit', 'customers.view_docs', 'customers.upload_docs', 'payments.reverse', 'sales.cancel_request'],
   collector: ['collector.expenses', 'collector.portfolio', 'collector.settings', 'loans.create', 'loans.customers', 'loans.interest', 'loans.cancel', 'loans.reschedule', 'payments.reverse', 'routes.liquidate', 'routes.invest'],
-  storekeeper: ['products.edit', 'products.price', 'products.delete', 'inv.receive', 'inv.adjust', 'inv.out', 'inv.transfer', 'inv.see_cost'],
+  storekeeper: ['products.create', 'products.edit', 'products.price', 'products.delete', 'inv.receive', 'inv.purchase', 'inv.adjust', 'inv.out_waste', 'inv.out_damaged', 'inv.out_expired', 'inv.out_internal', 'inv.out_supplier_return', 'inv.out_other', 'inv.transfer', 'inv.see_cost'],
   accountant: ['reports.export', 'inv.see_cost'],
-  technician: ['customers.edit', 'customers.view_docs'],
+  technician: ['customers.create', 'customers.edit', 'customers.view_docs', 'customers.upload_docs'],
 };
 
 // Cobrador de mercadería (rubro sin finanzas): cobra cuotas fijas sin interés; no presta dinero ni invierte en la ruta

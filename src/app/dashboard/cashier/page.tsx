@@ -591,6 +591,11 @@ function MovementsTab({
 }: Common & { movements: NonNullable<Home['shift']>['movements']; fmt: (n: number) => string }) {
   const { t, lang } = useT();
   const [type, setType] = useState<MovType>('expense');
+  // Solo los movimientos que este cajero tiene permitidos
+  const [allowedTypes, setAllowedTypes] = useState<string[] | null>(null);
+  useEffect(() => {
+    rpc<string[]>('cash_movement_types').then((x) => { const ok = x ?? []; setAllowedTypes(ok); if (ok.length && !ok.includes('expense')) setType(ok[0] as MovType); }).catch(() => setAllowedTypes(null));
+  }, []);
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
 
@@ -619,7 +624,7 @@ function MovementsTab({
           <div>
             <p className={ui.label}>{t('cash.movType')}</p>
             <div className="grid grid-cols-2 gap-2">
-              {MOV_TYPES.map((m) => (
+              {MOV_TYPES.filter((m) => !allowedTypes || allowedTypes.includes(m)).map((m) => (
                 <button
                   key={m}
                   type="button"

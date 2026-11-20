@@ -1,0 +1,3 @@
+-- Permisos por accion (migraciones permissions_split_by_action y cash_movement_types_allowed):
+-- cash.movements -> cash.expense/withdraw/deposit/change_fund; inv.out -> inv.out_waste/damaged/expired/internal/supplier_return/other (inv_out recibe p_kind);
+-- customers.create/upload_docs, products.create, inv.purchase; can_upload_customer_file para subir fotos. Los valores existentes se copian a los nuevos permisos.
