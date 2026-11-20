@@ -2132,6 +2132,16 @@ const es = {
   "sp.setLoc": "Actualizar ubicación (donde estoy)",
   "sp.done": "✅ Hecho.",
   "sp.noGps": "No se pudo obtener tu ubicación.",
+  "nav.settings": "Ajustes",
+  "ss.title": "Mis datos",
+  "ss.name": "Nombre",
+  "ss.phone": "Teléfono",
+  "ss.saved": "Guardado ✓",
+  "ss.qr": "QR para el pago de tu sueldo",
+  "ss.qrHint": "Solo la empresa lo usa para pagarte el sueldo.",
+  "ss.qrRemove": "Quitar QR",
+  "rep.received": "Recibidos",
+  "rep.none": "Aún no hay reportes.",
 };
 
 export default es;

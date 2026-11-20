@@ -2123,6 +2123,16 @@ const ru: Record<DictKey, string> = {
   "sp.setLoc": "Обновить локацию (здесь)",
   "sp.done": "✅ Готово.",
   "sp.noGps": "Не удалось определить местоположение.",
+  "nav.settings": "Настройки",
+  "ss.title": "Мои данные",
+  "ss.name": "Имя",
+  "ss.phone": "Телефон",
+  "ss.saved": "Сохранено ✓",
+  "ss.qr": "QR для выплаты зарплаты",
+  "ss.qrHint": "Используется только компанией для выплаты зарплаты.",
+  "ss.qrRemove": "Удалить QR",
+  "rep.received": "Полученные",
+  "rep.none": "Отчётов пока нет.",
 };
 
 export default ru;

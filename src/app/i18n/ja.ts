@@ -2123,6 +2123,16 @@ const ja: Record<DictKey, string> = {
   "sp.setLoc": "位置を更新（現在地）",
   "sp.done": "✅ 完了。",
   "sp.noGps": "位置情報を取得できません。",
+  "nav.settings": "設定",
+  "ss.title": "自分の情報",
+  "ss.name": "名前",
+  "ss.phone": "電話",
+  "ss.saved": "保存しました ✓",
+  "ss.qr": "給与受取用QR",
+  "ss.qrHint": "会社が給与支払いにのみ使用します。",
+  "ss.qrRemove": "QRを削除",
+  "rep.received": "受信",
+  "rep.none": "レポートはまだありません。",
 };
 
 export default ja;

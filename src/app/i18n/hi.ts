@@ -2123,6 +2123,16 @@ const hi: Record<DictKey, string> = {
   "sp.setLoc": "स्थान अपडेट करें (यहाँ)",
   "sp.done": "✅ हो गया।",
   "sp.noGps": "आपका स्थान नहीं मिला।",
+  "nav.settings": "सेटिंग्स",
+  "ss.title": "मेरा डेटा",
+  "ss.name": "नाम",
+  "ss.phone": "फ़ोन",
+  "ss.saved": "सहेजा गया ✓",
+  "ss.qr": "वेतन भुगतान के लिए QR",
+  "ss.qrHint": "केवल कंपनी वेतन देने के लिए इसका उपयोग करती है।",
+  "ss.qrRemove": "QR हटाएँ",
+  "rep.received": "प्राप्त",
+  "rep.none": "अभी कोई रिपोर्ट नहीं।",
 };
 
 export default hi;

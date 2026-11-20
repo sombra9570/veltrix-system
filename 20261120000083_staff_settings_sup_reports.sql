@@ -1,0 +1,2 @@
+-- Documentación (aplicada vía MCP): profiles.pay_qr_path/pay_qr_note; RPC my_settings, set_my_settings (datos propios y QR de sueldo),
+-- sup_reports (reportes enviados y recibidos del supervisor de cobranza).

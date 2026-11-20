@@ -2123,6 +2123,16 @@ const ko: Record<DictKey, string> = {
   "sp.setLoc": "위치 업데이트(현재 위치)",
   "sp.done": "✅ 완료.",
   "sp.noGps": "위치를 가져올 수 없습니다.",
+  "nav.settings": "설정",
+  "ss.title": "내 정보",
+  "ss.name": "이름",
+  "ss.phone": "전화",
+  "ss.saved": "저장됨 ✓",
+  "ss.qr": "급여 수령용 QR",
+  "ss.qrHint": "회사가 급여 지급에만 사용합니다.",
+  "ss.qrRemove": "QR 삭제",
+  "rep.received": "받은 항목",
+  "rep.none": "아직 보고서가 없습니다.",
 };
 
 export default ko;

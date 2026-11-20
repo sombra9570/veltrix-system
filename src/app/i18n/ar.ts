@@ -2123,6 +2123,16 @@ const ar: Record<DictKey, string> = {
   "sp.setLoc": "تحديث الموقع (مكاني)",
   "sp.done": "✅ تم.",
   "sp.noGps": "تعذّر الحصول على موقعك.",
+  "nav.settings": "الإعدادات",
+  "ss.title": "بياناتي",
+  "ss.name": "الاسم",
+  "ss.phone": "الهاتف",
+  "ss.saved": "تم الحفظ ✓",
+  "ss.qr": "رمز QR لاستلام راتبك",
+  "ss.qrHint": "تستخدمه الشركة فقط لدفع راتبك.",
+  "ss.qrRemove": "إزالة QR",
+  "rep.received": "المستلمة",
+  "rep.none": "لا توجد تقارير بعد.",
 };
 
 export default ar;

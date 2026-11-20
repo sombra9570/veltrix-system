@@ -2123,6 +2123,16 @@ const pt: Record<DictKey, string> = {
   "sp.setLoc": "Atualizar localização (onde estou)",
   "sp.done": "✅ Feito.",
   "sp.noGps": "Não foi possível obter sua localização.",
+  "nav.settings": "Configurações",
+  "ss.title": "Meus dados",
+  "ss.name": "Nome",
+  "ss.phone": "Telefone",
+  "ss.saved": "Salvo ✓",
+  "ss.qr": "QR para receber seu salário",
+  "ss.qrHint": "Só a empresa o usa para pagar seu salário.",
+  "ss.qrRemove": "Remover QR",
+  "rep.received": "Recebidos",
+  "rep.none": "Ainda não há relatórios.",
 };
 
 export default pt;

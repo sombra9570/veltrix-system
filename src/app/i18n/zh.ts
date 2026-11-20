@@ -2123,6 +2123,16 @@ const zh: Record<DictKey, string> = {
   "sp.setLoc": "更新位置（我所在处）",
   "sp.done": "✅ 完成。",
   "sp.noGps": "无法获取您的位置。",
+  "nav.settings": "设置",
+  "ss.title": "我的资料",
+  "ss.name": "姓名",
+  "ss.phone": "电话",
+  "ss.saved": "已保存 ✓",
+  "ss.qr": "工资收款二维码",
+  "ss.qrHint": "仅公司用于向您发放工资。",
+  "ss.qrRemove": "移除二维码",
+  "rep.received": "已收到",
+  "rep.none": "暂无报告。",
 };
 
 export default zh;

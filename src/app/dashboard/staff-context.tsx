@@ -69,9 +69,9 @@ export function StaffProvider({
     if (extra.length === 0) return [...mine, ...chat];
     return [...mine.map((n) => ({ ...n, group: `role.${session.role}` as DictKey })), ...extra, ...chat];
   })().filter((n) => navHas(modules, n.module))
-    // Supervisor de una empresa de cobranza: solo sus rutas y mensajes
+    // Supervisor de una empresa de cobranza: sus rutas, reportes, mensajes y ajustes
     .filter((n) => !(session.role === 'supervisor' && (modules ?? []).includes('field_collection') && !(modules ?? []).some((m) => ['retail', 'restaurant', 'workshop'].includes(m))
-      && ['/prestamos', '/caja', '/clientes', '/ventas', '/inventario', '/reportes', '/mesas', '/cocina', '/taller', '/despacho'].some((x) => n.href.endsWith(x))));
+      && ['/prestamos', '/caja', '/clientes', '/ventas', '/inventario', '/mesas', '/cocina', '/taller', '/despacho'].some((x) => n.href.endsWith(x))));
 
   const company = companies.find((c) => c.id === session.companyId);
   return (
