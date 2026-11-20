@@ -1,4 +1,5 @@
 'use client';
+import { STORE_THEMES } from '../../store-theme';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../../lib/supabase';
@@ -9,7 +10,7 @@ import { storeImageUrl, storeThumbUrl } from '../../dashboard/image';
 import { Spinner } from '../../spinner';
 
 type Product = { id: string; name: string; price: number; type: string; description: string | null; photo: string | null; unit: string; available: boolean; model?: string | null; size?: string | null; color?: string | null };
-type Store = { slug: string; name: string; description: string | null; whatsapp: string | null; logo: string | null; currency: string; products: Product[] };
+type Store = { slug: string; name: string; description: string | null; whatsapp: string | null; logo: string | null; theme?: string; currency: string; products: Product[] };
 type Line = { p: Product; qty: number };
 type Zone = { id: string; name: string; fee: number; free_over: number | null; eta_min: number };
 type DInfo = { enabled: boolean; zones?: Zone[] };
@@ -25,6 +26,7 @@ export function StoreView({ slug }: { slug: string }) {
   const [view, setView] = useState<Product | null>(null);
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
+  const th = STORE_THEMES[store?.theme ?? 'ocean'] ?? STORE_THEMES.ocean;
   const CART_KEY = `vx_store_cart_${slug}`;
   const DREQ_KEY = `vx_store_dreq_${slug}`;
   const [dinfo, setDinfo] = useState<DInfo | null>(null);
@@ -180,7 +182,12 @@ export function StoreView({ slug }: { slug: string }) {
   }
 
   return (
-    <main className="min-h-dvh bg-slate-50 pb-28 dark:bg-slate-950">
+    <main className="vx-theme min-h-dvh bg-[var(--sbg)] pb-28 dark:bg-[var(--sbgd)]"
+      style={{ ['--sa' as string]: th.a, ['--sh' as string]: th.h, ['--sbg' as string]: th.bg, ['--sbgd' as string]: th.bgd }}>
+      <style>{`.vx-theme .bg-blue-600{background-color:var(--sa)}.vx-theme .hover\\:bg-blue-500:hover{background-color:var(--sh)}
+.vx-theme .border-blue-500,.vx-theme .border-blue-600{border-color:var(--sa)}
+.vx-theme .bg-blue-50,.vx-theme [class*="dark:bg-blue-500/10"]{background-color:color-mix(in srgb,var(--sa) 12%,transparent)}
+.vx-theme .text-blue-600,.vx-theme [class*="dark:text-blue-400"]{color:var(--sa)}`}</style>
       {/* Encabezado de la tienda */}
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/90 pt-[env(safe-area-inset-top)] backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
         <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">

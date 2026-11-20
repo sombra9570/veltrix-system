@@ -11,10 +11,11 @@ import { compressImage, extFor, storeImageUrl, storeThumbUrl, makeThumb, thumbPa
 
 type Company = { id: string; legal_name: string };
 type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean; variants?: number };
-type Store = { id: string; company_id: string; branch_id: string; slug: string; name: string; description: string | null; whatsapp: string | null; logo_path: string | null; own_qr_path?: string | null; is_published: boolean };
+type Store = { id: string; company_id: string; branch_id: string; slug: string; name: string; description: string | null; whatsapp: string | null; logo_path: string | null; own_qr_path?: string | null; is_published: boolean; theme?: string; admin_bg?: string };
 type Admin = {
   perms?: { photo: boolean; publish: boolean; edit: boolean }; store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
 
+import { STORE_THEMES, ADMIN_BGS } from '../../../store-theme';
 const BUCKET = 'store-images';
 const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
 const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
@@ -199,9 +200,15 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
   const showForm = pe && (editing || !data.store.whatsapp);
   const published = data.products.filter((p) => p.in_store).length;
   const logo = storeImageUrl(data.store.logo_path);
+  const abg = ADMIN_BGS[data.store.admin_bg ?? 'none'] ?? ADMIN_BGS.none;
+  const setLook = async (theme: string, bg: string) => {
+    setBusy(true);
+    try { await rpc('set_store_look', { p_company: companyId, p_theme: theme, p_admin_bg: bg }); await load(); }
+    catch (err) { flash(false, storeError((err as Error).message, t)); } finally { setBusy(false); }
+  };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 rounded-2xl p-2 transition-colors sm:p-3 bg-[var(--abg)] dark:bg-[var(--abgd)]" style={{ ['--abg' as string]: abg.l, ['--abgd' as string]: abg.d }}>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-xl font-extrabold sm:text-2xl">🛍️ {t('store.title')}</h1>
@@ -276,6 +283,33 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
             </div>
           </fieldset>
           </form>
+        </Card>
+      )}
+
+      {showForm && pe && (
+        <Card className="space-y-4">
+          <h2 className="font-bold">🎨 {t('store.look')}</h2>
+          <div>
+            <p className={ui.label}>{t('store.lookPublic')}</p>
+            <div className="flex flex-wrap gap-3">
+              {Object.entries(STORE_THEMES).map(([id, c]) => (
+                <button key={id} type="button" disabled={busy} aria-label={id} title={id} onClick={() => setLook(id, data.store.admin_bg ?? 'none')}
+                  className={`h-10 w-10 rounded-full border-2 cursor-pointer transition ${(data.store.theme ?? 'ocean') === id ? 'scale-110 border-slate-900 ring-2 ring-offset-2 ring-slate-400 dark:border-white' : 'border-white dark:border-slate-700'}`}
+                  style={{ background: `linear-gradient(135deg, ${c.a} 60%, ${c.h})` }} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className={ui.label}>{t('store.lookAdmin')}</p>
+            <div className="flex flex-wrap gap-3">
+              {Object.entries(ADMIN_BGS).map(([id, c]) => (
+                <button key={id} type="button" disabled={busy} aria-label={id} title={id} onClick={() => setLook(data.store.theme ?? 'ocean', id)}
+                  className={`h-10 w-10 rounded-xl border-2 cursor-pointer transition ${(data.store.admin_bg ?? 'none') === id ? 'scale-110 border-slate-900 ring-2 ring-offset-2 ring-slate-400 dark:border-white' : 'border-slate-300 dark:border-slate-600'}`}
+                  style={{ background: id === 'none' ? 'repeating-linear-gradient(45deg,#e2e8f0 0 4px,#fff 4px 8px)' : c.l }} />
+              ))}
+            </div>
+          </div>
+          <p className={`text-xs ${ui.muted}`}>{t('store.lookHint')}</p>
         </Card>
       )}
 
