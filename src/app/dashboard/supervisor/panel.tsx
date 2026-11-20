@@ -108,16 +108,30 @@ export default function SupPanel() {
     onBack: rid ? back : undefined,
   }, [userName, rid, d?.name, screen, sel?.id, routes?.length, lang]);
 
-  const run = async (fn: () => Promise<unknown>, okText?: string) => {
+  // Por defecto NO vuelve a leer la ruta: cada acción actualiza solo su dato en pantalla (reload=true solo si hace falta)
+  const run = async (fn: () => Promise<unknown>, okText?: string, reload = false) => {
     setBusy(true); setMsg(null);
-    try { await fn(); if (okText) setMsg({ ok: true, text: okText }); if (rid) await loadRoute(rid); }
+    try { await fn(); if (okText) setMsg({ ok: true, text: okText }); if (reload && rid) await loadRoute(rid); }
     catch (e) { setMsg({ ok: false, text: (e as Error).message }); }
     finally { setBusy(false); }
   };
   const log = (action: string, detail: Record<string, unknown> = {}) => rpc('sup_log', { p_route: rid, p_action: action, p_detail: detail });
-  const rate = (c: Cust, r: string) => run(async () => { await rpc('sup_rate_customer', { p_route: rid, p_customer: c.id, p_rating: r }); setSel((x) => (x && x.id === c.id ? { ...x, sup_rating: r } : x)); }, t('sp.done'));
+  const patchCust = (id: string, fields: Partial<Cust>) => {
+    setD((x) => (x ? { ...x, customers: x.customers.map((c) => (c.id === id ? { ...c, ...fields } : c)) } : x));
+    setSel((x) => (x && x.id === id ? { ...x, ...fields } : x));
+  };
+  const rate = (c: Cust, r: string) => run(async () => { await rpc('sup_rate_customer', { p_route: rid, p_customer: c.id, p_rating: r }); patchCust(c.id, { sup_rating: r }); }, t('sp.done'));
   const reverse = async (order: string, n: number) => {
-    try { await rpc('collector_delete_installment', { p_order: order, p_n: n }); if (rid) await loadRoute(rid); setMsg({ ok: true, text: t('card.delInstDone', { n }) }); }
+    try {
+      await rpc('collector_delete_installment', { p_order: order, p_n: n });
+      const cid = d?.customers.find((c) => c.credits.some((k) => k.id === order))?.id;
+      const [row, tot] = await Promise.all([
+        cid ? rpc<(Omit<Cust, 'credits'> & { credits: RawCredit[] }) | null>('collector_customer_row', { p_route: rid, p_customer: cid }) : Promise.resolve(null),
+        rpc<{ fund_balance: number; period: Period; portfolio: number }>('collector_route_totals', { p_route: rid }),
+      ]);
+      setD((x) => (x ? { ...x, balance: tot.fund_balance, period: tot.period, portfolio: tot.portfolio,
+        customers: x.customers.map((c) => (row && c.id === row.id ? { ...c, ...row, credits: (row.credits ?? []).map(toCredit) } : c)) } : x));
+      setMsg({ ok: true, text: t('card.delInstDone', { n }) }); }
     catch (e) { const m = (e as Error).message; setMsg({ ok: false, text: m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic') }); }
   };
 
@@ -172,7 +186,7 @@ export default function SupPanel() {
   const setLoc = (c: Cust) => {
     if (!('geolocation' in navigator)) { setMsg({ ok: false, text: t('sp.noGps') }); return; }
     navigator.geolocation.getCurrentPosition(
-      (p) => run(() => rpc('sup_update_customer', { p_route: rid, p_customer: c.id, p_phone: null, p_lat: p.coords.latitude, p_lng: p.coords.longitude }), t('sp.done')),
+      (p) => run(async () => { await rpc('sup_update_customer', { p_route: rid, p_customer: c.id, p_phone: null, p_lat: p.coords.latitude, p_lng: p.coords.longitude }); patchCust(c.id, { lat: p.coords.latitude, lng: p.coords.longitude }); }, t('sp.done')),
       () => setMsg({ ok: false, text: t('sp.noGps') }), { enableHighAccuracy: true, timeout: 20000 });
   };
 
@@ -193,6 +207,7 @@ export default function SupPanel() {
             <MenuTile icon="sliders" label={d.locked ? t('sp.unlock') : t('sp.lock')} tone="plain" disabled={busy}
               onClick={() => run(async () => {
                 await rpc('sup_set_lock', { p_route: rid, p_lock: !d.locked });
+                setD((x) => (x ? { ...x, locked: !x.locked } : x));
                 // Aviso en vivo al cobrador: su teléfono se actualiza al instante
                 const ch = supabase.channel(`route-lock:${rid}`);
                 ch.subscribe((st) => { if (st === 'SUBSCRIBED') void ch.send({ type: 'broadcast', event: 'lock', payload: {} }).finally(() => { void supabase.removeChannel(ch); }); });
@@ -257,7 +272,13 @@ export default function SupPanel() {
       )}
 
       {screen === 'newclient' && d.can_customers && (
-        <NewClient routeId={d.id} orgId={d.org_id} online canLoan={false} onSaved={async () => { try { await log('other', { text: 'new_customer' }); } catch { /* ya se creó */ } await loadRoute(d.id); }} onLoan={() => undefined} />
+        <NewClient routeId={d.id} orgId={d.org_id} online canLoan={false} onSaved={async (id) => {
+          try { await log('other', { text: 'Creó un cliente nuevo' }); } catch { /* ya se creó */ }
+          try {
+            const row = await rpc<(Omit<Cust, 'credits'> & { credits: RawCredit[] }) | null>('collector_customer_row', { p_route: d.id, p_customer: id });
+            if (row) setD((x) => (x ? { ...x, customers: [...x.customers, { ...row, credits: (row.credits ?? []).map(toCredit) }].sort((p, q) => p.name.localeCompare(q.name)) } : x));
+          } catch { /* se completa al volver a abrir */ }
+        }} onLoan={() => undefined} />
       )}
 
       {(screen === 'list' || screen === 'pending') && sel && (
@@ -275,7 +296,7 @@ export default function SupPanel() {
             <div className="flex gap-2">
               <input inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t('sp.phone')} className={ui.input} />
               <button type="button" disabled={busy || !phone.trim() || phone.trim() === (sel.phone ?? '')}
-                onClick={() => run(async () => { await rpc('sup_update_customer', { p_route: rid, p_customer: sel.id, p_phone: phone, p_lat: null, p_lng: null }); setSel({ ...sel, phone: phone.trim() }); }, t('sp.done'))}
+                onClick={() => run(async () => { await rpc('sup_update_customer', { p_route: rid, p_customer: sel.id, p_phone: phone, p_lat: null, p_lng: null }); patchCust(sel.id, { phone: phone.trim() }); }, t('sp.done'))}
                 className={`${ui.btnPrimary} shrink-0 !px-3 text-xs`}>{t('sp.savePhone')}</button>
             </div>
             <button type="button" disabled={busy} onClick={() => setLoc(sel)} className={`${ui.btnGhost} w-full !py-2 text-xs`}>📍 {t('sp.setLoc')}</button>

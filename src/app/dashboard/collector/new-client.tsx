@@ -49,7 +49,7 @@ function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) 
  */
 export function NewClient({ routeId, orgId, online, canLoan, onSaved, onLoan }: {
   routeId: string; orgId: string; online: boolean; canLoan: boolean;
-  onSaved: () => Promise<void> | void; onLoan: () => void;
+  onSaved: (id: string) => Promise<void> | void; onLoan: () => void;
 }) {
   const { t } = useT();
   const [f, setF] = useState({ name: '', ci: '', phone: '', address: '', gName: '', gPhone: '', gAddress: '' });
@@ -114,7 +114,7 @@ export function NewClient({ routeId, orgId, online, canLoan, onSaved, onLoan }: 
     }
     setBusy(false);
     setDone({ name: f.name.trim(), photosOk });
-    await onSaved();
+    await onSaved(id);
   };
 
   if (done) {

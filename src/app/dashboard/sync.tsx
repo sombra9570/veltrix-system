@@ -48,6 +48,7 @@ export function useSync(load: Loader, every: number = AUTO_EVERY) {
     return () => { loaders.delete(id); };
   }, []);
   useEffect(() => {
+    if (!every || every <= 0) return; // solo manual (↻) y al volver la señal
     let last = Date.now();
     const tick = () => {
       if (document.visibilityState !== 'visible' || !navigator.onLine) return;

@@ -147,9 +147,9 @@ export default function CollectorPage() {
 
   const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 5000); };
   // Borrar cuota (revertir un cobro): solo con señal y si el administrador lo permitió en la ruta
-  const reverseInst = async (order: string, n: number) => {
+  const reverseInst = async (customerId: string, order: string, n: number) => {
     if (!navigator.onLine) { flash(false, t('loan.e.offline')); return; }
-    try { await rpc('collector_delete_installment', { p_order: order, p_n: n }); await refresh(); flash(true, t('card.delInstDone', { n })); }
+    try { await rpc('collector_delete_installment', { p_order: order, p_n: n }); await patch(routeId, { customers: [customerId], totals: true }); flash(true, t('card.delInstDone', { n })); }
     catch (e) {
       const m = (e as Error).message;
       flash(false, m.includes('ROUTE_LOCKED') ? t('sp.lockedInfo') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic'));
@@ -180,10 +180,37 @@ export default function CollectorPage() {
     } catch { /* sin señal: seguimos con lo guardado */ }
   }, [DAY_KEY]);
 
+  /* Sincronización puntual: solo lo que cambió (un cliente y/o las cifras de la ruta), sin volver a leer todo el día.
+   * Si no hay señal o falla, no avisa: lo local ya está al día y el resto llega al abrir o con ↻. */
+  const patch = useCallback(async (routeId: string, opts: { customers?: string[]; removed?: string[]; totals?: boolean }) => {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+    try {
+      const rows = await Promise.all((opts.customers ?? []).map((id) => rpc<Customer | null>('collector_customer_row', { p_route: routeId, p_customer: id }).catch(() => undefined)));
+      const totals = opts.totals ? await rpc<Partial<Route>>('collector_route_totals', { p_route: routeId }).catch(() => null) : null;
+      setDay((d) => {
+        if (!d) return d;
+        const nd: Day = { ...d, routes: d.routes.map((r) => {
+          if (r.id !== routeId) return r;
+          let customers = r.customers.filter((c) => !(opts.removed ?? []).includes(c.id));
+          for (const row of rows) {
+            if (!row) continue;
+            const one = normalizeDay({ generated_at: '', routes: [{ customers: [row] } as unknown as Route] }).routes[0].customers[0];
+            customers = customers.some((c) => c.id === one.id) ? customers.map((c) => (c.id === one.id ? one : c)) : [...customers, one];
+          }
+          customers = [...customers].sort((x, y) => Number(y.overdue) - Number(x.overdue) || x.name.localeCompare(y.name));
+          return { ...r, ...(totals ?? {}), customers };
+        }) };
+        save(DAY_KEY, nd);
+        return nd;
+      });
+    } catch { /* sin señal: se completa al abrir o con ↻ */ }
+  }, [DAY_KEY]);
+
   // Envía la cola, de a uno y en orden
   const flush = useCallback(async (force = false) => {
     let sent = 0;
     let lockedHit = false;
+    const touched = new Map<string, Set<string>>(); // ruta -> clientes tocados
     if (flushing.current) return;
     flushing.current = true;
     setSyncing(true);
@@ -211,6 +238,7 @@ export default function CollectorPage() {
             await rpc('collector_expense', { p_route: op.route, p_amount: op.amount, p_description: op.description, p_offline_uuid: op.id });
           }
           sent++;
+          { const set = touched.get(op.route) ?? new Set<string>(); if (op.kind !== 'expense') set.add(op.customer); touched.set(op.route, set); }
           await new Promise((r) => setTimeout(r, 150)); // de a uno, sin saturar la señal
         } catch (err) {
           const m = (err as Error).message;
@@ -233,8 +261,10 @@ export default function CollectorPage() {
       setSyncing(false);
     }
     // Solo vuelve a descargar el día si se envió algo o si se pidió
-    if (sent > 0 || force || lockedHit) await refresh();
-  }, [QUEUE_KEY, REJ_KEY, refresh, t]);
+    // Al abrir / ↻ / bloqueo: se descarga el día. Si solo se envió algo: se actualiza únicamente lo tocado.
+    if (force || lockedHit) await refresh();
+    else if (sent > 0) for (const [rid, set] of touched) await patch(rid, { customers: [...set], totals: true });
+  }, [QUEUE_KEY, REJ_KEY, refresh, patch, t]);
 
   const retryRejected = (id: string) => {
     const r = load<(Op & { reason: string })[]>(REJ_KEY, []);
@@ -262,7 +292,7 @@ export default function CollectorPage() {
     return () => clearInterval(id);
   }, [online, flush, QUEUE_KEY]);
   // El día completo se vuelve a descargar unas 5 veces al día o con el botón ↻
-  useSync(refresh);
+  useSync(refresh, 0); // sin reloj: el día se baja al abrir, al volver la señal o con ↻
 
   // Bloqueo/desbloqueo: el supervisor lo aplica una vez y avisa por un canal en vivo (sin consultas periódicas).
   // Al llegar el aviso se descarga el día una sola vez y se ve el cambio al instante.
@@ -270,10 +300,10 @@ export default function CollectorPage() {
   useEffect(() => {
     if (!routeKey) return;
     const chans = routeKey.split(',').map((id) => supabase.channel(`route-lock:${id}`)
-      .on('broadcast', { event: 'lock' }, () => { void refresh(); })
+      .on('broadcast', { event: 'lock' }, () => { void patch(id, { totals: true }); })
       .subscribe());
     return () => { chans.forEach((c) => { void supabase.removeChannel(c); }); };
-  }, [routeKey, refresh]);
+  }, [routeKey, patch]);
 
   const enqueue = (op: Op) => {
     const next = [...load<Op[]>(QUEUE_KEY, []), op];
@@ -506,7 +536,7 @@ export default function CollectorPage() {
 
       {screen === 'newclient' && (
         <NewClient routeId={route.id} orgId={route.org_id ?? ''} online={online} canLoan={!!route.can_loan && !!route.policy}
-          onSaved={async () => { await refresh(); }}
+          onSaved={async (id) => { await patch(route.id, { customers: [id] }); }}
           onLoan={() => { setPanel('loan'); }} />
       )}
 
@@ -514,7 +544,7 @@ export default function CollectorPage() {
         <SettingsScreen routeId={route.id} orgId={route.org_id ?? ''} branchId={route.branch_id ?? ''} ownQr={!!route.own_qr}
           canLoan={!!route.can_loan && !!route.policy} onLoan={() => setPanel('loan')} onQrChanged={refresh} payQr={route.pay_qr ?? null} payQrNote={route.pay_qr_note ?? null}
           geoOn={geoOn} onGeo={(v) => { setGeoOn(v); save('vx_col_geo', v); }} fmt={fmt} online={online}
-          onNoticesRead={() => { void refresh(); }}
+          onNoticesRead={() => { setDay((d) => { if (!d) return d; const nd = { ...d, routes: d.routes.map((r) => (r.id === route.id ? { ...r, notices_unread: 0 } : r)) }; save(DAY_KEY, nd); return nd; }); }}
           perms={[
             ['perm.loans.create', !!route.can_loan], ['perm.loans.customers', route.can_customers !== false],
             ['perm.loans.interest', !!route.can_interest], ['perm.routes.liquidate', !!route.can_liquidate],
@@ -565,7 +595,7 @@ export default function CollectorPage() {
                 </div>
                 <button type="button" onClick={() => { setSel(c); setPanel(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>👤 {t('card.profile')}</button>
               </div>
-              <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? reverseInst : undefined} c={c} filter={freq} today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
+              <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? (o, n) => reverseInst(c.id, o, n) : undefined} c={c} filter={freq} today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
               {(c.credits ?? []).length === 0 && <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>}
             </Card>
           ))}
@@ -612,9 +642,9 @@ export default function CollectorPage() {
             {sel && !panel && (
               <CustomerSheet locked={!!route.locked} c={selNow ?? sel} fmt={fmt} qr={route.pay_qr ?? null} online={online} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
                 cards={<>
-                  <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? reverseInst : undefined} c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
+                  <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? (o, n) => reverseInst(sel.id, o, n) : undefined} c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
                   <DeleteActions c={selNow ?? sel} canCredits={!!route.can_delete_credits} canCustomer={!!route.can_delete_customers} online={online}
-                    onDone={() => { setSel(null); setPanel(null); refresh(); }} />
+                    onDone={(what) => { const cid = sel.id; setSel(null); setPanel(null); void patch(route.id, what === 'customer' ? { removed: [cid], totals: true } : { customers: [cid], totals: true }); }} />
                 </>} />
             )}
             {sel && panel === 'pay' && (
@@ -641,10 +671,10 @@ export default function CollectorPage() {
             {panel === 'loan' && route.policy && (
               <LoanForm routeId={route.id} today={route.today} policy={route.policy} canInterest={!!route.can_interest}
                 canCustomers={route.can_customers !== false} fmt={fmt}
-                onDone={async (text, ok) => { flash(ok, text); setPanel(null); await refresh(); }} />
+                onDone={async (text, ok, customerId) => { flash(ok, text); setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
             )}
             {panel === 'settle' && fund !== null && <PeriodSheet route={route} fmt={fmt} fund={fund} online={online}
-              onChanged={async (text) => { flash(true, text); await refresh(); }} onError={(text) => flash(false, text)} />}
+              onChanged={async (text) => { flash(true, text); await patch(route.id, { totals: true }); }} onError={(text) => flash(false, text)} />}
             {panel === 'settle' && fund === null && (
               <SettleSheet route={route} fmt={fmt} online={online} pending={pendingRoute}
                 onClosed={async () => { await refresh(); flash(true, t('col.settled')); setPanel(null); }} />
@@ -678,7 +708,7 @@ function Dot({ r }: { r?: string }) {
 }
 
 /** Borrar créditos o al cliente: solo si el administrador lo permitió en los ajustes de la ruta */
-function DeleteActions({ c, canCredits, canCustomer, online, onDone }: { c: Customer; canCredits: boolean; canCustomer: boolean; online: boolean; onDone: () => void }) {
+function DeleteActions({ c, canCredits, canCustomer, online, onDone }: { c: Customer; canCredits: boolean; canCustomer: boolean; online: boolean; onDone: (what: 'credit' | 'customer') => void }) {
   const { t } = useT();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -686,7 +716,7 @@ function DeleteActions({ c, canCredits, canCustomer, online, onDone }: { c: Cust
   const run = async (fn: string, args: Record<string, string>) => {
     if (!window.confirm(t('col.delConfirm'))) return;
     setBusy(true); setErr('');
-    try { await rpc(fn, args); onDone(); }
+    try { await rpc(fn, args); onDone(fn === 'collector_delete_customer' ? 'customer' : 'credit'); }
     catch (e) {
       const m = (e as Error).message;
       setErr(m.includes('CUSTOMER_HAS_DEBT') ? t('col.delDebt') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : m.includes('cobros') ? t('col.delPaid') : t('err.generic'));

@@ -26,7 +26,7 @@ const addDays = (iso: string, n: number) => { const d = new Date(iso + 'T12:00:0
 
 export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fmt, onDone }: {
   routeId: string; today: string; policy: LoanPolicy; canInterest: boolean; canCustomers: boolean;
-  fmt: (n: number) => string; onDone: (text: string, ok: boolean) => void;
+  fmt: (n: number) => string; onDone: (text: string, ok: boolean, customerId?: string) => void;
 }) {
   const { t, lang } = useT();
   const [customers, setCustomers] = useState<RouteCustomer[]>([]);
@@ -77,7 +77,7 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
       });
       onDone(r.approval === 'pending_supervisor'
         ? t('loan.pending', { reasons: r.reasons.map((x) => t(`loan.r.${x}` as DictKey)).join(', ') })
-        : t('loan.created', { amount: fmt(p) }), true);
+        : t('loan.created', { amount: fmt(p) }), true, customer ?? undefined);
     } catch (e) {
       const m = (e as Error).message;
       setErr(m.includes('LOAN_INTEREST_LOCKED') ? t('loan.e.interest') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm')

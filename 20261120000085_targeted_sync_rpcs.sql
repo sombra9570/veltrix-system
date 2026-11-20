@@ -1,0 +1,4 @@
+-- Documentación (aplicada vía MCP): sincronización puntual.
+--  * _route_actor(route): valida cobrador / supervisor / administrador de la ruta.
+--  * collector_customer_row(route, customer): una sola fila de cliente (misma forma que collector_day) + sup_rating.
+--  * collector_route_totals(route): solo cifras de la ruta (caja, periodo, días, liquidaciones, cartera, bloqueo).
