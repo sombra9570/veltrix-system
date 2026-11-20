@@ -2113,7 +2113,7 @@ const fr: Record<DictKey, string> = {
   "sp.noteSaved": "✅ Note enregistrée dans le rapport.",
   "sp.rateCollector": "Évaluer le collecteur",
   "sp.finish": "Tournée supervisée",
-  "sp.finishConfirm": "Le rapport de toutes vos actions sera envoyé à l'administrateur et le collecteur sera débloqué. Terminer la supervision ?",
+  "sp.finishConfirm": "Le rapport de toutes vos actions sera envoyé à l'administrateur. Le collecteur reste bloqué jusqu'à ce que vous le débloquiez. Terminer la supervision ?",
   "sp.finished": "✅ Rapport envoyé à l'administrateur.",
   "sp.verifyCust": "Vérifier le client",
   "sp.verifyCredit": "Vérifier les montants",

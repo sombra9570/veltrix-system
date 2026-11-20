@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
-import { rpc } from '../../../lib/supabase';
+import { rpc, supabase } from '../../../lib/supabase';
 import { Card, useHeaderSlot } from '../shell';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
@@ -164,7 +164,12 @@ export default function SupPanel() {
             <MenuTile icon="receipt" label={t('nav.routeInfo')} tone="plain" onClick={() => setScreen('info')} />
             {d.can_liquidate && <MenuTile icon="refresh" label={t('rt.liq')} tone="amber" onClick={() => setScreen('liq')} />}
             <MenuTile icon="sliders" label={d.locked ? t('sp.unlock') : t('sp.lock')} tone="plain" disabled={busy}
-              onClick={() => run(() => rpc('sup_set_lock', { p_route: rid, p_lock: !d.locked }))} />
+              onClick={() => run(async () => {
+                await rpc('sup_set_lock', { p_route: rid, p_lock: !d.locked });
+                // Aviso en vivo al cobrador: su teléfono se actualiza al instante
+                const ch = supabase.channel(`route-lock:${rid}`);
+                ch.subscribe((st) => { if (st === 'SUBSCRIBED') void ch.send({ type: 'broadcast', event: 'lock', payload: {} }).finally(() => { void supabase.removeChannel(ch); }); });
+              })} />
             <MenuTile icon="clock" label={t('sp.notes')} tone="plain" onClick={() => setScreen('notes')} />
             <MenuTile icon="wallet" label={t('sp.rateCollector')} tone="plain" onClick={() => setScreen('rate')} />
           </div>

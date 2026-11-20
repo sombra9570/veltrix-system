@@ -2122,7 +2122,7 @@ const es = {
   "sp.noteSaved": "✅ Nota guardada en el reporte.",
   "sp.rateCollector": "Calificar cobrador",
   "sp.finish": "Ruta supervisada",
-  "sp.finishConfirm": "Se enviará al administrador el reporte con todas tus acciones y el cobrador se desbloqueará. ¿Terminar la supervisión?",
+  "sp.finishConfirm": "Se enviará al administrador el reporte con todas tus acciones. El bloqueo del cobrador NO se quita: solo lo quitas tú con Desbloquear. ¿Terminar la supervisión?",
   "sp.finished": "✅ Reporte enviado al administrador.",
   "sp.verifyCust": "Verificar cliente",
   "sp.verifyCredit": "Verificar montos de créditos",

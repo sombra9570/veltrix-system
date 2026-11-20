@@ -1,0 +1,3 @@
+-- Documentación (aplicada vía MCP):
+--  * sup_finish ya NO desbloquea la ruta: el bloqueo dura hasta que el supervisor pulsa Desbloquear.
+--  * sup_set_lock deja un aviso (route_notices kind lock/unlock) para el cobrador.

@@ -2113,7 +2113,7 @@ const ja: Record<DictKey, string> = {
   "sp.noteSaved": "✅ メモを報告に保存しました。",
   "sp.rateCollector": "集金担当を評価",
   "sp.finish": "ルート監督完了",
-  "sp.finishConfirm": "全操作の報告が管理者に送信され、集金担当のロックが解除されます。監督を終了しますか？",
+  "sp.finishConfirm": "全操作の報告が管理者に送信されます。集金担当は、あなたが解除するまでロックされたままです。監督を終了しますか？",
   "sp.finished": "✅ 管理者に報告を送信しました。",
   "sp.verifyCust": "顧客を確認",
   "sp.verifyCredit": "クレジット金額を確認",

@@ -2113,7 +2113,7 @@ const it: Record<DictKey, string> = {
   "sp.noteSaved": "✅ Nota salvata nel rapporto.",
   "sp.rateCollector": "Valuta incassatore",
   "sp.finish": "Giro supervisionato",
-  "sp.finishConfirm": "Il rapporto con tutte le tue azioni sarà inviato all'amministratore e l'incassatore sarà sbloccato. Terminare la supervisione?",
+  "sp.finishConfirm": "Il rapporto con tutte le tue azioni sarà inviato all'amministratore. L'incassatore resta bloccato finché non lo sblocchi. Terminare la supervisione?",
   "sp.finished": "✅ Rapporto inviato all'amministratore.",
   "sp.verifyCust": "Verifica cliente",
   "sp.verifyCredit": "Verifica importi dei crediti",

@@ -2113,7 +2113,7 @@ const pt: Record<DictKey, string> = {
   "sp.noteSaved": "✅ Nota salva no relatório.",
   "sp.rateCollector": "Avaliar cobrador",
   "sp.finish": "Rota supervisionada",
-  "sp.finishConfirm": "O relatório com todas as suas ações será enviado ao administrador e o cobrador será desbloqueado. Concluir a supervisão?",
+  "sp.finishConfirm": "O relatório com todas as suas ações será enviado ao administrador. O cobrador continua bloqueado até você desbloqueá-lo. Concluir a supervisão?",
   "sp.finished": "✅ Relatório enviado ao administrador.",
   "sp.verifyCust": "Verificar cliente",
   "sp.verifyCredit": "Verificar valores dos créditos",

@@ -2113,7 +2113,7 @@ const de: Record<DictKey, string> = {
   "sp.noteSaved": "✅ Notiz im Bericht gespeichert.",
   "sp.rateCollector": "Inkassant bewerten",
   "sp.finish": "Route beaufsichtigt",
-  "sp.finishConfirm": "Der Bericht mit allen Aktionen geht an den Administrator, der Inkassant wird entsperrt. Aufsicht beenden?",
+  "sp.finishConfirm": "Der Bericht mit allen Aktionen geht an den Administrator. Der Inkassant bleibt gesperrt, bis Sie ihn entsperren. Aufsicht beenden?",
   "sp.finished": "✅ Bericht an den Administrator gesendet.",
   "sp.verifyCust": "Kunden prüfen",
   "sp.verifyCredit": "Kreditbeträge prüfen",

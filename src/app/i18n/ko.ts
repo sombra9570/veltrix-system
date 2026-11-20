@@ -2113,7 +2113,7 @@ const ko: Record<DictKey, string> = {
   "sp.noteSaved": "✅ 메모가 보고서에 저장되었습니다.",
   "sp.rateCollector": "수금원 평가",
   "sp.finish": "경로 감독 완료",
-  "sp.finishConfirm": "모든 작업 보고서가 관리자에게 전송되고 수금원 잠금이 해제됩니다. 감독을 끝낼까요?",
+  "sp.finishConfirm": "모든 작업 보고서가 관리자에게 전송됩니다. 수금원은 직접 잠금 해제할 때까지 잠긴 상태로 유지됩니다. 감독을 끝낼까요?",
   "sp.finished": "✅ 보고서가 관리자에게 전송되었습니다.",
   "sp.verifyCust": "고객 확인",
   "sp.verifyCredit": "대출 금액 확인",

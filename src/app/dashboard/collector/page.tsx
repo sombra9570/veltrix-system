@@ -1,7 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { rpc } from '../../../lib/supabase';
+import { rpc, supabase } from '../../../lib/supabase';
 import { Card, useHeaderSlot } from '../shell';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
@@ -255,17 +255,16 @@ export default function CollectorPage() {
   // El día completo se vuelve a descargar unas 5 veces al día o con el botón ↻
   useSync(refresh);
 
-  // El bloqueo/desbloqueo del supervisor se refleja solo: revisa cada 20 s (visible y con señal) y al volver a la app
+  // Bloqueo/desbloqueo: el supervisor lo aplica una vez y avisa por un canal en vivo (sin consultas periódicas).
+  // Al llegar el aviso se descarga el día una sola vez y se ve el cambio al instante.
+  const routeKey = (day?.routes ?? []).map((r) => r.id).join(',');
   useEffect(() => {
-    const tick = () => {
-      if (document.visibilityState !== 'visible' || !navigator.onLine) return;
-      if (load<Op[]>(QUEUE_KEY, []).length > 0) void flush(true); else void refresh();
-    };
-    const id = setInterval(tick, 20_000);
-    document.addEventListener('visibilitychange', tick);
-    window.addEventListener('focus', tick);
-    return () => { clearInterval(id); document.removeEventListener('visibilitychange', tick); window.removeEventListener('focus', tick); };
-  }, [flush, refresh, QUEUE_KEY]);
+    if (!routeKey) return;
+    const chans = routeKey.split(',').map((id) => supabase.channel(`route-lock:${id}`)
+      .on('broadcast', { event: 'lock' }, () => { void refresh(); })
+      .subscribe());
+    return () => { chans.forEach((c) => { void supabase.removeChannel(c); }); };
+  }, [routeKey, refresh]);
 
   const enqueue = (op: Op) => {
     const next = [...load<Op[]>(QUEUE_KEY, []), op];

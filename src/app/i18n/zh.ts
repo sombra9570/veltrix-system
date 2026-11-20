@@ -2113,7 +2113,7 @@ const zh: Record<DictKey, string> = {
   "sp.noteSaved": "✅ 备注已保存到报告。",
   "sp.rateCollector": "评价收款员",
   "sp.finish": "路线已监督",
-  "sp.finishConfirm": "将向管理员发送包含您所有操作的报告，并解锁收款员。结束监督？",
+  "sp.finishConfirm": "将向管理员发送包含您所有操作的报告。收款员保持锁定，直到您手动解锁。结束监督？",
   "sp.finished": "✅ 报告已发送给管理员。",
   "sp.verifyCust": "核实客户",
   "sp.verifyCredit": "核实贷款金额",

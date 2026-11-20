@@ -2113,7 +2113,7 @@ const en: Record<DictKey, string> = {
   "sp.noteSaved": "✅ Note saved in the report.",
   "sp.rateCollector": "Rate collector",
   "sp.finish": "Route supervised",
-  "sp.finishConfirm": "The report with all your actions will be sent to the administrator and the collector will be unlocked. Finish supervision?",
+  "sp.finishConfirm": "The report with all your actions will be sent to the administrator. The collector stays locked until you unlock them. Finish supervision?",
   "sp.finished": "✅ Report sent to the administrator.",
   "sp.verifyCust": "Verify customer",
   "sp.verifyCredit": "Verify credit amounts",
