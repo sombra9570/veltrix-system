@@ -993,7 +993,7 @@ const es = {
   "ref.rules": "El mes gratis se suma cuando el negocio invitado hace su primer pago. No hay límite de invitados.",
   "ref.invitedBanner": "Te invitó otro negocio: tienes 30 días gratis en vez de 14.",
   "ref.subtitle2": "Recomienda Veltrix: el negocio que invitas prueba 30 días gratis y tú ganas descuentos cada vez que uno empieza a pagar.",
-  "ref.step3b": "Cuando empieza a pagar, ganas un descuento en tu próximo pago: 15 %, 20 % y 30 %. Desde el 4.º, un usuario extra.",
+  "ref.step3b": "Cuando empieza a pagar, ganas un descuento en tu próximo pago: 15 %, 20 % y 30 %. Del 4.º en adelante, también 30 %.",
   "ref.pending": "Descuento pendiente",
   "ref.tiersTitle": "Tus premios",
   "ref.tierN": "Invitado n.º {n} que paga",

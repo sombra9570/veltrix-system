@@ -129,3 +129,9 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Registro: casilla obligatoria "Acepto Términos y Privacidad"; al crear la empresa se llama `accept_terms('2026-11')` y queda `organizations.accepted_terms_at` + `terms_version`.
 - Panel IA: aviso "verifica las cifras con tu contador" en los 12 idiomas.
 - Falta: textos legales con precios reales ($12/$25/$49/$129/$235) y revisión de abogado (Bolivia y Colombia, Ley 1581).
+
+## Referidos solo con descuento y tope de extras (20 nov, migración 089)
+- Premios por invitado que paga: 15 %, 20 %, 30 % y del 4.º en adelante 30 % otra vez. Se quitaron los usuarios de regalo.
+- Usuarios extra comprables por plan: Startup 1, Empresa 3, Enterprise 5, Enterprise Plus 25 (antes 15). Básico no tiene.
+- Precio del extra = precio del plan / límite + 2 USD (se ajusta solo al cambiar precios de planes).
+- Pendiente de decidir: nuevos precios de planes (propuesta: $13/$25/$55/$145/$265 local) y textos legales.

@@ -984,7 +984,7 @@ const pt: Record<DictKey, string> = {
   "ref.rules": "O mês grátis é somado quando o negócio convidado faz o primeiro pagamento. Sem limite de convidados.",
   "ref.invitedBanner": "Outro negócio te convidou: você tem 30 dias grátis em vez de 14.",
   "ref.subtitle2": "Indique o Veltrix: o negócio convidado testa 30 dias grátis e você ganha descontos cada vez que um começa a pagar.",
-  "ref.step3b": "Quando começar a pagar, você ganha desconto no próximo pagamento: 15%, 20% e 30%. A partir do 4º, um usuário extra.",
+  "ref.step3b": "Quando começar a pagar, você ganha desconto no próximo pagamento: 15%, 20% e 30%. A partir do 4º, 30% de novo.",
   "ref.pending": "Desconto pendente",
   "ref.tiersTitle": "Seus prêmios",
   "ref.tierN": "Convidado nº {n} que paga",

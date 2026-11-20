@@ -984,7 +984,7 @@ const de: Record<DictKey, string> = {
   "ref.rules": "Der Gratismonat kommt mit der ersten Zahlung des eingeladenen Geschäfts. Unbegrenzt viele Einladungen.",
   "ref.invitedBanner": "Ein anderes Geschäft hat Sie eingeladen: 30 statt 14 Tage gratis.",
   "ref.subtitle2": "Empfehlen Sie Veltrix: Eingeladene testen 30 Tage gratis, Sie erhalten Rabatte, sobald jemand zahlt.",
-  "ref.step3b": "Sobald sie zahlen, erhalten Sie Rabatt auf Ihre nächste Zahlung: 15 %, 20 %, 30 %. Ab dem 4. einen zusätzlichen Benutzer.",
+  "ref.step3b": "Sobald sie zahlen, erhalten Sie Rabatt auf Ihre nächste Zahlung: 15 %, 20 %, 30 %. Ab dem 4. erneut 30 %.",
   "ref.pending": "Offener Rabatt",
   "ref.tiersTitle": "Ihre Prämien",
   "ref.tierN": "{n}. zahlender Kunde",

@@ -84,12 +84,12 @@ export default function InvitePage() {
           </div>
           <h2 className="mb-2 mt-5 text-sm font-bold">{t('ref.tiersTitle')}</h2>
           <ul className="grid grid-cols-2 gap-2 text-sm">
-            {[[1, '15%'], [2, '20%'], [3, '30%'], [4, t('ref.tier4')]].map(([n, prize]) => {
+            {[[1, '15%'], [2, '20%'], [3, '30%'], [4, '30%']].map(([n, prize]) => {
               const done = (d?.paying ?? 0) >= Number(n);
               return (
                 <li key={n} className={`rounded-xl border p-2.5 ${done ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-500/30 dark:bg-emerald-500/10' : 'border-slate-200 dark:border-slate-800'}`}>
                   <p className={`text-xs ${ui.muted}`}>{Number(n) < 4 ? t('ref.tierN', { n }) : t('ref.tierMore')}</p>
-                  <p className="font-extrabold">{done ? '✓ ' : ''}{Number(n) < 4 ? t('ref.tierOff', { pct: prize }) : prize}</p>
+                  <p className="font-extrabold">{done ? '✓ ' : ''}{t('ref.tierOff', { pct: prize })}</p>
                 </li>
               );
             })}

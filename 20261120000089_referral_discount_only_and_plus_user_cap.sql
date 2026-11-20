@@ -1,0 +1,4 @@
+-- 089: referidos solo con descuento (15/20/30 %, y 30 % del 4.º en adelante; sin usuarios de regalo)
+--      y tope de usuarios extra de Enterprise Plus 15 -> 25. Ver reward_referrer() y plan_addon_cap() en producción.
+-- Extras por plan (ya existentes): usuarios extra starter 1, pro 3, enterprise 5, enterprise_plus 25; sucursales extra enterprise 1, plus 2.
+-- Precio del extra = precio del plan / límite del plan + 2 USD (plan_addon_price), así se ajusta solo al cambiar precios.

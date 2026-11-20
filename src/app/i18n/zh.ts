@@ -984,7 +984,7 @@ const zh: Record<DictKey, string> = {
   "ref.rules": "受邀商家首次付款时即获得免费月，邀请数量不限。",
   "ref.invitedBanner": "另一家商家邀请了你：免费 30 天（而非 14 天）。",
   "ref.subtitle2": "推荐 Veltrix：受邀商家免费试用 30 天，每有一家开始付费，你就获得折扣。",
-  "ref.step3b": "对方开始付费后，你的下次付款享受折扣：15%、20%、30%。从第 4 家起，增加 1 个用户名额。",
+  "ref.step3b": "对方开始付费后，你的下次付款享受折扣：15%、20%、30%。从第 4 家起同样是 30%。",
   "ref.pending": "待用折扣",
   "ref.tiersTitle": "你的奖励",
   "ref.tierN": "第 {n} 家付费",
