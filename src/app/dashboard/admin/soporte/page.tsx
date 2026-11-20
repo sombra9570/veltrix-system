@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useVeltrixAuth } from '../../../auth-system';
 import { rpc, supabase } from '../../../../lib/supabase';
 import { Spinner } from '../../../spinner';
+import { useLiveTopic } from '../../live';
 
 type Ticket = { id: string; subject: string; status: 'open' | 'answered' | 'closed'; priority: string; updated_at: string; assigned_to: string | null; assigned_name: string | null; org: string | null; plan: string | null; mine: boolean };
 type Thread = {
@@ -288,7 +289,10 @@ function ChatTab() {
     if (!who) return;
     try { setList((await rpc<Chat[]>('platform_chat_list', { p_with: who })) ?? []); } catch (e) { setMsg(err(e)); }
   }, [who]);
-  useEffect(() => { load(); const i = setInterval(load, 8000); return () => clearInterval(i); }, [load]);
+  useEffect(() => { load(); }, [load]);
+  const [uid, setUid] = useState<string | null>(null);
+  useEffect(() => { supabase.auth.getSession().then(({ data }) => setUid(data.session?.user.id ?? null)); }, []);
+  useLiveTopic(uid ? `plat:${uid}` : null, load);
 
   const send = async () => {
     if (!text.trim() || !who) return;

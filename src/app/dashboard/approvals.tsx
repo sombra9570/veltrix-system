@@ -5,6 +5,7 @@ import { Card } from './shell';
 import { ui } from '../site-header';
 import { useT } from '../i18n';
 import { money } from './format';
+import { useLive } from './live';
 
 type Req = { id: string; kind: string; amount: number | null; reason: string; at: string; by: string | null; branch: string; currency: string | null; notes: string | null };
 
@@ -18,7 +19,8 @@ export function ApprovalsTray() {
   const load = useCallback(() => {
     rpc<Req[]>('approvals_list').then((r) => setRows(r ?? [])).catch(() => setRows([]));
   }, []);
-  useEffect(() => { load(); const id = setInterval(load, 60000); return () => clearInterval(id); }, [load]);
+  useEffect(() => { load(); }, [load]);
+  useLive('approvals', load);
 
   const decide = async (r: Req, approve: boolean) => {
     const note = approve ? '' : (window.prompt(t('appr.rejectWhy')) ?? '');

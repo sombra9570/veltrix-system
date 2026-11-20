@@ -7,6 +7,7 @@ import { useSync } from './sync';
 import { useT } from '../i18n';
 import { money } from './format';
 import { QrImage, downloadQr } from './qr-image';
+import { useLive } from './live';
 
 type Req = {
   id: string; table: string; at: string; notes: string | null; customer: string | null; pay_pref: 'qr' | 'cash';
@@ -27,7 +28,8 @@ export function QrRequests({ branchId, currency, onChanged, flash }: {
     try { setList(await rpc<Req[]>('table_requests_list', { p_branch: branchId }) ?? []); } catch { /* sin conexión */ }
   }, [branchId]);
   useEffect(() => { load(); }, [load]);
-  useSync(load, 8_000);
+  useSync(load, 0);
+  useLive('tables', load);
 
   const accept = async (r: Req, pay: 'qr' | 'cash') => {
     setBusy(r.id);

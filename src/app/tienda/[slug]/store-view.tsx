@@ -59,8 +59,9 @@ export function StoreView({ slug }: { slug: string }) {
       setDStatus(s);
     };
     tick();
-    const id = setInterval(() => { if (document.visibilityState === 'visible') tick(); }, 6000);
-    return () => { stop = true; clearInterval(id); };
+    const ch = supabase.channel(`req:${dReq}`).on('broadcast', { event: 'ping' }, () => { if (document.visibilityState === 'visible') tick(); }).subscribe();
+    const id = setInterval(() => { if (document.visibilityState === 'visible') tick(); }, 90_000);
+    return () => { stop = true; clearInterval(id); void supabase.removeChannel(ch); };
   }, [dReq, DREQ_KEY]);
   useEffect(() => { try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch { /* */ } }, [cart, CART_KEY]);
 

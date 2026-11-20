@@ -51,8 +51,10 @@ export function TableMenu({ token }: { token: string }) {
       setStatus(s);
     };
     tick();
-    const id = setInterval(() => { if (document.visibilityState === 'visible') tick(); }, 5000);
-    return () => { stop = true; clearInterval(id); };
+    // Aviso en vivo cuando el local cambia el estado; el reloj lento es solo un respaldo
+    const ch = supabase.channel(`req:${reqId}`).on('broadcast', { event: 'ping' }, () => { if (document.visibilityState === 'visible') tick(); }).subscribe();
+    const id = setInterval(() => { if (document.visibilityState === 'visible') tick(); }, 90_000);
+    return () => { stop = true; clearInterval(id); void supabase.removeChannel(ch); };
   }, [reqId, token, REQ_KEY]);
 
   // Si caja pidió pagar por QR, trae la imagen del QR del negocio

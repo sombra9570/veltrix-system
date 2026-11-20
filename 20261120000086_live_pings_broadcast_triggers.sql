@@ -1,0 +1,7 @@
+-- Documentación (ya aplicada por MCP): avisos en vivo por Realtime en vez de consultas por reloj.
+-- Triggers live_ping / live_ping_req / live_ping_plat emiten realtime.send en los temas:
+--   org:<org>:tables | delivery | dispatch | approvals | chat   (personal)
+--   req:<id>   (cliente público: estado de su pedido)
+--   plat:<user> (chat de soporte de la plataforma)
+-- Tablas: orders, order_items, table_requests, delivery_requests, approval_requests, chat_messages, platform_messages.
+-- Un aviso perdido nunca frena la operación (exception when others then null).

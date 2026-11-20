@@ -9,6 +9,7 @@ import type { DictKey } from '../i18n/es';
 import { money, parseAmount } from './format';
 import { QrRequests, TableQrCard } from './table-qr';
 import { DeliveryRequests, DeliveryBoard, DeliverySetup, CashReceive, CourierBoard } from './delivery';
+import { useLive } from './live';
 
 type Branch = { id: string; name: string; company: string; currency: string };
 type Table = {
@@ -59,7 +60,8 @@ export function TablesScreen({ manage = false }: { manage?: boolean }) {
     loadBoard();
   }, [loadBoard]);
   // Mesas en vivo, pero solo con la pantalla visible
-  useSync(() => { loadBoard(); if (order?.id) loadOrder(order.id); }, 20_000);
+  useSync(() => { loadBoard(); if (order?.id) loadOrder(order.id); }, 0);
+  useLive('tables', () => { loadBoard(); if (order?.id) loadOrder(order.id); });
 
   const openTable = async (tb: Table) => {
     try {
@@ -465,7 +467,8 @@ export function KitchenScreen() {
   useEffect(() => {
     load();
   }, [load]);
-  useSync(load, 15_000);
+  useSync(load, 0);
+  useLive('tables', load);
 
   const move = async (it: KItem) => {
     const next = it.kitchen_status === 'pending' ? 'preparing' : it.kitchen_status === 'preparing' ? 'ready' : 'served';

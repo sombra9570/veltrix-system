@@ -10,6 +10,7 @@ import { useT } from '../i18n';
 import { useSync, SyncButton, NetBanner } from './sync';
 import { loadAuth } from '../auth-system';
 import type { DictKey } from '../i18n/es';
+import { useLive } from './live';
 
 /** Un ítem del menú puede pedir uno o varios módulos ("a,b" = basta con uno) */
 export const navHas = (modules: string[] | null, need?: string) =>
@@ -131,8 +132,9 @@ export function AppShell({
   // Mensajes sin leer del equipo (insignia en "Mensajes")
   const loadUnread = () => rpc<number>('chat_unread_total').then((n) => setUnread(n ?? 0)).catch(() => {});
   useEffect(() => { loadUnread(); }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
-  useSync(loadUnread, 5 * 60_000);
-  useSync(loadAuth);
+  useSync(loadUnread, 0);
+  useLive('chat', loadUnread);
+  useSync(loadAuth, 0);
 
   // Menú móvil: se cierra con Escape y no deja mover la página de fondo
   useEffect(() => {

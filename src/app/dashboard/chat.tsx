@@ -7,6 +7,7 @@ import { useSync } from './sync';
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 import { compressImage, extFor } from './image';
+import { useLive } from './live';
 
 type Channel = { id: string; kind: 'announce' | 'branch' | 'direct'; name: string | null; can_post: boolean; last_at: string | null; last: string | null; unread: number };
 type Msg = { id: string; at: string; body: string | null; photo: string | null; sender_id: string; sender: string; client_id: string | null; pending?: boolean };
@@ -56,7 +57,8 @@ export function ChatScreen() {
   useEffect(() => {
     loadChannels();
   }, [loadChannels]);
-  useSync(loadChannels, 5 * 60_000);
+  useSync(loadChannels, 0);
+  useLive('chat', loadChannels);
 
   // Enlaces temporales para ver fotos privadas
   const signPhotos = useCallback(async (list: Msg[]) => {

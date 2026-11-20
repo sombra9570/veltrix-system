@@ -39,7 +39,7 @@ if (typeof window !== 'undefined') {
 }
 
 /** Registra un cargador. No lo ejecuta al montar (eso lo hace la pantalla); sí ~5 veces al día y al sincronizar. */
-export function useSync(load: Loader, every: number = AUTO_EVERY) {
+export function useSync(load: Loader, every: number = 0) {
   const ref = useRef<Loader>(load);
   ref.current = load;
   useEffect(() => {

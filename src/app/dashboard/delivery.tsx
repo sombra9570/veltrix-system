@@ -13,6 +13,7 @@ import { compressImage } from './image';
 import { PhotoPicker } from './photo-picker';
 import { QrRequests } from './table-qr';
 import Link from 'next/link';
+import { useLive } from './live';
 
 type Flash = (ok: boolean, text: string) => void;
 type Req = {
@@ -43,7 +44,8 @@ export function DeliveryRequests({ branchId, currency, onChanged, flash }: {
     try { setList(await rpc<Req[]>('delivery_requests_list', { p_branch: branchId }) ?? []); } catch { /* sin conexión o sin permiso */ }
   }, [branchId]);
   useEffect(() => { load(); }, [load]);
-  useSync(load, 8_000);
+  useSync(load, 0);
+  useLive('delivery', load);
 
   const accept = async (r: Req) => {
     setBusy(r.id);
@@ -116,7 +118,8 @@ export function DeliveryBoard({ branchId, currency, flash, showEmpty = false, dr
     if (!branchId) return;
     rpc<{ id: string; name: string }[]>('delivery_drivers', { p_branch: branchId }).then((d) => setDrivers(d ?? [])).catch(() => setDrivers(null));
   }, [branchId]);
-  useSync(load, 10_000);
+  useSync(load, 0);
+  useLive('delivery', load);
 
   const setStatus = async (o: Del, st: 'dispatched' | 'delivered' | 'failed') => {
     let collected: number | null = null;
@@ -368,7 +371,8 @@ export function CashReceive({ branchId, currency, flash, onChanged }: { branchId
     try { setList(await rpc<Row[]>('delivery_cash_list', { p_branch: branchId }) ?? []); } catch { /* */ }
   }, [branchId]);
   useEffect(() => { load(); }, [load]);
-  useSync(load, 10_000);
+  useSync(load, 0);
+  useLive('delivery', load);
   const receive = async (r: Row) => {
     const n = parseAmount(val[r.order_id] ?? String(r.amount));
     if (!Number.isFinite(n) || n < 0) return;
@@ -454,7 +458,8 @@ export function CourierBoard({ branchId, orgId, currency, flash, manager = false
     try { setList(await rpc<Task[]>('courier_tasks_list', { p_branch: branchId, p_done: tab === 'done' }) ?? []); } catch { /* */ }
   }, [branchId, tab]);
   useEffect(() => { load(); }, [load]);
-  useSync(load, 12_000);
+  useSync(load, 0);
+  useLive('delivery', load);
   const urls = useSignedUrls(list.map((x) => x.receipt).filter((x): x is string => !!x));
 
   const create = async (e: React.FormEvent) => {

@@ -5,6 +5,7 @@ import { Card } from './shell';
 import { ui } from '../site-header';
 import { useT } from '../i18n';
 import { money } from './format';
+import { useLive } from './live';
 
 type MBranch = { id: string; name: string; company: string };
 type DOrder = {
@@ -38,12 +39,8 @@ export function DispatchScreen() {
     catch { setQ({ enabled: false, manager: false, orders: [] }); flash(false, t('err.generic')); }
   }, [branchId, done, t]);
   useEffect(() => { load(); }, [load]);
-  // Se actualiza sola cada 30 s mientras está abierta (las ventas nuevas aparecen sin recargar)
-  useEffect(() => {
-    if (done) return;
-    const id = setInterval(load, 30_000);
-    return () => clearInterval(id);
-  }, [load, done]);
+  // Las ventas nuevas aparecen por aviso en vivo, sin consultar por reloj
+  useLive('dispatch', load, !done);
 
   const toggle = async (on: boolean) => {
     setBusy('toggle');

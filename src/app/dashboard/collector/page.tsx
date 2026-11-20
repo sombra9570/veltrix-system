@@ -146,7 +146,7 @@ export default function CollectorPage() {
   const flushing = useRef(false);
   // Acciones hechas desde la última descarga completa: al pasar el límite (app muy cargada) se reconcilia con el servidor
   const sinceSync = useRef(0);
-  const RECONCILE_EVERY = 25;
+  const RECONCILE_EVERY = 100;
 
   const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 5000); };
   // Borrar cuota (revertir un cobro): solo con señal y si el administrador lo permitió en la ruta
