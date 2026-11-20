@@ -106,3 +106,9 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Pantalla principal con resumen (inversión, caja anterior/actual, cobrado y prestado día/semana, gastos, cartera si hay permiso) y botones: cercanos (100 m), lista, pendientes, cliente nuevo, crédito nuevo, gastos, ajustes, liquidar.
 - Migración 071 (columnas de garante, avisos de ruta, permisos collector.portfolio y collector.settings).
 - Falta: verificar en pantalla con una "Ruta prueba" asignada a Diego; interfaz del administrador para enviar avisos (RPC admin_route_notice ya existe); push real.
+
+## Panel del administrador de cobranza (hecho, falta probar con datos)
+- Menú: "Rutas de cobro" desplegable con rutas activas; pantalla de ruta con Lista de clientes, Clientes en mapa, Información, Liquidar y Ajustes (permisos por ruta, migración 075).
+- Reportes: liquidaciones anteriores + reportes del supervisor (RPC supervisor_report existe; falta el botón de enviar en el panel del supervisor).
+- Permisos: sin topes, vendedor, contador ni excepciones por persona; cajero = "Liquidador" (permisos por definir).
+- Pendiente: probar con 3 clientes de prueba (diario/semanal/mensual), panel del supervisor con inicio y barra integrada, bloque Supervisor en Permisos.
