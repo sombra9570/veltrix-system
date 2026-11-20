@@ -15,7 +15,7 @@ type Store = { id: string; company_id: string; branch_id: string; slug: string; 
 type Admin = {
   perms?: { photo: boolean; publish: boolean; edit: boolean }; store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
 
-import { STORE_THEMES, ADMIN_BGS } from '../../../store-theme';
+import { COLOR_GRID, resolveAdminBg } from '../../../store-theme';
 const BUCKET = 'store-images';
 const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
 const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
@@ -200,7 +200,7 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
   const showForm = pe && (editing || !data.store.whatsapp);
   const published = data.products.filter((p) => p.in_store).length;
   const logo = storeImageUrl(data.store.logo_path);
-  const abg = ADMIN_BGS[data.store.admin_bg ?? 'none'] ?? ADMIN_BGS.none;
+  const abg = resolveAdminBg(data.store.admin_bg);
   const setLook = async (theme: string, bg: string) => {
     setBusy(true);
     try { await rpc('set_store_look', { p_company: companyId, p_theme: theme, p_admin_bg: bg }); await load(); }
@@ -289,26 +289,29 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
       {showForm && pe && (
         <Card className="space-y-4">
           <h2 className="font-bold">🎨 {t('store.look')}</h2>
-          <div>
-            <p className={ui.label}>{t('store.lookPublic')}</p>
-            <div className="flex flex-wrap gap-3">
-              {Object.entries(STORE_THEMES).map(([id, c]) => (
-                <button key={id} type="button" disabled={busy} aria-label={id} title={id} onClick={() => setLook(id, data.store.admin_bg ?? 'none')}
-                  className={`h-10 w-10 rounded-full border-2 cursor-pointer transition ${(data.store.theme ?? 'ocean') === id ? 'scale-110 border-slate-900 ring-2 ring-offset-2 ring-slate-400 dark:border-white' : 'border-white dark:border-slate-700'}`}
-                  style={{ background: `linear-gradient(135deg, ${c.a} 60%, ${c.h})` }} />
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className={ui.label}>{t('store.lookAdmin')}</p>
-            <div className="flex flex-wrap gap-3">
-              {Object.entries(ADMIN_BGS).map(([id, c]) => (
-                <button key={id} type="button" disabled={busy} aria-label={id} title={id} onClick={() => setLook(data.store.theme ?? 'ocean', id)}
-                  className={`h-10 w-10 rounded-xl border-2 cursor-pointer transition ${(data.store.admin_bg ?? 'none') === id ? 'scale-110 border-slate-900 ring-2 ring-offset-2 ring-slate-400 dark:border-white' : 'border-slate-300 dark:border-slate-600'}`}
-                  style={{ background: id === 'none' ? 'repeating-linear-gradient(45deg,#e2e8f0 0 4px,#fff 4px 8px)' : c.l }} />
-              ))}
-            </div>
-          </div>
+          {([['store.lookPublic', 'theme', data.store.theme ?? '#2563eb'], ['store.lookAdmin', 'bg', data.store.admin_bg ?? 'none']] as const).map(([label, kind, cur]) => {
+            const pick = (c: string) => (kind === 'theme' ? setLook(c, data.store.admin_bg ?? 'none') : setLook(data.store.theme ?? 'ocean', c));
+            const curHex = /^#/.test(cur) ? cur.toLowerCase() : '';
+            return (
+              <div key={kind} className="space-y-2">
+                <p className={ui.label}>{t(label)}</p>
+                <div className="inline-grid gap-1" style={{ gridTemplateColumns: `repeat(${COLOR_GRID[0].length}, minmax(0, 1fr))` }}>
+                  {COLOR_GRID.flat().map((c) => (
+                    <button key={c} type="button" disabled={busy} aria-label={c} title={c} onClick={() => pick(c)}
+                      className={`h-8 w-8 cursor-pointer rounded-md border transition sm:h-9 sm:w-9 ${curHex === c ? 'scale-110 border-2 border-slate-900 ring-2 ring-slate-400 dark:border-white' : 'border-black/10'}`}
+                      style={{ background: c }} />
+                  ))}
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <label className={`flex items-center gap-2 text-xs font-semibold ${ui.muted}`}>
+                    🎨 {t('store.lookCustom')}
+                    <input type="color" value={curHex || '#2563eb'} disabled={busy} onChange={(e) => pick(e.target.value)} className="h-9 w-14 cursor-pointer rounded-md border border-slate-300 bg-transparent dark:border-slate-600" />
+                  </label>
+                  {kind === 'bg' && cur !== 'none' && <button type="button" disabled={busy} onClick={() => pick('none')} className={`${ui.btnGhost} !min-h-9 !px-3 !py-1 text-xs`}>✕ {t('store.lookNone')}</button>}
+                </div>
+              </div>
+            );
+          })}
           <p className={`text-xs ${ui.muted}`}>{t('store.lookHint')}</p>
         </Card>
       )}

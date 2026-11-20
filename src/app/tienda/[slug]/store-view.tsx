@@ -1,5 +1,5 @@
 'use client';
-import { STORE_THEMES } from '../../store-theme';
+import { resolveTheme } from '../../store-theme';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../../lib/supabase';
@@ -26,7 +26,9 @@ export function StoreView({ slug }: { slug: string }) {
   const [view, setView] = useState<Product | null>(null);
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
-  const th = STORE_THEMES[store?.theme ?? 'ocean'] ?? STORE_THEMES.ocean;
+  const [sel, setSel] = useState<Record<string, { size?: string; color?: string }>>({});
+  const [pMode, setPMode] = useState(false);
+  const th = resolveTheme(store?.theme);
   const CART_KEY = `vx_store_cart_${slug}`;
   const DREQ_KEY = `vx_store_dreq_${slug}`;
   const [dinfo, setDinfo] = useState<DInfo | null>(null);
@@ -77,7 +79,7 @@ export function StoreView({ slug }: { slug: string }) {
     const seen = new Set<string>();
     // Los productos con tallas y colores salen como una sola tarjeta por modelo
     const all = (store?.products ?? []).filter((p) => { if (!p.model) return true; if (seen.has(p.model)) return false; seen.add(p.model); return true; })
-      .map((p) => (p.model ? { ...p, name: p.model } : p));
+      .map((p) => (p.model ? { ...p, name: p.model, available: (store?.products ?? []).some((x) => x.model === p.model && x.available) } : p));
     return s ? all.filter((p) => p.name.toLowerCase().includes(s) || (p.description ?? '').toLowerCase().includes(s)) : all;
   }, [store, q]);
 
@@ -113,7 +115,23 @@ export function StoreView({ slug }: { slug: string }) {
     try { localStorage.setItem(DREQ_KEY, id); } catch { /* */ }
     setDStatus(null); setDReq(id); setCart([]); setOpen(false); setDMode(false);
   };
-  const dAgain = () => { try { localStorage.removeItem(DREQ_KEY); } catch { /* */ } setDReq(null); setDStatus(null); };
+  const sendPickup = async () => {
+    if (!cart.length || dBusy) return;
+    setDBusy(true); setDErr('');
+    const { data, error } = await supabase.rpc('public_store_pickup', {
+      p_slug: slug, p_items: cart.map((l) => ({ product_id: l.p.id, qty: l.qty })), p_name: name, p_phone: phone, p_notes: note, p_pay: pay,
+    });
+    setDBusy(false);
+    if (error) {
+      const m = error.message;
+      setDErr(/PRODUCT_UNAVAILABLE/.test(m) ? t('tq.errUnavailable') : /TOO_MANY/.test(m) ? t('dl.errMany') : /PHONE|DATA/.test(m) ? t('dl.errData') : t('err.generic'));
+      return;
+    }
+    try { localStorage.setItem(DREQ_KEY, data as string); localStorage.setItem(`${DREQ_KEY}_pk`, '1'); } catch { /* */ }
+    setDStatus(null); setDReq(data as string); setCart([]); setOpen(false); setPMode(false);
+  };
+  const isPickup = (() => { try { return localStorage.getItem(`${DREQ_KEY}_pk`) === '1'; } catch { return false; } })();
+  const dAgain = () => { try { localStorage.removeItem(DREQ_KEY); localStorage.removeItem(`${DREQ_KEY}_pk`); } catch { /* */ } setDReq(null); setDStatus(null); };
 
   const sendWhatsApp = () => {
     if (!store?.whatsapp || !cart.length) return;
@@ -164,6 +182,10 @@ export function StoreView({ slug }: { slug: string }) {
           ) : dStatus.status === 'rejected' ? (
             <><p className="text-5xl">🙏</p><h1 className="text-lg font-extrabold">{t('tq.rejected')}</h1>
               {dStatus.reject_reason && <p className={`text-sm ${ui.muted}`}>{dStatus.reject_reason}</p>}
+              <button type="button" onClick={dAgain} className={ui.btnPrimary}>{t('tq.again')}</button></>
+          ) : isPickup ? (
+            <><p className="text-5xl">🏬</p><h1 className="text-lg font-extrabold">{t('pk.accepted')}</h1>
+              <p className="text-xl font-extrabold">{t('tq.payTotal')}: {fmt(dStatus.total)}</p>
               <button type="button" onClick={dAgain} className={ui.btnPrimary}>{t('tq.again')}</button></>
           ) : (
             <>
@@ -216,29 +238,61 @@ export function StoreView({ slug }: { slug: string }) {
             {list.map((p) => {
               const src = storeThumbUrl(p.photo);
               const full = storeImageUrl(p.photo);
-              const qty = p.model ? 0 : cart.find((l) => l.p.id === p.id)?.qty ?? 0;
-              const from = p.model ? Math.min(...(store.products ?? []).filter((x) => x.model === p.model).map((x) => Number(x.price))) : p.price;
+              const vars = p.model ? (store.products ?? []).filter((x) => x.model === p.model) : [];
+              const sizes = [...new Set<string>(vars.map((x) => x.size).filter((x): x is string => !!x))];
+              const colors = [...new Set<string>(vars.map((x) => x.color).filter((x): x is string => !!x))];
+              const cur = sel[p.model ?? ''] ?? {};
+              const size = cur.size ?? (sizes.length === 1 ? sizes[0] : undefined);
+              const color = cur.color ?? (colors.length === 1 ? colors[0] : undefined);
+              const chosen = p.model ? vars.find((x) => (!sizes.length || x.size === size) && (!colors.length || x.color === color)) : p;
+              const qty = chosen ? cart.find((l) => l.p.id === chosen.id)?.qty ?? 0 : 0;
+              const from = p.model ? Math.min(...vars.map((x) => Number(x.price))) : p.price;
+              const chip = (on: boolean, ok: boolean) => `rounded-lg border px-2.5 py-1 text-xs font-bold cursor-pointer disabled:cursor-not-allowed disabled:line-through disabled:opacity-40 ${on ? 'border-blue-500 bg-blue-50 text-blue-600 dark:text-blue-400' : 'border-slate-300 dark:border-slate-700'} ${ok ? '' : 'opacity-40'}`;
               return (
                 <article key={p.id} className={`flex flex-col overflow-hidden rounded-2xl ${ui.card}`}>
                   <button type="button" onClick={() => setView(p)} className="relative aspect-square bg-slate-100 cursor-pointer dark:bg-slate-800">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     {src ? <img src={src} alt={p.name} loading="lazy" decoding="async" onError={(e) => { if (full && e.currentTarget.src !== full) e.currentTarget.src = full; }} className="h-full w-full object-cover" /> : <span className="grid h-full place-items-center text-4xl">{p.type === 'service' ? '🛠️' : '📦'}</span>}
-                    {!p.available && <span className="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-center text-xs font-bold text-white">{t('pos.out')}</span>}
+                    <span className={`absolute inset-x-0 bottom-0 py-1 text-center text-xs font-bold text-white ${p.available ? 'bg-emerald-600/85' : 'bg-black/60'}`}>{p.available ? `✓ ${t('shop2.inStock')}` : t('pos.out')}</span>
                   </button>
                   <div className="flex flex-1 flex-col gap-2 p-3">
                     <p className="line-clamp-2 text-sm font-semibold">{p.name}</p>
-                    <p className="mt-auto text-lg font-extrabold">{fmt(from)}</p>
-                    {qty > 0 ? (
-                      <div className="flex items-center justify-between rounded-xl border border-blue-500">
-                        <button type="button" onClick={() => change(p.id, -1)} className="h-9 w-10 text-lg font-bold cursor-pointer">−</button>
-                        <span className="font-bold">{qty}</span>
-                        <button type="button" onClick={() => change(p.id, 1)} className="h-9 w-10 text-lg font-bold cursor-pointer">+</button>
+                    <p className="text-lg font-extrabold">{p.model ? `${t('shop2.from')} ` : ''}{fmt(from)}</p>
+                    {sizes.length > 0 && (
+                      <div>
+                        <p className={`mb-1 text-[11px] font-semibold ${ui.muted}`}>{t('shop2.size')}</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {sizes.map((z) => {
+                            const ok = vars.some((x) => x.size === z && x.available && (!color || x.color === color));
+                            return <button key={z} type="button" disabled={!ok} onClick={() => setSel((m) => ({ ...m, [p.model!]: { ...cur, size: z } }))} className={chip(size === z, ok)}>{z}</button>;
+                          })}
+                        </div>
                       </div>
-                    ) : p.model ? (
-                      <button type="button" onClick={() => setView(p)} className={`${ui.btnPrimary} !py-2`}>{t('shop2.choose')}</button>
-                    ) : (
-                      <button type="button" disabled={!p.available} onClick={() => add(p)} className={`${ui.btnPrimary} !py-2`}>{t('shop2.add')}</button>
                     )}
+                    {colors.length > 0 && !(colors.length === 1 && /todos/i.test(colors[0])) && (
+                      <div>
+                        <p className={`mb-1 text-[11px] font-semibold ${ui.muted}`}>{t('shop2.color')}</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {colors.map((c) => {
+                            const ok = vars.some((x) => x.color === c && x.available && (!size || x.size === size));
+                            return <button key={c} type="button" disabled={!ok} onClick={() => setSel((m) => ({ ...m, [p.model!]: { ...cur, color: c } }))} className={chip(color === c, ok)}>{c}</button>;
+                          })}
+                        </div>
+                      </div>
+                    )}
+                    <div className="mt-auto">
+                      {qty > 0 && chosen ? (
+                        <div className="flex items-center justify-between rounded-xl border border-blue-500">
+                          <button type="button" onClick={() => change(chosen.id, -1)} className="h-9 w-10 text-lg font-bold cursor-pointer">−</button>
+                          <span className="font-bold">{qty}</span>
+                          <button type="button" disabled={!chosen.available} onClick={() => add(chosen)} className="h-9 w-10 text-lg font-bold cursor-pointer disabled:opacity-40">+</button>
+                        </div>
+                      ) : (
+                        <button type="button" disabled={!chosen || !chosen.available} onClick={() => chosen && add(chosen)} className={`${ui.btnPrimary} w-full !py-2`}>
+                          {p.model && !chosen ? t('shop2.pickVariant') : t('shop2.select')}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </article>
               );
@@ -323,9 +377,27 @@ export function StoreView({ slug }: { slug: string }) {
             </div>
             <input value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder={t('shop2.yourName')} className={ui.input} />
             <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={300} rows={2} placeholder={t('shop2.noteHint')} className={ui.input} />
+            <div className="space-y-3 rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
+              <button type="button" onClick={() => { setPMode(!pMode); setDMode(false); }} className={`${ui.btnPrimary} w-full`}>🏬 {t('pk.order')}</button>
+              {pMode && (
+                <div className="space-y-3">
+                  <p className={`text-xs ${ui.muted}`}>{t('pk.hint')}</p>
+                  <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" maxLength={20} placeholder={t('dl.phone')} className={ui.input} />
+                  <div className="grid grid-cols-2 gap-2">
+                    {(['cash', 'qr'] as const).map((m) => (
+                      <button key={m} type="button" onClick={() => setPay(m)} className={`rounded-xl border-2 py-2 text-sm font-bold cursor-pointer ${pay === m ? 'border-blue-600 bg-blue-50 dark:bg-blue-500/10' : 'border-slate-300 dark:border-slate-700'}`}>
+                        {m === 'qr' ? `📲 ${t('tq.payQr')}` : `💵 ${t('tq.payCash')}`}
+                      </button>
+                    ))}
+                  </div>
+                  {dErr && <p className="rounded-xl border border-red-300 bg-red-50 p-2 text-sm font-semibold text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">{dErr}</p>}
+                  <button type="button" disabled={dBusy} onClick={sendPickup} className={`${ui.btnPrimary} w-full`}>{dBusy ? t('common.wait') : t('pk.send')}</button>
+                </div>
+              )}
+            </div>
             {dinfo?.enabled && (
               <div className="space-y-3 rounded-2xl border border-slate-200 p-3 dark:border-slate-700">
-                <button type="button" onClick={() => setDMode(!dMode)} className={`${ui.btnPrimary} w-full`}>🛵 {t('dl.orderDelivery')}</button>
+                <button type="button" onClick={() => { setDMode(!dMode); setPMode(false); }} className={`${ui.btnPrimary} w-full`}>🛵 {t('dl.orderDelivery')}</button>
                 {dMode && (
                   <div className="space-y-3">
                     <select value={zoneId} onChange={(e) => setZoneId(e.target.value)} className={ui.input}>
