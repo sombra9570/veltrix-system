@@ -21,7 +21,7 @@ type Person = { id: string; full_name: string | null; email: string | null };
 type Row = { userId: string; name: string; email: string; roles: string[]; branchIds: string[]; active: boolean; membershipIds: string[]; customRoleId: string | null };
 
 export default function TeamPage() {
-  const { orgId, reload, overview, modules, teamRoles } = useOwner();
+  const { orgId, reload, overview, modules, teamRoles, refreshTeamRoles } = useOwner();
   const [niches, setNiches] = useState<string[]>([]);
   // En planes chicos solo se ofrecen los cargos propios del nicho del negocio
   // Primero los cargos que el dueño confirmó al registrarse; si no hay, los del nicho
@@ -39,7 +39,24 @@ export default function TeamPage() {
   const [ownerRoles, setOwnerRoles] = useState<string[]>([]);
   const [customRoles, setCustomRoles] = useState<{ id: string; name: string; base_role: string; also_roles: string[] }[]>([]);
   const [busy, setBusy] = useState(false);
+  // "Necesito otro tipo de trabajador": tareas → rol recomendado (solo roles del rubro del negocio)
+  const [helper, setHelper] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  const TASK_ROLE: Record<string, string> = { sell: 'vendor', cash: 'cashier', stock: 'storekeeper', reception: 'reception', deliver: 'delivery', books: 'accountant', field: 'collector', supervise: 'supervisor', tables: 'waiter', kitchen: 'kitchen', repair: 'technician' };
+  const rubroRoles: string[] = niches.length ? [...suggestedRoles(niches), 'accountant'] : [];
+  const tasks = Object.keys(TASK_ROLE).filter((k) => rubroRoles.includes(TASK_ROLE[k]));
+  const wanted: string[] = Array.from(new Set<string>(picked.map((k) => TASK_ROLE[k])));
+  const activateRole = async (role: string) => {
+    setBusy(true); setMsg(null);
+    try {
+      await rpc('org_add_team_role', { p_org: orgId, p_role: role });
+      await refreshTeamRoles();
+      setForm((f) => ({ ...f, role })); setHelper(false); setPicked([]);
+    } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
+    finally { setBusy(false); }
+  };
 
   const load = useCallback(async () => {
     if (!orgId) return;
@@ -244,6 +261,48 @@ export default function TeamPage() {
                 )}
               </select>
             </div>
+            {rubroRoles.length > 0 && tasks.length > 0 && (
+              <div className="sm:col-span-2">
+                <button type="button" onClick={() => setHelper(!helper)} className={ui.btnGhost}>➕ {t('team.other')}</button>
+                {helper && (
+                  <div className="mt-3 rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+                    <p className="font-semibold">{t('team.otherTitle')}</p>
+                    <p className={`mb-3 text-sm ${ui.muted}`}>{t('team.otherHint')}</p>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {tasks.map((k) => (
+                        <label key={k} className="flex cursor-pointer items-center gap-2 text-sm">
+                          <input type="checkbox" checked={picked.includes(k)} onChange={(e) => setPicked(e.target.checked ? [...picked, k] : picked.filter((x) => x !== k))} />
+                          {t(`task.${k}` as DictKey)}
+                        </label>
+                      ))}
+                    </div>
+                    {wanted.length === 1 && (
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        {roles.includes(wanted[0]) ? (
+                          <>
+                            <span className="text-sm">{t('team.otherHave', { role: roleLabel(wanted[0]) })}</span>
+                            <button type="button" className={ui.btnPrimary} onClick={() => { setForm({ ...form, role: wanted[0] }); setHelper(false); setPicked([]); }}>{roleLabel(wanted[0])}</button>
+                          </>
+                        ) : (
+                          <button type="button" disabled={busy} className={ui.btnPrimary} onClick={() => activateRole(wanted[0])}>{t('team.otherActivate', { role: roleLabel(wanted[0]) })}</button>
+                        )}
+                      </div>
+                    )}
+                    {wanted.length > 1 && (
+                      <div className="mt-3 space-y-2 text-sm">
+                        <p>{t('team.otherCombo')}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {wanted.filter((r) => !roles.includes(r)).map((r) => (
+                            <button key={r} type="button" disabled={busy} className={ui.btnGhost} onClick={() => activateRole(r)}>{t('team.otherActivate', { role: roleLabel(r) })}</button>
+                          ))}
+                          <a href="/dashboard/owner/permisos" className={ui.btnPrimary}>{t('team.otherGoCustom')}</a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
             <div>
               <label className={ui.label}>{t('team.branch')}</label>
               <select className={ui.input} value={form.branchId} onChange={(e) => setForm({ ...form, branchId: e.target.value })}>

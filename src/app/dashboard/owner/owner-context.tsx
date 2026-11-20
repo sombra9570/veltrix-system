@@ -31,6 +31,7 @@ type Ctx = {
   modules: string[];
   /** Cargos que el dueño confirmó al registrar la empresa (vacío = sin restricción) */
   teamRoles: string[];
+  refreshTeamRoles: () => Promise<void>;
   /** Empresa de cobranza en calle pura (sin tienda, restaurante ni taller) */
   cobranza: boolean;
 };
@@ -120,15 +121,14 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
     rpc<string[]>('my_modules').then((m) => setModules(m ?? [])).catch(() => setModules([]));
   }, [session]);
 
-  useEffect(() => {
+  const refreshTeamRoles = useCallback(async () => {
     if (!orgId) return;
-    (async () => {
-      try {
-        const { data } = await supabase.from('organizations').select('onboarding').eq('id', orgId).limit(1);
-        setTeamRoles(((data ?? [])[0]?.onboarding as { roles?: string[] } | null)?.roles ?? []);
-      } catch { setTeamRoles([]); }
-    })();
+    try {
+      const { data } = await supabase.from('organizations').select('onboarding').eq('id', orgId).limit(1);
+      setTeamRoles(((data ?? [])[0]?.onboarding as { roles?: string[] } | null)?.roles ?? []);
+    } catch { setTeamRoles([]); }
   }, [orgId]);
+  useEffect(() => { refreshTeamRoles(); }, [refreshTeamRoles]);
 
   // Rutas de cobro activas: se despliegan debajo de "Rutas de cobro" en el menú
   const cobranza = modules.includes('field_collection') && !modules.some((m) => ['retail', 'restaurant', 'workshop'].includes(m));
@@ -217,7 +217,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   if (banner) banner = <Link href="/dashboard/owner/plan" className="block hover:opacity-95">{banner}</Link>;
 
   return (
-    <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name, modules, teamRoles, cobranza }}>
+    <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name, modules, teamRoles, refreshTeamRoles, cobranza }}>
       <AppShell
         nav={NAV
           .filter((n) => navHas(modules, n.module) && (!n.href.endsWith('/informes') || ['pro', 'enterprise', 'enterprise_plus'].includes(o?.plan_code ?? ''))
