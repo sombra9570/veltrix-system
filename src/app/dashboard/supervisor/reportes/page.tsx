@@ -1,5 +1,5 @@
 'use client';
-// Cobranza: reportes enviados y recibidos del supervisor. Otros rubros: misma pantalla del dueño (lo que puede ver lo decide el servidor)
+// Cobranza: reportes enviados del supervisor. Otros rubros: misma pantalla del dueño (lo que puede ver lo decide el servidor)
 import { useEffect, useState } from 'react';
 import { rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
@@ -12,22 +12,12 @@ type Item = { id: string; at: string; route: string; body: string; kind?: string
 
 function SupReports() {
   const { t, lang } = useT();
-  const [d, setD] = useState<{ sent: Item[]; received: Item[] } | null>(null);
-  const [tab, setTab] = useState<'sent' | 'received'>('sent');
-  useEffect(() => { rpc<{ sent: Item[]; received: Item[] }>('sup_reports').then(setD).catch(() => setD({ sent: [], received: [] })); }, []);
-  const list = d ? d[tab] : [];
+  const [list, setList] = useState<Item[] | null>(null);
+  useEffect(() => { rpc<{ sent: Item[] }>('sup_reports').then((d) => setList(d.sent ?? [])).catch(() => setList([])); }, []);
   return (
     <div className="mx-auto max-w-2xl space-y-3">
-      <h1 className="text-xl font-extrabold">📈 {t('nav.reports')}</h1>
-      <div className="flex gap-2">
-        {(['sent', 'received'] as const).map((k) => (
-          <button key={k} type="button" onClick={() => setTab(k)}
-            className={`rounded-full px-4 py-1.5 text-sm font-bold cursor-pointer ${tab === k ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'border border-slate-300 dark:border-slate-700'}`}>
-            {k === 'sent' ? t('rep.sent') : t('rep.received')}{d ? ` · ${d[k].length}` : ''}
-          </button>
-        ))}
-      </div>
-      {!d ? <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p> : list.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('rep.none')}</p></Card> : (
+      <h1 className="text-xl font-extrabold">📈 {t('rep.sent')}{list ? ` · ${list.length}` : ''}</h1>
+      {!list ? <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p> : list.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('rep.none')}</p></Card> : (
         <ul className="space-y-2">
           {list.map((r) => (
             <li key={r.id}>
