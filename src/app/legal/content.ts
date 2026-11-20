@@ -3,8 +3,8 @@
 export type LegalDoc = { title: string; updated: string; intro: string; sections: { h: string; p: string[] }[] };
 export type LegalKind = 'terms' | 'privacy' | 'refunds';
 
-const UPDATED_ES = '14 de noviembre de 2026';
-const UPDATED_EN = 'November 14, 2026';
+const UPDATED_ES = '20 de noviembre de 2026';
+const UPDATED_EN = 'November 20, 2026';
 const CONTACT = 'hola@veltrixsystem.app';
 
 export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
@@ -25,6 +25,9 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
         { h: '3. Planes y límites', p: [
           'Cada plan tiene límites de empresas, sucursales, usuarios, almacenamiento, productos en la tienda en línea, historial del chat y otros recursos. Ningún plan es ilimitado. Al alcanzar un límite, Veltrix no permitirá agregar más hasta que cambies de plan o contrates extras.',
           'Los precios se publican en dólares estadounidenses, más los impuestos que correspondan en tu país. Pueden existir precios regionales.',
+          'Precios vigentes por mes, en dólares estadounidenses (regional / global; se aplica el que corresponda al país del negocio): Básico 13 / 24 (1 empresa, 1 sucursal, 2 usuarios, 1 GB). Startup 25 / 49 (1 empresa, 1 sucursal, 6 usuarios, 3 GB). Empresa 55 / 95 (1 empresa, 2 sucursales, 15 usuarios, 8 GB). Enterprise 145 / 275 (3 empresas, 3 sucursales, 30 usuarios, 25 GB). Enterprise Plus 265 / 485 (10 empresas, 5 sucursales, 50 usuarios, 60 GB).',
+          'Extras opcionales, por mes (regional / global). Usuario adicional: Startup 6,17 / 10,17 (hasta 1); Empresa 5,67 / 8,34 (hasta 3); Enterprise 6,84 / 11,17 (hasta 5); Enterprise Plus 7,30 / 11,70 (hasta 25). Sucursal adicional: Enterprise 50,34 / 93,67 (hasta 1); Enterprise Plus 55 / 99 (hasta 2). Espacio adicional de 5 GB: 3 / 4 en todos los planes. El plan Básico no admite usuarios ni sucursales adicionales.',
+          'Podemos cambiar estos precios avisando con 15 días de anticipación. El cambio no afecta el período que ya pagaste.',
         ] },
         { h: '4. Pruebas y descuentos', p: [
           'Las pruebas gratuitas no generan cobro. Al terminar, para seguir usando Veltrix debes contratar un plan.',
@@ -93,7 +96,7 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'Usamos conexiones cifradas, control de acceso por empresa y por rol (cada usuario ve solo lo que le corresponde), archivos privados con enlaces temporales y copias de seguridad diarias.',
         ] },
         { h: '5. Cuánto tiempo los guardamos', p: [
-          'Mientras tu cuenta esté activa. El chat del equipo se borra según el plazo de tu plan (30, 90 o 365 días). Tras cancelar, conservamos los datos al menos 90 días para que puedas recuperarlos o exportarlos; luego los eliminamos, salvo los registros de facturación que la ley obligue a conservar.',
+          'Mientras tu cuenta esté activa. El chat del equipo se borra según el plazo de tu plan (15, 30, 90, 365 o 730 días). Tras cancelar, conservamos los datos al menos 90 días para que puedas recuperarlos o exportarlos; luego los eliminamos, salvo los registros de facturación que la ley obligue a conservar.',
         ] },
         { h: '6. Tus derechos', p: [
           `Puedes pedir acceso, corrección, exportación o eliminación de tus datos escribiendo a ${CONTACT}. Si eres cliente de un negocio que usa Veltrix, dirígete primero a ese negocio, que es quien decide sobre tus datos; nosotros lo ayudaremos a responderte.`,
@@ -153,6 +156,9 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
         { h: '3. Plans and limits', p: [
           'Each plan has limits on companies, branches, users, storage, online store products, chat history and other resources. No plan is unlimited. When you reach a limit, Veltrix will not allow adding more until you upgrade or buy extras.',
           'Prices are published in US dollars, plus any taxes that apply in your country. Regional prices may apply.',
+          'Current monthly prices in US dollars (regional / global; the one for the country where the business operates applies): Basic 13 / 24 (1 company, 1 branch, 2 users, 1 GB). Startup 25 / 49 (1 company, 1 branch, 6 users, 3 GB). Business 55 / 95 (1 company, 2 branches, 15 users, 8 GB). Enterprise 145 / 275 (3 companies, 3 branches, 30 users, 25 GB). Enterprise Plus 265 / 485 (10 companies, 5 branches, 50 users, 60 GB).',
+          'Optional extras, per month (regional / global). Extra user: Startup 6.17 / 10.17 (up to 1); Business 5.67 / 8.34 (up to 3); Enterprise 6.84 / 11.17 (up to 5); Enterprise Plus 7.30 / 11.70 (up to 25). Extra branch: Enterprise 50.34 / 93.67 (up to 1); Enterprise Plus 55 / 99 (up to 2). Extra 5 GB of storage: 3 / 4 on every plan. The Basic plan does not allow extra users or branches.',
+          'We may change these prices with 15 days notice. A change does not affect the period you already paid.',
         ] },
         { h: '4. Trials and discounts', p: [
           'Free trials are not charged. When they end, you must subscribe to keep using Veltrix.',
@@ -221,7 +227,7 @@ export const LEGAL: Record<'es' | 'en', Record<LegalKind, LegalDoc>> = {
           'We use encrypted connections, access control per company and role (each user sees only what they should), private files with temporary links and daily backups.',
         ] },
         { h: '5. Retention', p: [
-          'While your account is active. Team chat is deleted according to your plan (30, 90 or 365 days). After cancellation we keep data for at least 90 days so you can recover or export it; then we delete it, except billing records the law requires us to keep.',
+          'While your account is active. Team chat is deleted according to your plan (15, 30, 90, 365 or 730 days). After cancellation we keep data for at least 90 days so you can recover or export it; then we delete it, except billing records the law requires us to keep.',
         ] },
         { h: '6. Your rights', p: [
           `You can request access, correction, export or deletion of your data by writing to ${CONTACT}. If you are a customer of a business that uses Veltrix, contact that business first, since it decides about your data; we will help it respond.`,

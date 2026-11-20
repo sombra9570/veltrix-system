@@ -135,3 +135,9 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Usuarios extra comprables por plan: Startup 1, Empresa 3, Enterprise 5, Enterprise Plus 25 (antes 15). Básico no tiene.
 - Precio del extra = precio del plan / límite + 2 USD (se ajusta solo al cambiar precios de planes).
 - Pendiente de decidir: nuevos precios de planes (propuesta: $13/$25/$55/$145/$265 local) y textos legales.
+
+## Precios nuevos aplicados (20 nov)
+- Planes (local / global USD): Básico 13/24, Startup 25/49, Empresa 55/95, Enterprise 145/275, Enterprise Plus 265/485 (E+ ahora con todos los módulos).
+- Extras: fórmula precio del plan ÷ límite + 2 USD; storage +5 GB 3/4. Términos (es/en) ahora listan planes, extras y aviso de 15 días; chat 15/30/90/365/730 días.
+- Paddle: todavía no vinculado, nada que cambiar allá. Si se agregan precios nuevos, actualizar sección 3 de /terminos.
+- Falta: IA (clave de Claude o Gemini, cupo por plan) y revisión de abogado.
