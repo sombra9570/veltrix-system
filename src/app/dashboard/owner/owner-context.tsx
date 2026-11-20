@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 import { useRouter } from 'next/navigation';
 import { useVeltrixAuth, homeForRole } from '../../auth-system';
 import { supabase, rpc } from '../../../lib/supabase';
-import { AppShell, NavItem } from '../shell';
+import { AppShell, NavItem, navHas } from '../shell';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
 import { Spinner } from '../../spinner';
