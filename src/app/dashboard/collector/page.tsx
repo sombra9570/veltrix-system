@@ -13,7 +13,6 @@ import { isNetworkError } from '../offline-sales';
 import { ShowMore } from '../paged';
 import { CreditCard, applyPayment, freqOf, type Credit, type Freq, type Method } from './credit-card';
 import { CreditSaleForm } from './credit-sale-form';
-import { CreditSaleForm } from './credit-sale-form';
 import { LoanForm, RATING_DOT, type LoanPolicy } from './loan-form';
 import { DaysTable, type DayRow } from './days-table';
 import { CutForm } from './cut-form';
