@@ -7,6 +7,7 @@ import { useT } from '../../../i18n';
 import { parseAmount } from '../../format';
 import { friendlyError } from '../owner-context';
 
+const PRESETS = ['XS, S, M, L, XL, XXL', '28, 30, 32, 34, 36, 38', '35, 36, 37, 38, 39, 40, 41, 42, 43, 44', 'Única'];
 const split = (v: string) => v.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
 
 /** Modelo con tallas y colores: cada combinación queda como un producto con su propio stock. Sin fotos. */
@@ -39,12 +40,12 @@ export function ModelForm({ companyId, currency, onDone, onCancel }: {
     <Card>
       <form onSubmit={save} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <h2 className="font-bold">👕 {t('mod.new')}</h2>
+          <h2 className="font-bold">🏷️ {t('mod.new')}</h2>
           <p className={`text-xs ${ui.muted}`}>{t('mod.hint')}</p>
         </div>
         <div>
           <label className={ui.label}>{t('mod.name')}</label>
-          <input required autoFocus value={name} onChange={(e) => setName(e.target.value)} className={ui.input} />
+          <input required autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="Polo, Jean Slim, Zapatilla Runner…" className={ui.input} />
         </div>
         <div>
           <label className={ui.label}>{t('mod.price')} ({currency})</label>
@@ -53,6 +54,9 @@ export function ModelForm({ companyId, currency, onDone, onCancel }: {
         <div>
           <label className={ui.label}>{t('mod.sizes')}</label>
           <input value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="S, M, L, XL" className={ui.input} />
+          <div className="mt-1 flex flex-wrap gap-1">
+            {PRESETS.map((x) => <button key={x} type="button" onClick={() => setSizes(x)} className={`${ui.btnGhost} !px-2 !py-0.5 text-xs`}>{x.length > 22 ? '35 – 44' : x.length > 14 ? '28 – 38' : x}</button>)}
+          </div>
           <p className={`mt-1 text-xs ${ui.muted}`}>{t('mod.sizesHint')}</p>
         </div>
         <div>

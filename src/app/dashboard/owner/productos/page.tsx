@@ -144,7 +144,7 @@ export default function ProductsPage() {
           <p className={`text-sm ${ui.muted}`}>{t('prod.subtitle')}</p>
         </div>
         <div className="flex flex-wrap gap-2 max-sm:w-full">
-          {apparel && <button type="button" onClick={() => { setModelOpen(true); setForm(null); }} className={`${ui.btnPrimary} max-sm:w-full`}>👕 {t('mod.new')}</button>}
+          {apparel && <button type="button" onClick={() => { setModelOpen(true); setForm(null); }} className={`${ui.btnPrimary} max-sm:w-full`}>🏷️ {t('mod.new')}</button>}
           <button type="button" onClick={() => { setForm({ ...empty }); setModelOpen(false); }} className={`${apparel ? ui.btnGhost : ui.btnPrimary} max-sm:w-full`}>+ {t('prod.add')}</button>
         </div>
       </div>
