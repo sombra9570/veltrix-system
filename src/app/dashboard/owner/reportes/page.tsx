@@ -6,7 +6,7 @@ import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import { money } from '../../format';
 import { isoDay } from '../../sheet';
-import { friendlyError } from '../owner-context';
+import { friendlyError, useOwner } from '../owner-context';
 
 type MBranch = { id: string; name: string; company_id: string; company: string; currency: string; company_wide: boolean };
 type Report = {
@@ -49,7 +49,7 @@ function Bars({ rows, fmt }: { rows: { label: string; value: number; sub?: strin
   );
 }
 
-export default function ReportsPage() {
+function SalesReports() {
   const { t, lang } = useT();
   const [branches, setBranches] = useState<MBranch[]>([]);
   const [scope, setScope] = useState('');       // "company:<id>" o "branch:<id>"
@@ -273,4 +273,72 @@ export default function ReportsPage() {
       )}
     </div>
   );
+}
+
+type Liq = { id: string; route: string; at: string; opening: number; collected: number; lent: number; expenses: number; expected: number; counted: number; difference: number; closing: number; currency: string };
+type Rep = { id: string; route: string; at: string; body: string; author: string | null };
+
+/** Reportes de una empresa de cobranza: solo liquidaciones anteriores y reportes enviados por los supervisores */
+function CobranzaReports() {
+  const { t, lang } = useT();
+  const { orgId } = useOwner();
+  const [liqs, setLiqs] = useState<Liq[] | null>(null);
+  const [reps, setReps] = useState<Rep[] | null>(null);
+  useEffect(() => {
+    if (!orgId) return;
+    rpc<Liq[]>('liquidations_admin', { p_org: orgId }).then((r) => setLiqs(r ?? [])).catch(() => setLiqs([]));
+    rpc<Rep[]>('supervisor_reports_admin', { p_org: orgId }).then((r) => setReps(r ?? [])).catch(() => setReps([]));
+  }, [orgId]);
+  return (
+    <div className="space-y-5">
+      <div className="min-w-0">
+        <h1 className="text-xl font-extrabold sm:text-2xl">📊 {t('nav.reports')}</h1>
+        <p className={`text-sm ${ui.muted}`}>{t('rep.cobSubtitle')}</p>
+      </div>
+      <Card className="space-y-3">
+        <h2 className="font-bold">✂️ {t('rt.liqHist')}</h2>
+        {liqs === null ? <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p> : liqs.length === 0 ? <p className={`text-sm ${ui.muted}`}>{t('rt.liqNone')}</p> : (
+          <ul className="divide-y divide-slate-200 dark:divide-slate-800">
+            {liqs.map((l) => {
+              const m = (n: number) => money(Number(n), l.currency, lang);
+              return (
+                <li key={l.id} className="space-y-1.5 py-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-bold">🛵 {l.route}</p>
+                    <p className={`text-xs ${ui.muted}`}>{new Date(l.at).toLocaleString(lang)}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-4">
+                    <p><span className={ui.muted}>{t('cx.sum.prev')}</span><br /><b>{m(l.opening)}</b></p>
+                    <p><span className={ui.muted}>{t('cx.sum.collected')}</span><br /><b>{m(l.collected)}</b></p>
+                    <p><span className={ui.muted}>{t('cx.sum.lent')}</span><br /><b>{m(l.lent)}</b></p>
+                    <p><span className={ui.muted}>{t('cx.sum.expenses')}</span><br /><b>{m(l.expenses)}</b></p>
+                    <p><span className={ui.muted}>{t('cx.sum.current')}</span><br /><b>{m(l.closing)}</b></p>
+                    <p><span className={ui.muted}>{t('liq.diff')}</span><br /><b className={Number(l.difference) < 0 ? 'text-red-600 dark:text-red-400' : Number(l.difference) > 0 ? 'text-emerald-600' : ''}>{m(l.difference)}</b></p>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </Card>
+      <Card className="space-y-3">
+        <h2 className="font-bold">📝 {t('rep.supTitle')}</h2>
+        {reps === null ? <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p> : reps.length === 0 ? <p className={`text-sm ${ui.muted}`}>{t('rep.supNone')}</p> : (
+          <ul className="divide-y divide-slate-200 dark:divide-slate-800">
+            {reps.map((r) => (
+              <li key={r.id} className="space-y-1 py-3">
+                <p className="text-xs"><b>🛵 {r.route}</b> · {r.author ?? '—'} · <span className={ui.muted}>{new Date(r.at).toLocaleString(lang)}</span></p>
+                <p className="whitespace-pre-wrap text-sm">{r.body}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+    </div>
+  );
+}
+
+export default function ReportsPage() {
+  const { cobranza } = useOwner();
+  return cobranza ? <CobranzaReports /> : <SalesReports />;
 }

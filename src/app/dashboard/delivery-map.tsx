@@ -31,7 +31,7 @@ export type MapPoint = { lat: number; lng: number; label: string; icon: string }
 export const directionsUrl = (lat: number, lng: number) => `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
 
 /** Mapa del repartidor: su posición en vivo y los puntos de recogida/entrega. */
-export function DeliveryMap({ points, height = 260 }: { points: MapPoint[]; height?: number }) {
+export function DeliveryMap({ points, height = 260, names = false }: { points: MapPoint[]; height?: number; names?: boolean }) {
   const { t } = useT();
   const tr = useRef(t); tr.current = t;
   const box = useRef<HTMLDivElement>(null);
@@ -87,7 +87,11 @@ export function DeliveryMap({ points, height = 260 }: { points: MapPoint[]; heig
     const mk = (p: MapPoint) => L.marker([p.lat, p.lng], {
       icon: L.divIcon({ className: '', html: `<div style="font-size:26px;line-height:26px;filter:drop-shadow(0 1px 2px #0006)">${p.icon}</div>`, iconSize: [26, 26], iconAnchor: [13, 24] }),
     }).bindPopup(`<b>${p.label.replace(/[<>&]/g, '')}</b><br><a href="${directionsUrl(p.lat, p.lng)}" target="_blank" rel="noreferrer">${t('dl.how')}</a>`);
-    points.forEach((p) => mk(p).addTo(layer.current));
+    points.forEach((p) => {
+      const m = mk(p);
+      if (names) m.bindTooltip(p.label.replace(/[<>&]/g, ''), { permanent: true, direction: 'bottom', offset: [0, -2], className: 'vx-map-name' });
+      m.addTo(layer.current);
+    });
     if (pos) {
       if (me.current) me.current.setLatLng([pos.lat, pos.lng]);
       else me.current = L.circleMarker([pos.lat, pos.lng], { radius: 8, color: '#fff', weight: 3, fillColor: '#2563eb', fillOpacity: 1 }).bindPopup(t('dl.myPos')).addTo(map.current);

@@ -37,7 +37,7 @@ function Toggle({ on, onChange, label, disabled }: { on: boolean; onChange: (v: 
 
 export default function PermissionsPage() {
   const { t } = useT();
-  const { orgId, modules } = useOwner();
+  const { orgId, modules, cobranza } = useOwner();
   const [d, setD] = useState<Data | null>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
@@ -88,7 +88,7 @@ export default function PermissionsPage() {
       {!d ? <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p> : (
         <>
           {/* Topes */}
-          <Card>
+          {!cobranza && <Card>
             <h2 className="font-bold">🏷️ {t('lim.title')}</h2>
             <p className={`mb-3 text-xs ${ui.muted}`}>{t('lim.hint')}</p>
             <div className="grid gap-3 sm:grid-cols-3">
@@ -104,15 +104,15 @@ export default function PermissionsPage() {
                 </label>
               ))}
             </div>
-          </Card>
+          </Card>}
 
-          <CustomRoles keys={d.keys} />
+          {!cobranza && <CustomRoles keys={d.keys} />}
 
           {/* Por rol */}
           <div className="grid gap-4 lg:grid-cols-3">
-            {Object.entries(ROLE_KEYS).filter(([role]) => roleAvailable(role, modules)).map(([role, allKeys]) => { const keys = allKeys.filter((x) => keyAvailable(x, modules)); return (
+            {Object.entries(ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (!cobranza || role === 'cashier' || role === 'collector')).map(([role, allKeys]) => { const keys = allKeys.filter((x) => keyAvailable(x, modules) && !(cobranza && role === 'cashier' && !x.startsWith('cash.'))); return (
               <Card key={role}>
-                <h2 className="font-bold">{k(`role.${role}`)}</h2>
+                <h2 className="font-bold">{cobranza && role === 'cashier' ? t('rt.liquidator') : k(`role.${role}`)}</h2>
                 <p className={`mb-3 text-xs ${ui.muted}`}>{t('perm.roleHint')}</p>
                 <ul className="space-y-3">
                   {keys.map((key) => (
@@ -129,8 +129,8 @@ export default function PermissionsPage() {
             ); })}
           </div>
 
-          {/* Por usuario */}
-          <Card className="!p-0 overflow-hidden">
+          {/* Por usuario (en cobranza se hace desde los ajustes de cada ruta) */}
+          {!cobranza && <Card className="!p-0 overflow-hidden">
             <div className="border-b border-slate-200 p-4 dark:border-slate-800">
               <h2 className="font-bold">{t('perm.byUser')}</h2>
               <p className={`text-xs ${ui.muted}`}>{t('perm.byUserHint')}</p>
@@ -181,7 +181,7 @@ export default function PermissionsPage() {
                 })}
               </ul>
             )}
-          </Card>
+          </Card>}
         </>
       )}
     </div>

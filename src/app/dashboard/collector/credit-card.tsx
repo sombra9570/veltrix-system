@@ -38,9 +38,9 @@ export function applyPayment(c: Credit, amount: number, at: string): Credit {
   return { ...c, installments };
 }
 
-export function CreditCard({ credit, today, fmt, onSave }: {
+export function CreditCard({ credit, today, fmt, onSave, readOnly = false }: {
   credit: Credit; today: string; fmt: (n: number) => string;
-  onSave: (amount: number, method: Method) => void;
+  onSave: (amount: number, method: Method) => void; readOnly?: boolean;
 }) {
   const { t, lang } = useT();
   const list = useMemo(() => [...credit.installments].sort((a, b) => a.n - b.n), [credit]);
@@ -58,7 +58,7 @@ export function CreditCard({ credit, today, fmt, onSave }: {
   const preview = useMemo(() => (abono !== null && !invalid ? applyPayment(credit, amount, '') : null), [abono, invalid, credit, amount]);
 
   const tap = (idx: number) => {
-    if (firstOpen < 0 || idx < firstOpen) return;
+    if (readOnly || firstOpen < 0 || idx < firstOpen) return;
     setAbono(null);
     setUpTo((u) => (u === idx ? idx - 1 : idx)); // tocar la última seleccionada la quita
   };
@@ -107,7 +107,7 @@ export function CreditCard({ credit, today, fmt, onSave }: {
         <span>🟩 {t('card.legPaid')}</span><span>🟦 {t('card.legSel')}</span><span>🟨 {t('card.legPartial')}</span><span className="text-red-500">▢ {t('card.legLate')}</span>
       </div>
 
-      {abono !== null && (
+      {!readOnly && abono !== null && (
         <div>
           <label className={ui.label}>{t('card.abonoAmount')}</label>
           <input inputMode="decimal" autoFocus value={abono} onChange={(e) => setAbono(e.target.value)} className={`${ui.input} text-xl font-bold`} />
@@ -116,7 +116,7 @@ export function CreditCard({ credit, today, fmt, onSave }: {
         </div>
       )}
 
-      {(amount > 0 || abono !== null) && (
+      {!readOnly && (amount > 0 || abono !== null) && (
         <div className="grid grid-cols-3 gap-2">
           {(['cash', 'qr_transfer', 'card'] as Method[]).map((m) => (
             <button key={m} type="button" onClick={() => setMethod(m)}
@@ -127,13 +127,13 @@ export function CreditCard({ credit, today, fmt, onSave }: {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-2">
+      {!readOnly && <div className="grid grid-cols-3 gap-2">
         <button type="button" disabled={firstOpen < 0} onClick={() => { setUpTo(-1); setAbono(abono === null ? '' : null); }}
           className={`${ui.btnGhost} !px-2 text-sm`}>➗ {t('card.abono')}</button>
         <button type="button" disabled={amount <= 0 && abono === null} onClick={reset} className={`${ui.btnGhost} !px-2 text-sm`}>✕ {t('card.cancel')}</button>
         <button type="button" disabled={invalid} onClick={() => { onSave(amount, method); reset(); }}
           className={`${ui.btnPrimary} !px-2 text-sm`}>💾 {t('card.save')}{invalid ? '' : ` ${fmt(amount)}`}</button>
-      </div>
+      </div>}
     </div>
   );
 }

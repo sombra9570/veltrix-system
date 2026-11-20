@@ -1,8 +1,8 @@
 'use client';
-import { Fragment, createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, Suspense, createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { rpc } from '../../lib/supabase';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { ThemeToggle } from '../theme';
 import { HelpButton } from './help';
 import { RegionSelectors, ui } from '../site-header';
@@ -15,7 +15,23 @@ import type { DictKey } from '../i18n/es';
 export const navHas = (modules: string[] | null, need?: string) =>
   !need || (modules ?? []).some((m) => need.split(',').includes(m));
 
-export type NavItem = { href: string; icon: string; label: DictKey; soon?: boolean; module?: string; group?: DictKey };
+/** Sub-ítem desplegable del menú (por ejemplo, cada ruta activa); su texto viene de los datos, no del diccionario */
+export type NavChild = { href: string; label: string };
+export type NavItem = { href: string; icon: string; label: DictKey; soon?: boolean; module?: string; group?: DictKey; children?: NavChild[] };
+
+function ChildLink({ child, onGo }: { child: NavChild; onGo: () => void }) {
+  const pathname = usePathname();
+  const sp = useSearchParams();
+  const [path, query] = child.href.split('?');
+  const want = new URLSearchParams(query ?? '').get('r');
+  const active = pathname === path && (!want || sp.get('r') === want);
+  return (
+    <Link href={child.href} onClick={onGo}
+      className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold transition ${active ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800/70'}`}>
+      <span className="text-xs">•</span><span className="min-w-0 flex-1 truncate">{child.label}</span>
+    </Link>
+  );
+}
 
 /**
  * Ranura de la barra superior: cada pantalla puede poner ahí su título, el botón atrás
@@ -75,6 +91,8 @@ export function AppShell({
     };
   }, [open]);
 
+  const [closedKids, setClosedKids] = useState<Record<string, boolean>>({});
+
   const menu = (
     <nav className="safe-top safe-bottom flex h-full flex-col">
       <div className="px-5 py-5">
@@ -119,10 +137,21 @@ export function AppShell({
               >
                 <span className="text-base">{item.icon}</span>
                 <span className="flex-1">{t(item.label)}</span>
+                {item.children && (
+                  <span role="button" aria-label="toggle" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setClosedKids((c) => ({ ...c, [item.href]: !c[item.href] })); }}
+                    className="grid h-6 w-6 place-items-center rounded-md text-xs opacity-80 hover:bg-black/10">{closedKids[item.href] ? '▸' : '▾'}</span>
+                )}
                 {item.href.endsWith('/mensajes') && unread > 0 && (
                   <span className={`grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-bold ${active ? 'bg-white text-blue-700' : 'bg-blue-600 text-white'}`}>{unread > 99 ? '99+' : unread}</span>
                 )}
               </Link>
+              {item.children && !closedKids[item.href] && (
+                <ul className="ms-5 mt-0.5 space-y-0.5 border-s border-slate-200 ps-2 dark:border-slate-800">
+                  <Suspense fallback={null}>
+                    {item.children.map((c) => <li key={c.href}><ChildLink child={c} onGo={() => setOpen(false)} /></li>)}
+                  </Suspense>
+                </ul>
+              )}
             </li></Fragment>
           );
         })}

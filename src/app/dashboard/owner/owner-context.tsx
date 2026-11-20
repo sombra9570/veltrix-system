@@ -29,6 +29,8 @@ type Ctx = {
   reload: () => Promise<void>;
   userName: string;
   modules: string[];
+  /** Empresa de cobranza en calle pura (sin tienda, restaurante ni taller) */
+  cobranza: boolean;
 };
 
 const OwnerContext = createContext<Ctx | null>(null);
@@ -105,12 +107,23 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [denied, setDenied] = useState(false);
   const [modules, setModules] = useState<string[]>([]);
+  const [routes, setRoutes] = useState<{ id: string; name: string }[]>([]);
 
   // Solo se muestran las herramientas de los rubros que tiene activos la empresa
   useEffect(() => {
     if (!session || session.role !== 'owner') return;
     rpc<string[]>('my_modules').then((m) => setModules(m ?? [])).catch(() => setModules([]));
   }, [session]);
+
+  // Rutas de cobro activas: se despliegan debajo de "Rutas de cobro" en el menú
+  const cobranza = modules.includes('field_collection') && !modules.some((m) => ['retail', 'restaurant', 'workshop'].includes(m));
+  useEffect(() => {
+    if (!orgId || !modules.includes('field_collection')) return;
+    const load = () => rpc<{ id: string; name: string }[]>('owner_routes', { p_org: orgId }).then((r) => setRoutes(r ?? [])).catch(() => setRoutes([]));
+    load();
+    window.addEventListener('vx-routes-changed', load);
+    return () => window.removeEventListener('vx-routes-changed', load);
+  }, [orgId, modules]);
 
   useEffect(() => {
     if (!loaded) return;
@@ -188,9 +201,12 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   if (banner) banner = <Link href="/dashboard/owner/plan" className="block hover:opacity-95">{banner}</Link>;
 
   return (
-    <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name, modules }}>
+    <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name, modules, cobranza }}>
       <AppShell
-        nav={NAV.filter((n) => navHas(modules, n.module) && (!n.href.endsWith('/informes') || ['pro', 'enterprise', 'enterprise_plus'].includes(o?.plan_code ?? '')))}
+        nav={NAV
+          .filter((n) => navHas(modules, n.module) && (!n.href.endsWith('/informes') || ['pro', 'enterprise', 'enterprise_plus'].includes(o?.plan_code ?? ''))
+            && !(cobranza && ['/clientes', '/prestamos', '/caja'].some((x) => n.href.endsWith(x))))
+          .map((n) => (n.href.endsWith('/rutas') ? { ...n, children: routes.map((r) => ({ href: `/dashboard/owner/ruta?r=${r.id}`, label: r.name })) } : n))}
         orgName={o?.name ?? ''}
         userName={session.name || session.email}
         roleLabel={t('role.owner')}

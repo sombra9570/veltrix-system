@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
 import { ui } from '../../../site-header';
@@ -49,6 +50,7 @@ export default function RoutesPage() {
       flash(true, t('routes.saved'));
       setForm(null);
       await load();
+      window.dispatchEvent(new Event('vx-routes-changed'));
     } catch (err) { flash(false, friendlyError((err as Error).message, t)); }
   };
 
@@ -85,6 +87,8 @@ export default function RoutesPage() {
 
       {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? okBox : errBox}`}>{msg.text}</p>}
 
+      <Link href="/dashboard/owner/prestamos" className="block rounded-xl border border-slate-200 p-3 text-sm font-bold text-blue-600 hover:bg-slate-50 dark:border-slate-800 dark:text-blue-400 dark:hover:bg-slate-800/50">💸 {t('rt.rules')} →</Link>
+
       {data && data.collectors.length === 0 && (
         <p className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
           {t('routes.noCollectors')}
@@ -118,7 +122,7 @@ export default function RoutesPage() {
         {(data?.routes ?? []).map((r) => (
           <Card key={r.id} className="flex items-center gap-3">
             <div className="min-w-0 flex-1">
-              <p className="truncate font-bold">{r.name}</p>
+              <Link href={`/dashboard/owner/ruta?r=${r.id}`} className="block truncate font-bold hover:underline">{r.name}</Link>
               <p className={`truncate text-xs ${ui.muted}`}>🛵 {r.collector ?? t('routes.noCollector')} · {t('routes.customers', { n: r.customers })}</p>
             </div>
             <button type="button" onClick={() => setForm({ id: r.id, name: r.name, collector: r.collector_id ?? '' })} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>{t('prod.edit')}</button>
