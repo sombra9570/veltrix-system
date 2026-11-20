@@ -154,6 +154,6 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Sin verificar en pantalla.
 
 ## Cliente nuevo: datos obligatorios (2026-11-20)
-- Obligatorios: nombre completo, CI, celular, dirección, ubicación GPS y casilla de autorización; fotos solo si el administrador lo activa (Préstamos > reglas). No deja guardar hasta completar.
+- Obligatorios: nombre completo, CI, celular, dirección, ubicación GPS y casilla de autorización; fotos según los permisos existentes de la ruta ("Crédito sin foto del cliente" / "sin fotos del carnet"; apagados = obligatorias). No deja guardar hasta completar.
 - El servidor exige CI/celular/dirección/GPS; la autorización y las fotos se validan solo en la pantalla (las fotos se suben después de crear al cliente).
 - Sin verificar en pantalla.

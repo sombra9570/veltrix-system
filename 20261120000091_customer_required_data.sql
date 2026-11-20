@@ -1,4 +1,6 @@
 -- Cliente nuevo: datos obligatorios (nombre, CI, celular, dirección, ubicación GPS, autorización) también en el servidor.
--- Aplicada vía migración "customer_required_data".
--- set_loan_policy acepta 'require_customer_photos' (0/1): el administrador puede exigir carnet por ambos lados y foto.
+-- Aplicada vía migraciones "customer_required_data" y "customer_photos_use_existing_permissions".
 -- collector_save_customer lanza CUSTOMER_REQUIRED si faltan CI, celular, dirección o ubicación.
+-- Las fotos usan los permisos que ya existen en el panel de permisos de la ruta: loans.no_photo (foto del cliente)
+-- y loans.no_id_photo (carnet); apagados = fotos obligatorias. collector_day los entrega como can_no_photo / can_no_id_photo.
+-- (Se quitó la clave 'require_customer_photos' de set_loan_policy: no se crean reglas nuevas.)

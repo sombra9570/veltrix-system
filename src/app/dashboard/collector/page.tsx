@@ -44,7 +44,7 @@ type Route = {
   unsettled_cash: number; unsettled_digital: number; unsettled_expenses: number; unsettled_loans?: number;
   fund_balance?: number; fund_float?: number;
   period?: Period; liquidations?: Liquidation[]; days?: DayRow[]; can_liquidate?: boolean; can_invest?: boolean;
-  policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_interest?: boolean;
+  policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_no_photo?: boolean; can_no_id_photo?: boolean; can_interest?: boolean;
   can_expenses?: boolean; can_portfolio?: boolean; can_settings?: boolean; can_delete_credits?: boolean; can_delete_customers?: boolean; can_delete_installments?: boolean; commission_pct?: number; locked?: boolean; max_loan?: number; pay_qr?: string | null; pay_qr_note?: string | null; org_id?: string; branch_id?: string; own_qr?: boolean; notices_unread?: number;
   customers: Customer[]; settlements: Settlement[];
 };
@@ -543,7 +543,7 @@ export default function CollectorPage() {
       )}
 
       {screen === 'newclient' && (
-        <NewClient routeId={route.id} orgId={route.org_id ?? ''} online={online} canLoan={!!route.can_loan && !!route.policy} requirePhotos={!!route.policy?.require_customer_photos}
+        <NewClient routeId={route.id} orgId={route.org_id ?? ''} online={online} canLoan={!!route.can_loan && !!route.policy} needPhoto={!route.can_no_photo} needIdPhoto={!route.can_no_id_photo}
           onSaved={async (id) => { await patch(route.id, { customers: [id] }); }}
           onLoan={() => { setPanel('loan'); }} />
       )}

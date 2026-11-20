@@ -49,8 +49,8 @@ function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) 
  * Cliente nuevo de la ruta: datos, carnet por los dos lados, foto, ubicación GPS y garante.
  * Las fotos se suben al guardar, así que hace falta internet (el cobro sí funciona sin señal).
  */
-export function NewClient({ routeId, orgId, online, canLoan, requirePhotos = false, onSaved, onLoan }: {
-  routeId: string; orgId: string; online: boolean; canLoan: boolean; requirePhotos?: boolean;
+export function NewClient({ routeId, orgId, online, canLoan, needPhoto = false, needIdPhoto = false, onSaved, onLoan }: {
+  routeId: string; orgId: string; online: boolean; canLoan: boolean; needPhoto?: boolean; needIdPhoto?: boolean;
   onSaved: (id: string) => Promise<void> | void; onLoan: () => void;
 }) {
   const { t } = useT();
@@ -79,7 +79,8 @@ export function NewClient({ routeId, orgId, online, canLoan, requirePhotos = fal
   const missing = [
     !f.name.trim() && t('cx.nc.name'), !f.ci.trim() && t('cx.nc.ci'), !f.phone.trim() && t('cx.nc.phone'),
     !f.address.trim() && t('cx.nc.address'), !gps && t('cx.nc.gpsBtn'),
-    ...(requirePhotos && (!ciFront || !ciBack || !photo) ? [t('cx.nc.docs')] : []),
+    ...(needIdPhoto && (!ciFront || !ciBack) ? [t('cx.nc.docs')] : []),
+    ...(needPhoto && !photo ? [t('cx.nc.photo')] : []),
     !consent && t('cx.nc.consentShort'),
   ].filter(Boolean) as string[];
 
@@ -156,7 +157,7 @@ export function NewClient({ routeId, orgId, online, canLoan, requirePhotos = fal
       </Card>
 
       <Card className="space-y-3">
-        <p className="font-bold">🪪 {t('cx.nc.docs')}{requirePhotos ? ' *' : ''}</p>
+        <p className="font-bold">🪪 {t('cx.nc.docs')}{needIdPhoto || needPhoto ? ' *' : ''}</p>
         <div><label className={ui.label}>{t('cx.nc.ciFront')}</label><PhotoPicker value={ciFront} onChange={setCiFront} disabled={busy} /></div>
         <div><label className={ui.label}>{t('cx.nc.ciBack')}</label><PhotoPicker value={ciBack} onChange={setCiBack} disabled={busy} /></div>
         <div><label className={ui.label}>{t('cx.nc.photo')}</label><PhotoPicker value={photo} onChange={setPhoto} facing="user" disabled={busy} /></div>

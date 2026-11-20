@@ -1996,7 +1996,6 @@ const fr: Record<DictKey, string> = {
   "cx.nc.needName": "Saisissez le nom complet.",
   "cx.nc.needAll": "Données obligatoires manquantes : {list}.",
   "cx.nc.consentShort": "Le client autorise l'utilisation de ses données et photos",
-  "loan.p.requirePhotos": "Exiger des photos à la création d'un client (pièce d'identité recto verso et photo du client)",
   "cx.nc.needSignal": "Internet requis pour créer des clients.",
   "cx.nc.saved": "✅ Client enregistré. Il apparaît dans votre liste.",
   "cx.nc.partial": "Client enregistré, mais une photo n’a pas été envoyée. Rouvrez et réessayez.",

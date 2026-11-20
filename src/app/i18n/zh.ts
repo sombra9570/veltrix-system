@@ -1996,7 +1996,6 @@ const zh: Record<DictKey, string> = {
   "cx.nc.needName": "请输入全名。",
   "cx.nc.needAll": "缺少必填信息：{list}。",
   "cx.nc.consentShort": "客户授权使用其数据和照片",
-  "loan.p.requirePhotos": "创建客户时要求照片（证件正反面和客户照片）",
   "cx.nc.needSignal": "创建客户需要联网。",
   "cx.nc.saved": "✅ 客户已保存，已显示在列表中。",
   "cx.nc.partial": "客户已保存，但有照片未上传，请重试。",

@@ -1996,7 +1996,6 @@ const ja: Record<DictKey, string> = {
   "cx.nc.needName": "氏名を入力してください。",
   "cx.nc.needAll": "必須項目が未入力です：{list}。",
   "cx.nc.consentShort": "顧客がデータと写真の使用を許可します",
-  "loan.p.requirePhotos": "顧客登録時に写真を必須にする（身分証の両面と顧客の写真）",
   "cx.nc.needSignal": "顧客の作成にはインターネットが必要です。",
   "cx.nc.saved": "✅ 顧客を保存しました。リストに表示されます。",
   "cx.nc.partial": "顧客は保存されましたが、写真のアップロードに失敗しました。",

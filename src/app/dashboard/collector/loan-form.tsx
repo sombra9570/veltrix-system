@@ -14,7 +14,6 @@ import { parseAmount } from '../format';
 export type LoanPolicy = {
   interest_default: number; interest_min: number; interest_max: number; max_installments: number;
   late_daily: number; late_weekly: number; late_biweekly: number; late_monthly: number;
-  require_customer_photos?: number;
 };
 type RouteCustomer = { id: string; name: string; phone: string | null; address: string | null; balance: number; rating: string };
 const FREQS: [number, string][] = [[1, 'daily'], [7, 'weekly'], [15, 'biweekly'], [30, 'monthly']];

@@ -1996,7 +1996,6 @@ const it: Record<DictKey, string> = {
   "cx.nc.needName": "Inserisci il nome completo.",
   "cx.nc.needAll": "Dati obbligatori mancanti: {list}.",
   "cx.nc.consentShort": "Il cliente autorizza l'uso dei suoi dati e foto",
-  "loan.p.requirePhotos": "Richiedere le foto alla creazione di un cliente (documento fronte e retro e foto del cliente)",
   "cx.nc.needSignal": "Serve internet per creare clienti.",
   "cx.nc.saved": "✅ Cliente salvato. Ora è nell’elenco.",
   "cx.nc.partial": "Cliente salvato, ma una foto non è stata caricata. Riprova.",
