@@ -6,13 +6,14 @@ import { ui } from '../../../site-header';
 import { usePaged, ShowMore } from '../../paged';
 import { useT } from '../../../i18n';
 import { money, parseAmount } from '../../format';
-import { friendlyError } from '../owner-context';
+import { friendlyError, useOwner } from '../owner-context';
+import { ModelForm } from './model-form';
 
 type Company = { id: string; legal_name: string; base_currency: string };
 type Product = {
   id: string; sku: string; name: string; price: number; currency: string;
   type: 'good' | 'service'; track: boolean; unit: string; active: boolean;
-  stock: Record<string, number>;
+  stock: Record<string, number>; model?: string | null; size?: string | null; color?: string | null;
 };
 type Admin = { branches: { id: string; name: string }[]; products: Product[] };
 type Form = { id: string | null; name: string; price: string; type: 'good' | 'service'; track: boolean; unit: string; sku: string };
@@ -28,6 +29,9 @@ export default function ProductsPage() {
   const [data, setData] = useState<Admin | null>(null);
   const [branchId, setBranchId] = useState('');
   const [form, setForm] = useState<Form | null>(null);
+  const { categories } = useOwner();
+  const apparel = categories.includes('clothing');
+  const [modelOpen, setModelOpen] = useState(false);
   const [inMenu, setInMenu] = useState(true);
   const [stockEdit, setStockEdit] = useState<Record<string, string>>({});
   const [query, setQuery] = useState('');
@@ -64,7 +68,7 @@ export default function ProductsPage() {
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const all = data?.products ?? [];
+    const all = (data?.products ?? []).filter((x) => !x.model); // las prendas con talla y color se ven agrupadas en Inventario
     return q ? all.filter((p) => p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)) : all;
   }, [data, query]);
   const paged = usePaged(list, 40, list);
@@ -139,7 +143,10 @@ export default function ProductsPage() {
           <h1 className="text-xl font-extrabold sm:text-2xl">📦 {t('prod.title')}</h1>
           <p className={`text-sm ${ui.muted}`}>{t('prod.subtitle')}</p>
         </div>
-        <button type="button" onClick={() => setForm({ ...empty })} className={`${ui.btnPrimary} max-sm:w-full`}>+ {t('prod.add')}</button>
+        <div className="flex flex-wrap gap-2 max-sm:w-full">
+          {apparel && <button type="button" onClick={() => { setModelOpen(true); setForm(null); }} className={`${ui.btnPrimary} max-sm:w-full`}>👕 {t('mod.new')}</button>}
+          <button type="button" onClick={() => { setForm({ ...empty }); setModelOpen(false); }} className={`${apparel ? ui.btnGhost : ui.btnPrimary} max-sm:w-full`}>+ {t('prod.add')}</button>
+        </div>
       </div>
 
       {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? okBox : errBox}`}>{msg.text}</p>}
@@ -164,6 +171,11 @@ export default function ProductsPage() {
             </div>
           )}
         </div>
+      )}
+
+      {modelOpen && company && (
+        <ModelForm companyId={company.id} currency={company.base_currency} onCancel={() => setModelOpen(false)}
+          onDone={async (text) => { setModelOpen(false); flash(true, text); await load(); }} />
       )}
 
       {form && (

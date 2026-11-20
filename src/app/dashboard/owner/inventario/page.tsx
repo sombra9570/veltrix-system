@@ -12,9 +12,10 @@ import { photoErrorKey } from '../../photo-picker';
 import { useVeltrixAuth } from '../../../auth-system';
 import { TransferForm } from './transfer';
 import { AccountsCard, PaySheet, useAccounts } from './payments';
+import { ModelStock } from './model-stock';
 
 type MBranch = { id: string; name: string; company_id: string; company: string; currency: string; company_wide: boolean };
-type Item = { id: string; name: string; sku: string; unit: string; type: string; qty: number; min: number; cost: number; price: number; value: number };
+type Item = { id: string; name: string; sku: string; unit: string; type: string; qty: number; min: number; cost: number; price: number; value: number; model?: string | null; size?: string | null; color?: string | null };
 type Supplier = { id: string; name: string; phone: string | null; email: string | null; tax_id: string | null; terms: number };
 type Overview = {
   currency: string; purchasing: boolean;
@@ -223,7 +224,11 @@ export default function InventoryPage() {
             : items.length === 0 ? <p className={`p-5 text-sm ${ui.muted}`}>{data.items.length === 0 ? t('inv.empty') : t('inv.noMatch')}</p>
             : (
               <ul className="divide-y divide-slate-200 dark:divide-slate-800">
-                {items.map((i) => {
+                {Array.from(new Set<string>(items.filter((i) => i.model).map((i) => i.model as string))).sort((a, b) => a.localeCompare(b)).map((m) => (
+                  <ModelStock key={m} model={m} items={items.filter((i) => i.model === m)} branchId={branchId} canReceive={!readOnly}
+                    onChanged={load} flash={flash} />
+                ))}
+                {items.filter((i) => !i.model).map((i) => {
                   const out = Number(i.qty) <= 0;
                   const low = !out && Number(i.qty) <= Number(i.min);
                   return (

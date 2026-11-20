@@ -1,0 +1,2 @@
+-- Modelos con tallas y colores (migracion product_models_sizes_colors): products.model/size/color; save_product_model crea un producto por talla x color;
+-- inv_overview y products_admin devuelven model/size/color. Cada variante tiene su propio stock, asi venta, caja e inventario funcionan igual.

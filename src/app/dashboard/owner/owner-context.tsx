@@ -31,6 +31,8 @@ type Ctx = {
   modules: string[];
   /** Cargos que el dueño confirmó al registrar la empresa (vacío = sin restricción) */
   teamRoles: string[];
+  /** Rubros que eligió el dueño al registrar la empresa */
+  categories: string[];
   refreshTeamRoles: () => Promise<void>;
   /** Empresa de cobranza en calle pura (sin tienda, restaurante ni taller) */
   cobranza: boolean;
@@ -112,6 +114,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   const [denied, setDenied] = useState(false);
   const [modules, setModules] = useState<string[]>([]);
   const [teamRoles, setTeamRoles] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [routes, setRoutes] = useState<{ id: string; name: string }[]>([]);
   const [sups, setSups] = useState<{ membership_id: string; name: string }[]>([]);
 
@@ -125,8 +128,10 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
     if (!orgId) return;
     try {
       const { data } = await supabase.from('organizations').select('onboarding').eq('id', orgId).limit(1);
-      setTeamRoles(((data ?? [])[0]?.onboarding as { roles?: string[] } | null)?.roles ?? []);
-    } catch { setTeamRoles([]); }
+      const onb = (data ?? [])[0]?.onboarding as { roles?: string[]; categories?: string[] } | null;
+      setTeamRoles(onb?.roles ?? []);
+      setCategories(onb?.categories ?? []);
+    } catch { setTeamRoles([]); setCategories([]); }
   }, [orgId]);
   useEffect(() => { refreshTeamRoles(); }, [refreshTeamRoles]);
 
@@ -217,7 +222,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   if (banner) banner = <Link href="/dashboard/owner/plan" className="block hover:opacity-95">{banner}</Link>;
 
   return (
-    <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name, modules, teamRoles, refreshTeamRoles, cobranza }}>
+    <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name, modules, teamRoles, categories, refreshTeamRoles, cobranza }}>
       <AppShell
         nav={NAV
           .filter((n) => navHas(modules, n.module) && (!n.href.endsWith('/informes') || ['pro', 'enterprise', 'enterprise_plus'].includes(o?.plan_code ?? ''))
