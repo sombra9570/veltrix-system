@@ -258,7 +258,7 @@ export function StoreView({ slug }: { slug: string }) {
           <div className="absolute inset-0 bg-black/50" onClick={() => setView(null)} />
           <div className="absolute inset-x-0 bottom-0 mx-auto max-h-[90dvh] max-w-xl overflow-y-auto rounded-t-3xl bg-white pb-[calc(1.25rem+env(safe-area-inset-bottom))] dark:bg-slate-900">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            {storeImageUrl(view.photo) && <img src={storeImageUrl(view.photo)!} alt={view.name} className="max-h-[50dvh] w-full object-cover" />}
+            {storeImageUrl(view.photo) && <img src={storeImageUrl(view.photo)!} alt={view.name} className="max-h-[55dvh] w-full bg-slate-100 object-contain dark:bg-slate-800" />}
             <div className="space-y-3 p-5">
               <h2 className="text-xl font-extrabold">{view.name}</h2>
               <p className="text-2xl font-extrabold">{view.model ? fmt(Math.min(...store.products.filter((x) => x.model === view.model).map((x) => Number(x.price)))) : fmt(view.price)}</p>

@@ -56,9 +56,9 @@ export function extFor(blob: Blob) {
   return blob.type === 'image/webp' ? 'webp' : 'jpg';
 }
 
-/** Miniatura para listas: ~320 px y alrededor de 15 KB. La foto grande se baja solo al tocarla. */
-export const THUMB_SIDE = 320;
-export const THUMB_BYTES = 30_000;
+/** Miniatura para listas: ~480 px y menos de 45 KB (nítida en pantallas de celular). La foto grande se baja solo al tocarla. */
+export const THUMB_SIDE = 480;
+export const THUMB_BYTES = 45_000;
 export const makeThumb = (file: File | Blob) => compressImage(file as File, THUMB_SIDE, 0.7, THUMB_BYTES);
 /** La miniatura vive junto a la foto, con "-t" antes de la extensión (p-123-1700.webp → p-123-1700-t.webp) */
 export const thumbPath = (path: string) => path.replace(/(\.[a-z0-9]+)$/i, '-t$1');

@@ -8,7 +8,7 @@ import type { DictKey } from '../../../i18n/es';
 import { money } from '../../format';
 import { PhotoSlot } from '../../photo-picker';
 import { StoreProductForm } from './product-form';
-import { compressImage, extFor, storeImageUrl, makeThumb, thumbPath } from '../../image';
+import { compressImage, extFor, storeImageUrl, storeThumbUrl, makeThumb, thumbPath } from '../../image';
 
 type Company = { id: string; legal_name: string };
 type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean; variants?: number };
@@ -314,12 +314,13 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
         {data.products.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('prod.empty')}</p>}
         <ul className="divide-y divide-slate-200 dark:divide-slate-800">
           {data.products.map((p) => {
-            const img = storeImageUrl(p.photo);
+            const img = storeThumbUrl(p.photo);
+            const imgFull = storeImageUrl(p.photo);
             return (
               <li key={p.id} className={`flex flex-wrap items-center gap-3 py-3 ${p.active ? '' : 'opacity-50'}`}>
-                {pm.photo ? <PhotoSlot current={img} onFile={(f) => setPhoto(p, f)} busy={busy} /> : (
+                {pm.photo ? <PhotoSlot current={img} fallback={imgFull} onFile={(f) => setPhoto(p, f)} busy={busy} /> : (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <span className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">{img ? <img src={img} alt="" className="h-full w-full object-cover" /> : '📷'}</span>
+                  <span className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">{img ? <img src={img} alt="" loading="lazy" onError={(e) => { if (imgFull && e.currentTarget.src !== imgFull) e.currentTarget.src = imgFull; }} className="h-full w-full object-cover" /> : '📷'}</span>
                 )}
                 <div className="min-w-0 flex-1 basis-40">
                   <p className="truncate font-semibold">{p.name}</p>

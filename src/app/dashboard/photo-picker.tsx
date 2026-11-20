@@ -66,8 +66,8 @@ export function photoErrorKey(message: string): 'photo.unreadable' | 'photo.tooB
  * Foto que se sube al elegirla (logo, QR, producto de la tienda): miniatura grande con la foto actual,
  * dos botones (cámara / archivo) y vista previa inmediata mientras se sube.
  */
-export function PhotoSlot({ current, onFile, busy, size = 'h-16 w-16', icon = '📷' }: {
-  current: string | null; onFile: (f: File) => void; busy?: boolean; size?: string; icon?: string;
+export function PhotoSlot({ current, fallback, onFile, busy, size = 'h-16 w-16', icon = '📷' }: {
+  current: string | null; fallback?: string | null; onFile: (f: File) => void; busy?: boolean; size?: string; icon?: string;
 }) {
   const { t } = useT();
   const [local, setLocal] = useState<string | null>(null);
@@ -85,7 +85,7 @@ export function PhotoSlot({ current, onFile, busy, size = 'h-16 w-16', icon = '�
     <div className="flex shrink-0 flex-col items-center gap-1">
       <div className={`relative grid ${size} place-items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        {shown ? <img src={shown} alt="" className="h-full w-full object-cover" /> : <span className="text-xl">{icon}</span>}
+        {shown ? <img src={shown} alt="" loading="lazy" decoding="async" onError={(e) => { if (fallback && e.currentTarget.src !== fallback) e.currentTarget.src = fallback; }} className="h-full w-full object-cover" /> : <span className="text-xl">{icon}</span>}
         {busy && <span className="absolute inset-0 grid place-items-center bg-black/40 text-xs font-bold text-white">…</span>}
       </div>
       <div className="flex gap-1">
