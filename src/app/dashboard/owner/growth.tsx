@@ -3,13 +3,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { rpc } from '../../../lib/supabase';
 import { Card } from '../shell';
 import { ui } from '../../site-header';
-import { useT } from '../../i18n';
+import { useT, type TFunction } from '../../i18n';
+
+type DictKey = Parameters<TFunction>[0];
 import { useOwner } from './owner-context';
 
 type Row = { d: string; sales: number; orders: number; collected: number; expenses: number; lent: number };
 type Cur = { currency: string; rows: Row[] };
 type Metric = 'sales' | 'orders' | 'collected' | 'expenses' | 'lent';
-const METRICS: { key: Metric; label: string; color: string; money: boolean }[] = [
+const METRICS: { key: Metric; label: DictKey; color: string; money: boolean }[] = [
   { key: 'sales', label: 'gr2.sales', color: '#2563eb', money: true },
   { key: 'orders', label: 'gr2.orders', color: '#7c3aed', money: false },
   { key: 'collected', label: 'gr2.collected', color: '#10b981', money: true },
