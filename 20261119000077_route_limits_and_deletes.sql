@@ -1,0 +1,7 @@
+-- Aplicada por MCP (route_limits_and_deletes). Resumen:
+-- * perm_default: collector.delete_credits/customers/installments y loans.no_photo/no_id_photo = false por defecto.
+-- * create_street_loan: valida por ruta max_loan, max_cards, foto del cliente y fotos del carnet (permissions jsonb de collection_routes).
+-- * collector_day: devuelve can_delete_credits, can_delete_customers, can_delete_installments, commission_pct (3 por defecto), max_loan.
+-- * collector_delete_credit(p_order): anula un crédito sin cobros si la ruta lo permite.
+-- * collector_delete_customer(p_customer): borra (soft) a un cliente sin deuda si la ruta lo permite.
+-- Pendiente: "borrar cuotas" (permiso guardado, falta definir qué significa exactamente y su RPC).

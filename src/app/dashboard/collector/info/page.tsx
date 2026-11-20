@@ -12,7 +12,7 @@ type Row = { day: string; cash: number; digital: number; lent: number; expenses:
 type R = {
   id: string; name: string; branch: string; currency: string; today: string;
   unsettled_cash: number; unsettled_digital: number; unsettled_expenses: number; unsettled_loans?: number;
-  fund_balance?: number; days?: Row[]; can_portfolio?: boolean;
+  fund_balance?: number; days?: Row[]; can_portfolio?: boolean; commission_pct?: number;
   period?: { investments: number };
   customers: { balance: number; overdue: number; due_today: number; paid_today?: boolean }[];
 };
@@ -57,6 +57,7 @@ export default function RouteInfoPage() {
     [`${t('cx.sum.lent')} · ${t('cx.sum.day')}`, fmt(Number(today?.lent ?? 0)), 'text-violet-600 dark:text-violet-400'],
     [`${t('cx.sum.lent')} · ${t('cx.sum.week')}`, fmt(loans), 'text-violet-600 dark:text-violet-400'],
     [t('cx.sum.expenses'), fmt(Number(r.unsettled_expenses)), 'text-red-600 dark:text-red-400'],
+    [t('rt.commission', { pct: Number(r.commission_pct ?? 3) }), fmt(weekCollected * Number(r.commission_pct ?? 3) / 100), 'text-blue-600 dark:text-blue-400'],
     ...(r.can_portfolio ? [[t('cx.sum.portfolio'), fmt(portfolio)] as [string, string]] : []),
   ];
 

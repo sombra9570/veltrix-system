@@ -44,7 +44,7 @@ type Route = {
   fund_balance?: number; fund_float?: number;
   period?: Period; liquidations?: Liquidation[]; days?: DayRow[]; can_liquidate?: boolean; can_invest?: boolean;
   policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_interest?: boolean;
-  can_expenses?: boolean; can_portfolio?: boolean; can_settings?: boolean; pay_qr?: string | null; pay_qr_note?: string | null; org_id?: string; branch_id?: string; own_qr?: boolean; notices_unread?: number;
+  can_expenses?: boolean; can_portfolio?: boolean; can_settings?: boolean; can_delete_credits?: boolean; can_delete_customers?: boolean; commission_pct?: number; max_loan?: number; pay_qr?: string | null; pay_qr_note?: string | null; org_id?: string; branch_id?: string; own_qr?: boolean; notices_unread?: number;
   customers: Customer[]; settlements: Settlement[];
 };
 type Screen = 'home' | 'near' | 'list' | 'pending' | 'newclient' | 'settings';
@@ -586,7 +586,11 @@ export default function CollectorPage() {
 
             {sel && !panel && (
               <CustomerSheet c={selNow ?? sel} fmt={fmt} qr={route.pay_qr ?? null} online={online} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
-                cards={<Credits c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />} />
+                cards={<>
+                  <Credits c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
+                  <DeleteActions c={selNow ?? sel} canCredits={!!route.can_delete_credits} canCustomer={!!route.can_delete_customers} online={online}
+                    onDone={() => { setSel(null); setPanel(null); refresh(); }} />
+                </>} />
             )}
             {sel && panel === 'pay' && (
               <PayForm c={sel} fmt={fmt} onDone={(method, amount) => {
@@ -684,6 +688,37 @@ function Credits({ c, filter, today, policy, fmt, onSave }: {
         </div>
         );
       })}
+    </div>
+  );
+}
+
+/** Borrar créditos o al cliente: solo si el administrador lo permitió en los ajustes de la ruta */
+function DeleteActions({ c, canCredits, canCustomer, online, onDone }: { c: Customer; canCredits: boolean; canCustomer: boolean; online: boolean; onDone: () => void }) {
+  const { t } = useT();
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  if (!canCredits && !canCustomer) return null;
+  const run = async (fn: string, args: Record<string, string>) => {
+    if (!window.confirm(t('col.delConfirm'))) return;
+    setBusy(true); setErr('');
+    try { await rpc(fn, args); onDone(); }
+    catch (e) {
+      const m = (e as Error).message;
+      setErr(m.includes('CUSTOMER_HAS_DEBT') ? t('col.delDebt') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : m.includes('cobros') ? t('col.delPaid') : t('err.generic'));
+    } finally { setBusy(false); }
+  };
+  return (
+    <div className="space-y-2 border-t border-slate-200 pt-3 dark:border-slate-800">
+      {!online && <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">{t('loan.e.offline')}</p>}
+      {err && <p className="text-xs font-semibold text-red-600 dark:text-red-400">{err}</p>}
+      {canCredits && (c.credits ?? []).map((k, i) => (
+        <button key={k.id} type="button" disabled={busy || !online} onClick={() => run('collector_delete_credit', { p_order: k.id })}
+          className="w-full rounded-xl border border-red-300 px-3 py-2 text-sm font-bold text-red-600 cursor-pointer disabled:opacity-50 dark:border-red-500/40 dark:text-red-400">🗑️ {t('col.delCredit')} {(c.credits ?? []).length > 1 ? `#${i + 1}` : ''}</button>
+      ))}
+      {canCustomer && (
+        <button type="button" disabled={busy || !online} onClick={() => run('collector_delete_customer', { p_customer: c.id })}
+          className="w-full rounded-xl border border-red-300 px-3 py-2 text-sm font-bold text-red-600 cursor-pointer disabled:opacity-50 dark:border-red-500/40 dark:text-red-400">🗑️ {t('col.delCustomer')}</button>
+      )}
     </div>
   );
 }

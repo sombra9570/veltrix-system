@@ -82,6 +82,8 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
       const m = (e as Error).message;
       setErr(m.includes('LOAN_INTEREST_LOCKED') ? t('loan.e.interest') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm')
         : m.includes('LOAN_MAX_CUSTOMERS') ? t('loan.e.maxCustomers') : m.includes('LOAN_OTHER_ROUTE') ? t('loan.e.otherRoute')
+        : m.includes('LOAN_ROUTE_MAX_AMOUNT') ? t('loan.e.maxAmount') : m.includes('LOAN_ROUTE_MAX_CARDS') ? t('loan.e.maxCards')
+        : m.includes('LOAN_NEEDS_PHOTO') ? t('loan.e.photo') : m.includes('LOAN_NEEDS_ID') ? t('loan.e.id')
         : /fetch|network|Failed/i.test(m) ? t('loan.e.offline') : m);
     } finally { setBusy(false); }
   };

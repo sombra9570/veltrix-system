@@ -21,13 +21,15 @@ type Cust = {
   id: string; name: string; phone: string | null; address: string | null; tax_id: string | null; lat: number | null; lng: number | null;
   rating: string; balance: number; overdue: number; credits: RawCredit[];
 };
-type RouteRow = { id: string; name: string; collector: string | null; currency: string; permissions: Record<string, boolean> };
+type RouteRow = { id: string; name: string; collector: string | null; currency: string; permissions: Record<string, boolean | number> };
 type Fund = {
   id: string; currency: string; balance: number; invested: number; portfolio: number; period: Period;
   liquidations: { id: string; created_at: string; expected: number; counted: number; difference: number; closing: number }[];
   moves: { at: string; type: string; amount: number; note: string | null }[];
 };
-const PERMS = ['loans.create', 'loans.customers', 'loans.interest', 'routes.liquidate', 'routes.invest', 'collector.expenses', 'collector.portfolio', 'collector.settings'];
+const PERMS = ['loans.create', 'loans.customers', 'loans.interest', 'routes.liquidate', 'routes.invest', 'collector.expenses', 'collector.portfolio', 'collector.settings',
+  'collector.delete_installments', 'collector.delete_credits', 'collector.delete_customers', 'loans.no_photo', 'loans.no_id_photo'];
+const NUMS: [string, string, number | null][] = [['commission_pct', 'rt.commPct', 3], ['max_loan', 'rt.maxLoan', null], ['max_cards', 'rt.maxCards', null]];
 
 const toCredit = (k: RawCredit): Credit => ({
   id: k.id, created: k.created, total: k.total, every_days: k.every_days,
@@ -46,7 +48,7 @@ function RouteScreen() {
   const [sel, setSel] = useState<Cust | null>(null);
   const [q, setQ] = useState('');
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  const [perms, setPerms] = useState<Record<string, boolean>>({});
+  const [perms, setPerms] = useState<Record<string, boolean | number>>({});
   const [busy, setBusy] = useState(false);
   const [mv, setMv] = useState<{ type: 'investment' | 'withdrawal'; amount: string; note: string } | null>(null);
 
@@ -86,7 +88,7 @@ function RouteScreen() {
     lat: Number(c.lat), lng: Number(c.lng), label: c.name, icon: Number(c.overdue) > 0 ? '🔴' : '📍',
   }));
 
-  const savePerms = async (next: Record<string, boolean>) => {
+  const savePerms = async (next: Record<string, boolean | number>) => {
     setPerms(next); setBusy(true); setMsg(null);
     try { await rpc('route_set_permissions', { p_route: rid, p_perms: next }); setMsg({ ok: true, text: t('rt.saved') }); }
     catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); await load(); }
@@ -180,7 +182,7 @@ function RouteScreen() {
           </div>
           <ul className="space-y-3">
             {PERMS.map((key) => {
-              const v = perms[key];
+              const v = perms[key] as boolean | undefined;
               const val = v === undefined ? 'inherit' : v ? 'yes' : 'no';
               return (
                 <li key={key} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -199,6 +201,24 @@ function RouteScreen() {
               );
             })}
           </ul>
+          <div className="space-y-3 border-t border-slate-200 pt-3 dark:border-slate-800">
+            <h3 className="text-sm font-bold">📏 {t('rt.limitsTitle')}</h3>
+            {NUMS.map(([key, label, def]) => (
+              <label key={key} className="flex items-center justify-between gap-3">
+                <span className="min-w-0 text-sm font-semibold">{t(label as DictKey)}</span>
+                <input key={`${key}-${String(perms[key] ?? '')}`} inputMode="decimal" disabled={busy}
+                  defaultValue={perms[key] === undefined ? (def === null ? '' : String(def)) : String(perms[key])}
+                  placeholder={def === null ? t('rt.noLimit') : String(def)}
+                  onBlur={(e) => {
+                    const raw = e.target.value.trim().replace(',', '.');
+                    const n = { ...perms };
+                    if (raw === '') delete n[key]; else { const x = Number(raw); if (!Number.isFinite(x) || x < 0) return; n[key] = x; }
+                    if (JSON.stringify(n) !== JSON.stringify(perms)) savePerms(n);
+                  }}
+                  className={`${ui.input} !w-32 text-right`} />
+              </label>
+            ))}
+          </div>
         </Card>
       )}
 
@@ -206,6 +226,7 @@ function RouteScreen() {
         <Card className="space-y-3">
           {!fund ? <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p> : (() => {
             const p = fund.period;
+            const pct = typeof perms.commission_pct === 'number' ? perms.commission_pct : 3;
             const rows: [string, number, string?][] = [
               ...(Number(fund.invested) > 0 ? [[t('cx.sum.invest'), Number(fund.invested)] as [string, number]] : []),
               [t('cx.sum.prev'), Number(p.opening)],
@@ -214,9 +235,11 @@ function RouteScreen() {
               [t('cx.sum.expenses'), Number(p.collector_expenses), 'text-red-600 dark:text-red-400'],
               [t('cx.sum.current'), Number(fund.balance), Number(fund.balance) < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'],
               [t('cx.sum.portfolio'), Number(fund.portfolio)],
+              [t('rt.commission', { pct: pct }), (Number(p.collected_cash) + Number(p.collected_digital)) * pct / 100, 'text-blue-600 dark:text-blue-400'],
             ];
             return (
               <>
+                <p className={`text-[11px] ${ui.muted}`}>{t('rt.commHint')}</p>
                 <ul className="divide-y divide-slate-200 dark:divide-slate-800">
                   {rows.map(([label, v, cls]) => (
                     <li key={label} className="flex items-center justify-between gap-3 py-2.5">
