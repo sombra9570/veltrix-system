@@ -164,3 +164,9 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Pendiente: Diego crea PURGE_KEY (y CRON_SECRET) en Vercel; revisar cuenta de acceso sin empresa (equilibrium@gmail.com).
 - Sin verificar en pantalla.
 - Borrado automático por falta de renovación: construido y APAGADO (120 días tras la suspensión). Para que corra hace falta CRON_SECRET en Vercel (lo pone Diego) y encenderlo con la clave desde el panel. Falta el aviso por correo antes de borrar (depende de la decisión del correo de respaldo/Resend).
+
+## Antes del lanzamiento (acordado 2026-11-20: se hace al terminar las pruebas y dar el visto bueno)
+- Seguridad adecuada: crear PURGE_KEY y CRON_SECRET en Vercel, probar el borrado seguro y limpiar los 5 archivos sueltos de Dfg coorp (botón "Limpiar archivos de empresas ya borradas"), decidir el aviso por correo antes del borrado automático y encenderlo.
+- Pagos (Paddle) y revisión de facturación.
+- Arquitectura robusta: revisión de rendimiento, copias de seguridad, pruebas automáticas y vigilancia de errores.
+- Revisión de los textos legales con un abogado y traducción.
