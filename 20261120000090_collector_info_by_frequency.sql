@@ -1,0 +1,5 @@
+-- Información de ruta del cobrador: cobrado/prestado del período abierto, separados por frecuencia.
+-- Aplicada en la base vía migración "collector_info_by_frequency".
+-- order_every_days(p_order): días entre cuotas (loans.every_days o diferencia de las dos primeras cuotas).
+-- route_freq_split(p_route, p_collector): jsonb {daily:{collected,lent}, weekly:{collected,lent}}; diario = cada 1-3 días, semanal = el resto (null → 7).
+-- collector_info(): jsonb { "<route_id>": split } para auth.uid(); grant a authenticated.

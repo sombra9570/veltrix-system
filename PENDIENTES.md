@@ -145,3 +145,10 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 ## Kit de marca (20 nov)
 - Paso 1 hecho: `BRAND_KIT.md`, página `/marca`, piezas `dashboard/kit.tsx` (PageTitle, Pill, Loading, Empty), botones `btnDanger`/`btnOk`/alto 44 px, `Card` p-4/p-5, tokens de color y sin animación si el equipo lo pide.
 - Siguiente: aplicar por grupos (cobrador/supervisor → administrador → caja/mesas/cocina/delivery → resto), reemplazando tarjetas y botones a mano, subiendo texto de 10-11 px a 12 px y probando desde 320 px.
+
+## Info de ruta del cobrador (2026-11-20)
+- Quitado "Información de ruta" del menú lateral (queda la tarjeta de la pantalla principal).
+- Página rehecha: cifras del período abierto (desde el último cierre/liquidación), botones Diario/Semanal, listas desplegables de clientes con pagos y de préstamos/créditos.
+- Semanal = todo lo que paga cada más de 3 días (incluye quincenal/mensual). Pendiente si se quiere separar.
+- Cobrado/prestado/comisión cambian con el botón; caja anterior, inversión y gastos son de toda la ruta.
+- Sin verificar en pantalla.
