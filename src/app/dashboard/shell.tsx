@@ -313,5 +313,5 @@ export function UsageBar({ label, used, max }: { label: string; used: number; ma
 
 /** Tarjeta simple para números y secciones */
 export function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-2xl p-5 ${ui.card} ${className}`}>{children}</div>;
+  return <div className={`rounded-2xl p-4 sm:p-5 ${ui.card} ${className}`}>{children}</div>;
 }

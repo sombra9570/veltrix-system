@@ -141,3 +141,7 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Extras: fórmula precio del plan ÷ límite + 2 USD; storage +5 GB 3/4. Términos (es/en): SIN precios fijos; dicen que pueden variar por términos y costos de operación, con aviso de 15 días y derecho a cancelar. Chat por plan: 15/30/90/120/365 días (Básico/Startup/Empresa/Enterprise/Plus).
 - Paddle: todavía no vinculado, nada que cambiar allá. Textos legales solo existen en es y en; falta traducirlos a los otros 10 idiomas (después de la revisión del abogado).
 - Falta: IA (clave de Claude o Gemini, cupo por plan) y revisión de abogado.
+
+## Kit de marca (20 nov)
+- Paso 1 hecho: `BRAND_KIT.md`, página `/marca`, piezas `dashboard/kit.tsx` (PageTitle, Pill, Loading, Empty), botones `btnDanger`/`btnOk`/alto 44 px, `Card` p-4/p-5, tokens de color y sin animación si el equipo lo pide.
+- Siguiente: aplicar por grupos (cobrador/supervisor → administrador → caja/mesas/cocina/delivery → resto), reemplazando tarjetas y botones a mano, subiendo texto de 10-11 px a 12 px y probando desde 320 px.

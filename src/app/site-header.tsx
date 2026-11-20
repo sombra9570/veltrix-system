@@ -13,10 +13,18 @@ export const ui = {
     'w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500',
   label: 'block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1',
   muted: 'text-slate-500 dark:text-slate-400',
+  // Botones: alto mínimo cómodo para el dedo en celular (44 px) y más compacto en pantalla grande
   btnPrimary:
-    'inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50 transition cursor-pointer',
+    'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-500 disabled:opacity-50 transition cursor-pointer sm:min-h-10',
   btnGhost:
-    'inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 transition cursor-pointer',
+    'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 hover:border-slate-400 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 transition cursor-pointer sm:min-h-10',
+  btnDanger:
+    'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-red-500 disabled:opacity-50 transition cursor-pointer sm:min-h-10',
+  btnOk:
+    'inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-500 disabled:opacity-50 transition cursor-pointer sm:min-h-10',
+  // Títulos
+  title: 'text-xl font-extrabold sm:text-2xl',
+  subtitle: 'text-sm text-slate-500 dark:text-slate-400',
 };
 
 const selectCls =

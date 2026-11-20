@@ -14,6 +14,12 @@
 }
 
 @theme inline {
+  /* Kit de marca: colores con nombre (ver BRAND_KIT.md) */
+  --color-brand: #2563eb;
+  --color-brand-strong: #1d4ed8;
+  --color-ok: #059669;
+  --color-warn: #d97706;
+  --color-danger: #dc2626;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -74,3 +80,13 @@ main, section, header, footer, nav, aside {
 /* Nombre fijo debajo de cada punto del mapa (clientes de una ruta) */
 .leaflet-tooltip.vx-map-name { background: rgba(255,255,255,.92); border: 0; border-radius: 8px; padding: 1px 6px; font-size: 11px; font-weight: 700; color: #0f172a; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
 .leaflet-tooltip-bottom.vx-map-name::before { display: none; }
+
+/* Equipos con poca potencia o personas sensibles al movimiento: sin animaciones ni transiciones largas */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
