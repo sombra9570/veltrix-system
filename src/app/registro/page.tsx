@@ -49,7 +49,6 @@ function TriRow({ q, value, onChange, unsureLabel }: { q: string; value: Tri | n
 /** Formulario para quien no sabe qué necesita (o prefiere ayuda): lo atiende servicio al cliente. */
 function HelpForm({ auto, answers, onBack }: { auto: boolean; answers: Record<string, unknown>; onBack: () => void }) {
   const qq = useQ();
-  const [accepted, setAccepted] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -114,6 +113,7 @@ function HelpForm({ auto, answers, onBack }: { auto: boolean; answers: Record<st
 export default function RegistroPage() {
   const router = useRouter();
   const { loaded, session, registerCompany } = useVeltrixAuth();
+  const [accepted, setAccepted] = useState(false);
   const { country, lang } = useLanguage();
   const { t } = useT();
   const qq = useQ();
