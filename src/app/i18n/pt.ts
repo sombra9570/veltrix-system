@@ -112,6 +112,8 @@ const pt: Record<DictKey, string> = {
   'reg.companyNamePh': 'Ex.: Distribuidora Sol Nascente',
   'reg.taxIdOptional': '{taxId} (opcional)',
   'reg.taxIdPh': 'Número de {taxId}',
+  'reg.taxIdRequired': "{taxId} ou documento de identidade",
+  'val.taxId': "Informe o {taxId} ou o documento de identidade.",
   'reg.currencyInfo': 'Moeda: {currency} · Imposto: {taxName} {taxRate}%. Você poderá mudar depois.',
   'reg.ownerTitle': 'Sua conta de administrador',
   'reg.ownerHint': 'Você sempre entrará com este e-mail e senha. Seus funcionários você cria no seu painel.',

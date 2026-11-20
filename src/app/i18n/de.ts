@@ -112,6 +112,8 @@ const de: Record<DictKey, string> = {
   'reg.companyNamePh': 'z. B.: Sonnen-Großhandel',
   'reg.taxIdOptional': '{taxId} (optional)',
   'reg.taxIdPh': '{taxId}-Nummer',
+  'reg.taxIdRequired': "{taxId} oder Ausweisnummer",
+  'val.taxId': "Geben Sie die {taxId} oder die Ausweisnummer ein.",
   'reg.currencyInfo': 'Währung: {currency} · Steuer: {taxName} {taxRate} %. Sie können das später ändern.',
   'reg.ownerTitle': 'Ihr Administratorkonto',
   'reg.ownerHint': 'Sie melden sich immer mit dieser E-Mail und diesem Passwort an. Ihre Mitarbeiter legen Sie in Ihrem Dashboard an.',

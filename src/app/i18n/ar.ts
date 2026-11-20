@@ -112,6 +112,8 @@ const ar: Record<DictKey, string> = {
   'reg.companyNamePh': 'مثال: موزعو الشمس',
   'reg.taxIdOptional': '{taxId} (اختياري)',
   'reg.taxIdPh': 'رقم {taxId}',
+  'reg.taxIdRequired': "{taxId} أو وثيقة الهوية",
+  'val.taxId': "أدخل {taxId} أو رقم وثيقة الهوية.",
   'reg.currencyInfo': 'العملة: {currency} · الضريبة: {taxName} {taxRate}%. يمكنك تغييرها لاحقًا.',
   'reg.ownerTitle': 'حساب المدير',
   'reg.ownerHint': 'ستدخل دائمًا بهذا البريد وكلمة المرور. تنشئ حسابات موظفيك من لوحتك.',

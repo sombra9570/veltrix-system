@@ -112,6 +112,8 @@ const zh: Record<DictKey, string> = {
   'reg.companyNamePh': '例如：太阳批发公司',
   'reg.taxIdOptional': '{taxId}（可选）',
   'reg.taxIdPh': '{taxId} 号码',
+  'reg.taxIdRequired': "{taxId} 或身份证件号码",
+  'val.taxId': "请填写 {taxId} 或身份证件号码。",
   'reg.currencyInfo': '货币：{currency} · 税：{taxName} {taxRate}%。之后可以修改。',
   'reg.ownerTitle': '您的管理员账户',
   'reg.ownerHint': '您将始终使用此邮箱和密码登录。员工账户由您在面板中创建。',

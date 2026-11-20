@@ -112,6 +112,8 @@ const ja: Record<DictKey, string> = {
   'reg.companyNamePh': '例：サンライズ卸売',
   'reg.taxIdOptional': '{taxId}（任意）',
   'reg.taxIdPh': '{taxId}番号',
+  'reg.taxIdRequired': "{taxId} または本人確認書類番号",
+  'val.taxId': "{taxId} または本人確認書類の番号を入力してください。",
   'reg.currencyInfo': '通貨：{currency} · 税：{taxName} {taxRate}%。後から変更できます。',
   'reg.ownerTitle': '管理者アカウント',
   'reg.ownerHint': 'このメールアドレスとパスワードで常にログインします。従業員はパネルから作成します。',

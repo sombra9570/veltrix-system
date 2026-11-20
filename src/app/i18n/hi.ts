@@ -112,6 +112,8 @@ const hi: Record<DictKey, string> = {
   'reg.companyNamePh': 'जैसे: सूरज वितरक',
   'reg.taxIdOptional': '{taxId} (वैकल्पिक)',
   'reg.taxIdPh': '{taxId} नंबर',
+  'reg.taxIdRequired': "{taxId} या पहचान दस्तावेज़",
+  'val.taxId': "{taxId} या पहचान दस्तावेज़ की संख्या दर्ज करें।",
   'reg.currencyInfo': 'मुद्रा: {currency} · कर: {taxName} {taxRate}%. आप इसे बाद में बदल सकते हैं।',
   'reg.ownerTitle': 'आपका प्रशासक खाता',
   'reg.ownerHint': 'आप हमेशा इसी ईमेल और पासवर्ड से लॉग इन करेंगे। अपने कर्मचारियों को आप डैशबोर्ड से बनाते हैं।',

@@ -112,6 +112,8 @@ const ko: Record<DictKey, string> = {
   'reg.companyNamePh': '예: 해돋이 유통',
   'reg.taxIdOptional': '{taxId} (선택)',
   'reg.taxIdPh': '{taxId} 번호',
+  'reg.taxIdRequired': "{taxId} 또는 신분증 번호",
+  'val.taxId': "{taxId} 또는 신분증 번호를 입력하세요.",
   'reg.currencyInfo': '통화: {currency} · 세금: {taxName} {taxRate}%. 나중에 변경할 수 있습니다.',
   'reg.ownerTitle': '총괄 관리자 계정',
   'reg.ownerHint': '항상 이 이메일과 비밀번호로 로그인합니다. 직원 계정은 대시보드에서 직접 만듭니다.',

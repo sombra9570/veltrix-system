@@ -118,6 +118,8 @@ const es = {
   'reg.companyNamePh': 'Ej.: Distribuidora El Sol',
   'reg.taxIdOptional': '{taxId} (opcional)',
   'reg.taxIdPh': 'Número de {taxId}',
+  'reg.taxIdRequired': "{taxId} o documento de identidad",
+  'val.taxId': "Escribe el {taxId} o el documento de identidad.",
   'reg.currencyInfo': 'Moneda: {currency} · Impuesto: {taxName} {taxRate}%. Podrás cambiarlo después.',
   'reg.ownerTitle': 'Tu cuenta de administrador',
   'reg.ownerHint': 'Con este correo y contraseña entrarás siempre. A tus trabajadores los creas tú desde tu panel.',

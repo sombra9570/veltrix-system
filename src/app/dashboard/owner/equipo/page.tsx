@@ -23,9 +23,8 @@ type Row = { userId: string; name: string; email: string; roles: string[]; branc
 export default function TeamPage() {
   const { orgId, reload, overview, modules } = useOwner();
   const [niches, setNiches] = useState<string[]>([]);
-  const limitedPlan = ['basic', 'starter', 'pro'].includes(overview?.org.plan_code ?? '');
   // En planes chicos solo se ofrecen los cargos propios del nicho del negocio
-  const nicheRoles: string[] | null = limitedPlan && niches.length ? suggestedRoles(niches) : null;
+  const nicheRoles: string[] | null = niches.length ? suggestedRoles(niches) : null;
   const roles = ROLES.filter((r) => (!(['secretary', 'director'] as string[]).includes(r) || ['pro', 'enterprise', 'enterprise_plus'].includes(overview?.org.plan_code ?? '')) && (!ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!)) && (r !== 'delivery' || modules.length === 0 || modules.some((m) => DELIVERY_MODULES.includes(m))) && (!nicheRoles || nicheRoles.includes(r) || r === 'secretary' || r === 'director' || r === 'reception'));
   const { t } = useT();
   const roleLabel = (r: string) => t(`role.${r}` as DictKey);

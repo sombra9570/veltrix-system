@@ -231,6 +231,7 @@ export default function RegistroPage() {
     }
     if (step === LAST) {
       if (!compName.trim()) return t('val.companyName');
+      if (!taxId.trim()) return t('val.taxId', { taxId: country.taxIdName });
       if (!ownerName.trim()) return t('val.ownerName');
       if (!/^\S+@\S+\.\S+$/.test(email.trim())) return t('val.email');
       if (pass1.length < 8) return t('val.passMin');
@@ -554,8 +555,8 @@ export default function RegistroPage() {
                   </select>
                 </div>
                 <div>
-                  <label className={ui.label}>{t('reg.taxIdOptional', { taxId: country.taxIdName })}</label>
-                  <input className={ui.input} value={taxId} onChange={(e) => setTaxId(e.target.value)}
+                  <label className={ui.label}>{t('reg.taxIdRequired', { taxId: country.taxIdName })} *</label>
+                  <input className={ui.input} required value={taxId} onChange={(e) => setTaxId(e.target.value)}
                     placeholder={t('reg.taxIdPh', { taxId: country.taxIdName })} />
                 </div>
               </div>

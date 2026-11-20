@@ -112,6 +112,8 @@ const ru: Record<DictKey, string> = {
   'reg.companyNamePh': 'Напр.: Оптовая компания «Солнце»',
   'reg.taxIdOptional': '{taxId} (необязательно)',
   'reg.taxIdPh': 'Номер {taxId}',
+  'reg.taxIdRequired': "{taxId} или документ, удостоверяющий личность",
+  'val.taxId': "Введите {taxId} или номер документа, удостоверяющего личность.",
   'reg.currencyInfo': 'Валюта: {currency} · Налог: {taxName} {taxRate}%. Это можно изменить позже.',
   'reg.ownerTitle': 'Ваш аккаунт администратора',
   'reg.ownerHint': 'Вы всегда будете входить с этой почтой и паролем. Сотрудников вы создаёте в своей панели.',

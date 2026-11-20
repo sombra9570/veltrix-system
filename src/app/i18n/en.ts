@@ -112,6 +112,8 @@ const en: Record<DictKey, string> = {
   'reg.companyNamePh': 'E.g.: Sunrise Distributors',
   'reg.taxIdOptional': '{taxId} (optional)',
   'reg.taxIdPh': '{taxId} number',
+  'reg.taxIdRequired': "{taxId} or ID document",
+  'val.taxId': "Enter the {taxId} or ID document number.",
   'reg.currencyInfo': 'Currency: {currency} · Tax: {taxName} {taxRate}%. You can change it later.',
   'reg.ownerTitle': 'Your administrator account',
   'reg.ownerHint': 'You will always log in with this email and password. You create your employees from your dashboard.',
