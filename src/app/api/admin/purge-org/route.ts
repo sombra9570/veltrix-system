@@ -78,6 +78,12 @@ export async function POST(request: Request) {
       return Response.json(data);
     }
     case 'setkey': {
+      // Cambiar la clave exige la actual, con el mismo bloqueo por intentos que el borrado
+      const { data: st } = await admin.rpc('purge_key_status', { p_actor: actor });
+      if ((st as { configured?: boolean } | null)?.configured) {
+        const bad = await checkKey(body.key, 'setkey', null, null);
+        if (bad) return bad;
+      }
       const { error } = await admin.rpc('purge_key_set', { p_actor: actor, p_new: body.newKey ?? '', p_current: body.key ?? null });
       if (error) return fail(400, error.message.includes('LENGTH') ? 'KEY_LENGTH' : error.message.includes('WRONG') ? 'KEY_WRONG' : error.message.includes('LOCKED') ? 'KEY_LOCKED' : error.message);
       return Response.json({ ok: true });

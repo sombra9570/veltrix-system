@@ -9,7 +9,7 @@ import { Spinner } from '../../spinner';
 import { TransferAdmin } from './transfer-admin';
 import { NetBanner } from '../sync';
 import { PlatformBell } from './platform-bell';
-import { PurgeOrg, SweepFiles } from './purge-org';
+import { PurgeOrg, PurgeKeyPanel, SweepFiles } from './purge-org';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -545,7 +545,7 @@ export default function GlobalCoreAdminPage() {
               {busy ? 'Cargando…' : 'Todavía no hay empresas aquí. Cuando alguien se registre en veltrixsystem.app aparecerá en esta lista.'}
             </p>
           )}
-          <div className="mb-2"><SweepFiles onDone={setPurgeDone} /></div>
+          <div className="mb-2 flex flex-wrap items-start gap-2"><PurgeKeyPanel onDone={setPurgeDone} /><SweepFiles onDone={setPurgeDone} /></div>
           {purgeDone && <p className="mb-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2 text-xs font-semibold text-emerald-300">{purgeDone}</p>}
           {orgs.map((o) => (
             <div key={o.org_id} className="p-4 rounded-xl border bg-slate-900/70 border-slate-800 flex flex-col md:flex-row justify-between gap-3">

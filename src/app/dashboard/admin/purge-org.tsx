@@ -148,3 +148,45 @@ export function SweepFiles({ onDone }: { onDone: (msg: string) => void }) {
     </div>
   );
 }
+
+// Crear o cambiar la clave de borrado (una sola para todas las empresas; se guarda cifrada y no se puede ver)
+export function PurgeKeyPanel({ onDone }: { onDone: (msg: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [configured, setConfigured] = useState<boolean | null>(null);
+  const [cur, setCur] = useState('');
+  const [k1, setK1] = useState('');
+  const [k2, setK2] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState('');
+  const show = async () => {
+    setOpen(true); setMsg('');
+    const st = await call({ action: 'status' });
+    setConfigured(st.ok ? !!st.data.configured : null);
+    if (!st.ok) setMsg(explain(st.data));
+  };
+  const close = () => { setOpen(false); setCur(''); setK1(''); setK2(''); setMsg(''); };
+  const save = async () => {
+    if (k1 !== k2) { setMsg('Las dos claves no coinciden.'); return; }
+    setBusy(true); setMsg('');
+    const r = await call({ action: 'setkey', newKey: k1, key: configured ? cur : undefined });
+    setBusy(false);
+    if (!r.ok) { setMsg(explain(r.data)); return; }
+    close(); onDone(configured ? '🔑 Clave de borrado cambiada.' : '🔑 Clave de borrado creada. Guárdala: no se puede ver después.');
+  };
+  if (!open) return <button type="button" onClick={show} className={ghostBtn}>🔑 Clave de borrado</button>;
+  return (
+    <div className="max-w-xs space-y-2">
+      <p className="text-[11px] text-slate-300">
+        {configured ? 'Cambiar la clave de borrado (10 a 12 caracteres). Pide la actual.' : 'Crea la clave de borrado (10 a 12 caracteres). Vale para todas las empresas, también las que se creen después.'}
+      </p>
+      {configured && <input type="password" autoComplete="off" value={cur} onChange={(e) => setCur(e.target.value)} className={field} aria-label="Clave actual" placeholder="Clave actual" />}
+      <input type="password" autoComplete="new-password" value={k1} onChange={(e) => setK1(e.target.value)} className={field} aria-label="Clave nueva" placeholder="Clave nueva" />
+      <input type="password" autoComplete="new-password" value={k2} onChange={(e) => setK2(e.target.value)} className={field} aria-label="Repite la clave nueva" placeholder="Repite la clave nueva" />
+      {msg && <p className="text-[11px] font-semibold text-red-300">{msg}</p>}
+      <div className="flex gap-2">
+        <button type="button" disabled={busy || configured === null || k1.length < 10 || k1.length > 12 || k1 !== k2 || (!!configured && cur.length < 10)} onClick={save} className={dangerBtn}>{busy ? 'Guardando…' : 'Guardar'}</button>
+        <button type="button" disabled={busy} onClick={close} className={ghostBtn}>Cancelar</button>
+      </div>
+    </div>
+  );
+}
