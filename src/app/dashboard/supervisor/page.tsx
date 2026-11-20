@@ -12,11 +12,12 @@ import { DaysTable } from '../collector/days-table';
 import { CutForm } from '../collector/cut-form';
 import { RouteTrail } from '../route-trail';
 import { ApprovalsTray } from '../approvals';
+import SupPanel from './panel';
 import { useBoard, type SRoute, type SBranch } from './board';
 
 // Panel del supervisor: cajas de ruta de sus sucursales, cobrado y prestado por día,
 // cierre de caja e inversión según los permisos que le dio el administrador.
-export default function SupervisorRoutes() {
+function BranchBoard() {
   const { t } = useT();
   const { board, error, load } = useBoard();
   const { modules } = useStaff();
@@ -132,4 +133,12 @@ function RouteCard({ r, b, onChanged, onError }: { r: SRoute; b: SBranch; onChan
       <RouteTrail routeId={r.id} currency={r.currency} />
     </Card>
   );
+}
+
+export default function SupervisorHome() {
+  const { modules } = useStaff();
+  const { t } = useT();
+  if (modules === null) return <Card><p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p></Card>;
+  const cobranza = modules.includes('field_collection') && !modules.some((m) => ['retail', 'restaurant', 'workshop'].includes(m));
+  return cobranza ? <SupPanel /> : <BranchBoard />;
 }

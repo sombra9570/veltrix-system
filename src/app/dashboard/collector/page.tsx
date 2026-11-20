@@ -44,7 +44,7 @@ type Route = {
   fund_balance?: number; fund_float?: number;
   period?: Period; liquidations?: Liquidation[]; days?: DayRow[]; can_liquidate?: boolean; can_invest?: boolean;
   policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_interest?: boolean;
-  can_expenses?: boolean; can_portfolio?: boolean; can_settings?: boolean; can_delete_credits?: boolean; can_delete_customers?: boolean; commission_pct?: number; max_loan?: number; pay_qr?: string | null; pay_qr_note?: string | null; org_id?: string; branch_id?: string; own_qr?: boolean; notices_unread?: number;
+  can_expenses?: boolean; can_portfolio?: boolean; can_settings?: boolean; can_delete_credits?: boolean; can_delete_customers?: boolean; commission_pct?: number; locked?: boolean; max_loan?: number; pay_qr?: string | null; pay_qr_note?: string | null; org_id?: string; branch_id?: string; own_qr?: boolean; notices_unread?: number;
   customers: Customer[]; settlements: Settlement[];
 };
 type Screen = 'home' | 'near' | 'list' | 'pending' | 'newclient' | 'settings';
@@ -454,14 +454,15 @@ export default function CollectorPage() {
 
       {screen === 'home' && (
         <>
+          {route.locked && <p className="mb-3 rounded-xl border border-red-300 bg-red-50 p-3 text-xs font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">🔒 {t('sp.lockedInfo')}</p>}
           <div className="mx-auto grid max-w-xl grid-cols-2 gap-3">
             <MenuTile icon="pin" tone="blue" label={`${t('cx.nearby')}${nearCount === null ? '' : ` (${nearCount})`}`} onClick={() => go('near')} />
             <MenuTile icon="clock" tone="amber" label={`${t('cx.pending')} (${pendingCustomers.length})`} onClick={() => go('pending')} />
             <MenuTile icon="users" tone="plain" label={`${t('cx.list')} (${route.customers.length})`} onClick={() => go('list')} />
-            <MenuTile icon="userPlus" tone="blue" label={t('cx.newClient')} onClick={() => go('newclient')} />
+            <MenuTile icon="userPlus" tone="blue" label={t('cx.newClient')} onClick={() => go('newclient')} disabled={!!route.locked} />
             <MenuTile icon="wallet" tone="plain" label={t('nav.routeInfo')} onClick={() => router.push('/dashboard/collector/info')} />
-            {canExpenses && <MenuTile icon="receipt" tone="amber" label={t('cx.expenses')} onClick={() => { setSel(null); setPanel('expense'); }} />}
-            {route.can_liquidate && <MenuTile icon="refresh" tone="blue" label={t('cx.settle')} onClick={() => { setSel(null); setPanel('settle'); }} />}
+            {canExpenses && <MenuTile icon="receipt" tone="amber" label={t('cx.expenses')} onClick={() => { setSel(null); setPanel('expense'); }} disabled={!!route.locked} />}
+            {route.can_liquidate && <MenuTile icon="refresh" tone="blue" label={t('cx.settle')} onClick={() => { setSel(null); setPanel('settle'); }} disabled={!!route.locked} />}
             <MenuTile icon="sliders" tone="plain" label={`${t('cx.settings')}${unread > 0 ? ` (${unread})` : ''}`} onClick={() => go('settings')} />
           </div>
         </>
@@ -540,7 +541,7 @@ export default function CollectorPage() {
                 </div>
                 <button type="button" onClick={() => { setSel(c); setPanel(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>👤 {t('card.profile')}</button>
               </div>
-              <Credits c={c} filter={freq} today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
+              <Credits locked={!!route.locked} c={c} filter={freq} today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
               {(c.credits ?? []).length === 0 && <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>}
             </Card>
           ))}
@@ -585,9 +586,9 @@ export default function CollectorPage() {
             </div>
 
             {sel && !panel && (
-              <CustomerSheet c={selNow ?? sel} fmt={fmt} qr={route.pay_qr ?? null} online={online} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
+              <CustomerSheet locked={!!route.locked} c={selNow ?? sel} fmt={fmt} qr={route.pay_qr ?? null} online={online} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
                 cards={<>
-                  <Credits c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
+                  <Credits locked={!!route.locked} c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
                   <DeleteActions c={selNow ?? sel} canCredits={!!route.can_delete_credits} canCustomer={!!route.can_delete_customers} online={online}
                     onDone={() => { setSel(null); setPanel(null); refresh(); }} />
                 </>} />
@@ -652,7 +653,8 @@ function Dot({ r }: { r?: string }) {
   return <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${RATING_DOT[r] ?? RATING_DOT.new}`} title={t(`rating.${r}` as DictKey)} />;
 }
 
-function Credits({ c, filter, today, policy, fmt, onSave }: {
+function Credits({ c, filter, today, policy, fmt, onSave, locked = false }: {
+  locked?: boolean;
   c: Customer; filter: Freq | 'all'; today: string; policy?: LoanPolicy; fmt: (n: number) => string;
   onSave: (order: string, amount: number, method: Method) => void;
 }) {
@@ -684,7 +686,7 @@ function Credits({ c, filter, today, policy, fmt, onSave }: {
             <p className="text-right"><span className={ui.muted}>{t('card.hValue')}: </span><span className="font-bold">{fmt(Number(k.installments[0]?.amount ?? 0))}</span></p>
             <p className="col-span-2"><span className={ui.muted}>{t('loan.count')}: </span><span className="font-bold">{k.installments.length}</span><span className={ui.muted}> · {t(`card.f.${f}` as DictKey)} · </span><span className="font-bold">{fmt(Number(k.total))}</span></p>
           </div>
-          <CreditCard credit={k} today={today} fmt={fmt} onSave={(amount, method) => onSave(k.id, amount, method)} />
+          <CreditCard credit={k} today={today} fmt={fmt} readOnly={locked} onSave={(amount, method) => onSave(k.id, amount, method)} />
         </div>
         );
       })}
@@ -723,7 +725,7 @@ function DeleteActions({ c, canCredits, canCustomer, online, onDone }: { c: Cust
   );
 }
 
-function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, cards }: { c: Customer; fmt: (n: number) => string; qr: string | null; online: boolean; onPay: () => void; onVisit: () => void; cards: ReactNode }) {
+function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, cards, locked = false }: { locked?: boolean; c: Customer; fmt: (n: number) => string; qr: string | null; online: boolean; onPay: () => void; onVisit: () => void; cards: ReactNode }) {
   const { t, lang } = useT();
   const map = c.lat != null && c.lng != null
     ? `https://maps.google.com/?q=${c.lat},${c.lng}`
@@ -768,8 +770,8 @@ function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, cards }: { c: Custo
       </div>
       {qr && c.phone && <button type="button" onClick={sendQr} disabled={!online} className={`${ui.btnGhost} w-full`}>📲 {t('cx.cs.sendQr')}</button>}
       <div className="grid grid-cols-2 gap-2">
-        <button type="button" onClick={onVisit} className={ui.btnGhost}>📝 {t('col.visit')}</button>
-        <button type="button" onClick={onPay} className={`${ui.btnPrimary} py-3`}>💵 {t('col.collect')}</button>
+        <button type="button" disabled={locked} onClick={onVisit} className={ui.btnGhost}>📝 {t('col.visit')}</button>
+        <button type="button" disabled={locked} onClick={onPay} className={`${ui.btnPrimary} py-3`}>💵 {t('col.collect')}</button>
       </div>
       {(c.credits ?? []).length > 0 && (
         <div className="space-y-2 border-t border-slate-200 pt-4 dark:border-slate-800">

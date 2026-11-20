@@ -1,0 +1,7 @@
+-- Aplicada por MCP (supervisor_panel_supervision). Resumen:
+-- * collection_routes.locked_by/locked_at: el supervisor bloquea al cobrador (solo consulta).
+-- * assert_route_open(route): lo llaman collector_expense, collector_visit, create_street_loan, collector_save_customer, close_route, register_payment;
+--   si el que actúa es el cobrador de una ruta bloqueada → ROUTE_LOCKED.
+-- * route_supervisions + route_supervision_log (RLS sin políticas: solo vía RPC).
+-- * RPC del supervisor: sup_my_routes, sup_route_detail, sup_set_lock, sup_log, sup_update_customer, sup_finish (envía el reporte al administrador y desbloquea).
+-- * collector_day devuelve 'locked'.
