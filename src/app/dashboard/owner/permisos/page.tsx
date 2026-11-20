@@ -92,7 +92,7 @@ export default function PermissionsPage() {
             <h2 className="font-bold">🏷️ {t('lim.title')}</h2>
             <p className={`mb-3 text-xs ${ui.muted}`}>{t('lim.hint')}</p>
             <div className="grid gap-3 sm:grid-cols-3">
-              {['cashier', 'vendor', 'waiter'].map((role) => (
+              {['cashier', 'vendor', 'waiter'].filter((role) => teamRoles.length === 0 || teamRoles.includes(role)).map((role) => (
                 <label key={role} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3 dark:border-slate-800">
                   <span className="text-sm font-semibold">{k(`role.${role}`)}</span>
                   <span className="flex items-center gap-1">
