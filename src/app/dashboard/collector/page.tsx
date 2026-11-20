@@ -144,6 +144,9 @@ export default function CollectorPage() {
   // Último cobro, para ofrecer el comprobante por WhatsApp
   const [receipt, setReceipt] = useState<{ phone: string; text: string } | null>(null);
   const flushing = useRef(false);
+  // Acciones hechas desde la última descarga completa: al pasar el límite (app muy cargada) se reconcilia con el servidor
+  const sinceSync = useRef(0);
+  const RECONCILE_EVERY = 25;
 
   const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 5000); };
   // Borrar cuota (revertir un cobro): solo con señal y si el administrador lo permitió en la ruta
@@ -174,6 +177,7 @@ export default function CollectorPage() {
   const refresh = useCallback(async () => {
     try {
       const d = normalizeDay(await rpc<Day>('collector_day'));
+      sinceSync.current = 0;
       setDay(d);
       save(DAY_KEY, d);
       setRouteId((r) => (d.routes.some((x) => x.id === r) ? r : d.routes[0]?.id ?? ''));
@@ -262,8 +266,11 @@ export default function CollectorPage() {
     }
     // Solo vuelve a descargar el día si se envió algo o si se pidió
     // Al abrir / ↻ / bloqueo: se descarga el día. Si solo se envió algo: se actualiza únicamente lo tocado.
-    if (force || lockedHit) await refresh();
-    else if (sent > 0) for (const [rid, set] of touched) await patch(rid, { customers: [...set], totals: true });
+    // Las cifras ya se calcularon en el teléfono al anotar (caja, cobrado, deuda del cliente): no se lee nada más.
+    // Solo se tira del servidor al abrir / ↻ / bloqueo, si hubo rechazos, o cuando se acumulan muchas acciones.
+    const hadRejects = load<unknown[]>(REJ_KEY, []).length > 0;
+    if (force || lockedHit || hadRejects || sinceSync.current >= RECONCILE_EVERY) await refresh();
+    void touched;
   }, [QUEUE_KEY, REJ_KEY, refresh, patch, t]);
 
   const retryRejected = (id: string) => {
@@ -306,6 +313,7 @@ export default function CollectorPage() {
   }, [routeKey, patch]);
 
   const enqueue = (op: Op) => {
+    sinceSync.current += 1;
     const next = [...load<Op[]>(QUEUE_KEY, []), op];
     save(QUEUE_KEY, next);
     setQueue(next);
