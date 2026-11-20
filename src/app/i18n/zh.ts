@@ -2153,6 +2153,8 @@ const zh: Record<DictKey, string> = {
   "gr2.total": "期间合计",
   "gr2.best": "最佳时段",
   "gr2.empty": "暂无可绘制曲线的数据。",
+  "store.editBtn": "编辑",
+  "store.linkLocked": "链接不可更改：已通过二维码、社交媒体和 WhatsApp 分享。",
   "sp.new": "商店新商品",
   "sp.hint": "上传照片（必填），填写名称和价格。如有尺码或颜色，请添加，每种组合有各自库存。",
   "sp.photoOk": "照片已就绪",

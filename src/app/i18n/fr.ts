@@ -2153,6 +2153,8 @@ const fr: Record<DictKey, string> = {
   "gr2.total": "Total de la période",
   "gr2.best": "Meilleure période",
   "gr2.empty": "Aucune activité pour tracer des courbes.",
+  "store.editBtn": "Modifier",
+  "store.linkLocked": "Le lien ne peut pas être changé : il est déjà partagé via QR, réseaux et WhatsApp.",
   "sp.new": "Nouveau produit pour la boutique",
   "sp.hint": "Ajoutez la photo (obligatoire), le nom et le prix. S'il y a des tailles ou couleurs, ajoutez-les : chaque combinaison a son propre stock.",
   "sp.photoOk": "Photo prête",

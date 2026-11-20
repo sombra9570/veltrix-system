@@ -45,6 +45,7 @@ export default function StoreAdminPage() {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [origin, setOrigin] = useState('');
   const [newOpen, setNewOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -80,6 +81,7 @@ export default function StoreAdminPage() {
       });
       flash(true, t('store.saved'));
       await load();
+      setEditing(false);
     } catch (err) { flash(false, storeError((err as Error).message, t)); } finally { setBusy(false); }
   };
 
@@ -204,6 +206,7 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
   if (!data || !form) return <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p>;
   const pm = data.perms ?? { create: true, photo: true, publish: true, edit: true };
   const pe = pm.edit;
+  const showForm = pe && (editing || !data.store.whatsapp);
   const published = data.products.filter((p) => p.in_store).length;
   const logo = storeImageUrl(data.store.logo_path);
 
@@ -223,9 +226,22 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
 
       {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? okBox : errBox}`}>{msg.text}</p>}
 
-      <div className="grid gap-4 lg:grid-cols-5">
-        {/* Datos de la tienda */}
-        <Card className="lg:col-span-3">
+      {/* Tienda ya configurada: solo logo, nombre y editar */}
+      {!showForm && (
+        <Card className="flex items-center gap-3 !p-3">
+          <span className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-slate-100 text-2xl dark:bg-slate-800">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {logo ? <img src={logo} alt="" className="h-full w-full object-cover" /> : '🏪'}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-bold">{data.store.name}</p>
+            {data.store.description && <p className={`line-clamp-1 text-xs ${ui.muted}`}>{data.store.description}</p>}
+          </div>
+          {pe && <button type="button" onClick={() => setEditing(true)} className={`${ui.btnGhost} shrink-0`}>✏️ {t('store.editBtn')}</button>}
+        </Card>
+      )}
+      {showForm && (
+        <Card>
           <form onSubmit={save} className="grid gap-4 sm:grid-cols-2">
           <fieldset disabled={!pe} className="contents">
             <div className="flex items-center gap-4 sm:col-span-2">
@@ -241,12 +257,9 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
               <input type="tel" inputMode="tel" value={form.whatsapp ?? ''} placeholder="+591 70000000" onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} className={ui.input} />
             </div>
             <div className="sm:col-span-2">
-              <label className={ui.label}>{t('store.link')}</label>
-              <div className="flex items-center overflow-hidden rounded-xl border border-slate-300 dark:border-slate-700">
-                <span className={`hidden shrink-0 bg-slate-50 px-3 py-2.5 text-sm sm:block dark:bg-slate-800 ${ui.muted}`}>{origin.replace(/^https?:\/\//, '')}/tienda/</span>
-                <input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
-                  className="w-full bg-transparent px-3 py-2.5 text-sm outline-none" />
-              </div>
+              <label className={ui.label}>🔒 {t('store.link')}</label>
+              <p className="break-all rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-xs dark:border-slate-800 dark:bg-slate-800/50">{link}</p>
+              <p className={`mt-1 text-xs ${ui.muted}`}>{t('store.linkLocked')}</p>
             </div>
             <div className="sm:col-span-2">
               <label className={ui.label}>{t('store.description')}</label>
@@ -267,52 +280,18 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
                 <span className={`block text-xs ${ui.muted}`}>{t('store.publishHint')}</span>
               </span>
             </label>
-            <button type="submit" disabled={busy} className={`${ui.btnPrimary} sm:col-span-2`}>{busy ? t('common.wait') : t('prod.save')}</button>
+            <div className="grid gap-2 sm:col-span-2 sm:grid-cols-2">
+              {data.store.whatsapp && <button type="button" onClick={() => { setForm(data.store); setEditing(false); }} className={ui.btnGhost}>{t('card.cancel')}</button>}
+              <button type="submit" disabled={busy} className={`${ui.btnPrimary} ${data.store.whatsapp ? '' : 'sm:col-span-2'}`}>{busy ? t('common.wait') : t('prod.save')}</button>
+            </div>
           </fieldset>
           </form>
         </Card>
+      )}
 
-        {/* Compartir */}
-        <Card className="space-y-3 lg:col-span-2">
-          <h2 className="font-bold">📣 {t('store.share')}</h2>
-          {data.store.is_published ? (
-            <>
-              <p className="break-all rounded-lg bg-slate-50 p-2 font-mono text-xs dark:bg-slate-800">{link}</p>
-              <div className="grid grid-cols-2 gap-2">
-                <button type="button" onClick={share} className={ui.btnPrimary}>🔗 {t('store.shareBtn')}</button>
-                <a href={link} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>👁️ {t('store.view')}</a>
-                <a href={`https://wa.me/?text=${encodeURIComponent(`${form.name} 👉 ${link}`)}`} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>💬 WhatsApp</a>
-                <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>📘 Facebook</a>
-              </div>
-              {(() => {
-                const own = data.store.own_qr_path ? storeImageUrl(data.store.own_qr_path) : null;
-                const gen = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=12&format=png&data=${encodeURIComponent(link)}`;
-                const qr = own ?? gen;
-                return (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={qr} alt="QR" width={240} height={240} className="mx-auto h-60 w-60 rounded-xl bg-white object-contain p-1" />
-                    <p className={`text-center text-xs ${ui.muted}`}>{own ? t('store.qrOwn') : t('store.qrHint')}</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      <a href={qr} download={`qr-${form.slug}.png`} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>⬇️ {t('store.qrDownload')}</a>
-                      <button type="button" onClick={() => printCard(qr)} className={`${ui.btnGhost} cursor-pointer`}>🖨️ {t('store.qrPrint')}</button>
-                      <label className={`${ui.btnGhost} relative cursor-pointer text-center`}>📤 {t('store.qrUpload')}
-                        <input type="file" accept="image/*" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; setOwnQr(f); }} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
-                      </label>
-                      {own && <button type="button" disabled={busy} onClick={useVeltrixQr} className={`${ui.btnGhost} cursor-pointer`}>↺ {t('store.qrUseVeltrix')}</button>}
-                    </div>
-                  </>
-                );
-              })()}
-            </>
-          ) : (
-            <p className={`text-sm ${ui.muted}`}>{t('store.notPublished')}</p>
-          )}
-        </Card>
-      </div>
-
+      <div className="grid gap-4 lg:grid-cols-5">
       {/* Productos de la tienda */}
-      <Card className="space-y-3">
+        <Card className="space-y-3 lg:col-span-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-bold">{t('store.products')}</h2>
           <span className={`rounded-full px-3 py-1 text-xs font-bold ${data.max_products !== null && published >= data.max_products ? 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300' : 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300'}`}>
@@ -361,6 +340,44 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
           })}
         </ul>
       </Card>
+        {/* Compartir */}
+        <Card className="space-y-3 lg:order-last lg:col-span-2">
+          <h2 className="font-bold">📣 {t('store.share')}</h2>
+          {data.store.is_published ? (
+            <>
+              <p className="break-all rounded-lg bg-slate-50 p-2 font-mono text-xs dark:bg-slate-800">{link}</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button type="button" onClick={share} className={ui.btnPrimary}>🔗 {t('store.shareBtn')}</button>
+                <a href={link} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>👁️ {t('store.view')}</a>
+                <a href={`https://wa.me/?text=${encodeURIComponent(`${form.name} 👉 ${link}`)}`} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>💬 WhatsApp</a>
+                <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>📘 Facebook</a>
+              </div>
+              {(() => {
+                const own = data.store.own_qr_path ? storeImageUrl(data.store.own_qr_path) : null;
+                const gen = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=12&format=png&data=${encodeURIComponent(link)}`;
+                const qr = own ?? gen;
+                return (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={qr} alt="QR" width={240} height={240} className="mx-auto h-60 w-60 rounded-xl bg-white object-contain p-1" />
+                    <p className={`text-center text-xs ${ui.muted}`}>{own ? t('store.qrOwn') : t('store.qrHint')}</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <a href={qr} download={`qr-${form.slug}.png`} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>⬇️ {t('store.qrDownload')}</a>
+                      <button type="button" onClick={() => printCard(qr)} className={`${ui.btnGhost} cursor-pointer`}>🖨️ {t('store.qrPrint')}</button>
+                      <label className={`${ui.btnGhost} relative cursor-pointer text-center`}>📤 {t('store.qrUpload')}
+                        <input type="file" accept="image/*" disabled={busy} onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; setOwnQr(f); }} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
+                      </label>
+                      {own && <button type="button" disabled={busy} onClick={useVeltrixQr} className={`${ui.btnGhost} cursor-pointer`}>↺ {t('store.qrUseVeltrix')}</button>}
+                    </div>
+                  </>
+                );
+              })()}
+            </>
+          ) : (
+            <p className={`text-sm ${ui.muted}`}>{t('store.notPublished')}</p>
+          )}
+        </Card>
+      </div>
     </div>
   );
 }

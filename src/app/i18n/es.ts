@@ -2162,6 +2162,8 @@ const es = {
   "gr2.total": "Total del periodo",
   "gr2.best": "Mejor periodo",
   "gr2.empty": "Aún no hay movimientos para mostrar curvas.",
+  "store.editBtn": "Editar",
+  "store.linkLocked": "El enlace no se puede cambiar: ya está compartido en QR, redes y WhatsApp.",
   "sp.new": "Producto nuevo para la tienda",
   "sp.hint": "Sube la foto (obligatoria), pon nombre y precio. Si tiene tallas o colores, agrégalos y cada combinación llevará su propio stock.",
   "sp.photoOk": "Foto lista",

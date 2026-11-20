@@ -2153,6 +2153,8 @@ const ja: Record<DictKey, string> = {
   "gr2.total": "期間合計",
   "gr2.best": "最高の期間",
   "gr2.empty": "曲線を表示するデータがまだありません。",
+  "store.editBtn": "編集",
+  "store.linkLocked": "リンクは変更できません。QR・SNS・WhatsAppで共有済みです。",
   "sp.new": "ストアの新商品",
   "sp.hint": "写真（必須）、名前、価格を入力。サイズやカラーがある場合は追加すると、組み合わせごとに在庫を持ちます。",
   "sp.photoOk": "写真OK",

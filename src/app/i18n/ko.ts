@@ -2153,6 +2153,8 @@ const ko: Record<DictKey, string> = {
   "gr2.total": "기간 합계",
   "gr2.best": "최고 기간",
   "gr2.empty": "곡선을 그릴 거래가 아직 없습니다.",
+  "store.editBtn": "편집",
+  "store.linkLocked": "링크는 변경할 수 없습니다. QR, SNS, WhatsApp으로 이미 공유되었습니다.",
   "sp.new": "스토어 새 상품",
   "sp.hint": "사진(필수), 이름, 가격을 입력하세요. 사이즈나 색상이 있으면 추가하세요. 조합마다 재고가 따로 관리됩니다.",
   "sp.photoOk": "사진 준비됨",
