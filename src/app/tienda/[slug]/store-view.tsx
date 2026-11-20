@@ -21,7 +21,6 @@ export function StoreView({ slug }: { slug: string }) {
   const [q, setQ] = useState('');
   const [cart, setCart] = useState<Line[]>([]);
   const [open, setOpen] = useState(false);
-  const [view, setView] = useState<Product | null>(null);
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
   const [sel, setSel] = useState<Record<string, { size?: string; color?: string }>>({});
@@ -223,11 +222,11 @@ export function StoreView({ slug }: { slug: string }) {
               const chip = (on: boolean, ok: boolean) => `rounded-lg border px-2.5 py-1 text-xs font-bold cursor-pointer disabled:cursor-not-allowed disabled:line-through disabled:opacity-40 ${on ? 'border-blue-500 bg-blue-50 text-blue-600 dark:text-blue-400' : 'border-slate-300 dark:border-slate-700'} ${ok ? '' : 'opacity-40'}`;
               return (
                 <article key={p.id} className={`flex flex-col overflow-hidden rounded-2xl ${ui.card}`}>
-                  <button type="button" onClick={() => setView(p)} className="relative aspect-square bg-slate-100 cursor-pointer dark:bg-slate-800">
+                  <div className="relative aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     {src ? <img src={src} alt={p.name} loading="lazy" decoding="async" onError={(e) => { if (full && e.currentTarget.src !== full) e.currentTarget.src = full; }} className="h-full w-full object-cover" /> : <span className="grid h-full place-items-center text-4xl">{p.type === 'service' ? '🛠️' : '📦'}</span>}
                     <span className={`absolute inset-x-0 bottom-0 py-1 text-center text-xs font-bold text-white ${p.available ? 'bg-emerald-600/85' : 'bg-black/60'}`}>{p.available ? `✓ ${t('shop2.inStock')}` : t('pos.out')}</span>
-                  </button>
+                  </div>
                   <div className="flex flex-1 flex-col gap-2 p-3">
                     <p className="line-clamp-2 text-sm font-semibold">{p.name}</p>
                     <p className="text-lg font-extrabold">{p.model ? `${t('shop2.from')} ` : ''}{fmt(from)}</p>
@@ -283,44 +282,6 @@ export function StoreView({ slug }: { slug: string }) {
           <button type="button" onClick={() => setOpen(true)} className={`${ui.btnPrimary} mx-auto w-full max-w-xl justify-between py-3 text-base`}>
             <span>🛒 {t('shop2.cart')} · {units}</span><span>{fmt(total)}</span>
           </button>
-        </div>
-      )}
-
-      {/* Detalle de producto */}
-      {view && (
-        <div className="fixed inset-x-0 top-0 z-40 h-dvh">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setView(null)} />
-          <div className="absolute inset-x-0 bottom-0 mx-auto max-h-[90dvh] max-w-xl overflow-y-auto rounded-t-3xl bg-white pb-[calc(1.25rem+env(safe-area-inset-bottom))] dark:bg-slate-900">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            {storeImageUrl(view.photo) && <img src={storeImageUrl(view.photo)!} alt={view.name} className="max-h-[55dvh] w-full bg-slate-100 object-contain dark:bg-slate-800" />}
-            <div className="space-y-3 p-5">
-              <h2 className="text-xl font-extrabold">{view.name}</h2>
-              <p className="text-2xl font-extrabold">{view.model ? fmt(Math.min(...store.products.filter((x) => x.model === view.model).map((x) => Number(x.price)))) : fmt(view.price)}</p>
-              {view.description && <p className={`text-sm ${ui.muted}`}>{view.description}</p>}
-              {view.model ? (
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold">{t('shop2.pickVariant')}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {store.products.filter((x) => x.model === view.model).map((v) => {
-                      const n = cart.find((l) => l.p.id === v.id)?.qty ?? 0;
-                      return (
-                        <button key={v.id} type="button" disabled={!v.available} onClick={() => add(v)}
-                          className={`rounded-xl border px-3 py-2 text-sm font-semibold cursor-pointer disabled:cursor-not-allowed disabled:line-through disabled:opacity-40 ${n > 0 ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10' : 'border-slate-300 dark:border-slate-700'}`}>
-                          {[v.size, v.color].filter(Boolean).join(' · ') || v.name}{n > 0 && ` ×${n}`}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <button type="button" onClick={() => setView(null)} className={`${ui.btnGhost} w-full`}>{t('pos.close')}</button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  <button type="button" onClick={() => setView(null)} className={ui.btnGhost}>{t('pos.close')}</button>
-                  <button type="button" disabled={!view.available} onClick={() => { add(view); setView(null); }} className={ui.btnPrimary}>{t('shop2.add')}</button>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
       )}
 
