@@ -138,6 +138,6 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 
 ## Precios nuevos aplicados (20 nov)
 - Planes (local / global USD): Básico 13/24, Startup 25/49, Empresa 55/95, Enterprise 145/275, Enterprise Plus 265/485 (E+ ahora con todos los módulos).
-- Extras: fórmula precio del plan ÷ límite + 2 USD; storage +5 GB 3/4. Términos (es/en) ahora listan planes, extras y aviso de 15 días; chat 15/30/90/365/730 días.
-- Paddle: todavía no vinculado, nada que cambiar allá. Si se agregan precios nuevos, actualizar sección 3 de /terminos.
+- Extras: fórmula precio del plan ÷ límite + 2 USD; storage +5 GB 3/4. Términos (es/en): SIN precios fijos; dicen que pueden variar por términos y costos de operación, con aviso de 15 días y derecho a cancelar. Chat por plan: 15/30/90/120/365 días (Básico/Startup/Empresa/Enterprise/Plus).
+- Paddle: todavía no vinculado, nada que cambiar allá. Textos legales solo existen en es y en; falta traducirlos a los otros 10 idiomas (después de la revisión del abogado).
 - Falta: IA (clave de Claude o Gemini, cupo por plan) y revisión de abogado.
