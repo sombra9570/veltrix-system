@@ -19,6 +19,7 @@ import { SignalButton } from './signal';
 import { MenuTile } from './tiles';
 import { NearbyScreen, NEAR_METERS, distanceM } from './nearby';
 import { NewClient } from './new-client';
+import { Credits } from './credits';
 import { SettingsScreen, payQrUrl } from './settings';
 
 /* ------------------------------------------------------------------
@@ -173,6 +174,7 @@ export default function CollectorPage() {
   // Envía la cola, de a uno y en orden
   const flush = useCallback(async (force = false) => {
     let sent = 0;
+    let lockedHit = false;
     if (flushing.current) return;
     flushing.current = true;
     setSyncing(true);
@@ -206,6 +208,8 @@ export default function CollectorPage() {
           // Sin señal o corte por tiempo: se reintenta más tarde (el identificador evita duplicar).
           // Rechazo real (p. ej. monto mayor a la deuda): NO se pierde, queda en "rechazados" para revisar.
           if (isNetworkError(m) || !navigator.onLine) break;
+          // Ruta bloqueada por el supervisor: lo anotado se conserva en la cola y se envía al desbloquear
+          if (m.includes('ROUTE_LOCKED')) { lockedHit = true; break; }
           const rej = [...load<(Op & { reason: string })[]>(REJ_KEY, []).filter((o) => o.id !== op.id), { ...op, reason: m }];
           save(REJ_KEY, rej);
           setRejected(rej);
@@ -220,7 +224,7 @@ export default function CollectorPage() {
       setSyncing(false);
     }
     // Solo vuelve a descargar el día si se envió algo o si se pidió
-    if (sent > 0 || force) await refresh();
+    if (sent > 0 || force || lockedHit) await refresh();
   }, [QUEUE_KEY, REJ_KEY, refresh, t]);
 
   const retryRejected = (id: string) => {
@@ -250,6 +254,18 @@ export default function CollectorPage() {
   }, [online, flush, QUEUE_KEY]);
   // El día completo se vuelve a descargar unas 5 veces al día o con el botón ↻
   useSync(refresh);
+
+  // El bloqueo/desbloqueo del supervisor se refleja solo: revisa cada 20 s (visible y con señal) y al volver a la app
+  useEffect(() => {
+    const tick = () => {
+      if (document.visibilityState !== 'visible' || !navigator.onLine) return;
+      if (load<Op[]>(QUEUE_KEY, []).length > 0) void flush(true); else void refresh();
+    };
+    const id = setInterval(tick, 20_000);
+    document.addEventListener('visibilitychange', tick);
+    window.addEventListener('focus', tick);
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', tick); window.removeEventListener('focus', tick); };
+  }, [flush, refresh, QUEUE_KEY]);
 
   const enqueue = (op: Op) => {
     const next = [...load<Op[]>(QUEUE_KEY, []), op];
@@ -651,47 +667,6 @@ function Dot({ r }: { r?: string }) {
   const { t } = useT();
   if (!r) return null;
   return <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${RATING_DOT[r] ?? RATING_DOT.new}`} title={t(`rating.${r}` as DictKey)} />;
-}
-
-function Credits({ c, filter, today, policy, fmt, onSave, locked = false }: {
-  locked?: boolean;
-  c: Customer; filter: Freq | 'all'; today: string; policy?: LoanPolicy; fmt: (n: number) => string;
-  onSave: (order: string, amount: number, method: Method) => void;
-}) {
-  const { t, lang } = useT();
-  const all = c.credits ?? [];
-  const list = all.filter((k) => filter === 'all' || freqOf(k) === filter);
-  if (all.length === 0) return <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>;
-  return (
-    <div className="space-y-4">
-      {list.map((k) => {
-        // Atraso contado desde las fechas del crédito: borde rojo al llegar al tope de su frecuencia
-        const late = k.installments.filter((i) => i.due < today && Number(i.amount) - Number(i.paid) > 0.004).length;
-        const f = freqOf(k);
-        const limit = Number((policy as Record<string, number> | undefined)?.[`late_${f}`] ?? ({ daily: 10, weekly: 2, biweekly: 1, monthly: 1 })[f]);
-        const border = late >= limit && limit > 0 ? 'border-4 border-red-500' : late > 0 ? 'border-2 border-amber-400' : 'border border-slate-200 dark:border-slate-800';
-        return (
-        <div key={k.id} className={`space-y-2 rounded-xl p-3 ${border}`}>
-          {late > 0 && (
-            <p className={`text-xs font-bold ${late >= limit ? 'text-red-600 dark:text-red-400' : 'text-amber-700 dark:text-amber-300'}`}>
-              {late >= limit ? '🚨' : '⚠️'} {t('card.lateN', { n: late })}
-            </p>
-          )}
-          {all.length > 1 && (
-            <p className="text-xs font-bold">💳 {t('card.creditN', { n: all.indexOf(k) + 1, total: all.length })}</p>
-          )}
-          {/* Encabezado como la tarjeta de papel: fecha, valor de cada cuota y total */}
-          <div className="grid grid-cols-2 gap-x-3 gap-y-1 rounded-lg bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800/50">
-            <p><span className={ui.muted}>{t('card.hDate')}: </span><span className="font-bold">{new Date(k.created).toLocaleDateString(lang)}</span></p>
-            <p className="text-right"><span className={ui.muted}>{t('card.hValue')}: </span><span className="font-bold">{fmt(Number(k.installments[0]?.amount ?? 0))}</span></p>
-            <p className="col-span-2"><span className={ui.muted}>{t('loan.count')}: </span><span className="font-bold">{k.installments.length}</span><span className={ui.muted}> · {t(`card.f.${f}` as DictKey)} · </span><span className="font-bold">{fmt(Number(k.total))}</span></p>
-          </div>
-          <CreditCard credit={k} today={today} fmt={fmt} readOnly={locked} onSave={(amount, method) => onSave(k.id, amount, method)} />
-        </div>
-        );
-      })}
-    </div>
-  );
 }
 
 /** Borrar créditos o al cliente: solo si el administrador lo permitió en los ajustes de la ruta */

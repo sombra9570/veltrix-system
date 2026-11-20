@@ -8,21 +8,26 @@ import type { DictKey } from '../../i18n/es';
 import { money } from '../format';
 import { useStaff } from '../staff-context';
 import { MenuTile } from '../collector/tiles';
-import { CreditCard, type Credit } from '../collector/credit-card';
+import { CreditCard, freqOf, type Credit, type Freq } from '../collector/credit-card';
+import { ShowMore } from '../paged';
+import { Credits } from '../collector/credits';
+import { NewClient } from '../collector/new-client';
 import { CutForm, type Period } from '../collector/cut-form';
 import { DeliveryMap, type MapPoint } from '../delivery-map';
 import { RATING_DOT } from '../collector/loan-form';
 
 /* Panel del supervisor de cobranza: sus rutas asignadas; cada acción queda grabada y al terminar se envía el reporte al administrador */
 type RawCredit = { id: string; created: string; total: number; every_days: number | null; i?: [number, string, number, number, string | null][] };
-type Cust = { id: string; name: string; phone: string | null; address: string | null; tax_id: string | null; lat: number | null; lng: number | null; rating: string; balance: number; overdue: number; credits: RawCredit[] };
+type Cust = { id: string; name: string; phone: string | null; address: string | null; tax_id: string | null; lat: number | null; lng: number | null; rating: string; balance: number; overdue: number; credits: Credit[];
+  due_today: number; paid_today: boolean; visited_today: boolean; next_due: string | null;
+  last_visit: { at: string; result: string; notes: string | null; promise_date: string | null } | null };
 type RouteLite = { id: string; name: string; collector: string | null; locked: boolean; currency: string; customers: number; supervising: boolean };
 type Detail = {
   id: string; name: string; locked: boolean; collector: string | null; currency: string; balance: number; period: Period; portfolio: number;
   liquidations: { id: string; created_at: string; closing: number; difference: number }[];
-  can_liquidate: boolean; supervising: boolean; customers: Cust[];
+  can_liquidate: boolean; supervising: boolean; customers: Cust[]; org_id: string; today: string; can_customers: boolean;
 };
-type Screen = 'home' | 'list' | 'map' | 'info' | 'liq' | 'notes' | 'rate';
+type Screen = 'home' | 'list' | 'pending' | 'newclient' | 'map' | 'info' | 'liq' | 'notes' | 'rate';
 const toCredit = (k: RawCredit): Credit => ({
   id: k.id, created: k.created, total: k.total, every_days: k.every_days,
   installments: (k.i ?? []).map(([n, due, amount, paid, last_at]) => ({ id: `${k.id}:${n}`, n, due, amount: Number(amount), paid: Number(paid), last_at })),
@@ -53,12 +58,18 @@ export default function SupPanel() {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState('');
   const [phone, setPhone] = useState('');
+  const [freq, setFreq] = useState<Freq | 'all'>('all');
+  const [limit, setLimit] = useState(25);
+  useEffect(() => { setLimit(25); }, [freq, q, rid]);
 
   const loadList = useCallback(async () => {
     try { setRoutes((await rpc<RouteLite[]>('sup_my_routes')) ?? []); } catch { setRoutes([]); }
   }, []);
   const loadRoute = useCallback(async (id: string) => {
-    try { setD(await rpc<Detail>('sup_route_detail', { p_route: id })); } catch (e) { setMsg({ ok: false, text: (e as Error).message }); }
+    try {
+      const raw = await rpc<Omit<Detail, 'customers'> & { customers: (Omit<Cust, 'credits'> & { credits: RawCredit[] })[] }>('sup_route_detail', { p_route: id });
+      setD({ ...raw, customers: raw.customers.map((c) => ({ ...c, credits: (c.credits ?? []).map(toCredit) })) });
+    } catch (e) { setMsg({ ok: false, text: (e as Error).message }); }
   }, []);
   useEffect(() => { loadList(); }, [loadList]);
   useEffect(() => { if (rid) loadRoute(rid); else setD(null); }, [rid, loadRoute]);
@@ -68,7 +79,7 @@ export default function SupPanel() {
     else if (screen !== 'home') setScreen('home');
     else if (rid) { setRid(null); loadList(); }
   };
-  const titles: Record<string, string> = { list: 'rt.list', map: 'rt.map', info: 'nav.routeInfo', liq: 'rt.liq', notes: 'sp.notes', rate: 'sp.rateCollector' };
+  const titles: Record<string, string> = { list: 'rt.list', pending: 'cx.pending', newclient: 'cx.newClient', map: 'rt.map', info: 'nav.routeInfo', liq: 'rt.liq', notes: 'sp.notes', rate: 'sp.rateCollector' };
   useHeaderSlot({
     title: userName,
     subtitle: rid && d ? `${d.name}${screen !== 'home' ? ' · ' + (sel ? sel.name : t(titles[screen] as DictKey)) : ''}` : (routes ?? []).map((r) => r.name).join(' · '),
@@ -115,8 +126,13 @@ export default function SupPanel() {
 
   if (!d) return <p className={`text-sm ${ui.muted}`}>{msg?.text ?? t('common.wait')}</p>;
   const m = (n: number) => money(Number(n), d.currency, lang);
-  const today = new Date().toISOString().slice(0, 10);
-  const list = d.customers.filter((c) => { const s = q.trim().toLowerCase(); return !s || c.name.toLowerCase().includes(s) || (c.address ?? '').toLowerCase().includes(s); });
+  const today = d.today ?? new Date().toISOString().slice(0, 10);
+  const sq = q.trim().toLowerCase();
+  const byFreq = freq === 'all' ? d.customers : d.customers.filter((c) => c.credits.some((k) => freqOf(k) === freq));
+  const listAll = byFreq.filter((c) => !sq || c.name.toLowerCase().includes(sq) || (c.address ?? '').toLowerCase().includes(sq) || (c.tax_id ?? '').toLowerCase().includes(sq));
+  const list = listAll.slice(0, limit);
+  const pending = d.customers.filter((c) => !c.paid_today && Number(c.overdue) + Number(c.due_today) > 0.004).sort((x, y) => Number(y.overdue) - Number(x.overdue));
+  const dot = (c: Cust) => c.paid_today ? '✅' : Number(c.overdue) > 0 ? '🔴' : Number(c.due_today) > 0 ? '🟡' : '⚪';
   const points: MapPoint[] = d.customers.filter((c) => c.lat != null && c.lng != null).map((c) => ({ lat: Number(c.lat), lng: Number(c.lng), label: c.name, icon: Number(c.overdue) > 0 ? '🔴' : '📍' }));
 
   const finish = async () => {
@@ -141,7 +157,9 @@ export default function SupPanel() {
       {screen === 'home' && (
         <>
           <div className="grid max-w-xl grid-cols-2 gap-3">
-            <MenuTile icon="users" label={t('rt.list')} tone="blue" onClick={() => setScreen('list')} />
+            <MenuTile icon="users" label={`${t('rt.list')} (${d.customers.length})`} tone="blue" onClick={() => setScreen('list')} />
+            <MenuTile icon="clock" label={`${t('cx.pending')} (${d.customers.filter((c) => !c.paid_today && Number(c.overdue) + Number(c.due_today) > 0.004).length})`} tone="amber" onClick={() => setScreen('pending')} />
+            {d.can_customers && <MenuTile icon="userPlus" label={t('cx.newClient')} tone="blue" onClick={() => setScreen('newclient')} />}
             <MenuTile icon="pin" label={t('rt.map')} tone="blue" onClick={() => setScreen('map')} />
             <MenuTile icon="receipt" label={t('nav.routeInfo')} tone="plain" onClick={() => setScreen('info')} />
             {d.can_liquidate && <MenuTile icon="refresh" label={t('rt.liq')} tone="amber" onClick={() => setScreen('liq')} />}
@@ -155,26 +173,61 @@ export default function SupPanel() {
       )}
 
       {screen === 'list' && !sel && (
-        <Card className="space-y-3">
+        <div className="space-y-3">
           <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('cust.search')} className={ui.input} />
-          {list.length === 0 ? <p className={`text-sm ${ui.muted}`}>{t('rt.noCust')}</p> : (
-            <ul className="divide-y divide-slate-200 dark:divide-slate-800">
-              {list.map((c) => (
-                <li key={c.id}>
-                  <button type="button" onClick={() => { setSel(c); setPhone(c.phone ?? ''); }} className="flex w-full items-center gap-3 py-3 text-start cursor-pointer">
-                    <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${RATING_DOT[c.rating] ?? RATING_DOT.new}`} />
-                    <span className="min-w-0 flex-1"><span className="block truncate font-semibold">{c.name}</span><span className={`block truncate text-xs ${ui.muted}`}>{c.address ?? c.phone ?? '—'}</span></span>
-                    <span className="shrink-0 text-end text-xs"><b className="block">{t('rt.owes', { amount: m(c.balance) })}</b>
-                      {Number(c.overdue) > 0 && <span className="font-semibold text-red-600 dark:text-red-400">{t('rt.late', { amount: m(c.overdue) })}</span>}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
+          <div className="flex flex-wrap gap-1">
+            {(['all', 'daily', 'weekly', 'biweekly', 'monthly'] as const).map((f) => {
+              const n = f === 'all' ? d.customers.length : d.customers.filter((c) => c.credits.some((k) => freqOf(k) === f)).length;
+              if (f !== 'all' && n === 0) return null;
+              return (
+                <button key={f} type="button" onClick={() => setFreq(f)}
+                  className={`rounded-full px-3 py-1 text-xs font-bold cursor-pointer ${freq === f ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'border border-slate-300 dark:border-slate-700'}`}>
+                  {f === 'all' ? t('card.all') : t(`card.f.${f}` as DictKey)} · {n}
+                </button>
+              );
+            })}
+          </div>
+          {list.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('rt.noCust')}</p></Card>}
+          {list.map((c) => (
+            <Card key={c.id} className={`space-y-3 ${c.visited_today ? 'opacity-80' : ''}`}>
+              <div className="flex items-start gap-3">
+                <span className="text-xl">{dot(c)}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="flex items-start gap-1.5 break-words font-bold leading-tight"><span className={`mt-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-full ${RATING_DOT[c.rating] ?? RATING_DOT.new}`} /><span className="min-w-0">{c.name}</span></p>
+                  <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
+                </div>
+                <button type="button" onClick={() => { setSel(c); setPhone(c.phone ?? ''); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>👤 {t('card.profile')}</button>
+              </div>
+              <Credits locked c={c} filter={freq} today={today} fmt={m} onSave={() => undefined} />
+            </Card>
+          ))}
+          <ShowMore rest={listAll.length - list.length} onClick={() => setLimit((x) => x + 25)} />
+        </div>
       )}
 
-      {screen === 'list' && sel && (
+      {screen === 'pending' && !sel && (
+        <div className="space-y-2">
+          <h2 className="font-bold">⏳ {t('cx.pend.title', { n: pending.length })}</h2>
+          {pending.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('cx.pend.none')}</p></Card>}
+          <ul className="space-y-2">
+            {pending.map((c) => (
+              <li key={c.id}>
+                <button type="button" onClick={() => { setSel(c); setPhone(c.phone ?? ''); }} className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer ${ui.card}`}>
+                  <span className="text-xl">{dot(c)}</span>
+                  <div className="min-w-0 flex-1"><p className="break-words font-bold leading-tight">{c.name}</p><p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p></div>
+                  <p className="shrink-0 whitespace-nowrap text-sm font-extrabold">{m(Number(c.overdue) + Number(c.due_today))}</p>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {screen === 'newclient' && d.can_customers && (
+        <NewClient routeId={d.id} orgId={d.org_id} online canLoan={false} onSaved={async () => { try { await log('other', { text: 'new_customer' }); } catch { /* ya se creó */ } await loadRoute(d.id); }} onLoan={() => undefined} />
+      )}
+
+      {(screen === 'list' || screen === 'pending') && sel && (
         <div className="space-y-3">
           <Card className="space-y-3 text-sm">
             <p className="text-lg font-extrabold">{sel.name}</p>
@@ -197,7 +250,7 @@ export default function SupPanel() {
           {sel.credits.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('card.noCards')}</p></Card> : sel.credits.map((k) => (
             <Card key={k.id}>
               <p className={`mb-2 text-xs ${ui.muted}`}>{new Date(k.created).toLocaleDateString(lang)} · {m(k.total)}</p>
-              <CreditCard credit={toCredit(k)} today={today} fmt={m} onSave={() => undefined} readOnly />
+              <CreditCard credit={k} today={today} fmt={m} onSave={() => undefined} readOnly />
             </Card>
           ))}
         </div>

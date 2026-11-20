@@ -1,0 +1,3 @@
+-- Documentación (aplicada vía MCP):
+--  * sup_route_detail: por cliente due_today, next_due, paid_today, visited_today, last_visit; y org_id, today, can_customers.
+--  * collector_save_customer / collector_set_customer_files: también permiten al supervisor asignado (r.supervisor_id).

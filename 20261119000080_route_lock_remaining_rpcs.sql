@@ -1,0 +1,2 @@
+-- Documentación (aplicada vía MCP): assert_route_open también en register_payment (ruta del cliente), collector_set_qr,
+-- collector_set_customer_files, collector_delete_credit y collector_delete_customer.
