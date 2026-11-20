@@ -5,7 +5,7 @@ import { supabase } from '../../../lib/supabase';
 import { useT } from '../../i18n';
 import { ThemeToggle } from '../../theme';
 import { ui } from '../../site-header';
-import { storeImageUrl } from '../../dashboard/image';
+import { storeImageUrl, storeThumbUrl } from '../../dashboard/image';
 import { Spinner } from '../../spinner';
 
 type Product = { id: string; name: string; price: number; type: string; description: string | null; photo: string | null; unit: string; available: boolean };
@@ -204,13 +204,14 @@ export function StoreView({ slug }: { slug: string }) {
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
             {list.map((p) => {
-              const src = storeImageUrl(p.photo);
+              const src = storeThumbUrl(p.photo);
+              const full = storeImageUrl(p.photo);
               const qty = cart.find((l) => l.p.id === p.id)?.qty ?? 0;
               return (
                 <article key={p.id} className={`flex flex-col overflow-hidden rounded-2xl ${ui.card}`}>
                   <button type="button" onClick={() => setView(p)} className="relative aspect-square bg-slate-100 cursor-pointer dark:bg-slate-800">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {src ? <img src={src} alt={p.name} loading="lazy" className="h-full w-full object-cover" /> : <span className="grid h-full place-items-center text-4xl">{p.type === 'service' ? '🛠️' : '📦'}</span>}
+                    {src ? <img src={src} alt={p.name} loading="lazy" decoding="async" onError={(e) => { if (full && e.currentTarget.src !== full) e.currentTarget.src = full; }} className="h-full w-full object-cover" /> : <span className="grid h-full place-items-center text-4xl">{p.type === 'service' ? '🛠️' : '📦'}</span>}
                     {!p.available && <span className="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-center text-xs font-bold text-white">{t('pos.out')}</span>}
                   </button>
                   <div className="flex flex-1 flex-col gap-2 p-3">

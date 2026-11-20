@@ -112,3 +112,15 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Reportes: liquidaciones anteriores + reportes del supervisor (RPC supervisor_report existe; falta el botón de enviar en el panel del supervisor).
 - Permisos: sin topes, vendedor, contador ni excepciones por persona; cajero = "Liquidador" (permisos por definir).
 - Pendiente: probar con 3 clientes de prueba (diario/semanal/mensual), panel del supervisor con inicio y barra integrada, bloque Supervisor en Permisos.
+
+## Lecturas y avisos (20 nov)
+- Sin consultas por reloj: `useSync` ahora es solo manual (al abrir, ↻ y al volver la señal). Mesas, cocina, delivery, despacho, aprobaciones, mensajes y pedidos públicos se actualizan por aviso en vivo (Realtime, migración 086: triggers `live_ping*` → temas `org:<org>:<tipo>`, `req:<id>`, `plat:<user>`). Respaldo lento de 90 s solo en pedidos públicos en curso.
+- Cobrador: reconciliación con el servidor cada 100 acciones (antes 25).
+- Fotos de tienda/carta: miniatura (~15 KB, archivo `-t`) para listas; la grande al tocar. Las fotos antiguas se completan solas la primera vez que el dueño abre Tienda; mientras tanto la lista usa la grande.
+- Pantallas del administrador de cobranza (ruta, préstamos): tras una acción solo se vuelve a leer lo que cambió.
+- Falta: fotos de clientes/garantes (bucket privado) con miniatura; auditar el resto de pantallas del dueño.
+
+## Registro como test y avisos al superadmin (20 nov, migración 087)
+- Registro por preguntas (qué vende → cuántos negocios → sucursales → rubro por grupos compatibles → equipo → detalles → resumen → cuenta), "No estoy seguro" en cada pregunta; 3 o más dudas = formulario de ayuda (tabla `support_leads`) en vez de crear empresa. 12 idiomas.
+- Superadmin/servicio al cliente: campanita (solicitudes, empresas nuevas, mensajes de clientes) y pestaña "Solicitudes".
+- Falta: push real con la app cerrada, correo de respaldo (Resend gratis: verificar dominio en Porkbun), separar de verdad varios negocios en un mismo administrador.

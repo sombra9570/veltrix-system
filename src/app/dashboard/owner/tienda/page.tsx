@@ -7,7 +7,7 @@ import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { money } from '../../format';
 import { PhotoSlot } from '../../photo-picker';
-import { compressImage, extFor, storeImageUrl } from '../../image';
+import { compressImage, extFor, storeImageUrl, makeThumb, thumbPath } from '../../image';
 
 type Company = { id: string; legal_name: string };
 type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean };
@@ -84,7 +84,7 @@ export default function StoreAdminPage() {
     if (error) throw new Error(error.message);
     return path;
   };
-  const removeOld = async (path: string | null) => { if (path) await supabase.storage.from(BUCKET).remove([path]); };
+  const removeOld = async (path: string | null) => { if (path) await supabase.storage.from(BUCKET).remove([path, thumbPath(path)]); };
 
   // QR propio del negocio (carta existente): se guarda nítido y sin recorte
   const setOwnQr = async (file: File | undefined) => {
@@ -148,11 +148,39 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
     setBusy(true);
     try {
       const path = await upload(file, `p-${p.id}`, 1200);
+      // Miniatura para las listas: si falla, la foto igual queda (la lista usa la grande)
+      try {
+        const tb = await makeThumb(file);
+        await supabase.storage.from(BUCKET).upload(thumbPath(path), tb, { contentType: tb.type, cacheControl: '31536000', upsert: false });
+      } catch { /* sin miniatura */ }
       await rpc('set_product_photo', { p_product: p.id, p_path: path });
       await removeOld(p.photo);
       await load();
     } catch (err) { flash(false, storeError((err as Error).message, t)); } finally { setBusy(false); }
   };
+  // Fotos antiguas sin miniatura: se crean una sola vez desde este equipo, de a una y sin apuro
+  useEffect(() => {
+    const items = (data?.products ?? []).filter((p) => p.photo);
+    if (!items.length) return;
+    let stop = false;
+    (async () => {
+      for (const p of items) {
+        if (stop) return;
+        const key = `vx:thumb:${p.photo}`;
+        try { if (localStorage.getItem(key)) continue; } catch { /* */ }
+        try {
+          const res = await fetch(storeImageUrl(p.photo)!);
+          if (!res.ok) continue;
+          const tb = await makeThumb(await res.blob());
+          // si ya existía, el servidor la rechaza y no pasa nada
+          await supabase.storage.from(BUCKET).upload(thumbPath(p.photo!), tb, { contentType: tb.type, cacheControl: '31536000', upsert: false });
+        } catch { /* se intenta otro día */ }
+        try { localStorage.setItem(key, '1'); } catch { /* */ }
+        await new Promise((r) => setTimeout(r, 400));
+      }
+    })();
+    return () => { stop = true; };
+  }, [data?.products]);
   const toggle = async (p: Product, description?: string) => {
     try {
       await rpc('set_product_store', { p_product: p.id, p_in_store: description !== undefined ? p.in_store : !p.in_store, p_description: description ?? p.description });

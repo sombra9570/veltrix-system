@@ -65,6 +65,12 @@ function RouteScreen() {
       setFund((funds ?? []).find((f) => f.id === rid) ?? null);
     } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
   }, [orgId, rid, t]);
+  // Tras mover dinero solo cambia el fondo de la ruta: se pide eso, no toda la pantalla
+  const loadFund = useCallback(async () => {
+    if (!orgId || !rid) return;
+    const funds = await rpc<Fund[]>('route_funds_admin', { p_org: orgId });
+    setFund((funds ?? []).find((f) => f.id === rid) ?? null);
+  }, [orgId, rid]);
   useEffect(() => { setScreen('home'); setSel(null); setMv(null); setRoute(undefined); load(); }, [load]);
 
   const back = () => {
@@ -99,7 +105,7 @@ function RouteScreen() {
     const n = Number(mv.amount.replace(',', '.'));
     if (!(n > 0)) return;
     setBusy(true); setMsg(null);
-    try { await rpc('route_fund_move', { p_route: rid, p_type: mv.type, p_amount: n, p_note: mv.note || null }); setMv(null); await load(); setMsg({ ok: true, text: t('fund.saved') }); }
+    try { await rpc('route_fund_move', { p_route: rid, p_type: mv.type, p_amount: n, p_note: mv.note || null }); setMv(null); await loadFund(); setMsg({ ok: true, text: t('fund.saved') }); }
     catch (e) { const x = (e as Error).message; setMsg({ ok: false, text: x.includes('ROUTE_FUND_LOW') ? t('fund.low') : friendlyError(x, t) }); }
     finally { setBusy(false); }
   };

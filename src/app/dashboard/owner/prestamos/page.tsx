@@ -49,14 +49,19 @@ export default function LoansPage() {
   const [cut, setCut] = useState<string | null>(null);
   const [mv, setMv] = useState<{ route: string; type: 'investment' | 'withdrawal'; amount: string; note: string } | null>(null);
 
-  const load = useCallback(async () => {
+  // Cada parte se pide por separado: tras una acción solo se vuelve a leer lo que pudo cambiar
+  const loadLoans = useCallback(async () => {
     if (!orgId) return;
-    try {
-      const r = await rpc<{ policy: Policy; loans: Loan[] }>('loans_admin', { p_org: orgId });
-      setPolicy(r.policy); setLoans(r.loans ?? []);
-      setFunds(await rpc<Fund[]>('route_funds_admin', { p_org: orgId }) ?? []);
-    } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
-  }, [orgId, t]);
+    const r = await rpc<{ policy: Policy; loans: Loan[] }>('loans_admin', { p_org: orgId });
+    setPolicy(r.policy); setLoans(r.loans ?? []);
+  }, [orgId]);
+  const loadFunds = useCallback(async () => {
+    if (!orgId) return;
+    setFunds(await rpc<Fund[]>('route_funds_admin', { p_org: orgId }) ?? []);
+  }, [orgId]);
+  const load = useCallback(async () => {
+    try { await loadLoans(); await loadFunds(); } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
+  }, [loadLoans, loadFunds, t]);
   useEffect(() => { load(); }, [load]);
 
   const val = (k: string) => edit[k] ?? String(policy?.[k] ?? '');
@@ -74,14 +79,14 @@ export default function LoansPage() {
   };
   const decide = async (l: Loan, ok: boolean) => {
     setBusy(l.order_id); setMsg(null);
-    try { await rpc('decide_street_loan', { p_order: l.order_id, p_approve: ok, p_reason: ok ? null : t('cust.rejected') }); await load();
+    try { await rpc('decide_street_loan', { p_order: l.order_id, p_approve: ok, p_reason: ok ? null : t('cust.rejected') }); await loadLoans(); await loadFunds();
       setMsg({ ok: true, text: ok ? t('loan.approved') : t('loan.rejected') });
     } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); } finally { setBusy(''); }
   };
   const cancel = async (l: Loan) => {
     if (!window.confirm(t('loan.cancelConfirm', { name: l.customer }))) return;
     setBusy(l.order_id); setMsg(null);
-    try { await rpc('cancel_street_loan', { p_order: l.order_id }); await load(); setMsg({ ok: true, text: t('loan.cancelled') }); }
+    try { await rpc('cancel_street_loan', { p_order: l.order_id }); await loadLoans(); await loadFunds(); setMsg({ ok: true, text: t('loan.cancelled') }); }
     catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); } finally { setBusy(''); }
   };
 
@@ -92,7 +97,7 @@ export default function LoansPage() {
     setBusy('fund'); setMsg(null);
     try {
       await rpc('route_fund_move', { p_route: mv.route, p_type: mv.type, p_amount: n, p_note: mv.note || null });
-      setMv(null); await load(); setMsg({ ok: true, text: t('fund.saved') });
+      setMv(null); await loadFunds(); setMsg({ ok: true, text: t('fund.saved') });
     } catch (e) {
       const m = (e as Error).message;
       setMsg({ ok: false, text: m.includes('ROUTE_FUND_LOW') ? t('fund.low') : friendlyError(m, t) });
@@ -103,7 +108,7 @@ export default function LoansPage() {
     const d = Number(window.prompt(t('loan.reschedulePrompt'), '7'));
     if (!Number.isInteger(d) || d < 1) return;
     setBusy(order); setMsg(null);
-    try { const n = await rpc<number>('reschedule_loan', { p_order: order, p_days: d }); await load(); setMsg({ ok: true, text: t('loan.rescheduled', { n, days: d }) }); }
+    try { const n = await rpc<number>('reschedule_loan', { p_order: order, p_days: d }); await loadLoans(); setMsg({ ok: true, text: t('loan.rescheduled', { n, days: d }) }); }
     catch (e) { const m = (e as Error).message; setMsg({ ok: false, text: m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : friendlyError(m, t) }); }
     finally { setBusy(''); }
   };

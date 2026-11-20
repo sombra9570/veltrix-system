@@ -56,6 +56,17 @@ export function extFor(blob: Blob) {
   return blob.type === 'image/webp' ? 'webp' : 'jpg';
 }
 
+/** Miniatura para listas: ~320 px y alrededor de 15 KB. La foto grande se baja solo al tocarla. */
+export const THUMB_SIDE = 320;
+export const THUMB_BYTES = 30_000;
+export const makeThumb = (file: File | Blob) => compressImage(file as File, THUMB_SIDE, 0.7, THUMB_BYTES);
+/** La miniatura vive junto a la foto, con "-t" antes de la extensión (p-123-1700.webp → p-123-1700-t.webp) */
+export const thumbPath = (path: string) => path.replace(/(\.[a-z0-9]+)$/i, '-t$1');
+/** Enlace de la miniatura (si la foto es antigua y no la tiene, la pantalla vuelve sola a la foto grande) */
+export function storeThumbUrl(path: string | null | undefined) {
+  return path ? storeImageUrl(thumbPath(path)) : null;
+}
+
 /** Enlace público de una foto de la tienda (bucket público "store-images") */
 export function storeImageUrl(path: string | null | undefined) {
   if (!path) return null;
