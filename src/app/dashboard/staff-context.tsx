@@ -56,7 +56,7 @@ export function StaffProvider({
   // Menú: el de su rol principal + las pantallas de los roles que cubre (sin repetir ni duplicar mensajes)
   const also = (session.alsoRoles ?? []).filter((r) => r !== session.role);
   const own = (ROLE_NAV as Record<string, NavItem[]>)[session.role] ?? nav;
-  const menu = also.length === 0 ? nav : (() => {
+  const menuRaw = also.length === 0 ? nav : (() => {
     const seen = new Set(own.map((n) => n.label));
     const extra: NavItem[] = [];
     for (const r of also) for (const n of ((ROLE_NAV as Record<string, NavItem[]>)[r] ?? [])) {
@@ -68,7 +68,8 @@ export function StaffProvider({
     // Con funciones de varios roles, el menú se separa por rol; con uno solo no hace falta
     if (extra.length === 0) return [...mine, ...chat];
     return [...mine.map((n) => ({ ...n, group: `role.${session.role}` as DictKey })), ...extra, ...chat];
-  })().filter((n) => navHas(modules, n.module))
+  })();
+  const menu = menuRaw.filter((n) => navHas(modules, n.module))
     // Cada rol ve solo lo de su rubro. Supervisor de cobranza en calle: únicamente sus rutas, reportes, mensajes y ajustes
     // (lista cerrada, no de exclusión: así nada de otros rubros se cuela, ni siquiera mientras carga el rubro).
     .filter((n) => {
