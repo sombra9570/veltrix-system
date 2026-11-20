@@ -157,3 +157,9 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Obligatorios: nombre completo, CI, celular, dirección, ubicación GPS y casilla de autorización; fotos según los permisos existentes de la ruta ("Crédito sin foto del cliente" / "sin fotos del carnet"; apagados = obligatorias). No deja guardar hasta completar.
 - El servidor exige CI/celular/dirección/GPS; la autorización y las fotos se validan solo en la pantalla (las fotos se suben después de crear al cliente).
 - Sin verificar en pantalla.
+
+## Borrado seguro de empresas (2026-11-20)
+- /api/admin/purge-org: solo superadmin; pasos = resumen, nombre exacto, clave de borrado (10-12 caracteres, se crea la primera vez que se borra) y palabra BORRAR; bloqueo 30 min tras 5 fallos; registro en purge_log.
+- Borra base, cuentas de acceso del personal y archivos de todos los almacenamientos. Botón "Limpiar archivos de empresas ya borradas" para restos antiguos.
+- Pendiente: pantalla para cambiar la clave (la función purge_key_set ya lo permite con la clave actual); revisar cuentas de acceso sin empresa.
+- Sin verificar en pantalla.

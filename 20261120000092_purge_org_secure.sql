@@ -1,0 +1,5 @@
+-- Borrado definitivo de empresas con guardas. Aplicada vía migración "purge_org_secure".
+-- Tablas: purge_key (hash de la clave 10-12 caracteres, bloqueo 5 fallos = 30 min), purge_requests (solicitud de un solo uso, 10 min, espera mínima 5 s), purge_log (registro de intentos).
+-- Funciones solo para service_role: purge_key_status/set/check, purge_start, purge_consume, purge_log_add, admin_purge_org(org, nombre, actor).
+-- admin_purge_org(uuid,text) se eliminó: ya no se puede borrar desde el navegador; todo pasa por /api/admin/purge-org,
+-- que además borra los archivos de todos los almacenamientos con la API de Storage (por SQL no está permitido).

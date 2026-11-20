@@ -9,6 +9,7 @@ import { Spinner } from '../../spinner';
 import { TransferAdmin } from './transfer-admin';
 import { NetBanner } from '../sync';
 import { PlatformBell } from './platform-bell';
+import { PurgeOrg, SweepFiles } from './purge-org';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -169,24 +170,9 @@ export default function GlobalCoreAdminPage() {
       setPlanMsg(m.includes('INVALID') ? '⚠️ Revisa los valores: precios desde 0 y máximo entre 0 y 500.' : '⚠️ No se pudo guardar el extra.');
     }
   };
-  // Borrar empresas de prueba: la confirmación va dentro de la página (las ventanas emergentes del navegador se bloquean con facilidad)
+  // Borrar empresas de prueba: pasos y clave de borrado en purge-org.tsx
   const [purgeDone, setPurgeDone] = useState('');
-  const [purge, setPurge] = useState<{ id: string; typed: string; busy: boolean; msg: string; ok: boolean } | null>(null);
-  const purgeOrg = async (org: { org_id: string; name: string }) => {
-    if (!purge || purge.id !== org.org_id) return;
-    if (purge.typed.trim() !== org.name) { setPurge({ ...purge, ok: false, msg: 'El nombre no coincide. No se borró nada.' }); return; }
-    setPurge({ ...purge, busy: true, msg: '' });
-    try {
-      const r = await rpc<{ rows: number; users: number; files_left: number }>('admin_purge_org', { p_org: org.org_id, p_confirm: purge.typed.trim() });
-      setPurge(null);
-      setPurgeDone(`✅ Empresa "${org.name}" borrada: ${r.rows} registros y ${r.users} usuarios eliminados.` + (r.files_left > 0 ? ` Quedaron ${r.files_left} archivos: bórralos en Supabase → Storage (carpeta ${org.org_id}).` : ''));
-      await Promise.all([refresh(), loadPlans(), loadAi(), loadPilots()]);
-    } catch (e) {
-      const m = e instanceof Error ? e.message : '';
-      setPurge({ id: org.org_id, typed: purge.typed, busy: false, ok: false,
-        msg: m.includes('propia') ? 'No puedes borrar tu propia organización.' : m.includes('superadmin') ? 'Solo el superadmin puede borrar empresas: entra con esa cuenta.' : `No se pudo borrar: ${m || 'error desconocido'}` });
-    }
-  };
+  const afterPurge = async (m: string) => { setPurgeDone(m); await Promise.all([refresh(), loadPlans(), loadAi(), loadPilots()]); };
   const [mailMsg, setMailMsg] = useState('');
   const [sending, setSending] = useState(false);
   const sendMail = async () => {
@@ -559,6 +545,7 @@ export default function GlobalCoreAdminPage() {
               {busy ? 'Cargando…' : 'Todavía no hay empresas aquí. Cuando alguien se registre en veltrixsystem.app aparecerá en esta lista.'}
             </p>
           )}
+          <div className="mb-2"><SweepFiles onDone={setPurgeDone} /></div>
           {purgeDone && <p className="mb-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2 text-xs font-semibold text-emerald-300">{purgeDone}</p>}
           {orgs.map((o) => (
             <div key={o.org_id} className="p-4 rounded-xl border bg-slate-900/70 border-slate-800 flex flex-col md:flex-row justify-between gap-3">
@@ -579,19 +566,7 @@ export default function GlobalCoreAdminPage() {
               <div className="text-right self-end md:self-center">
                 <p className="text-[11px] text-slate-400">Mensualidad</p>
                 <p className="text-lg font-bold text-emerald-400">{formatMoney(Number(o.price_usd))}</p>
-                {purge?.id === o.org_id ? (
-                  <div className="mt-2 max-w-xs space-y-2 text-left">
-                    <p className="text-[11px] text-red-300">Esto borra PARA SIEMPRE "{o.name}" con sus ventas, clientes, usuarios y archivos. Escribe el nombre exacto para confirmar:</p>
-                    <input value={purge.typed} onChange={(e) => setPurge({ ...purge, typed: e.target.value })} className="w-full rounded-lg border border-red-500/30 bg-slate-900 px-2 py-1 text-xs text-white" aria-label="Nombre de la empresa" />
-                    {purge.msg && <p className={`text-[11px] font-semibold ${purge.ok ? 'text-emerald-300' : 'text-red-300'}`}>{purge.msg}</p>}
-                    <div className="flex gap-2">
-                      <button type="button" disabled={purge.busy || purge.typed.trim() !== o.name} onClick={() => purgeOrg(o)} className="text-[11px] font-bold text-white bg-red-600 disabled:opacity-40 px-2.5 py-1 rounded-lg cursor-pointer">{purge.busy ? 'Borrando…' : 'Borrar definitivamente'}</button>
-                      <button type="button" disabled={purge.busy} onClick={() => setPurge(null)} className="text-[11px] font-bold text-slate-300 border border-slate-600 px-2.5 py-1 rounded-lg cursor-pointer">Cancelar</button>
-                    </div>
-                  </div>
-                ) : (
-                  <button type="button" onClick={() => setPurge({ id: o.org_id, typed: '', busy: false, msg: '', ok: true })} className="mt-2 text-[11px] font-bold text-red-300 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 px-2.5 py-1 rounded-lg cursor-pointer">🗑️ Borrar empresa de prueba</button>
-                )}
+                <PurgeOrg orgId={o.org_id} name={o.name} onDone={afterPurge} />
               </div>
             </div>
           ))}
