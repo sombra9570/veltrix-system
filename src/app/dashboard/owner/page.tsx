@@ -1,5 +1,7 @@
 'use client';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { rpc } from '../../../lib/supabase';
 import { useOwner } from './owner-context';
 import { Card, UsageBar } from '../shell';
 import { ApprovalsTray } from '../approvals';
@@ -14,7 +16,58 @@ function money(amount: number, currency: string, lang: string) {
   }
 }
 
+type CFund = { id: string; name: string; collector: string | null; currency: string; balance: number; portfolio: number; days?: { day: string; cash: number; digital: number }[] };
+
+/** Inicio de una empresa de cobranza: lo cobrado hoy, la cartera y cada ruta de un vistazo */
+function CobranzaHome() {
+  const { overview, userName, orgId } = useOwner();
+  const { t, lang } = useT();
+  const [funds, setFunds] = useState<CFund[] | null>(null);
+  useEffect(() => { if (orgId) rpc<CFund[]>('route_funds_admin', { p_org: orgId }).then((f) => setFunds(f ?? [])).catch(() => setFunds([])); }, [orgId]);
+  const cur = funds?.[0]?.currency ?? 'USD';
+  const todayOf = (f: CFund) => { const d = f.days?.[0]; return d ? Number(d.cash) + Number(d.digital) : 0; };
+  const sum = (fn: (f: CFund) => number) => (funds ?? []).reduce((a, f) => a + fn(f), 0);
+  return (
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-xl font-extrabold sm:text-2xl">{t('owner.welcome', { name: userName.split(' ')[0] || '' })}</h1>
+        <p className={`text-sm ${ui.muted}`}>{t('rep.cobSubtitle')}</p>
+      </div>
+      <ApprovalsTray />
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Card><p className={`text-xs font-semibold uppercase tracking-wide ${ui.muted}`}>{t('owner.collectedToday')}</p>
+          <p className="mt-2 text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">{money(sum(todayOf), cur, lang)}</p></Card>
+        <Card><p className={`text-xs font-semibold uppercase tracking-wide ${ui.muted}`}>{t('cx.sum.portfolio')}</p>
+          <p className="mt-2 text-2xl font-extrabold">{money(sum((f) => Number(f.portfolio)), cur, lang)}</p></Card>
+        <Card><p className={`text-xs font-semibold uppercase tracking-wide ${ui.muted}`}>{t('cx.sum.current')}</p>
+          <p className="mt-2 text-2xl font-extrabold">{money(sum((f) => Number(f.balance)), cur, lang)}</p></Card>
+        <Card><p className={`text-xs font-semibold uppercase tracking-wide ${ui.muted}`}>{t('owner.toReview')}</p>
+          <p className="mt-2 text-2xl font-extrabold">{(overview?.pending_reversals ?? 0) + (overview?.pending_settlements ?? 0)}</p></Card>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {funds === null ? <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p> : funds.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('routes.empty')}</p></Card> : funds.map((f) => (
+          <Link key={f.id} href={`/dashboard/owner/ruta?r=${f.id}`} className="block">
+            <Card className="space-y-2 transition hover:shadow-md">
+              <div><p className="font-bold">🛵 {f.name}</p><p className={`text-xs ${ui.muted}`}>{f.collector ?? t('routes.noCollector')}</p></div>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <p><span className={ui.muted}>{t('owner.collectedToday')}</span><br /><b>{money(todayOf(f), f.currency, lang)}</b></p>
+                <p><span className={ui.muted}>{t('cx.sum.current')}</span><br /><b>{money(Number(f.balance), f.currency, lang)}</b></p>
+                <p><span className={ui.muted}>{t('cx.sum.portfolio')}</span><br /><b>{money(Number(f.portfolio), f.currency, lang)}</b></p>
+              </div>
+            </Card>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function OwnerHome() {
+  const { cobranza } = useOwner();
+  return cobranza ? <CobranzaHome /> : <GenericHome />;
+}
+
+function GenericHome() {
   const { overview, userName } = useOwner();
   const { t, lang } = useT();
   const firstName = userName.split(' ')[0] || '';
