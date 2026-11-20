@@ -70,6 +70,7 @@ export default function LoansPage() {
     try {
       const body: Record<string, number> = {};
       for (const [k] of [...FIELDS, ...LATE]) body[k] = Number(val(k).replace(',', '.'));
+      body.require_customer_photos = (edit.require_customer_photos ?? String(policy?.require_customer_photos ?? 0)) === '1' ? 1 : 0;
       setPolicy(await rpc<Policy>('set_loan_policy', { p_org: orgId, p_policy: body }));
       setEdit({}); setMsg({ ok: true, text: t('loan.p.saved') });
     } catch (e) {
@@ -262,6 +263,12 @@ export default function LoansPage() {
               </label>
             ))}
           </div>
+          <label className="flex items-start gap-2 text-sm">
+            <input type="checkbox" className="mt-0.5 h-4 w-4"
+              checked={(edit.require_customer_photos ?? String(policy.require_customer_photos ?? 0)) === '1'}
+              onChange={(e) => setEdit({ ...edit, require_customer_photos: e.target.checked ? '1' : '0' })} />
+            <span>{t('loan.p.requirePhotos')}</span>
+          </label>
           <div>
             <p className="text-sm font-bold">🚨 {t('loan.p.lateTitle')}</p>
             <p className={`text-xs ${ui.muted}`}>{t('loan.p.lateHint')}</p>

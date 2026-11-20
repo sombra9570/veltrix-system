@@ -152,3 +152,8 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Semanal = todo lo que paga cada más de 3 días (incluye quincenal/mensual). Pendiente si se quiere separar.
 - Cobrado/prestado/comisión cambian con el botón; caja anterior, inversión y gastos son de toda la ruta.
 - Sin verificar en pantalla.
+
+## Cliente nuevo: datos obligatorios (2026-11-20)
+- Obligatorios: nombre completo, CI, celular, dirección, ubicación GPS y casilla de autorización; fotos solo si el administrador lo activa (Préstamos > reglas). No deja guardar hasta completar.
+- El servidor exige CI/celular/dirección/GPS; la autorización y las fotos se validan solo en la pantalla (las fotos se suben después de crear al cliente).
+- Sin verificar en pantalla.

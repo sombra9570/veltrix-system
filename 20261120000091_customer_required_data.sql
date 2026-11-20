@@ -1,0 +1,4 @@
+-- Cliente nuevo: datos obligatorios (nombre, CI, celular, dirección, ubicación GPS, autorización) también en el servidor.
+-- Aplicada vía migración "customer_required_data".
+-- set_loan_policy acepta 'require_customer_photos' (0/1): el administrador puede exigir carnet por ambos lados y foto.
+-- collector_save_customer lanza CUSTOMER_REQUIRED si faltan CI, celular, dirección o ubicación.

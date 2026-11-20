@@ -543,7 +543,7 @@ export default function CollectorPage() {
       )}
 
       {screen === 'newclient' && (
-        <NewClient routeId={route.id} orgId={route.org_id ?? ''} online={online} canLoan={!!route.can_loan && !!route.policy}
+        <NewClient routeId={route.id} orgId={route.org_id ?? ''} online={online} canLoan={!!route.can_loan && !!route.policy} requirePhotos={!!route.policy?.require_customer_photos}
           onSaved={async (id) => { await patch(route.id, { customers: [id] }); }}
           onLoan={() => { setPanel('loan'); }} />
       )}

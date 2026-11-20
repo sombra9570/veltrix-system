@@ -49,8 +49,8 @@ function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) 
  * Cliente nuevo de la ruta: datos, carnet por los dos lados, foto, ubicación GPS y garante.
  * Las fotos se suben al guardar, así que hace falta internet (el cobro sí funciona sin señal).
  */
-export function NewClient({ routeId, orgId, online, canLoan, onSaved, onLoan }: {
-  routeId: string; orgId: string; online: boolean; canLoan: boolean;
+export function NewClient({ routeId, orgId, online, canLoan, requirePhotos, onSaved, onLoan }: {
+  routeId: string; orgId: string; online: boolean; canLoan: boolean; requirePhotos: boolean;
   onSaved: (id: string) => Promise<void> | void; onLoan: () => void;
 }) {
   const { t } = useT();
@@ -75,11 +75,18 @@ export function NewClient({ routeId, orgId, online, canLoan, onSaved, onLoan }: 
     return path;
   };
 
+  // Datos obligatorios: sin ellos no se puede guardar. Las fotos solo si el administrador lo exige; el resto es opcional.
+  const missing = [
+    !f.name.trim() && t('cx.nc.name'), !f.ci.trim() && t('cx.nc.ci'), !f.phone.trim() && t('cx.nc.phone'),
+    !f.address.trim() && t('cx.nc.address'), !gps && t('cx.nc.gpsBtn'),
+    ...(requirePhotos && (!ciFront || !ciBack || !photo) ? [t('cx.nc.docs')] : []),
+    !consent && t('cx.nc.consentShort'),
+  ].filter(Boolean) as string[];
+
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr('');
-    if (!f.name.trim()) return setErr(t('cx.nc.needName'));
-    if ((ciFront || ciBack || gPhoto) && !consent) return setErr(t('cust.needConsent'));
+    if (missing.length) return setErr(t('cx.nc.needAll', { list: missing.join(', ') }));
     if (!online) return setErr(t('cx.nc.needSignal'));
     setBusy(true);
     let id: string;
@@ -93,6 +100,7 @@ export function NewClient({ routeId, orgId, online, canLoan, onSaved, onLoan }: 
     } catch (ex) {
       const m = (ex as Error).message;
       setErr(m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : m.includes('LOAN_MAX_CUSTOMERS') ? t('loan.e.maxCustomers')
+        : m.includes('CUSTOMER_REQUIRED') ? t('cx.nc.needAll', { list: '' })
         : /fetch|network|Failed/i.test(m) ? t('loan.e.offline') : t('err.generic'));
       setBusy(false);
       return;
@@ -140,15 +148,15 @@ export function NewClient({ routeId, orgId, online, canLoan, onSaved, onLoan }: 
       <Card className="space-y-3">
         <div><label className={ui.label}>{t('cx.nc.name')}</label><input required value={f.name} onChange={(e) => set('name', e.target.value)} className={ui.input} /></div>
         <div className="grid grid-cols-2 gap-3">
-          <div><label className={ui.label}>{t('cx.nc.ci')}</label><input value={f.ci} onChange={(e) => set('ci', e.target.value)} className={ui.input} /></div>
-          <div><label className={ui.label}>{t('cx.nc.phone')}</label><input type="tel" inputMode="tel" value={f.phone} onChange={(e) => set('phone', e.target.value)} className={ui.input} /></div>
+          <div><label className={ui.label}>{t('cx.nc.ci')}</label><input required value={f.ci} onChange={(e) => set('ci', e.target.value)} className={ui.input} /></div>
+          <div><label className={ui.label}>{t('cx.nc.phone')}</label><input required type="tel" inputMode="tel" value={f.phone} onChange={(e) => set('phone', e.target.value)} className={ui.input} /></div>
         </div>
-        <div><label className={ui.label}>{t('cx.nc.address')}</label><input value={f.address} onChange={(e) => set('address', e.target.value)} className={ui.input} /></div>
+        <div><label className={ui.label}>{t('cx.nc.address')}</label><input required value={f.address} onChange={(e) => set('address', e.target.value)} className={ui.input} /></div>
         <GpsButton value={gps} onChange={setGps} label={t('cx.nc.gpsBtn')} />
       </Card>
 
       <Card className="space-y-3">
-        <p className="font-bold">🪪 {t('cx.nc.docs')}</p>
+        <p className="font-bold">🪪 {t('cx.nc.docs')}{requirePhotos ? ' *' : ''}</p>
         <div><label className={ui.label}>{t('cx.nc.ciFront')}</label><PhotoPicker value={ciFront} onChange={setCiFront} disabled={busy} /></div>
         <div><label className={ui.label}>{t('cx.nc.ciBack')}</label><PhotoPicker value={ciBack} onChange={setCiBack} disabled={busy} /></div>
         <div><label className={ui.label}>{t('cx.nc.photo')}</label><PhotoPicker value={photo} onChange={setPhoto} facing="user" disabled={busy} /></div>
@@ -164,12 +172,13 @@ export function NewClient({ routeId, orgId, online, canLoan, onSaved, onLoan }: 
       </Card>
 
       <label className="flex items-start gap-2 text-sm">
-        <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4" />
+        <input type="checkbox" required checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4" />
         <span>{t('cx.nc.consent')}</span>
       </label>
 
       {err && <p className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">{err}</p>}
-      <button type="submit" disabled={busy || !online} className={`${ui.btnPrimary} w-full py-3`}>{busy ? t('common.wait') : `💾 ${t('prod.save')}`}</button>
+      {missing.length > 0 && <p className={`text-xs ${ui.muted}`}>{t('cx.nc.needAll', { list: missing.join(', ') })}</p>}
+      <button type="submit" disabled={busy || !online || missing.length > 0} className={`${ui.btnPrimary} w-full py-3`}>{busy ? t('common.wait') : `💾 ${t('prod.save')}`}</button>
     </form>
   );
 }
