@@ -51,62 +51,6 @@ export function useHeaderSlot(slot: HeaderSlot | null, deps: unknown[]) {
   useEffect(() => { set(ref.current); return () => set(null); }, [set, ...deps]);
 }
 
-/** Menú del celular: franja compacta bajo la barra superior (no le quita espacio a la pantalla principal) */
-function DesktopNav({ nav, pathname, unread }: { nav: NavItem[]; pathname: string; unread: number }) {
-  const { t } = useT();
-  const [dd, setDd] = useState<{ href: string; left: number; top: number } | null>(null);
-  useEffect(() => { setDd(null); }, [pathname]);
-  useEffect(() => {
-    if (!dd) return;
-    const close = () => setDd(null);
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close();
-    window.addEventListener('click', close); window.addEventListener('resize', close); document.addEventListener('keydown', onKey);
-    return () => { window.removeEventListener('click', close); window.removeEventListener('resize', close); document.removeEventListener('keydown', onKey); };
-  }, [dd]);
-  const open = nav.find((n) => n.href === dd?.href);
-  return (
-    <div className="border-b border-slate-200 bg-white/90 backdrop-blur sm:hidden dark:border-slate-800 dark:bg-slate-950/90">
-      <ul className="flex items-center gap-1 overflow-x-auto px-4 py-1.5 [scrollbar-width:thin]">
-        {nav.map((item, i) => {
-          const active = pathname === item.href || (!!item.children && pathname.startsWith(item.href + '/'));
-          const sep = i > 0 && item.group !== nav[i - 1].group;
-          const cls = `flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold transition ${active ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800/70'}`;
-          return (
-            <Fragment key={item.href}>
-              {sep && <li aria-hidden className="mx-1 h-5 shrink-0 border-s border-slate-200 dark:border-slate-700" />}
-              <li className="flex shrink-0 items-center">
-                {item.soon ? (
-                  <span className={`${cls} cursor-not-allowed !text-slate-400 dark:!text-slate-600`}><span>{item.icon}</span>{t(item.label)}</span>
-                ) : (
-                  <Link href={item.href} className={`${cls} ${item.children ? '!rounded-e-none' : ''}`}>
-                    <span>{item.icon}</span>{t(item.label)}
-                    {item.href.endsWith('/mensajes') && unread > 0 && (
-                      <span className={`grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-bold ${active ? 'bg-white text-blue-700' : 'bg-blue-600 text-white'}`}>{unread > 99 ? '99+' : unread}</span>
-                    )}
-                  </Link>
-                )}
-                {item.children && (
-                  <button type="button" aria-label="toggle"
-                    onClick={(e) => { e.stopPropagation(); const r = e.currentTarget.getBoundingClientRect(); setDd(dd?.href === item.href ? null : { href: item.href, left: r.left, top: r.bottom + 4 }); }}
-                    className={`grid h-8 w-7 place-items-center rounded-e-lg text-xs cursor-pointer ${active ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/70'}`}>▾</button>
-                )}
-              </li>
-            </Fragment>
-          );
-        })}
-      </ul>
-      {dd && open?.children && (
-        <ul onClick={(e) => e.stopPropagation()} style={{ left: dd.left, top: dd.top }}
-          className="fixed z-50 max-h-[60vh] min-w-48 max-w-72 space-y-0.5 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg dark:border-slate-700 dark:bg-slate-900">
-          <Suspense fallback={null}>
-            {open.children.map((c) => <li key={c.href}><ChildLink child={c} onGo={() => setDd(null)} /></li>)}
-          </Suspense>
-        </ul>
-      )}
-    </div>
-  );
-}
-
 /**
  * Estructura común de todos los paneles: menú lateral (en celular, desplegable),
  * barra superior y contenido al centro.
@@ -279,7 +223,6 @@ export function AppShell({
             )}
           </div>
         </header>
-        <DesktopNav nav={nav} pathname={pathname} unread={unread} />
         </div>
 
         <NetBanner />
