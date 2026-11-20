@@ -159,8 +159,8 @@ Plan Piloto/Fundador · Inventario · Reportes · Editor de planes · Borrar emp
 - Sin verificar en pantalla.
 
 ## Borrado seguro de empresas (2026-11-20)
-- /api/admin/purge-org: solo superadmin; pasos = resumen, nombre exacto, clave de borrado (10-12 caracteres, se crea la primera vez que se borra) y palabra BORRAR; bloqueo 30 min tras 5 fallos; registro en purge_log.
+- /api/admin/purge-org: solo superadmin; pasos = resumen, nombre exacto, clave de borrado (10-12 caracteres) que vive solo en la variable secreta PURGE_KEY de Vercel (ninguna pantalla la crea ni la muestra) y palabra BORRAR; bloqueo 30 min tras 5 fallos; registro en purge_log.
 - Borra base, cuentas de acceso del personal y archivos de todos los almacenamientos. Botón "Limpiar archivos de empresas ya borradas" para restos antiguos.
-- Pendiente: pantalla para cambiar la clave (la función purge_key_set ya lo permite con la clave actual); revisar cuentas de acceso sin empresa.
+- Pendiente: Diego crea PURGE_KEY (y CRON_SECRET) en Vercel; revisar cuenta de acceso sin empresa (equilibrium@gmail.com).
 - Sin verificar en pantalla.
 - Borrado automático por falta de renovación: construido y APAGADO (120 días tras la suspensión). Para que corra hace falta CRON_SECRET en Vercel (lo pone Diego) y encenderlo con la clave desde el panel. Falta el aviso por correo antes de borrar (depende de la decisión del correo de respaldo/Resend).

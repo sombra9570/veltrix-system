@@ -1,8 +1,9 @@
 // Borrado definitivo de una empresa (solo superadmin, solo en el servidor).
 // Pasos: 1) pedir el borrado y ver el resumen, 2) escribir el nombre exacto, la clave de borrado (10-12 caracteres) y la palabra BORRAR.
-// La clave se guarda solo como hash; 5 fallos seguidos bloquean 30 minutos; cada intento queda en purge_log.
+// La clave NO está en la base ni en ninguna pantalla: es la variable secreta PURGE_KEY del servidor (10-12 caracteres). 5 fallos seguidos bloquean 30 minutos; cada intento queda en purge_log.
 // Borra la base (admin_purge_org), los archivos de todos los almacenamientos y las cuentas de acceso del personal.
 import { createClient } from '@supabase/supabase-js';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { listAll, removeFiles, buckets } from '../../../../lib/purge-files';
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -12,7 +13,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function fail(status: number, error: string, extra: Record<string, unknown> = {}) { return Response.json({ error, ...extra }, { status }); }
 
-type Body = { action?: string; enabled?: boolean; org?: string; request?: string; name?: string; key?: string; newKey?: string; phrase?: string };
+type Body = { action?: string; enabled?: boolean; org?: string; request?: string; name?: string; key?: string; phrase?: string };
 
 export async function POST(request: Request) {
   if (!url || !anonKey || !serviceKey) return fail(500, 'Faltan las claves de Supabase');
@@ -30,35 +31,21 @@ export async function POST(request: Request) {
   const log = (org: string | null, name: string | null, action: string, ok: boolean, detail = '') =>
     admin.rpc('purge_log_add', { p_actor: actor, p_org: org, p_name: name, p_action: action, p_ok: ok, p_detail: detail });
 
-  // Revisa la clave (con bloqueo por intentos)
+  // Revisa la clave contra la variable secreta del servidor (con bloqueo por intentos)
+  const sha = (x: string) => createHash('sha256').update(x).digest();
   const checkKey = async (key: string | undefined, action: string, org: string | null, name: string | null) => {
-    const { data } = await admin.rpc('purge_key_check', { p_actor: actor, p_key: key ?? '' });
-    const r = data as { ok: boolean; reason?: string; left?: number; locked_until?: string } | null;
-    if (!r?.ok) {
-      await log(org, name, action, false, `clave: ${r?.reason ?? 'error'}`);
-      return fail(r?.reason === 'LOCKED' ? 423 : 403, r?.reason === 'NO_KEY' ? 'KEY_NOT_SET' : r?.reason === 'LOCKED' ? 'KEY_LOCKED' : 'KEY_WRONG',
-        { left: r?.left ?? 0, locked_until: r?.locked_until ?? null });
-    }
+    const secret = process.env.PURGE_KEY ?? '';
+    if (secret.length < 10 || secret.length > 12) { await log(org, name, action, false, 'clave no configurada en el servidor'); return fail(503, 'KEY_NOT_SET'); }
+    const { data: lock } = await admin.rpc('purge_lock_state', { p_actor: actor });
+    const ls = lock as { locked?: boolean; locked_until?: string } | null;
+    if (ls?.locked) { await log(org, name, action, false, 'bloqueado'); return fail(423, 'KEY_LOCKED', { locked_until: ls.locked_until ?? null }); }
+    const ok = timingSafeEqual(sha(key ?? ''), sha(secret));
+    const { data: att } = await admin.rpc('purge_attempt', { p_actor: actor, p_ok: ok });
+    if (!ok) { await log(org, name, action, false, 'clave incorrecta'); return fail(403, 'KEY_WRONG', { left: (att as { left?: number } | null)?.left ?? 0 }); }
     return null;
   };
 
   switch (body.action) {
-    case 'status': {
-      const { data, error } = await admin.rpc('purge_key_status', { p_actor: actor });
-      if (error) return fail(400, error.message);
-      return Response.json(data);
-    }
-    case 'setkey': {
-      // Cambiar la clave exige la actual, con el mismo bloqueo por intentos que el borrado
-      const { data: st } = await admin.rpc('purge_key_status', { p_actor: actor });
-      if ((st as { configured?: boolean } | null)?.configured) {
-        const bad = await checkKey(body.key, 'setkey', null, null);
-        if (bad) return bad;
-      }
-      const { error } = await admin.rpc('purge_key_set', { p_actor: actor, p_new: body.newKey ?? '', p_current: body.key ?? null });
-      if (error) return fail(400, error.message.includes('LENGTH') ? 'KEY_LENGTH' : error.message.includes('WRONG') ? 'KEY_WRONG' : error.message.includes('LOCKED') ? 'KEY_LOCKED' : error.message);
-      return Response.json({ ok: true });
-    }
     case 'start': {
       if (!body.org || !UUID.test(body.org)) return fail(400, 'Empresa inválida');
       const { data, error } = await admin.rpc('purge_start', { p_actor: actor, p_org: body.org });

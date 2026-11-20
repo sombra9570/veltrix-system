@@ -18,8 +18,7 @@ function explain(d: Json): string {
   switch (d.error) {
     case 'KEY_WRONG': return `Clave incorrecta.${typeof d.left === 'number' ? ` Te quedan ${d.left} intentos antes del bloqueo.` : ''}`;
     case 'KEY_LOCKED': return `Demasiados intentos: bloqueado hasta las ${when(d.locked_until)}.`;
-    case 'KEY_NOT_SET': return 'Todavía no hay una clave de borrado: créala primero.';
-    case 'KEY_LENGTH': return 'La clave debe tener entre 10 y 12 caracteres.';
+    case 'KEY_NOT_SET': return 'La clave de borrado no está configurada en el servidor (variable PURGE_KEY en Vercel).';
     case 'NAME_MISMATCH': return 'El nombre no coincide. No se borró nada.';
     case 'PHRASE': return 'Escribe la palabra BORRAR en mayúsculas.';
     case 'TOO_FAST': return 'Espera unos segundos y vuelve a pulsar el botón.';
@@ -36,37 +35,21 @@ const ghostBtn = 'text-[11px] font-bold text-slate-300 border border-slate-600 p
 type Summary = { request: string; name: string; users: number; branches: number; customers: number; orders: number; files: number };
 
 export function PurgeOrg({ orgId, name, onDone }: { orgId: string; name: string; onDone: (msg: string) => void }) {
-  const [phase, setPhase] = useState<'idle' | 'setkey' | 'confirm'>('idle');
+  const [phase, setPhase] = useState<'idle' | 'confirm'>('idle');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const [sum, setSum] = useState<Summary | null>(null);
   const [typed, setTyped] = useState('');
   const [key, setKey] = useState('');
-  const [key2, setKey2] = useState('');
   const [phrase, setPhrase] = useState('');
 
-  const reset = () => { setPhase('idle'); setMsg(''); setSum(null); setTyped(''); setKey(''); setKey2(''); setPhrase(''); };
+  const reset = () => { setPhase('idle'); setMsg(''); setSum(null); setTyped(''); setKey(''); setPhrase(''); };
 
   const begin = async () => {
-    setBusy(true); setMsg('');
-    const st = await call({ action: 'status' });
-    if (!st.ok) { setMsg(explain(st.data)); setBusy(false); return; }
-    if (!st.data.configured) { setPhase('setkey'); setBusy(false); return; }
-    await start();
-  };
-  const start = async () => {
     setBusy(true); setMsg('');
     const r = await call({ action: 'start', org: orgId });
     if (!r.ok) setMsg(explain(r.data)); else { setSum(r.data as unknown as Summary); setPhase('confirm'); }
     setBusy(false);
-  };
-  const saveKey = async () => {
-    if (key !== key2) { setMsg('Las dos claves no coinciden.'); return; }
-    setBusy(true); setMsg('');
-    const r = await call({ action: 'setkey', newKey: key });
-    if (!r.ok) { setMsg(explain(r.data)); setBusy(false); return; }
-    setKey(''); setKey2('');
-    await start();
   };
   const run = async () => {
     if (!sum) return;
@@ -88,16 +71,6 @@ export function PurgeOrg({ orgId, name, onDone }: { orgId: string; name: string;
   }
   return (
     <div className="mt-2 max-w-xs space-y-2 text-left">
-      {phase === 'setkey' && (<>
-        <p className="text-[11px] text-red-300">Primero crea la clave de borrado (10 a 12 caracteres). Guárdala tú: no se puede ver después, solo cambiar.</p>
-        <input type="password" autoComplete="new-password" value={key} onChange={(e) => setKey(e.target.value)} className={field} aria-label="Nueva clave de borrado" />
-        <input type="password" autoComplete="new-password" value={key2} onChange={(e) => setKey2(e.target.value)} className={field} aria-label="Repite la clave" />
-        {msg && <p className="text-[11px] font-semibold text-red-300">{msg}</p>}
-        <div className="flex gap-2">
-          <button type="button" disabled={busy || key.length < 10 || key.length > 12 || key !== key2} onClick={saveKey} className={dangerBtn}>{busy ? 'Guardando…' : 'Guardar clave y seguir'}</button>
-          <button type="button" disabled={busy} onClick={reset} className={ghostBtn}>Cancelar</button>
-        </div>
-      </>)}
       {phase === 'confirm' && sum && (<>
         <p className="text-[11px] text-red-300">
           Se borrará PARA SIEMPRE "{sum.name}": {sum.users} usuarios, {sum.branches} sucursales, {sum.customers} clientes, {sum.orders} pedidos y {sum.files} archivos, además de las cuentas de acceso del personal.
@@ -144,48 +117,6 @@ export function SweepFiles({ onDone }: { onDone: (msg: string) => void }) {
       <div className="flex gap-2">
         <button type="button" disabled={busy || key.length < 10} onClick={run} className={dangerBtn}>{busy ? 'Limpiando…' : 'Limpiar'}</button>
         <button type="button" disabled={busy} onClick={() => { setOpen(false); setKey(''); setMsg(''); }} className={ghostBtn}>Cancelar</button>
-      </div>
-    </div>
-  );
-}
-
-// Crear o cambiar la clave de borrado (una sola para todas las empresas; se guarda cifrada y no se puede ver)
-export function PurgeKeyPanel({ onDone }: { onDone: (msg: string) => void }) {
-  const [open, setOpen] = useState(false);
-  const [configured, setConfigured] = useState<boolean | null>(null);
-  const [cur, setCur] = useState('');
-  const [k1, setK1] = useState('');
-  const [k2, setK2] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState('');
-  const show = async () => {
-    setOpen(true); setMsg('');
-    const st = await call({ action: 'status' });
-    setConfigured(st.ok ? !!st.data.configured : null);
-    if (!st.ok) setMsg(explain(st.data));
-  };
-  const close = () => { setOpen(false); setCur(''); setK1(''); setK2(''); setMsg(''); };
-  const save = async () => {
-    if (k1 !== k2) { setMsg('Las dos claves no coinciden.'); return; }
-    setBusy(true); setMsg('');
-    const r = await call({ action: 'setkey', newKey: k1, key: configured ? cur : undefined });
-    setBusy(false);
-    if (!r.ok) { setMsg(explain(r.data)); return; }
-    close(); onDone(configured ? '🔑 Clave de borrado cambiada.' : '🔑 Clave de borrado creada. Guárdala: no se puede ver después.');
-  };
-  if (!open) return <button type="button" onClick={show} className={ghostBtn}>🔑 Clave de borrado</button>;
-  return (
-    <div className="max-w-xs space-y-2">
-      <p className="text-[11px] text-slate-300">
-        {configured ? 'Cambiar la clave de borrado (10 a 12 caracteres). Pide la actual.' : 'Crea la clave de borrado (10 a 12 caracteres). Vale para todas las empresas, también las que se creen después.'}
-      </p>
-      {configured && <input type="password" autoComplete="off" value={cur} onChange={(e) => setCur(e.target.value)} className={field} aria-label="Clave actual" placeholder="Clave actual" />}
-      <input type="password" autoComplete="new-password" value={k1} onChange={(e) => setK1(e.target.value)} className={field} aria-label="Clave nueva" placeholder="Clave nueva" />
-      <input type="password" autoComplete="new-password" value={k2} onChange={(e) => setK2(e.target.value)} className={field} aria-label="Repite la clave nueva" placeholder="Repite la clave nueva" />
-      {msg && <p className="text-[11px] font-semibold text-red-300">{msg}</p>}
-      <div className="flex gap-2">
-        <button type="button" disabled={busy || configured === null || k1.length < 10 || k1.length > 12 || k1 !== k2 || (!!configured && cur.length < 10)} onClick={save} className={dangerBtn}>{busy ? 'Guardando…' : 'Guardar'}</button>
-        <button type="button" disabled={busy} onClick={close} className={ghostBtn}>Cancelar</button>
       </div>
     </div>
   );

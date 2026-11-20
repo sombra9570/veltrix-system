@@ -1,0 +1,3 @@
+-- La clave de borrado vive solo en la variable secreta PURGE_KEY del servidor (Vercel): no está en la base ni en ninguna pantalla.
+-- Aplicada vía migración "purge_key_only_in_server_env". Se eliminaron purge_key_check/set/status; quedan purge_lock_state y purge_attempt
+-- (solo cuentan intentos: 5 fallos = bloqueo de 30 minutos). El hash guardado antes (nunca se creó ninguno) queda en null.
