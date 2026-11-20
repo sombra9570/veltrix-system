@@ -6,6 +6,8 @@ import { useVeltrixAuth } from '../../../auth-system';
 import { rpc, supabase } from '../../../../lib/supabase';
 import { Spinner } from '../../../spinner';
 import { useLiveTopic } from '../../live';
+import { PlatformBell } from '../platform-bell';
+import { LeadsPanel } from '../leads-panel';
 
 type Ticket = { id: string; subject: string; status: 'open' | 'answered' | 'closed'; priority: string; updated_at: string; assigned_to: string | null; assigned_name: string | null; org: string | null; plan: string | null; mine: boolean };
 type Thread = {
@@ -32,7 +34,8 @@ export default function SupportPage() {
   const router = useRouter();
   const { loaded, session, logout } = useVeltrixAuth();
   const isAdmin = session?.role === 'superadmin';
-  const [tab, setTab] = useState<'tickets' | 'team' | 'chat'>('tickets');
+  const [tab, setTab] = useState<'tickets' | 'leads' | 'team' | 'chat'>('tickets');
+  useEffect(() => { try { if (new URLSearchParams(window.location.search).get('tab') === 'leads') setTab('leads'); } catch { /* */ } }, []);
 
   useEffect(() => {
     if (loaded && (!session || (session.role !== 'superadmin' && session.role !== 'support'))) router.replace('/');
@@ -42,7 +45,7 @@ export default function SupportPage() {
     return <div className="grid min-h-dvh place-items-center bg-slate-950"><Spinner /></div>;
   }
 
-  const tabs: [typeof tab, string][] = [['tickets', '🎫 Tickets']];
+  const tabs: [typeof tab, string][] = [['tickets', '🎫 Tickets'], ['leads', '🆘 Solicitudes']];
   if (isAdmin) tabs.push(['team', '👥 Equipo']);
   tabs.push(['chat', '💬 Chat directo']);
 
@@ -55,6 +58,7 @@ export default function SupportPage() {
             <p className="text-xs text-slate-400">{session.name} · {isAdmin ? 'Superadmin' : 'Equipo de la plataforma'}</p>
           </div>
           <div className="flex gap-2">
+            <PlatformBell />
             {isAdmin && <Link href="/dashboard/admin" className={ghost}>← Consola</Link>}
             <button type="button" onClick={logout} className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-400 cursor-pointer">Cerrar sesión</button>
           </div>
@@ -68,6 +72,7 @@ export default function SupportPage() {
         </nav>
 
         {tab === 'tickets' && <Tickets myId={session.userId} />}
+        {tab === 'leads' && <LeadsPanel />}
         {tab === 'team' && isAdmin && <Team />}
         {tab === 'chat' && <ChatTab />}
       </div>

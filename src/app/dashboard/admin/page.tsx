@@ -8,6 +8,7 @@ import { rpc, supabase } from '../../../lib/supabase';
 import { Spinner } from '../../spinner';
 import { TransferAdmin } from './transfer-admin';
 import { NetBanner } from '../sync';
+import { PlatformBell } from './platform-bell';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -275,6 +276,7 @@ export default function GlobalCoreAdminPage() {
             >
               {busy ? 'Actualizando…' : '↻ Actualizar'}
             </button>
+            <PlatformBell />
             <a
               href="/dashboard/admin/soporte"
               className="bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/20 text-xs font-semibold px-4 py-2.5 rounded-lg cursor-pointer"

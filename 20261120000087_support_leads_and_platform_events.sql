@@ -1,0 +1,4 @@
+-- Documentación (ya aplicada por MCP): solicitudes de ayuda del registro + bandeja de avisos de la plataforma.
+-- support_leads: datos que deja quien no supo qué elegir (public_submit_lead, con freno de 3 por hora por correo/celular).
+-- platform_events: avisos (lead | company | support_msg) creados por triggers; el equipo los lee con platform_events_list / platform_events_read.
+-- Cada aviso emite un ping Realtime en el tema 'plat:inbox' (la campanita se actualiza sin consultar por reloj).
