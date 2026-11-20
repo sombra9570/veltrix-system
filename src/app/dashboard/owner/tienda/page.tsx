@@ -45,6 +45,8 @@ export default function StoreAdminPage() {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [origin, setOrigin] = useState('');
   const [editing, setEditing] = useState(false);
+  const [picker, setPicker] = useState(false);
+  const [pq, setPq] = useState('');
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -335,9 +337,8 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
           </span>
         </div>
         <p className={`text-xs ${ui.muted}`}>{t('store.photoHint')}</p>
-        {data.products.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('prod.empty')}</p>}
-        <ul className="divide-y divide-slate-200 dark:divide-slate-800">
-          {data.products.map((p) => {
+        {(() => {
+          const row = (p: Product) => {
             const img = storeThumbUrl(p.photo);
             const imgFull = storeImageUrl(p.photo);
             return (
@@ -357,13 +358,33 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
                   )}
                 </div>
                 <button type="button" disabled={!pm.publish || (!p.in_store && !p.photo)} onClick={() => toggle(p)}
-                  className={`shrink-0 rounded-full disabled:cursor-not-allowed disabled:opacity-40 px-3 py-1.5 text-xs font-bold transition cursor-pointer ${p.in_store ? 'bg-emerald-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
-                  {p.in_store ? `✓ ${t('store.inStore')}` : t('store.addToStore')}
+                  className={`shrink-0 rounded-full disabled:cursor-not-allowed disabled:opacity-40 px-3 py-1.5 text-xs font-bold transition cursor-pointer ${p.in_store ? 'border border-red-300 text-red-600 dark:border-red-500/40 dark:text-red-400' : 'border border-slate-300 dark:border-slate-700'}`}>
+                  {p.in_store ? `🗑️ ${t('store.remove')}` : `➕ ${t('store.addToStore')}`}
                 </button>
               </li>
             );
-          })}
-        </ul>
+                    };
+          const inStore = data.products.filter((p) => p.in_store);
+          const rest = data.products.filter((p) => !p.in_store && p.name.toLowerCase().includes(pq.trim().toLowerCase()));
+          return (
+            <>
+              {inStore.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('store.noneYet')}</p>}
+              <ul className="divide-y divide-slate-200 dark:divide-slate-800">{inStore.map(row)}</ul>
+              {pm.publish && (
+                <div className="space-y-3 rounded-2xl border border-dashed border-slate-300 p-3 dark:border-slate-700">
+                  <button type="button" onClick={() => setPicker(!picker)} className={`${ui.btnPrimary} w-full`}>{picker ? `✕ ${t('store.closePicker')}` : `➕ ${t('store.pickProducts')}`}</button>
+                  {picker && (
+                    <>
+                      <input type="search" value={pq} onChange={(e) => setPq(e.target.value)} placeholder={t('prod.search')} className={ui.input} />
+                      {rest.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('prod.empty')}</p>}
+                      <ul className="max-h-[60vh] divide-y divide-slate-200 overflow-y-auto dark:divide-slate-800">{rest.map(row)}</ul>
+                    </>
+                  )}
+                </div>
+              )}
+            </>
+          );
+        })()}
       </Card>
         {/* Compartir */}
         <Card className="space-y-3 lg:order-last lg:col-span-2">

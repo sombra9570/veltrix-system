@@ -243,6 +243,15 @@ export default function InventoryPage() {
                           {i.value != null && <p className={`text-xs ${ui.muted}`}>{fmt(i.value)}</p>}
                         </div>
                       </button>
+                      {out && !readOnly && (
+                        <div className="flex flex-wrap justify-end gap-2 px-4 pb-3">
+                          <button type="button" onClick={() => openItem(i)} className={`${ui.btnPrimary} !px-3 !py-1.5 text-xs`}>➕ {t('inv.increase')}</button>
+                          <button type="button" onClick={async () => {
+                            if (!window.confirm(t('inv.deleteZeroConfirm', { name: i.name }))) return;
+                            try { await rpc('delete_product', { p_product: i.id }); await load(); } catch (e) { flash(false, friendlyError((e as Error).message, t)); }
+                          }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs hover:!border-red-400 hover:!text-red-600`}>🗑️ {t('prod.delete')}</button>
+                        </div>
+                      )}
                     </li>
                   );
                 })}

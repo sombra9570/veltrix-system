@@ -19,10 +19,14 @@ export function ModelForm({ companyId, currency, onDone, onCancel }: {
   const [price, setPrice] = useState('');
   const [sizes, setSizes] = useState('');
   const [colors, setColors] = useState('');
+  const [qty, setQty] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const sz = split(sizes); const cl = split(colors);
   const count = Math.max(sz.length, 1) * Math.max(cl.length, 1);
+  const szs = sz.length ? sz : [''];
+  const cls = cl.length ? cl : [''];
+  const total = szs.reduce((a, z) => a + cls.reduce((b, c) => b + (parseInt(qty[`${z}|${c}`] ?? '', 10) || 0), 0), 0);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +34,7 @@ export function ModelForm({ companyId, currency, onDone, onCancel }: {
     if (!name.trim() || Number.isNaN(p) || p < 0) return;
     setBusy(true); setErr('');
     try {
-      const n = await rpc<number>('save_product_model', { p_company: companyId, p_model: name.trim(), p_price: p, p_sizes: sz, p_colors: cl, p_unit: 'unid' });
+      const n = await rpc<number>('save_product_model', { p_company: companyId, p_model: name.trim(), p_price: p, p_sizes: sz, p_colors: cl, p_unit: 'unid', p_stock: Object.fromEntries(Object.entries(qty).filter(([, v]) => parseInt(String(v), 10) > 0).map(([k, v]) => [k, parseInt(String(v), 10)])) });
       onDone(t('mod.created', { n: n ?? 0 }));
     } catch (e2) { setErr(friendlyError((e2 as Error).message, t)); }
     finally { setBusy(false); }
@@ -63,6 +67,35 @@ export function ModelForm({ companyId, currency, onDone, onCancel }: {
           <label className={ui.label}>{t('mod.colors')}</label>
           <input value={colors} onChange={(e) => setColors(e.target.value)} placeholder="Negro, Blanco, Azul" className={ui.input} />
           <p className={`mt-1 text-xs ${ui.muted}`}>{t('mod.colorsHint')}</p>
+        </div>
+
+        <div className="sm:col-span-2">
+          <p className={ui.label}>{t('mod.stockByVariant')}</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-center text-sm">
+              <thead>
+                <tr className={ui.muted}>
+                  <th className="p-1.5 text-start font-semibold">{t('mod.color')} \ {t('mod.size')}</th>
+                  {szs.map((z) => <th key={z} className="p-1.5 font-semibold">{z || t('mod.noColor')}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {cls.map((c) => (
+                  <tr key={c} className="border-t border-slate-100 dark:border-slate-800">
+                    <td className="p-1.5 text-start font-semibold">{c || t('mod.noColor')}</td>
+                    {szs.map((z) => (
+                      <td key={z} className="p-1">
+                        <input inputMode="numeric" value={qty[`${z}|${c}`] ?? ''} placeholder="0"
+                          onChange={(e) => setQty({ ...qty, [`${z}|${c}`]: e.target.value.replace(/\D/g, '') })}
+                          className={`${ui.input} !min-w-12 !px-1 !py-1 text-center`} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-1 text-end text-sm font-extrabold">{t('mod.totalLabel')}: {total}</p>
         </div>
         {err && <p className="text-sm font-semibold text-red-600 sm:col-span-2 dark:text-red-400">{err}</p>}
         <div className="flex items-center justify-end gap-2 sm:col-span-2">

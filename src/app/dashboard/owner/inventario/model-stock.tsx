@@ -4,7 +4,6 @@ import { rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
 import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
-import { parseAmount } from '../../format';
 import { friendlyError } from '../owner-context';
 
 export type VariantItem = { id: string; name: string; qty: number; min: number; model?: string | null; size?: string | null; color?: string | null };
@@ -40,8 +39,16 @@ export function ModelStock({ model, items, branchId, canReceive, onChanged, flas
   const sizeLabel = (s: string) => s || t('mod.noColor');
   const colorLabel = (c: string) => c || t('mod.noColor');
 
+  const del = async (it: VariantItem) => {
+    if (!window.confirm(t('inv.deleteZeroConfirm', { name: it.name }))) return;
+    setBusy(true);
+    try { await rpc('delete_product', { p_product: it.id }); await onChanged(); }
+    catch (e) { flash(false, friendlyError((e as Error).message, t)); }
+    finally { setBusy(false); }
+  };
+
   const save = async () => {
-    const lines = Object.entries(add).map(([id, v]) => ({ product_id: id, qty: parseAmount(String(v)), cost: 0 })).filter((l) => !Number.isNaN(l.qty) && l.qty > 0);
+    const lines = Object.entries(add).map(([id, v]) => ({ product_id: id, qty: parseInt(String(v), 10), cost: 0 })).filter((l) => !Number.isNaN(l.qty) && l.qty > 0);
     if (lines.length === 0) return;
     setBusy(true);
     try {
@@ -84,8 +91,11 @@ export function ModelStock({ model, items, branchId, canReceive, onChanged, flas
                       return (
                         <td key={s} className="p-1">
                           {adding
-                            ? <input inputMode="numeric" value={add[it.id] ?? ''} onChange={(e) => setAdd({ ...add, [it.id]: e.target.value.replace(/[^\d.,]/g, '') })} placeholder={String(q)} className={`${ui.input} !px-1 !py-1 text-center`} />
-                            : <span className={q <= 0 ? 'font-bold text-red-600 dark:text-red-400' : q <= Number(it.min) ? 'font-bold text-amber-600 dark:text-amber-400' : 'font-bold'}>{q}</span>}
+                            ? <input inputMode="numeric" value={add[it.id] ?? ''} onChange={(e) => setAdd({ ...add, [it.id]: e.target.value.replace(/\D/g, '') })} placeholder={String(q)} className={`${ui.input} !px-1 !py-1 text-center`} />
+                            : q <= 0 && canReceive
+                              ? <span className="inline-flex items-center gap-1"><span className="font-bold text-red-600 dark:text-red-400">0</span>
+                                  <button type="button" disabled={busy} onClick={() => del(it)} aria-label={t('prod.delete')} title={t('prod.delete')} className="cursor-pointer rounded px-1 text-xs hover:bg-red-50 dark:hover:bg-red-500/10">🗑️</button></span>
+                              : <span className={q <= 0 ? 'font-bold text-red-600 dark:text-red-400' : q <= Number(it.min) ? 'font-bold text-amber-600 dark:text-amber-400' : 'font-bold'}>{q}</span>}
                         </td>
                       );
                     })}
