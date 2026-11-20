@@ -49,8 +49,8 @@ function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) 
  * Cliente nuevo de la ruta: datos, carnet por los dos lados, foto, ubicación GPS y garante.
  * Las fotos se suben al guardar, así que hace falta internet (el cobro sí funciona sin señal).
  */
-export function NewClient({ routeId, orgId, online, canLoan, requirePhotos, onSaved, onLoan }: {
-  routeId: string; orgId: string; online: boolean; canLoan: boolean; requirePhotos: boolean;
+export function NewClient({ routeId, orgId, online, canLoan, requirePhotos = false, onSaved, onLoan }: {
+  routeId: string; orgId: string; online: boolean; canLoan: boolean; requirePhotos?: boolean;
   onSaved: (id: string) => Promise<void> | void; onLoan: () => void;
 }) {
   const { t } = useT();
