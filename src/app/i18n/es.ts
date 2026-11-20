@@ -2051,6 +2051,16 @@ const es = {
   "rep.supNone": "Los supervisores todavía no enviaron reportes.",
   "rep.cobSubtitle": "Liquidaciones de las rutas y reportes de los supervisores.",
   "rt.liquidator": "Liquidador",
+  "gr.title": "Crecimiento",
+  "gr.collect": "Cobro",
+  "gr.loan": "Préstamo",
+  "gr.all": "Todas las rutas",
+  "gr.each": "Ruta por ruta",
+  "gr.w0": "Esta semana",
+  "gr.w1": "Semana pasada",
+  "gr.w2": "Hace 2 semanas",
+  "gr.up": "▲ {pct} % frente al periodo anterior",
+  "gr.down": "▼ {pct} % frente al periodo anterior",
 };
 
 export default es;

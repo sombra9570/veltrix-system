@@ -2042,6 +2042,16 @@ const it: Record<DictKey, string> = {
   "rep.supNone": "I supervisori non hanno ancora inviato rapporti.",
   "rep.cobSubtitle": "Liquidazioni dei giri e rapporti dei supervisori.",
   "rt.liquidator": "Liquidatore",
+  "gr.title": "Crescita",
+  "gr.collect": "Incassi",
+  "gr.loan": "Prestiti",
+  "gr.all": "Tutti i giri",
+  "gr.each": "Giro per giro",
+  "gr.w0": "Questa settimana",
+  "gr.w1": "Settimana scorsa",
+  "gr.w2": "2 settimane fa",
+  "gr.up": "▲ {pct} % rispetto al periodo precedente",
+  "gr.down": "▼ {pct} % rispetto al periodo precedente",
 };
 
 export default it;

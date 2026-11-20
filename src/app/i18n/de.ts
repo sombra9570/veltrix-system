@@ -2042,6 +2042,16 @@ const de: Record<DictKey, string> = {
   "rep.supNone": "Supervisoren haben noch keine Berichte gesendet.",
   "rep.cobSubtitle": "Routenabrechnungen und Supervisor-Berichte.",
   "rt.liquidator": "Abrechner",
+  "gr.title": "Wachstum",
+  "gr.collect": "Inkasso",
+  "gr.loan": "Kredite",
+  "gr.all": "Alle Routen",
+  "gr.each": "Route für Route",
+  "gr.w0": "Diese Woche",
+  "gr.w1": "Letzte Woche",
+  "gr.w2": "Vor 2 Wochen",
+  "gr.up": "▲ {pct} % zum Vorzeitraum",
+  "gr.down": "▼ {pct} % zum Vorzeitraum",
 };
 
 export default de;

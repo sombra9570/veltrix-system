@@ -2042,6 +2042,16 @@ const zh: Record<DictKey, string> = {
   "rep.supNone": "主管尚未发送报告。",
   "rep.cobSubtitle": "路线结算和主管报告。",
   "rt.liquidator": "结算员",
+  "gr.title": "增长",
+  "gr.collect": "收款",
+  "gr.loan": "放贷",
+  "gr.all": "所有路线",
+  "gr.each": "逐条路线",
+  "gr.w0": "本周",
+  "gr.w1": "上周",
+  "gr.w2": "两周前",
+  "gr.up": "▲ 较上期 {pct} %",
+  "gr.down": "▼ 较上期 {pct} %",
 };
 
 export default zh;

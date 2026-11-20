@@ -2042,6 +2042,16 @@ const ja: Record<DictKey, string> = {
   "rep.supNone": "スーパーバイザーからの報告はまだありません。",
   "rep.cobSubtitle": "ルートの精算とスーパーバイザーの報告。",
   "rt.liquidator": "精算担当",
+  "gr.title": "成長",
+  "gr.collect": "回収",
+  "gr.loan": "貸付",
+  "gr.all": "全ルート",
+  "gr.each": "ルート別",
+  "gr.w0": "今週",
+  "gr.w1": "先週",
+  "gr.w2": "2週間前",
+  "gr.up": "▲ 前期比 {pct} %",
+  "gr.down": "▼ 前期比 {pct} %",
 };
 
 export default ja;

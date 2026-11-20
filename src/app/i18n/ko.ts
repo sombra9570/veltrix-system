@@ -2042,6 +2042,16 @@ const ko: Record<DictKey, string> = {
   "rep.supNone": "감독자가 아직 보고서를 보내지 않았습니다.",
   "rep.cobSubtitle": "경로 정산과 감독자 보고서.",
   "rt.liquidator": "정산 담당",
+  "gr.title": "성장",
+  "gr.collect": "수금",
+  "gr.loan": "대출",
+  "gr.all": "모든 경로",
+  "gr.each": "경로별",
+  "gr.w0": "이번 주",
+  "gr.w1": "지난주",
+  "gr.w2": "2주 전",
+  "gr.up": "▲ 이전 기간 대비 {pct} %",
+  "gr.down": "▼ 이전 기간 대비 {pct} %",
 };
 
 export default ko;

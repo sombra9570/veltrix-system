@@ -2042,6 +2042,16 @@ const hi: Record<DictKey, string> = {
   "rep.supNone": "सुपरवाइज़रों ने अभी कोई रिपोर्ट नहीं भेजी है।",
   "rep.cobSubtitle": "रूट के हिसाब और सुपरवाइज़र रिपोर्ट।",
   "rt.liquidator": "सेटलमेंट अधिकारी",
+  "gr.title": "वृद्धि",
+  "gr.collect": "वसूली",
+  "gr.loan": "ऋण",
+  "gr.all": "सभी रूट",
+  "gr.each": "रूट दर रूट",
+  "gr.w0": "इस सप्ताह",
+  "gr.w1": "पिछला सप्ताह",
+  "gr.w2": "2 सप्ताह पहले",
+  "gr.up": "▲ पिछली अवधि से {pct} %",
+  "gr.down": "▼ पिछली अवधि से {pct} %",
 };
 
 export default hi;
