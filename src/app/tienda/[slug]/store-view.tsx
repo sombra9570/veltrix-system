@@ -8,7 +8,7 @@ import { ui } from '../../site-header';
 import { storeImageUrl, storeThumbUrl } from '../../dashboard/image';
 import { Spinner } from '../../spinner';
 
-type Product = { id: string; name: string; price: number; type: string; description: string | null; photo: string | null; unit: string; available: boolean };
+type Product = { id: string; name: string; price: number; type: string; description: string | null; photo: string | null; unit: string; available: boolean; model?: string | null; size?: string | null; color?: string | null };
 type Store = { slug: string; name: string; description: string | null; whatsapp: string | null; logo: string | null; currency: string; products: Product[] };
 type Line = { p: Product; qty: number };
 type Zone = { id: string; name: string; fee: number; free_over: number | null; eta_min: number };
@@ -72,7 +72,10 @@ export function StoreView({ slug }: { slug: string }) {
 
   const list = useMemo(() => {
     const s = q.trim().toLowerCase();
-    const all = store?.products ?? [];
+    const seen = new Set<string>();
+    // Los productos con tallas y colores salen como una sola tarjeta por modelo
+    const all = (store?.products ?? []).filter((p) => { if (!p.model) return true; if (seen.has(p.model)) return false; seen.add(p.model); return true; })
+      .map((p) => (p.model ? { ...p, name: p.model } : p));
     return s ? all.filter((p) => p.name.toLowerCase().includes(s) || (p.description ?? '').toLowerCase().includes(s)) : all;
   }, [store, q]);
 
@@ -206,7 +209,8 @@ export function StoreView({ slug }: { slug: string }) {
             {list.map((p) => {
               const src = storeThumbUrl(p.photo);
               const full = storeImageUrl(p.photo);
-              const qty = cart.find((l) => l.p.id === p.id)?.qty ?? 0;
+              const qty = p.model ? 0 : cart.find((l) => l.p.id === p.id)?.qty ?? 0;
+              const from = p.model ? Math.min(...(store.products ?? []).filter((x) => x.model === p.model).map((x) => Number(x.price))) : p.price;
               return (
                 <article key={p.id} className={`flex flex-col overflow-hidden rounded-2xl ${ui.card}`}>
                   <button type="button" onClick={() => setView(p)} className="relative aspect-square bg-slate-100 cursor-pointer dark:bg-slate-800">
@@ -216,13 +220,15 @@ export function StoreView({ slug }: { slug: string }) {
                   </button>
                   <div className="flex flex-1 flex-col gap-2 p-3">
                     <p className="line-clamp-2 text-sm font-semibold">{p.name}</p>
-                    <p className="mt-auto text-lg font-extrabold">{fmt(p.price)}</p>
+                    <p className="mt-auto text-lg font-extrabold">{fmt(from)}</p>
                     {qty > 0 ? (
                       <div className="flex items-center justify-between rounded-xl border border-blue-500">
                         <button type="button" onClick={() => change(p.id, -1)} className="h-9 w-10 text-lg font-bold cursor-pointer">−</button>
                         <span className="font-bold">{qty}</span>
                         <button type="button" onClick={() => change(p.id, 1)} className="h-9 w-10 text-lg font-bold cursor-pointer">+</button>
                       </div>
+                    ) : p.model ? (
+                      <button type="button" onClick={() => setView(p)} className={`${ui.btnPrimary} !py-2`}>{t('shop2.choose')}</button>
                     ) : (
                       <button type="button" disabled={!p.available} onClick={() => add(p)} className={`${ui.btnPrimary} !py-2`}>{t('shop2.add')}</button>
                     )}
@@ -255,12 +261,30 @@ export function StoreView({ slug }: { slug: string }) {
             {storeImageUrl(view.photo) && <img src={storeImageUrl(view.photo)!} alt={view.name} className="max-h-[50dvh] w-full object-cover" />}
             <div className="space-y-3 p-5">
               <h2 className="text-xl font-extrabold">{view.name}</h2>
-              <p className="text-2xl font-extrabold">{fmt(view.price)}</p>
+              <p className="text-2xl font-extrabold">{view.model ? fmt(Math.min(...store.products.filter((x) => x.model === view.model).map((x) => Number(x.price)))) : fmt(view.price)}</p>
               {view.description && <p className={`text-sm ${ui.muted}`}>{view.description}</p>}
-              <div className="grid grid-cols-2 gap-2">
-                <button type="button" onClick={() => setView(null)} className={ui.btnGhost}>{t('pos.close')}</button>
-                <button type="button" disabled={!view.available} onClick={() => { add(view); setView(null); }} className={ui.btnPrimary}>{t('shop2.add')}</button>
-              </div>
+              {view.model ? (
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold">{t('shop2.pickVariant')}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {store.products.filter((x) => x.model === view.model).map((v) => {
+                      const n = cart.find((l) => l.p.id === v.id)?.qty ?? 0;
+                      return (
+                        <button key={v.id} type="button" disabled={!v.available} onClick={() => add(v)}
+                          className={`rounded-xl border px-3 py-2 text-sm font-semibold cursor-pointer disabled:cursor-not-allowed disabled:line-through disabled:opacity-40 ${n > 0 ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10' : 'border-slate-300 dark:border-slate-700'}`}>
+                          {[v.size, v.color].filter(Boolean).join(' · ') || v.name}{n > 0 && ` ×${n}`}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <button type="button" onClick={() => setView(null)} className={`${ui.btnGhost} w-full`}>{t('pos.close')}</button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <button type="button" onClick={() => setView(null)} className={ui.btnGhost}>{t('pos.close')}</button>
+                  <button type="button" disabled={!view.available} onClick={() => { add(view); setView(null); }} className={ui.btnPrimary}>{t('shop2.add')}</button>
+                </div>
+              )}
             </div>
           </div>
         </div>

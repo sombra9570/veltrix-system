@@ -1,0 +1,1 @@
+-- Tienda: foto obligatoria para publicar (set_product_store, store_add_all, public_store); modelos con tallas/colores comparten una foto y una publicacion; public_store devuelve model/size/color.

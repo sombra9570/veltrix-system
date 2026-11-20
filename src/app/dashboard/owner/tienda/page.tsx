@@ -10,7 +10,7 @@ import { PhotoSlot } from '../../photo-picker';
 import { compressImage, extFor, storeImageUrl, makeThumb, thumbPath } from '../../image';
 
 type Company = { id: string; legal_name: string };
-type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean };
+type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean; variants?: number };
 type Store = { id: string; company_id: string; branch_id: string; slug: string; name: string; description: string | null; whatsapp: string | null; logo_path: string | null; own_qr_path?: string | null; is_published: boolean };
 type Admin = { store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
 
@@ -24,6 +24,7 @@ function storeError(msg: string, t: (k: DictKey) => string) {
   if (msg.includes('STORE_SLUG_INVALID')) return t('store.slugInvalid');
   if (msg.includes('STORE_SLUG_TAKEN')) return t('store.slugTaken');
   if (msg.includes('STORE_NEEDS_WHATSAPP')) return t('store.needsWhatsapp');
+  if (msg.includes('STORE_PHOTO_REQUIRED')) return t('store.photoRequired');
   if (msg.includes('PLAN_LIMIT_STORE')) return t('store.limit');
   if (/row-level|storage/i.test(msg)) return t('cust.uploadFailed');
   return t('err.generic');
@@ -310,7 +311,7 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
           </span>
         </div>
         <p className={`text-xs ${ui.muted}`}>{t('store.photoHint')}</p>
-        {data.products.some((p) => !p.in_store && p.active) && (
+        {data.products.some((p) => !p.in_store && p.active && p.photo) && (
           <button type="button" disabled={busy} onClick={addAll} className={`${ui.btnGhost} w-full cursor-pointer`}>➕ {t('store.addAll')}</button>
         )}
         {data.products.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('prod.empty')}</p>}
@@ -322,15 +323,16 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
                 <PhotoSlot current={img} onFile={(f) => setPhoto(p, f)} busy={busy} />
                 <div className="min-w-0 flex-1 basis-40">
                   <p className="truncate font-semibold">{p.name}</p>
-                  <p className={`text-xs ${ui.muted}`}>{fmt(p.price)}</p>
+                  <p className={`text-xs ${ui.muted}`}>{fmt(p.price)}{(p.variants ?? 1) > 1 && <> · {t('store.variants', { n: p.variants ?? 1 })}</>}</p>
+                  {!p.photo && <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">📷 {t('store.needsPhoto')}</p>}
                   {p.in_store && (
                     <input defaultValue={p.description ?? ''} placeholder={t('store.productDesc')} maxLength={300}
                       onBlur={(e) => { if (e.target.value !== (p.description ?? '')) toggle(p, e.target.value); }}
                       className={`${ui.input} mt-1 !py-1.5 text-xs`} />
                   )}
                 </div>
-                <button type="button" onClick={() => toggle(p)}
-                  className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition cursor-pointer ${p.in_store ? 'bg-emerald-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
+                <button type="button" disabled={!p.in_store && !p.photo} onClick={() => toggle(p)}
+                  className={`shrink-0 rounded-full disabled:cursor-not-allowed disabled:opacity-40 px-3 py-1.5 text-xs font-bold transition cursor-pointer ${p.in_store ? 'bg-emerald-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
                   {p.in_store ? `✓ ${t('store.inStore')}` : t('store.addToStore')}
                 </button>
               </li>
