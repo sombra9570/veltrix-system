@@ -54,6 +54,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/taller', icon: '🔧', label: 'nav.workshop', module: 'workshop', group: 'nav.g.sell' },
   { href: '/dashboard/owner/despacho', icon: '🚚', label: 'nav.dispatch', module: 'retail', group: 'nav.g.sell' },
   { href: '/dashboard/owner/rutas', icon: '🛵', label: 'nav.routes', module: 'field_collection', group: 'nav.g.sell' },
+  { href: '/dashboard/owner/supervisores', icon: '🧑‍💼', label: 'nav.supervisors', module: 'field_collection', group: 'nav.g.sell' },
   { href: '/dashboard/owner/prestamos', icon: '💸', label: 'nav.loans', module: 'field_collection', group: 'nav.g.sell' },
   { href: '/dashboard/owner/caja', icon: '💵', label: 'nav.cash', group: 'nav.g.sell' },
   { href: '/dashboard/owner/ventas', icon: '🧾', label: 'nav.sales', module: 'retail,restaurant,workshop', group: 'nav.g.sell' },
@@ -108,6 +109,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   const [denied, setDenied] = useState(false);
   const [modules, setModules] = useState<string[]>([]);
   const [routes, setRoutes] = useState<{ id: string; name: string }[]>([]);
+  const [sups, setSups] = useState<{ membership_id: string; name: string }[]>([]);
 
   // Solo se muestran las herramientas de los rubros que tiene activos la empresa
   useEffect(() => {
@@ -121,6 +123,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
     if (!orgId || !modules.includes('field_collection')) return;
     const load = () => rpc<{ id: string; name: string }[]>('owner_routes', { p_org: orgId }).then((r) => setRoutes(r ?? [])).catch(() => setRoutes([]));
     load();
+    rpc<{ membership_id: string; name: string }[]>('owner_supervisors', { p_org: orgId }).then((r) => setSups(r ?? [])).catch(() => setSups([]));
     window.addEventListener('vx-routes-changed', load);
     return () => window.removeEventListener('vx-routes-changed', load);
   }, [orgId, modules]);
@@ -206,7 +209,10 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
         nav={NAV
           .filter((n) => navHas(modules, n.module) && (!n.href.endsWith('/informes') || ['pro', 'enterprise', 'enterprise_plus'].includes(o?.plan_code ?? ''))
             && !(cobranza && ['/clientes', '/prestamos', '/caja'].some((x) => n.href.endsWith(x))))
-          .map((n) => (n.href.endsWith('/rutas') ? { ...n, children: routes.map((r) => ({ href: `/dashboard/owner/ruta?r=${r.id}`, label: r.name })) } : n))}
+          .filter((n) => !n.href.endsWith('/supervisores') || cobranza)
+          .map((n) => (n.href.endsWith('/rutas') ? { ...n, children: routes.map((r) => ({ href: `/dashboard/owner/ruta?r=${r.id}`, label: r.name })) }
+            : n.href.endsWith('/supervisores') ? { ...n, children: sups.map((x) => ({ href: `/dashboard/owner/supervisor?s=${x.membership_id}`, label: x.name })) } : n))
+          .map((n) => (cobranza && n.group === 'nav.g.sell' ? { ...n, group: 'nav.g.routesSup' as const } : n))}
         orgName={o?.name ?? ''}
         userName={session.name || session.email}
         roleLabel={t('role.owner')}

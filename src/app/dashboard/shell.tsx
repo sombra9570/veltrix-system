@@ -23,8 +23,8 @@ function ChildLink({ child, onGo }: { child: NavChild; onGo: () => void }) {
   const pathname = usePathname();
   const sp = useSearchParams();
   const [path, query] = child.href.split('?');
-  const want = new URLSearchParams(query ?? '').get('r');
-  const active = pathname === path && (!want || sp.get('r') === want);
+  const [wk, wv] = Array.from(new URLSearchParams(query ?? '').entries())[0] ?? [];
+  const active = pathname === path && (!wk || sp.get(wk) === wv);
   return (
     <Link href={child.href} onClick={onGo}
       className={`flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold transition ${active ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800/70'}`}>

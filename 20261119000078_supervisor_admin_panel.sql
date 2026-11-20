@@ -1,0 +1,5 @@
+-- Aplicada por MCP (supervisor_admin_panel). Resumen:
+-- * has_perm: un permiso explícito en memberships.permissions de un supervisor manda sobre el atajo de "encargado de sucursal".
+-- * owner_supervisors(org), supervisor_set_permission(membership,key,value), supervisor_set_routes(membership,routes[]).
+-- * supervisor_reports_admin devuelve author_id.
+-- Permisos nuevos sin aplicación en el servidor todavía: payments.record_installment, payments.record_partial, collector.delete_expenses.
