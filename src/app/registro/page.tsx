@@ -387,7 +387,7 @@ export default function RegistroPage() {
                       <>
                         <div className="mt-4 space-y-4">
                           {groupIds.map((gg) => {
-                            const items = pool.filter((c) => (g && g !== 'ask' ? true : primaryGroup(c.id) === gg));
+                            const items = pool.filter((c) => (g ? true : primaryGroup(c.id) === gg));
                             if (!items.length) return null;
                             return (
                               <div key={gg}>
