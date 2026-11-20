@@ -1,6 +1,8 @@
 'use client';
 import { useCallback } from 'react';
 import { useLanguage } from '../language-selector';
+import { MORE } from './quiz-text-more';
+import { ASIA } from './quiz-text-asia';
 
 // Textos del test de registro. Español, inglés y portugués completos; los demás idiomas muestran inglés por ahora.
 const es = {
@@ -168,6 +170,8 @@ const pt: Record<Key, string> = {
 };
 
 const DICTS: Record<string, Record<Key, string>> = { es, en, pt };
+// Los demás idiomas heredan del inglés lo que no se tradujo (por ejemplo los números)
+for (const [code, part] of Object.entries({ ...MORE, ...ASIA })) DICTS[code] = { ...en, ...part } as Record<Key, string>;
 export type QKey = Key;
 export function useQ() {
   const { lang } = useLanguage();
