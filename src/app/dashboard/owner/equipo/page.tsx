@@ -278,7 +278,7 @@ export default function TeamPage() {
                     </div>
                     {wanted.length === 1 && (
                       <div className="mt-3 flex flex-wrap items-center gap-2">
-                        {roles.includes(wanted[0]) ? (
+                        {(roles as string[]).includes(wanted[0]) ? (
                           <>
                             <span className="text-sm">{t('team.otherHave', { role: roleLabel(wanted[0]) })}</span>
                             <button type="button" className={ui.btnPrimary} onClick={() => { setForm({ ...form, role: wanted[0] }); setHelper(false); setPicked([]); }}>{roleLabel(wanted[0])}</button>
@@ -292,7 +292,7 @@ export default function TeamPage() {
                       <div className="mt-3 space-y-2 text-sm">
                         <p>{t('team.otherCombo')}</p>
                         <div className="flex flex-wrap gap-2">
-                          {wanted.filter((r) => !roles.includes(r)).map((r) => (
+                          {wanted.filter((r) => !(roles as string[]).includes(r)).map((r) => (
                             <button key={r} type="button" disabled={busy} className={ui.btnGhost} onClick={() => activateRole(r)}>{t('team.otherActivate', { role: roleLabel(r) })}</button>
                           ))}
                           <a href="/dashboard/owner/permisos" className={ui.btnPrimary}>{t('team.otherGoCustom')}</a>

@@ -1,0 +1,3 @@
+-- Activar un rol del rubro despues del registro (lo usa 'Necesito otro tipo de trabajador' en Equipo).
+-- Aplicada como migracion org_add_team_role: solo el administrador; el rol exige un modulo que el negocio ya tiene,
+-- respeta role_plan_ok y el tope max_roles del plan; guarda en organizations.onboarding.roles y registra en audit_log.
