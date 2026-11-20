@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { rpc } from '../../lib/supabase';
 import { useRouter, usePathname } from 'next/navigation';
 import { useVeltrixAuth, homeForRole, UserRole } from '../auth-system';
-import { AppShell, NavItem } from './shell';
+import { AppShell, NavItem, navHas } from './shell';
 import { ROLE_NAV } from './role-nav';
 import { Spinner, NoAccess } from '../spinner';
 export { Spinner, NoAccess };
@@ -68,7 +68,7 @@ export function StaffProvider({
     // Con funciones de varios roles, el menú se separa por rol; con uno solo no hace falta
     if (extra.length === 0) return [...mine, ...chat];
     return [...mine.map((n) => ({ ...n, group: `role.${session.role}` as DictKey })), ...extra, ...chat];
-  })().filter((n) => !n.module || (modules ?? []).includes(n.module));
+  })().filter((n) => navHas(modules, n.module));
 
   const company = companies.find((c) => c.id === session.companyId);
   return (

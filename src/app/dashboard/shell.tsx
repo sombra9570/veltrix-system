@@ -11,6 +11,10 @@ import { useSync, SyncButton, NetBanner } from './sync';
 import { loadAuth } from '../auth-system';
 import type { DictKey } from '../i18n/es';
 
+/** Un ítem del menú puede pedir uno o varios módulos ("a,b" = basta con uno) */
+export const navHas = (modules: string[] | null, need?: string) =>
+  !need || (modules ?? []).some((m) => need.split(',').includes(m));
+
 export type NavItem = { href: string; icon: string; label: DictKey; soon?: boolean; module?: string; group?: DictKey };
 
 /**

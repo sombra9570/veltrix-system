@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useStaff } from '../staff-context';
 import { ROLE_NAV } from '../role-nav';
 import { rpc } from '../../../lib/supabase';
-import { Card } from '../shell';
+import { Card, navHas } from '../shell';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import { money, parseAmount } from '../format';
@@ -24,7 +24,7 @@ export default function SupervisorRoutes() {
   const noRoutes = modules !== null && !modules.includes('field_collection');
   useEffect(() => {
     if (!noRoutes) return;
-    const first = ROLE_NAV.supervisor.find((n) => n.href !== '/dashboard/supervisor' && (!n.module || modules!.includes(n.module)));
+    const first = ROLE_NAV.supervisor.find((n) => n.href !== '/dashboard/supervisor' && navHas(modules, n.module));
     if (first) router.replace(first.href);
   }, [noRoutes, modules, router]);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);

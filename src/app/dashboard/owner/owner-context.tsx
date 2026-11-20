@@ -45,7 +45,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner', icon: '🏠', label: 'nav.home', group: 'nav.g.today' },
   { href: '/dashboard/owner/mensajes', icon: '💬', label: 'nav.messages', group: 'nav.g.today' },
   { href: '/dashboard/owner/ia', icon: '✨', label: 'nav.ai', group: 'nav.g.today' },
-  { href: '/dashboard/owner/vender', icon: '🛒', label: 'nav.pos', group: 'nav.g.sell' },
+  { href: '/dashboard/owner/vender', icon: '🛒', label: 'nav.pos', module: 'retail,restaurant,workshop', group: 'nav.g.sell' },
   { href: '/dashboard/owner/mesas', icon: '🍽️', label: 'nav.tables', module: 'restaurant', group: 'nav.g.sell' },
   { href: '/dashboard/owner/cocina', icon: '🔥', label: 'nav.kitchen', module: 'restaurant', group: 'nav.g.sell' },
   { href: '/dashboard/owner/entregas', icon: '🛵', label: 'dl.nav', module: 'restaurant', group: 'nav.g.sell' },
@@ -54,11 +54,11 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/rutas', icon: '🛵', label: 'nav.routes', module: 'field_collection', group: 'nav.g.sell' },
   { href: '/dashboard/owner/prestamos', icon: '💸', label: 'nav.loans', module: 'field_collection', group: 'nav.g.sell' },
   { href: '/dashboard/owner/caja', icon: '💵', label: 'nav.cash', group: 'nav.g.sell' },
-  { href: '/dashboard/owner/ventas', icon: '🧾', label: 'nav.sales', group: 'nav.g.sell' },
+  { href: '/dashboard/owner/ventas', icon: '🧾', label: 'nav.sales', module: 'retail,restaurant,workshop', group: 'nav.g.sell' },
   { href: '/dashboard/owner/clientes', icon: '🤝', label: 'nav.customers', group: 'nav.g.sell' },
-  { href: '/dashboard/owner/productos', icon: '📦', label: 'nav.products', group: 'nav.g.business' },
-  { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory', group: 'nav.g.business' },
-  { href: '/dashboard/owner/tienda', icon: '🛍️', label: 'nav.store', group: 'nav.g.business' },
+  { href: '/dashboard/owner/productos', icon: '📦', label: 'nav.products', module: 'inventory', group: 'nav.g.business' },
+  { href: '/dashboard/owner/inventario', icon: '🗃️', label: 'nav.inventory', module: 'inventory', group: 'nav.g.business' },
+  { href: '/dashboard/owner/tienda', icon: '🛍️', label: 'nav.store', module: 'retail,restaurant,workshop', group: 'nav.g.business' },
   { href: '/dashboard/owner/sucursales', icon: '🏢', label: 'nav.branches', group: 'nav.g.business' },
   { href: '/dashboard/owner/reportes', icon: '📊', label: 'nav.reports', group: 'nav.g.reports' },
   { href: '/dashboard/owner/informes', icon: '📑', label: 'nav.informes', group: 'nav.g.reports' },
@@ -190,7 +190,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
   return (
     <OwnerContext.Provider value={{ orgId, overview, reload, userName: session.name, modules }}>
       <AppShell
-        nav={NAV.filter((n) => (!n.module || modules.includes(n.module)) && (!n.href.endsWith('/informes') || ['pro', 'enterprise', 'enterprise_plus'].includes(o?.plan_code ?? '')))}
+        nav={NAV.filter((n) => navHas(modules, n.module) && (!n.href.endsWith('/informes') || ['pro', 'enterprise', 'enterprise_plus'].includes(o?.plan_code ?? '')))}
         orgName={o?.name ?? ''}
         userName={session.name || session.email}
         roleLabel={t('role.owner')}
