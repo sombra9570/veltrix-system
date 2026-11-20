@@ -41,7 +41,7 @@ export function ModelStock({ model, items, branchId, canReceive, onChanged, flas
   const colorLabel = (c: string) => c || t('mod.noColor');
 
   const save = async () => {
-    const lines = Object.entries(add).map(([id, v]) => ({ product_id: id, qty: parseAmount(v), cost: 0 })).filter((l) => !Number.isNaN(l.qty) && l.qty > 0);
+    const lines = Object.entries(add).map(([id, v]) => ({ product_id: id, qty: parseAmount(String(v)), cost: 0 })).filter((l) => !Number.isNaN(l.qty) && l.qty > 0);
     if (lines.length === 0) return;
     setBusy(true);
     try {
