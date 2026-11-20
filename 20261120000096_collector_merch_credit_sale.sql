@@ -1,0 +1,2 @@
+-- Cobrador de mercaderia: collector_sale_mode, collector_products, collector_credit_sale (migracion collector_merch_credit_sale).
+-- Ventas a plazos fijas y sin interes; exigen el permiso sales.credit del cobrador y solo en rubros sin el modulo finance.

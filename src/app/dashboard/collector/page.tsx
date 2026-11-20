@@ -12,6 +12,8 @@ import { useSync } from '../sync';
 import { isNetworkError } from '../offline-sales';
 import { ShowMore } from '../paged';
 import { CreditCard, applyPayment, freqOf, type Credit, type Freq, type Method } from './credit-card';
+import { CreditSaleForm } from './credit-sale-form';
+import { CreditSaleForm } from './credit-sale-form';
 import { LoanForm, RATING_DOT, type LoanPolicy } from './loan-form';
 import { DaysTable, type DayRow } from './days-table';
 import { CutForm } from './cut-form';
@@ -122,6 +124,7 @@ export default function CollectorPage() {
   const [syncing, setSyncing] = useState(false);
   const [routeId, setRouteId] = useState('');
   const [sel, setSel] = useState<Customer | null>(null);
+  const [saleMode, setSaleMode] = useState<{ mode: 'loan' | 'merch'; can: boolean } | null>(null);
   const [panel, setPanel] = useState<'pay' | 'visit' | 'expense' | 'settle' | 'loan' | null>(null);
   const [view, setView] = useState<'cards' | 'list'>('list');
   const [freq, setFreq] = useState<Freq | 'all'>('all');
@@ -371,6 +374,12 @@ export default function CollectorPage() {
   };
 
   const route = day?.routes.find((r) => r.id === routeId);
+  useEffect(() => {
+    if (!routeId) return;
+    rpc<{ mode: 'loan' | 'merch'; can: boolean }>('collector_sale_mode', { p_route: routeId }).then((m) => setSaleMode(m ?? null)).catch(() => setSaleMode(null));
+  }, [routeId]);
+  const merch = saleMode?.mode === 'merch';
+  const canNew = merch ? !!saleMode?.can : !!route?.can_loan && !!route?.policy;
   // Registra el cobro al instante; la ubicación se adjunta apenas el teléfono la da (sin hacer esperar)
   const pay = (customer: string, method: Method, amount: number, order?: string) => {
     if (!route) return;
@@ -543,14 +552,14 @@ export default function CollectorPage() {
       )}
 
       {screen === 'newclient' && (
-        <NewClient routeId={route.id} orgId={route.org_id ?? ''} online={online} canLoan={!!route.can_loan && !!route.policy} needPhoto={!route.can_no_photo} needIdPhoto={!route.can_no_id_photo}
+        <NewClient routeId={route.id} orgId={route.org_id ?? ''} online={online} canLoan={canNew} saleLabel={merch} needPhoto={!route.can_no_photo} needIdPhoto={!route.can_no_id_photo}
           onSaved={async (id) => { await patch(route.id, { customers: [id] }); }}
           onLoan={() => { setPanel('loan'); }} />
       )}
 
       {screen === 'settings' && (
         <SettingsScreen routeId={route.id} orgId={route.org_id ?? ''} branchId={route.branch_id ?? ''} ownQr={!!route.own_qr}
-          canLoan={!!route.can_loan && !!route.policy} onLoan={() => setPanel('loan')} onQrChanged={refresh} payQr={route.pay_qr ?? null} payQrNote={route.pay_qr_note ?? null}
+          canLoan={canNew} saleLabel={merch} onLoan={() => setPanel('loan')} onQrChanged={refresh} payQr={route.pay_qr ?? null} payQrNote={route.pay_qr_note ?? null}
           geoOn={geoOn} onGeo={(v) => { setGeoOn(v); save('vx_col_geo', v); }} fmt={fmt} online={online}
           onNoticesRead={() => { setDay((d) => { if (!d) return d; const nd = { ...d, routes: d.routes.map((r) => (r.id === route.id ? { ...r, notices_unread: 0 } : r)) }; save(DAY_KEY, nd); return nd; }); }}
           perms={[
@@ -676,7 +685,11 @@ export default function CollectorPage() {
                 setPanel(null);
               }} />
             )}
-            {panel === 'loan' && route.policy && (
+            {panel === 'loan' && merch && (
+              <CreditSaleForm routeId={route.id} today={route.today} fmt={fmt}
+                onDone={async (text, ok, customerId) => { flash(ok, text); setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
+            )}
+            {panel === 'loan' && !merch && route.policy && (
               <LoanForm routeId={route.id} today={route.today} policy={route.policy} canInterest={!!route.can_interest}
                 canCustomers={route.can_customers !== false} fmt={fmt}
                 onDone={async (text, ok, customerId) => { flash(ok, text); setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />

@@ -26,6 +26,14 @@ const ROLE_KEYS: Record<string, string[]> = {
   technician: ['customers.edit', 'customers.view_docs'],
 };
 
+// Cobrador de mercadería (rubro sin finanzas): cobra cuotas fijas sin interés; no presta dinero ni invierte en la ruta
+const MERCH_COLLECTOR_OUT = ['loans.create', 'loans.interest', 'routes.invest'];
+function roleKeys(role: string, modules: string[]): string[] {
+  const base = ROLE_KEYS[role] ?? [];
+  if (role !== 'collector' || modules.length === 0 || modules.includes('finance')) return base;
+  return [...base.filter((k) => !MERCH_COLLECTOR_OUT.includes(k)), 'sales.credit'];
+}
+
 function Toggle({ on, onChange, label, disabled }: { on: boolean; onChange: (v: boolean) => void; label: string; disabled?: boolean }) {
   return (
     <button type="button" role="switch" aria-checked={on} aria-label={label} disabled={disabled} onClick={() => onChange(!on)}
@@ -110,7 +118,7 @@ export default function PermissionsPage() {
 
           {/* Por rol */}
           <div className="grid gap-4 lg:grid-cols-3">
-            {Object.entries(ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (teamRoles.length === 0 || teamRoles.includes(role) || (d?.users ?? []).some((u) => u.role === role)) && (!cobranza || role === 'cashier' || role === 'collector')).map(([role, allKeys]) => { const keys = allKeys.filter((x) => keyAvailable(x, modules) && !(cobranza && role === 'cashier' && !x.startsWith('cash.'))); return (
+            {Object.entries(ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (teamRoles.length === 0 || teamRoles.includes(role) || (d?.users ?? []).some((u) => u.role === role)) && (!cobranza || role === 'cashier' || role === 'collector')).map(([role, allKeys]) => { const keys = roleKeys(role, modules).filter((x) => keyAvailable(x, modules) && !(cobranza && role === 'cashier' && !x.startsWith('cash.'))); return (
               <Card key={role}>
                 <h2 className="font-bold">{cobranza && role === 'cashier' ? t('rt.liquidator') : k(`role.${role}`)}</h2>
                 <p className={`mb-3 text-xs ${ui.muted}`}>{t('perm.roleHint')}</p>
@@ -138,7 +146,7 @@ export default function PermissionsPage() {
             {users.length === 0 ? <p className={`p-5 text-sm ${ui.muted}`}>{t('perm.noUsers')}</p> : (
               <ul className="divide-y divide-slate-200 dark:divide-slate-800">
                 {users.map((u) => {
-                  const overrides = Object.keys(u.permissions ?? {}).filter((x) => ROLE_KEYS[u.role].includes(x)).length;
+                  const overrides = Object.keys(u.permissions ?? {}).filter((x) => roleKeys(u.role, modules).includes(x)).length;
                   return (
                     <li key={u.membership_id}>
                       <button type="button" onClick={() => setOpen(open === u.membership_id ? null : u.membership_id)}
@@ -152,7 +160,7 @@ export default function PermissionsPage() {
                       </button>
                       {open === u.membership_id && (
                         <ul className="space-y-3 px-4 pb-4">
-                          {(ROLE_KEYS[u.role] ?? []).filter((x) => keyAvailable(x, modules)).map((key) => {
+                          {roleKeys(u.role, modules).filter((x) => keyAvailable(x, modules)).map((key) => {
                             const own = u.permissions?.[key];
                             const inherited = !!d.roles[u.role]?.[key];
                             const val = own === undefined ? 'inherit' : own ? 'yes' : 'no';

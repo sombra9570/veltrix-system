@@ -24,8 +24,8 @@ export async function payQrUrl(path: string, seconds = 3 * 86400): Promise<strin
  *  - reportes de todas las liquidaciones,
  *  - preferencias del teléfono.
  */
-export function SettingsScreen({ routeId, orgId, branchId, ownQr, canLoan, onLoan, onQrChanged, perms, payQr, payQrNote, geoOn, onGeo, fmt, online, onNoticesRead }: {
-  routeId: string; orgId: string; branchId: string; ownQr: boolean; canLoan: boolean; onLoan: () => void; onQrChanged: () => void | Promise<void>; perms: [DictKey, boolean][]; payQr: string | null; payQrNote: string | null;
+export function SettingsScreen({ routeId, orgId, branchId, ownQr, canLoan, saleLabel = false, onLoan, onQrChanged, perms, payQr, payQrNote, geoOn, onGeo, fmt, online, onNoticesRead }: {
+  routeId: string; orgId: string; branchId: string; ownQr: boolean; canLoan: boolean; saleLabel?: boolean; onLoan: () => void; onQrChanged: () => void | Promise<void>; perms: [DictKey, boolean][]; payQr: string | null; payQrNote: string | null;
   geoOn: boolean; onGeo: (v: boolean) => void; fmt: (n: number) => string; online: boolean; onNoticesRead: () => void;
 }) {
   const { t, lang } = useT();
@@ -151,9 +151,9 @@ export function SettingsScreen({ routeId, orgId, branchId, ownQr, canLoan, onLoa
 
       {canLoan && (
         <Card className="space-y-2">
-          <p className="font-bold">💸 {t('cx.set.loans')}</p>
-          <p className={`text-xs ${ui.muted}`}>{t('cx.set.loansHint')}</p>
-          <button type="button" onClick={onLoan} disabled={!online} className={ui.btnGhost}>{t('cx.newLoan')}</button>
+          <p className="font-bold">{saleLabel ? '🛍️' : '💸'} {t(saleLabel ? 'cx.newSale' : 'cx.set.loans')}</p>
+          {!saleLabel && <p className={`text-xs ${ui.muted}`}>{t('cx.set.loansHint')}</p>}
+          <button type="button" onClick={onLoan} disabled={!online} className={ui.btnGhost}>{t(saleLabel ? 'cx.newSale' : 'cx.newLoan')}</button>
         </Card>
       )}
 

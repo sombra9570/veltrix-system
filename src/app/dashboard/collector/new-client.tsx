@@ -49,8 +49,8 @@ function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) 
  * Cliente nuevo de la ruta: datos, carnet por los dos lados, foto, ubicación GPS y garante.
  * Las fotos se suben al guardar, así que hace falta internet (el cobro sí funciona sin señal).
  */
-export function NewClient({ routeId, orgId, online, canLoan, needPhoto = false, needIdPhoto = false, onSaved, onLoan }: {
-  routeId: string; orgId: string; online: boolean; canLoan: boolean; needPhoto?: boolean; needIdPhoto?: boolean;
+export function NewClient({ routeId, orgId, online, canLoan, saleLabel = false, needPhoto = false, needIdPhoto = false, onSaved, onLoan }: {
+  routeId: string; orgId: string; online: boolean; canLoan: boolean; saleLabel?: boolean; needPhoto?: boolean; needIdPhoto?: boolean;
   onSaved: (id: string) => Promise<void> | void; onLoan: () => void;
 }) {
   const { t } = useT();
@@ -135,7 +135,7 @@ export function NewClient({ routeId, orgId, online, canLoan, needPhoto = false, 
         <h2 className="text-lg font-bold">{t('cx.nc.saved')}: {done.name}</h2>
         {!done.photosOk && <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">{err || t('cx.nc.partial')}</p>}
         <div className="grid gap-2">
-          {canLoan && <button type="button" onClick={onLoan} className={`${ui.btnPrimary} py-3`}>💸 {t('cx.newLoan')}</button>}
+          {canLoan && <button type="button" onClick={onLoan} className={`${ui.btnPrimary} py-3`}>{saleLabel ? '🛍️' : '💸'} {t(saleLabel ? 'cx.newSale' : 'cx.newLoan')}</button>}
         </div>
       </Card>
     );
