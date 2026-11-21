@@ -174,6 +174,7 @@ const ar: Record<DictKey, string> = {
   'nav.branches': "الفروع",
   'nav.sales': "المبيعات",
   'nav.cash': "الصندوق",
+  'nav.myCash': "صندوقي",
   'nav.customers': "العملاء والائتمان",
   'nav.inventory': "المخزون",
   'nav.reports': "التقارير",

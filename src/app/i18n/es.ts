@@ -183,6 +183,7 @@ const es = {
   'nav.branches': "Sucursales",
   'nav.sales': "Ventas",
   'nav.cash': "Caja",
+  'nav.myCash': "Mi caja",
   'nav.customers': "Clientes y créditos",
   'nav.inventory': "Inventario",
   'nav.reports': "Reportes",

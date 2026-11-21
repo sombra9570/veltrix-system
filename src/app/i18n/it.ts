@@ -174,6 +174,7 @@ const it: Record<DictKey, string> = {
   'nav.branches': "Filiali",
   'nav.sales': "Vendite",
   'nav.cash': "Cassa",
+  'nav.myCash': "La mia cassa",
   'nav.customers': "Clienti e crediti",
   'nav.inventory': "Magazzino",
   'nav.reports': "Report",

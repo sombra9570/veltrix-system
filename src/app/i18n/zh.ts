@@ -174,6 +174,7 @@ const zh: Record<DictKey, string> = {
   'nav.branches': "分店",
   'nav.sales': "销售",
   'nav.cash': "收银",
+  'nav.myCash': "我的收银台",
   'nav.customers': "客户与赊账",
   'nav.inventory': "库存",
   'nav.reports': "报表",

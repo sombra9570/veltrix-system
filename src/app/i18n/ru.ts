@@ -174,6 +174,7 @@ const ru: Record<DictKey, string> = {
   'nav.branches': "Филиалы",
   'nav.sales': "Продажи",
   'nav.cash': "Касса",
+  'nav.myCash': "Моя касса",
   'nav.customers': "Клиенты и кредиты",
   'nav.inventory': "Склад",
   'nav.reports': "Отчёты",

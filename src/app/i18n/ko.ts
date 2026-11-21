@@ -174,6 +174,7 @@ const ko: Record<DictKey, string> = {
   'nav.branches': "지점",
   'nav.sales': "판매",
   'nav.cash': "계산대",
+  'nav.myCash': "내 금전함",
   'nav.customers': "고객과 외상",
   'nav.inventory': "재고",
   'nav.reports': "보고서",

@@ -62,6 +62,7 @@ const NAV: NavItem[] = [
   { href: '/dashboard/owner/rutas', icon: '🛵', label: 'nav.routes', module: 'field_collection', group: 'nav.g.sell' },
   { href: '/dashboard/owner/supervisores', icon: '🧑‍💼', label: 'nav.supervisors', module: 'field_collection', group: 'nav.g.sell' },
   { href: '/dashboard/owner/prestamos', icon: '💸', label: 'nav.loans', module: 'field_collection', group: 'nav.g.sell' },
+  { href: '/dashboard/owner/mi-caja', icon: '🧮', label: 'nav.myCash', group: 'nav.g.sell' },
   { href: '/dashboard/owner/caja', icon: '💵', label: 'nav.cash', group: 'nav.g.sell' },
   { href: '/dashboard/owner/ventas', icon: '🧾', label: 'nav.sales', module: 'retail,restaurant,workshop', group: 'nav.g.sell' },
   { href: '/dashboard/owner/clientes', icon: '🤝', label: 'nav.customers', group: 'nav.g.sell' },

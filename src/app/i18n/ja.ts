@@ -174,6 +174,7 @@ const ja: Record<DictKey, string> = {
   'nav.branches': "支店",
   'nav.sales': "販売",
   'nav.cash': "レジ",
+  'nav.myCash': "自分のレジ",
   'nav.customers': "顧客と掛け売り",
   'nav.inventory': "在庫",
   'nav.reports': "レポート",
