@@ -5,6 +5,7 @@ import { rpc } from '../../../lib/supabase';
 import { useOwner } from './owner-context';
 import { Card, UsageBar } from '../shell';
 import { ApprovalsTray } from '../approvals';
+import { StoreOrdersBanner } from '../store-orders-alert';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import { GrowthCurves } from './growth';
@@ -138,6 +139,7 @@ function CobranzaHome() {
           ))}
         </div>
       </div>
+      <StoreOrdersBanner />
       <ApprovalsTray />
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card><p className={lbl}>{t('cx.sum.collected')} · {per}</p>
@@ -191,6 +193,7 @@ function GenericHome() {
         <p className={`text-sm ${ui.muted}`}>{t('owner.subtitle')}</p>
       </div>
 
+      <StoreOrdersBanner />
       <ApprovalsTray />
 
       {/* HOY */}

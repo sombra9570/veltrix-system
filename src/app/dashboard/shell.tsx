@@ -4,6 +4,7 @@ import { rpc } from '../../lib/supabase';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { ThemeToggle } from '../theme';
+import { StoreOrdersBell } from './store-orders-alert';
 import { HelpButton } from './help';
 import { RegionSelectors, ui } from '../site-header';
 import { useT } from '../i18n';
@@ -214,6 +215,7 @@ export function AppShell({
           <div className="ml-auto flex items-center gap-2 rtl:ml-0 rtl:mr-auto">
             {slot?.extra}
             <div className="hidden sm:block"><RegionSelectors /></div>
+            <StoreOrdersBell />
             {!slot?.hideSync && <SyncButton />}
             {help && <HelpButton />}
             <ThemeToggle />

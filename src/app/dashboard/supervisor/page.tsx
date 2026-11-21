@@ -12,6 +12,7 @@ import { DaysTable } from '../collector/days-table';
 import { CutForm } from '../collector/cut-form';
 import { RouteTrail } from '../route-trail';
 import { ApprovalsTray } from '../approvals';
+import { StoreOrdersBanner } from '../store-orders-alert';
 import SupPanel from './panel';
 import { useBoard, type SRoute, type SBranch } from './board';
 
@@ -41,6 +42,7 @@ function BranchBoard() {
         <h1 className="text-xl font-extrabold sm:text-2xl">🛵 {t('sup.title')}</h1>
         <p className={`text-sm ${ui.muted}`}>{t('sup.subtitle')}</p>
       </div>
+      <StoreOrdersBanner />
       <ApprovalsTray />
       {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300' : 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400'}`}>{msg.text}</p>}
       {pending > 0 && (
