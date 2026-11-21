@@ -29,6 +29,8 @@ export function StoreView({ slug }: { slug: string }) {
   const DREQ_KEY = `vx_store_dreq_${slug}`;
   const [phone, setPhone] = useState('');
   const [pay, setPay] = useState<'qr' | 'cash'>('cash');
+  const [address, setAddress] = useState('');
+  const [reference, setReference] = useState('');
   const [method, setMethod] = useState<'pickup' | 'delivery'>('pickup');
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [dBusy, setDBusy] = useState(false);
@@ -95,25 +97,13 @@ export function StoreView({ slug }: { slug: string }) {
     setDBusy(true); setDErr('');
     const { data, error } = await supabase.rpc('public_store_pickup', {
       p_slug: slug, p_items: cart.map((l) => ({ product_id: l.p.id, qty: l.qty })), p_name: name, p_phone: phone, p_notes: note, p_pay: pay,
-      p_kind: method, p_lat: method === 'delivery' ? coords?.lat ?? null : null, p_lng: method === 'delivery' ? coords?.lng ?? null : null,
+      p_kind: method, p_address: address, p_reference: reference, p_lat: method === 'delivery' ? coords?.lat ?? null : null, p_lng: method === 'delivery' ? coords?.lng ?? null : null,
     });
     setDBusy(false);
     if (error) {
       const m = error.message;
       setDErr(/PRODUCT_UNAVAILABLE/.test(m) ? t('tq.errUnavailable') : /TOO_MANY/.test(m) ? t('dl.errMany') : /PHONE|DATA/.test(m) ? t('dl.errData') : t('err.generic'));
       return;
-    }
-    if (store.whatsapp) {
-      const lines = cart.map((l) => `• ${l.qty} × ${l.p.name} — ${fmt(l.qty * Number(l.p.price))}`).join('\n');
-      const text = [
-        t('shop2.waHello', { store: store.name }), '', lines, '', `${t('pos.total')}: ${fmt(total)}`,
-        `${t('pk.payLabel')}: ${pay === 'qr' ? t('tq.payQr') : t('tq.payCash')}`,
-        `${t('pk.methodLabel')}: ${method === 'pickup' ? t('pk.pickup') : t('pk.delivery')}`,
-        method === 'delivery' && coords ? `📍 https://maps.google.com/?q=${coords.lat},${coords.lng}` : method === 'delivery' ? t('pk.sendLoc') : '',
-        `${t('shop2.waName')}: ${name.trim()}`, `${t('dl.phone')}: ${phone.trim()}`,
-        note.trim() ? `${t('shop2.waNote')}: ${note.trim()}` : '',
-      ].filter((x, i, a) => x !== '' || (a[i - 1] ?? '') !== '').join('\n');
-      window.open(`https://wa.me/${store.whatsapp}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
     }
     try { localStorage.setItem(DREQ_KEY, data as string); if (method === 'pickup') localStorage.setItem(`${DREQ_KEY}_pk`, '1'); else localStorage.removeItem(`${DREQ_KEY}_pk`); } catch { /* */ }
     setDStatus(null); setDReq(data as string); setCart([]); setOpen(false);
@@ -330,6 +320,8 @@ export function StoreView({ slug }: { slug: string }) {
             ) : (
               <div className="space-y-2">
                 <p className={`text-xs ${ui.muted}`}>{t('pk.deliveryHint')}</p>
+                <input value={address} onChange={(e) => setAddress(e.target.value)} maxLength={200} placeholder={t('pk.address')} className={ui.input} />
+                <input value={reference} onChange={(e) => setReference(e.target.value)} maxLength={150} placeholder={t('pk.reference')} className={ui.input} />
                 <button type="button" onClick={useMyLocation} className={`${ui.btnGhost} w-full !py-2 text-sm`}>{coords ? `✅ ${t('dl.locationSet')}` : `📍 ${t('dl.useLocation')}`}</button>
               </div>
             )}
@@ -344,9 +336,9 @@ export function StoreView({ slug }: { slug: string }) {
               </div>
             </div>
             {dErr && <p className="rounded-xl border border-red-300 bg-red-50 p-2 text-sm font-semibold text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">{dErr}</p>}
-            <button type="button" disabled={dBusy || name.trim().length < 2 || phone.trim().length < 6} onClick={sendOrder}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-base font-bold text-white cursor-pointer hover:brightness-95 disabled:opacity-50">
-              💬 {dBusy ? t('common.wait') : t('pk.sendOrder')}
+            <button type="button" disabled={dBusy || name.trim().length < 2 || phone.trim().length < 6 || (method === 'delivery' && address.trim().length < 5 && !coords)} onClick={sendOrder}
+              className={`${ui.btnPrimary} w-full py-3 text-base`}>
+              ✅ {dBusy ? t('common.wait') : t('pk.sendOrder')}
             </button>
             <button type="button" onClick={() => setCart([])} className={`w-full text-xs font-semibold ${ui.muted} hover:underline cursor-pointer`}>{t('pos.clear')}</button>
           </div>

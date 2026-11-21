@@ -18,10 +18,10 @@ type Data = {
 // Qué permisos tienen sentido para cada rol (los demás no se muestran para no confundir)
 // Permisos delegables por rol (el dueño y el supervisor ya lo tienen todo en su sucursal)
 const ROLE_KEYS: Record<string, string[]> = {
-  cashier: ['cash.see_expected', 'cash.expense', 'cash.withdraw', 'cash.deposit', 'cash.change_fund', 'customers.view_docs', 'customers.upload_docs', 'payments.reverse', 'sales.cancel_request', 'store.photo', 'store.publish', 'store.edit_info'],
-  vendor: ['sales.credit', 'customers.create', 'customers.edit', 'customers.view_docs', 'customers.upload_docs', 'payments.reverse', 'sales.cancel_request', 'store.photo', 'store.publish', 'store.edit_info'],
+  cashier: ['cash.see_expected', 'cash.expense', 'cash.withdraw', 'cash.deposit', 'cash.change_fund', 'customers.view_docs', 'customers.upload_docs', 'payments.reverse', 'sales.cancel_request', 'store.photo', 'store.publish', 'store.edit_info', 'store.orders', 'store.assign'],
+  vendor: ['sales.credit', 'customers.create', 'customers.edit', 'customers.view_docs', 'customers.upload_docs', 'payments.reverse', 'sales.cancel_request', 'store.photo', 'store.publish', 'store.edit_info', 'store.orders', 'store.assign'],
   collector: ['collector.expenses', 'collector.portfolio', 'collector.settings', 'loans.create', 'loans.customers', 'loans.interest', 'loans.cancel', 'loans.reschedule', 'payments.reverse', 'routes.liquidate', 'routes.invest'],
-  storekeeper: ['products.create', 'products.edit', 'products.price', 'products.delete', 'inv.receive', 'inv.purchase', 'inv.adjust', 'inv.out_waste', 'inv.out_damaged', 'inv.out_expired', 'inv.out_internal', 'inv.out_supplier_return', 'inv.out_other', 'inv.transfer', 'inv.see_cost', 'store.photo', 'store.publish', 'store.edit_info'],
+  storekeeper: ['products.create', 'products.edit', 'products.price', 'products.delete', 'inv.receive', 'inv.purchase', 'inv.adjust', 'inv.out_waste', 'inv.out_damaged', 'inv.out_expired', 'inv.out_internal', 'inv.out_supplier_return', 'inv.out_other', 'inv.transfer', 'inv.see_cost', 'store.photo', 'store.publish', 'store.edit_info', 'store.orders', 'store.assign'],
   accountant: ['reports.export', 'inv.see_cost'],
   technician: ['customers.create', 'customers.edit', 'customers.view_docs', 'customers.upload_docs'],
 };

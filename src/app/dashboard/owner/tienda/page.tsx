@@ -6,6 +6,7 @@ import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { money } from '../../format';
+import { StoreOrders } from './orders';
 import { PhotoSlot } from '../../photo-picker';
 import { compressImage, extFor, storeImageUrl, storeThumbUrl, makeThumb, thumbPath } from '../../image';
 
@@ -13,7 +14,7 @@ type Company = { id: string; legal_name: string };
 type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean; variants?: number };
 type Store = { id: string; company_id: string; branch_id: string; slug: string; name: string; description: string | null; whatsapp: string | null; logo_path: string | null; own_qr_path?: string | null; is_published: boolean; theme?: string; admin_bg?: string; address?: string | null; map_url?: string | null };
 type Admin = {
-  perms?: { photo: boolean; publish: boolean; edit: boolean }; store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
+  perms?: { photo: boolean; publish: boolean; edit: boolean; orders?: boolean }; store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
 
 import { COLOR_GRID, resolveAdminBg } from '../../../store-theme';
 const BUCKET = 'store-images';
@@ -226,6 +227,8 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
 
       {msg && <p className={`rounded-xl border p-3 text-sm font-semibold ${msg.ok ? okBox : errBox}`}>{msg.text}</p>}
 
+      {pm.orders && <StoreOrders companyId={companyId} currency={data.currency} flash={flash} />}
+
       {/* Tienda ya configurada: solo logo, nombre y editar */}
       {!showForm && (
         <Card className="flex items-center gap-3 !p-3">
@@ -329,7 +332,7 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
 
       <div className="grid gap-4 lg:grid-cols-5">
       {/* Productos de la tienda */}
-        <Card className="space-y-3 lg:col-span-3">
+        <Card className={`space-y-3 lg:col-span-3 ${pm.photo || pm.publish ? '' : 'hidden'}`}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-bold">{t('store.products')}</h2>
           <span className={`rounded-full px-3 py-1 text-xs font-bold ${data.max_products !== null && published >= data.max_products ? 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300' : 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300'}`}>
