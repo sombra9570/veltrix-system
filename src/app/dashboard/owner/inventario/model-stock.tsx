@@ -4,8 +4,9 @@ import { rpc } from '../../../../lib/supabase';
 import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import { friendlyError } from '../owner-context';
+import { PhotoThumb, ProductPhotoEditor } from './product-photo';
 
-export type VariantItem = { id: string; name: string; qty: number; min: number; model?: string | null; size?: string | null; color?: string | null };
+export type VariantItem = { id: string; name: string; qty: number; min: number; model?: string | null; size?: string | null; color?: string | null; photo_path?: string | null; org_id?: string; company_id?: string };
 
 const SIZE_ORDER = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', 'XXXL', '3XL', 'UNICA', 'ÚNICA', 'U'];
 const sizeKey = (s: string): [number, number, string] => {
@@ -17,9 +18,9 @@ const sizeKey = (s: string): [number, number, string] => {
 };
 const sortSizes = (a: string, b: string) => { const x = sizeKey(a), y = sizeKey(b); return x[0] - y[0] || x[1] - y[1] || x[2].localeCompare(y[2]); };
 
-/** Un modelo con su matriz talla × color: cantidad por cada combinación y totales. Sin fotos. */
-export function ModelStock({ model, items, branchId, canReceive, onChanged, flash }: {
-  model: string; items: VariantItem[]; branchId: string; canReceive: boolean;
+/** Un modelo con su matriz talla × color: cantidad por cada combinación y totales. La foto es opcional y vale para todo el modelo. */
+export function ModelStock({ model, items, branchId, canReceive, canPhoto, onChanged, flash }: {
+  model: string; items: VariantItem[]; branchId: string; canReceive: boolean; canPhoto?: boolean;
   onChanged: () => void | Promise<void>; flash: (ok: boolean, text: string) => void;
 }) {
   const { t } = useT();
@@ -62,6 +63,7 @@ export function ModelStock({ model, items, branchId, canReceive, onChanged, flas
   return (
     <li>
       <button type="button" onClick={() => setOpen(!open)} className="flex w-full items-center gap-3 p-4 text-start hover:bg-slate-50 cursor-pointer dark:hover:bg-slate-800/50">
+        <PhotoThumb path={items[0]?.photo_path} />
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold">👕 {model}</p>
           <p className={`text-xs ${ui.muted}`}>{t('mod.variants', { n: items.length })}{lowCount > 0 ? ` · ${lowCount} ✗` : ''}</p>
@@ -70,6 +72,7 @@ export function ModelStock({ model, items, branchId, canReceive, onChanged, flas
       </button>
       {open && (
         <div className="space-y-3 border-t border-slate-200 p-3 dark:border-slate-800">
+          {canPhoto && items[0] && <ProductPhotoEditor item={items[0]} onChanged={onChanged} flash={flash} />}
           <div className="overflow-x-auto">
             <table className="w-full text-center text-sm">
               <thead>

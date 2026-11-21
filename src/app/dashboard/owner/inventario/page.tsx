@@ -9,16 +9,17 @@ import { Sheet } from '../../sheet';
 import { friendlyError } from '../owner-context';
 import { EvidenceFields, EvidenceLog, OutForm, addEvidence, emptyEvidence, uploadEvidencePhoto, type Evidence } from './evidence';
 import { photoErrorKey } from '../../photo-picker';
+import { PhotoThumb, ProductPhotoEditor } from './product-photo';
 import { useVeltrixAuth } from '../../../auth-system';
 import { TransferForm } from './transfer';
 import { AccountsCard, PaySheet, useAccounts } from './payments';
 import { ModelStock } from './model-stock';
 
 type MBranch = { id: string; name: string; company_id: string; company: string; currency: string; company_wide: boolean };
-type Item = { id: string; name: string; sku: string; unit: string; type: string; qty: number; min: number; cost: number; price: number; value: number; model?: string | null; size?: string | null; color?: string | null };
+type Item = { id: string; name: string; sku: string; unit: string; type: string; qty: number; min: number; cost: number; price: number; value: number; model?: string | null; size?: string | null; color?: string | null; photo_path?: string | null; org_id?: string; company_id?: string };
 type Supplier = { id: string; name: string; phone: string | null; email: string | null; tax_id: string | null; terms: number };
 type Overview = {
-  currency: string; purchasing: boolean;
+  currency: string; purchasing: boolean; can_photo?: boolean;
   summary: { products: number; value: number; retail_value: number; low: number; out: number };
   items: Item[]; untracked: { id: string; name: string }[]; suppliers: Supplier[];
 };
@@ -225,7 +226,7 @@ export default function InventoryPage() {
             : (
               <ul className="divide-y divide-slate-200 dark:divide-slate-800">
                 {Array.from(new Set<string>(items.filter((i) => i.model).map((i) => i.model as string))).sort((a, b) => a.localeCompare(b)).map((m) => (
-                  <ModelStock key={m} model={m} items={items.filter((i) => i.model === m)} branchId={branchId} canReceive={!readOnly}
+                  <ModelStock key={m} model={m} items={items.filter((i) => i.model === m)} branchId={branchId} canReceive={!readOnly} canPhoto={!!data.can_photo && !readOnly}
                     onChanged={load} flash={flash} />
                 ))}
                 {items.filter((i) => !i.model).map((i) => {
@@ -234,6 +235,7 @@ export default function InventoryPage() {
                   return (
                     <li key={i.id}>
                       <button type="button" onClick={() => openItem(i)} className="flex w-full items-center gap-3 p-4 text-start hover:bg-slate-50 cursor-pointer dark:hover:bg-slate-800/50">
+                        <PhotoThumb path={i.photo_path} />
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-semibold">{i.name}</p>
                           <p className={`truncate text-xs ${ui.muted}`}>{i.sku}{i.cost != null ? ` · ${t('inv.costEach', { cost: fmt(i.cost) })}` : ''}{Number(i.min) > 0 ? ` · ${t('inv.minN', { n: qtyFmt(i.min) })}` : ''}</p>
@@ -453,6 +455,7 @@ export default function InventoryPage() {
               <h2 className="text-lg font-extrabold">{sel.name}</h2>
               <p className={`text-sm ${ui.muted}`}>{sel.sku} · {t('inv.systemQty', { n: qtyFmt(sel.qty), unit: sel.unit })}</p>
             </div>
+            {data?.can_photo && !readOnly && <ProductPhotoEditor item={sel} onChanged={async () => { await load(); }} flash={flash} />}
             <div>
               <label className={ui.label}>{t('inv.counted')}</label>
               <input inputMode="decimal" autoFocus value={count.qty} onChange={(e) => setCount({ ...count, qty: e.target.value })} className={ui.input} />
