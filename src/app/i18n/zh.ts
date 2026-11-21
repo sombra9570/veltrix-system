@@ -341,6 +341,8 @@ const zh: Record<DictKey, string> = {
   'pos.notes': "备注（可选）",
   'pos.send': "发送到收银",
   'pos.sent': "✅ 已将 {amount} 的销售发送到收银。收银员已在“待收款”中看到。",
+  'pos.collectNow': "在我的收银台立即收款",
+  'pos.collectedOk': "✅ 已在你的收银台收款 {amount}。",
   'pos.clear': "清空",
   'pos.viewCart': "查看订单",
   'pos.today': "我今天的销售",

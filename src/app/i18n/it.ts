@@ -341,6 +341,8 @@ const it: Record<DictKey, string> = {
   'pos.notes': "Nota (facoltativa)",
   'pos.send': "Invia alla cassa",
   'pos.sent': "✅ Vendita inviata alla cassa per {amount}. Il cassiere la vede già in \"Da incassare\".",
+  'pos.collectNow': "Incassa ora nella mia cassa",
+  'pos.collectedOk': "✅ Vendita incassata per {amount} nella tua cassa.",
   'pos.clear': "Svuota",
   'pos.viewCart': "Vedi ordine",
   'pos.today': "Le mie vendite di oggi",

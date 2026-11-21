@@ -341,6 +341,8 @@ const ko: Record<DictKey, string> = {
   'pos.notes': "메모 (선택)",
   'pos.send': "계산대로 보내기",
   'pos.sent': "✅ {amount} 판매를 계산대로 보냈습니다. 계산원이 \"결제 대기\"에서 바로 볼 수 있습니다.",
+  'pos.collectNow': "내 금전함에서 바로 결제",
+  'pos.collectedOk': "✅ {amount} 판매를 내 금전함에서 결제했습니다.",
   'pos.clear': "비우기",
   'pos.viewCart': "주문 보기",
   'pos.today': "오늘 내 판매",

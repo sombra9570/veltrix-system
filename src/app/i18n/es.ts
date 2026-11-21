@@ -350,6 +350,8 @@ const es = {
   'pos.notes': "Nota (opcional)",
   'pos.send': "Enviar a caja",
   'pos.sent': "✅ Venta enviada a caja por {amount}. El cajero ya la ve en \"Por cobrar\".",
+  'pos.collectNow': "Cobrar ahora en mi caja",
+  'pos.collectedOk': "✅ Venta cobrada por {amount} en tu caja.",
   'pos.clear': "Vaciar",
   'pos.viewCart': "Ver pedido",
   'pos.today': "Mis ventas de hoy",

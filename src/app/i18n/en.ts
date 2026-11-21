@@ -341,6 +341,8 @@ const en: Record<DictKey, string> = {
   'pos.notes': "Note (optional)",
   'pos.send': "Send to register",
   'pos.sent': "✅ Sale sent to the register for {amount}. The cashier already sees it in \"To charge\".",
+  'pos.collectNow': "Charge now in my register",
+  'pos.collectedOk': "✅ Sale charged for {amount} in your register.",
   'pos.clear': "Clear",
   'pos.viewCart': "View order",
   'pos.today': "My sales today",

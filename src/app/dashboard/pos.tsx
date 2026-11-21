@@ -67,6 +67,9 @@ export function PosScreen() {
   // Venta a crédito
   const [mode, setMode] = useState<'cash' | 'credit'>('cash');
   const [canCredit, setCanCredit] = useState(true);   // permiso que da el dueño
+  // El administrador con su caja abierta puede cobrar él mismo la venta (si no, va a "Por cobrar" como siempre)
+  const [myShift, setMyShift] = useState<string | null>(null);
+  const [payNow, setPayNow] = useState<'cash' | 'card'>('cash');
   const [custQuery, setCustQuery] = useState('');
   const [custs, setCusts] = useState<Cust[]>([]);
   const [customer, setCustomer] = useState<Cust | null>(null);
@@ -117,6 +120,11 @@ export function PosScreen() {
       .then((p) => { const ok = p?.['sales.credit'] !== false; setCanCredit(ok); if (!ok) setMode('cash'); })
       .catch(() => {});
   }, [branchId]);
+
+  useEffect(() => {
+    if (session?.role !== 'owner') return;
+    rpc<{ shift: { id: string } | null }>('cashier_home').then((h) => setMyShift(h?.shift?.id ?? null)).catch(() => setMyShift(null));
+  }, [session?.role, branchId]);
 
   useEffect(() => {
     load();
@@ -262,7 +270,7 @@ export function PosScreen() {
     }
   };
 
-  const send = async () => {
+  const send = async (collect = false) => {
     if (!cart.length || !branchId) return;
     if (mode === 'credit' && !customer) return flash(false, t('pos.pickCustomer'));
     if (mode === 'credit' && !online) return flash(false, t('pos.creditOffline'));
@@ -286,8 +294,15 @@ export function PosScreen() {
           total: Math.round(total * 100) / 100, currency, lines: cart.map((l) => ({ name: l.product.name, qty: l.qty })),
         };
         try {
-          await rpc('create_sale_idem', { p_branch: branchId, p_items: items, p_notes: notes, p_discount: pct, p_uuid: sale.id, p_at: sale.at });
-          flash(true, t('pos.sent', { amount: fmt(total) }));
+          const orderId = await rpc<string>('create_sale_idem', { p_branch: branchId, p_items: items, p_notes: notes, p_discount: pct, p_uuid: sale.id, p_at: sale.at });
+          if (collect && myShift) {
+            // Cobra en su propia caja: la venta aparece en su cola con el saldo exacto
+            const q = await rpc<{ order_id: string; customer_id: string; balance: number }[]>('get_cashier_queue');
+            const row = (q ?? []).find((x) => x.order_id === orderId);
+            if (!row) throw new Error('turno de caja');
+            await rpc('register_payment', { p_customer: row.customer_id, p_origin: 'pos_counter', p_method: payNow, p_amount: Number(row.balance), p_shift: myShift, p_order: orderId, p_offline_uuid: crypto.randomUUID() });
+            flash(true, t('pos.collectedOk', { amount: fmt(total) }));
+          } else flash(true, t('pos.sent', { amount: fmt(total) }));
         } catch (err) {
           if (!isNetworkError((err as Error).message)) throw err;
           enqueueSale(sale);
@@ -415,7 +430,22 @@ export function PosScreen() {
         <span className="font-semibold">{t('pos.total')}</span>
         <span className="text-2xl font-extrabold">{fmt(total)}</span>
       </div>
-      <button type="button" disabled={busy || cart.length === 0} onClick={send} className={`${ui.btnPrimary} w-full py-3 text-base`}>
+      {mode === 'cash' && myShift && online && (
+        <div className="space-y-2 rounded-xl border border-emerald-300 p-3 dark:border-emerald-500/30">
+          <div className="grid grid-cols-2 gap-2">
+            {(['cash', 'card'] as const).map((m) => (
+              <button key={m} type="button" onClick={() => setPayNow(m)}
+                className={`rounded-xl px-2 py-2 text-sm font-bold cursor-pointer ${payNow === m ? 'bg-emerald-600 text-white' : 'border border-slate-300 dark:border-slate-700'}`}>
+                {t(`cash.m.${m}` as DictKey)}
+              </button>
+            ))}
+          </div>
+          <button type="button" disabled={busy || cart.length === 0} onClick={() => send(true)} className={`${ui.btnPrimary} w-full !bg-emerald-600 py-3 text-base`}>
+            {busy ? t('common.wait') : `💵 ${t('pos.collectNow')}`}
+          </button>
+        </div>
+      )}
+      <button type="button" disabled={busy || cart.length === 0} onClick={() => send()} className={`${myShift && mode === 'cash' ? ui.btnGhost : ui.btnPrimary} w-full py-3 text-base`}>
         {busy ? t('common.wait') : mode === 'credit' ? `${t('pos.sendCredit')} →` : `${t('pos.send')} →`}
       </button>
     </div>

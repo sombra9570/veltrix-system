@@ -341,6 +341,8 @@ const pt: Record<DictKey, string> = {
   'pos.notes': "Observação (opcional)",
   'pos.send': "Enviar ao caixa",
   'pos.sent': "✅ Venda enviada ao caixa por {amount}. O caixa já a vê em \"A cobrar\".",
+  'pos.collectNow': "Cobrar agora no meu caixa",
+  'pos.collectedOk': "✅ Venda cobrada por {amount} no seu caixa.",
   'pos.clear': "Esvaziar",
   'pos.viewCart': "Ver pedido",
   'pos.today': "Minhas vendas de hoje",

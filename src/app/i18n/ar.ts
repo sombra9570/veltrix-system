@@ -341,6 +341,8 @@ const ar: Record<DictKey, string> = {
   'pos.notes': "ملاحظة (اختياري)",
   'pos.send': "إرسال إلى الصندوق",
   'pos.sent': "✅ أُرسل البيع إلى الصندوق بمبلغ {amount}. يراه أمين الصندوق الآن في «بانتظار الدفع».",
+  'pos.collectNow': "التحصيل الآن في صندوقي",
+  'pos.collectedOk': "✅ تم تحصيل البيع بقيمة {amount} في صندوقك.",
   'pos.clear': "إفراغ",
   'pos.viewCart': "عرض الطلب",
   'pos.today': "مبيعاتي اليوم",

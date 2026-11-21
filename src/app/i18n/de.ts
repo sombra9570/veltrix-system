@@ -341,6 +341,8 @@ const de: Record<DictKey, string> = {
   'pos.notes': "Notiz (optional)",
   'pos.send': "An die Kasse senden",
   'pos.sent': "✅ Verkauf über {amount} an die Kasse gesendet. Der Kassierer sieht ihn schon unter „Zu kassieren“.",
+  'pos.collectNow': "Jetzt in meiner Kasse kassieren",
+  'pos.collectedOk': "✅ Verkauf über {amount} in deiner Kasse kassiert.",
   'pos.clear': "Leeren",
   'pos.viewCart': "Bestellung ansehen",
   'pos.today': "Meine Verkäufe heute",

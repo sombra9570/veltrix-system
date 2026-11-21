@@ -341,6 +341,8 @@ const ja: Record<DictKey, string> = {
   'pos.notes': "メモ（任意）",
   'pos.send': "レジに送る",
   'pos.sent': "✅ {amount} の販売をレジに送りました。レジ担当の「会計待ち」に表示されています。",
+  'pos.collectNow': "自分のレジで今すぐ会計",
+  'pos.collectedOk': "✅ {amount} の販売を自分のレジで会計しました。",
   'pos.clear': "空にする",
   'pos.viewCart': "注文を見る",
   'pos.today': "今日の販売",
