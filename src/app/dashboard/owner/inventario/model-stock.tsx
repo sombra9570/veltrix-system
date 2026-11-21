@@ -1,7 +1,6 @@
 'use client';
 import { useMemo, useState } from 'react';
 import { rpc } from '../../../../lib/supabase';
-import { Card } from '../../shell';
 import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import { friendlyError } from '../owner-context';

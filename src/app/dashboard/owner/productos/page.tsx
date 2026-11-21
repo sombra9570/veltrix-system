@@ -63,7 +63,6 @@ export default function ProductsPage() {
   };
 
   const company = companies.find((c) => c.id === companyId);
-  const branchName = data?.branches.find((b) => b.id === branchId)?.name ?? '';
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
