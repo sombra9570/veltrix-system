@@ -12,9 +12,59 @@ import { useSync } from '../../sync';
 type Order = {
   id: string; at: string; status: 'pending' | 'accepted' | 'rejected'; kind: 'pickup' | 'delivery'; customer: string; phone: string; address: string;
   lat: number | null; lng: number | null; notes: string | null; pay_pref: 'cash' | 'qr'; subtotal: number; reject_reason: string | null;
-  assigned_to: string | null; assigned_name: string | null; fulfilled_at: string | null; items: { name: string; qty: number }[];
+  contact_pref: 'chat' | 'whatsapp'; chat_n: number; chat_waiting: boolean; assigned_to: string | null; assigned_name: string | null; fulfilled_at: string | null; items: { name: string; qty: number }[];
 };
+type Msg = { id: string; mine: boolean; body: string; at: string; who: string | null };
 type Data = { can_resolve: boolean; can_assign: boolean; me: string; workers: { id: string; name: string }[]; orders: Order[] };
+
+
+/** Mensajes del pedido con el cliente (solo mientras el pedido está en curso). */
+function OrderThread({ o, active, onSent }: { o: Order; active: boolean; onSent: () => void }) {
+  const { t } = useT();
+  const [open, setOpen] = useState(false);
+  const [msgs, setMsgs] = useState<Msg[]>([]);
+  const [text, setText] = useState('');
+  const [busy, setBusy] = useState(false);
+  const load = useCallback(async () => { try { setMsgs((await rpc<Msg[]>('store_order_chat', { p_request: o.id })) ?? []); } catch { /* */ } }, [o.id]);
+  useEffect(() => { if (open) void load(); }, [open, load, o.chat_n]);
+  const send = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!text.trim() || busy) return;
+    setBusy(true);
+    try { await rpc('store_order_say', { p_request: o.id, p_body: text }); setText(''); await load(); onSent(); } catch { /* */ }
+    setBusy(false);
+  };
+  const digits = o.phone.replace(/\D/g, '');
+  return (
+    <div className="mt-2 space-y-2">
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" onClick={() => setOpen(!open)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs ${o.chat_waiting ? '!border-amber-400 !text-amber-700 dark:!text-amber-300' : ''}`}>
+          💬 {t('so.chat')}{o.chat_n > 0 ? ` (${o.chat_n})` : ''}{o.chat_waiting ? ` · ${t('so.chatWaiting')}` : ''}
+        </button>
+        <span className={`text-xs ${ui.muted}`}>{o.contact_pref === 'whatsapp' ? `🟢 ${t('so.prefWa')}` : `💬 ${t('so.prefChat')}`}</span>
+        <a href={`https://wa.me/${digits}`} target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-emerald-600 hover:underline dark:text-emerald-400">🟢 {t('so.openWa')}</a>
+      </div>
+      {open && (
+        <div className="space-y-2">
+          <div className="max-h-56 space-y-1.5 overflow-y-auto rounded-xl bg-slate-50 p-2 dark:bg-slate-800/50">
+            {msgs.length === 0 && <p className={`p-2 text-center text-xs ${ui.muted}`}>{t('so.noMsgs')}</p>}
+            {msgs.map((m) => (
+              <div key={m.id} className={`flex ${m.mine ? 'justify-end' : 'justify-start'}`}>
+                <p className={`max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-3 py-1.5 text-sm ${m.mine ? 'bg-blue-600 text-white' : 'bg-white shadow-sm dark:bg-slate-700'}`}>{m.body}</p>
+              </div>
+            ))}
+          </div>
+          {active && (
+            <form onSubmit={send} className="flex gap-2">
+              <input value={text} onChange={(e) => setText(e.target.value)} maxLength={500} placeholder={t('so.write')} className={ui.input} />
+              <button type="submit" disabled={busy || !text.trim()} className={`${ui.btnPrimary} shrink-0`}>➤</button>
+            </form>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 /** Bandeja de pedidos que llegan de la tienda virtual: el administrador los acepta o rechaza y los delega a un trabajador. */
 export function StoreOrders({ companyId, currency, flash }: { companyId: string; currency: string; flash: (ok: boolean, text: string) => void }) {
@@ -84,6 +134,7 @@ export function StoreOrders({ companyId, currency, flash }: { companyId: string;
           <button type="button" disabled={busy === o.id} onClick={() => done(o)} className={`${ui.btnPrimary} w-full !py-2 text-sm`}>📦 {t('so.markDone')}</button>
         </div>
       )}
+      {o.status !== 'rejected' && <OrderThread o={o} active={!o.fulfilled_at} onSent={load} />}
       {o.status === 'rejected' && <p className="mt-1 text-xs font-semibold text-red-600 dark:text-red-400">✖ {t('tq.rejected')}{o.reject_reason ? `: ${o.reject_reason}` : ''}</p>}
       {o.fulfilled_at && <p className="mt-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">✓ {t('so.done')}{o.assigned_name ? ` · ${o.assigned_name}` : ''}</p>}
     </li>

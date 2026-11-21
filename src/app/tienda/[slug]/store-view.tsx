@@ -1,4 +1,5 @@
 'use client';
+import { OrderChat } from './order-chat';
 import { resolveTheme } from '../../store-theme';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -37,6 +38,7 @@ export function StoreView({ slug }: { slug: string }) {
   const [dErr, setDErr] = useState('');
   const [dReq, setDReq] = useState<string | null>(null);
   const [dStatus, setDStatus] = useState<DStatus | null>(null);
+  const [ping, setPing] = useState(0);
 
   useEffect(() => {
     supabase.rpc('public_store', { p_slug: slug }).then(({ data }) => setStore((data as Store | null) ?? null));
@@ -53,7 +55,7 @@ export function StoreView({ slug }: { slug: string }) {
       if (stop) return;
       const s = data as DStatus | null;
       if (!s) { try { localStorage.removeItem(DREQ_KEY); } catch { /* */ } setDReq(null); return; }
-      setDStatus(s);
+      setDStatus(s); setPing((n) => n + 1);
     };
     tick();
     const ch = supabase.channel(`req:${dReq}`).on('broadcast', { event: 'ping' }, () => { if (document.visibilityState === 'visible') tick(); }).subscribe();
@@ -160,6 +162,7 @@ export function StoreView({ slug }: { slug: string }) {
               {(ds === 'delivered' || ds === 'failed') && <button type="button" onClick={dAgain} className={ui.btnPrimary}>{t('tq.again')}</button>}
             </>
           )}
+          {dReq && dStatus?.status !== 'rejected' && <OrderChat requestId={dReq} ping={ping} />}
         </div>
       </main>
     );
