@@ -591,7 +591,7 @@ const ja: Record<DictKey, string> = {
   // ---------- Tienda virtual ----------
   'nav.store': "オンラインショップ",
   'store.title': "オンラインショップ",
-  'store.subtitle': "SNSで共有できるオンラインカタログ。注文はWhatsAppで届きます。",
+  'store.subtitle': "SNSで共有できるオンラインカタログ。注文はシステムに届き、チームに割り当てられます。",
   'store.logoHint': "タップしてロゴをアップロード。自動で圧縮されます。",
   'store.name': "ショップ名",
   'store.whatsapp': "注文用WhatsApp（国番号付き）",
@@ -1869,6 +1869,7 @@ const ja: Record<DictKey, string> = {
   'tq.accept': "承認",
   'dl.pending': "デリバリー注文",
   'dl.acceptedOk': "{name} さんの注文を承認：キッチンへ",
+  "so.acceptedOk": "{name} さんの注文を承認しました。割り当てるか、引き渡し済みにできます。",
   'dl.map': "地図を見る",
   'dl.fee': "配送料",
   'dl.free': "無料",

@@ -591,7 +591,7 @@ const it: Record<DictKey, string> = {
   // ---------- Tienda virtual ----------
   'nav.store': "Negozio online",
   'store.title': "Negozio online",
-  'store.subtitle': "Il tuo catalogo online da condividere sui social. Gli ordini arrivano su WhatsApp.",
+  'store.subtitle': "Il tuo catalogo online da condividere sui social. Gli ordini arrivano nel tuo sistema e puoi delegarli al tuo team.",
   'store.logoHint': "Tocca per caricare il logo. Viene compresso da solo.",
   'store.name': "Nome del negozio",
   'store.whatsapp': "WhatsApp per gli ordini (con prefisso internazionale)",
@@ -1869,6 +1869,7 @@ const it: Record<DictKey, string> = {
   'tq.accept': "Accetta",
   'dl.pending': "Ordini a domicilio",
   'dl.acceptedOk': "Ordine di {name} accettato: va in cucina",
+  "so.acceptedOk": "Ordine di {name} accettato. Ora puoi delegarlo o segnarlo come consegnato.",
   'dl.map': "Vedi mappa",
   'dl.fee': "Consegna",
   'dl.free': "Gratis",

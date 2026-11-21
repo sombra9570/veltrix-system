@@ -591,7 +591,7 @@ const ko: Record<DictKey, string> = {
   // ---------- Tienda virtual ----------
   'nav.store': "온라인 스토어",
   'store.title': "온라인 스토어",
-  'store.subtitle': "SNS에 공유하는 온라인 카탈로그. 주문은 WhatsApp으로 받습니다.",
+  'store.subtitle': "SNS에 공유하는 온라인 카탈로그입니다. 주문은 시스템으로 들어오며 팀에 위임할 수 있습니다.",
   'store.logoHint': "눌러서 로고를 올리세요. 자동으로 압축됩니다.",
   'store.name': "스토어 이름",
   'store.whatsapp': "주문용 WhatsApp (국가 번호 포함)",
@@ -1869,6 +1869,7 @@ const ko: Record<DictKey, string> = {
   'tq.accept': "수락",
   'dl.pending': "배달 주문",
   'dl.acceptedOk': "{name} 님 주문 수락: 주방으로 전달",
+  "so.acceptedOk": "{name}님의 주문을 수락했습니다. 이제 위임하거나 전달 완료로 표시할 수 있습니다.",
   'dl.map': "지도 보기",
   'dl.fee': "배달비",
   'dl.free': "무료",

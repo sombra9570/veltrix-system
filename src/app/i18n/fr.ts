@@ -591,7 +591,7 @@ const fr: Record<DictKey, string> = {
   // ---------- Tienda virtual ----------
   'nav.store': "Boutique en ligne",
   'store.title': "Boutique en ligne",
-  'store.subtitle': "Votre catalogue en ligne à partager sur les réseaux. Les commandes arrivent sur WhatsApp.",
+  'store.subtitle': "Votre catalogue en ligne à partager sur les réseaux. Les commandes arrivent dans votre système et vous pouvez les déléguer à votre équipe.",
   'store.logoHint': "Touchez pour envoyer le logo. Il est compressé automatiquement.",
   'store.name': "Nom de la boutique",
   'store.whatsapp': "WhatsApp pour les commandes (avec indicatif)",
@@ -1869,6 +1869,7 @@ const fr: Record<DictKey, string> = {
   'tq.accept': "Accepter",
   'dl.pending': "Commandes en livraison",
   'dl.acceptedOk': "Commande de {name} acceptée : en cuisine",
+  "so.acceptedOk": "Commande de {name} acceptée. Vous pouvez la déléguer ou la marquer comme livrée.",
   'dl.map': "Voir la carte",
   'dl.fee': "Livraison",
   'dl.free': "Gratuit",

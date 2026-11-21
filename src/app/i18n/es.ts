@@ -600,7 +600,7 @@ const es = {
   // ---------- Tienda virtual ----------
   'nav.store': "Tienda virtual",
   'store.title': "Tienda virtual",
-  'store.subtitle': "Tu catálogo en línea para compartir en redes. Los pedidos te llegan por WhatsApp.",
+  'store.subtitle': "Tu catálogo en línea para compartir en redes. Los pedidos llegan a tu sistema y puedes delegarlos a tu equipo.",
   'store.logoHint': "Toca para subir el logo. Se comprime solo.",
   'store.name': "Nombre de la tienda",
   'store.whatsapp': "WhatsApp para pedidos (con código de país)",
@@ -1878,6 +1878,7 @@ const es = {
   'tq.accept': "Aceptar",
   'dl.pending': "Pedidos de delivery",
   'dl.acceptedOk': "Pedido de {name} aceptado: va a cocina",
+  "so.acceptedOk": "Pedido de {name} aceptado. Ya puedes delegarlo o marcarlo como entregado.",
   'dl.map': "Ver mapa",
   'dl.fee': "Envío",
   'dl.free': "Gratis",

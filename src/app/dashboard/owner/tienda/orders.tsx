@@ -87,7 +87,7 @@ export function StoreOrders({ companyId, currency, flash }: { companyId: string;
     catch (e) { flash(false, /PRODUCT|disponible|stock/i.test((e as Error).message) ? t('tq.errUnavailable') : friendlyError((e as Error).message, t)); }
     setBusy('');
   };
-  const accept = (o: Order) => run(o.id, () => rpc('store_order_resolve', { p_request: o.id, p_accept: true, p_reason: null }), t('dl.acceptedOk', { name: o.customer }));
+  const accept = (o: Order) => run(o.id, () => rpc('store_order_resolve', { p_request: o.id, p_accept: true, p_reason: null }), t('so.acceptedOk', { name: o.customer }));
   const reject = (o: Order) => {
     const reason = window.prompt(t('tq.rejectReason'));
     if (reason === null) return;

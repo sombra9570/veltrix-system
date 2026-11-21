@@ -591,7 +591,7 @@ const zh: Record<DictKey, string> = {
   // ---------- Tienda virtual ----------
   'nav.store': "网店",
   'store.title': "网店",
-  'store.subtitle': "可分享到社交网络的在线目录。订单通过 WhatsApp 发给你。",
+  'store.subtitle': "可在社交网络分享的在线商品目录。订单会进入你的系统，你可以委派给团队。",
   'store.logoHint': "点击上传标志，会自动压缩。",
   'store.name': "店铺名称",
   'store.whatsapp': "接单 WhatsApp（含国家区号）",
@@ -1869,6 +1869,7 @@ const zh: Record<DictKey, string> = {
   'tq.accept': "接受",
   'dl.pending': "外送订单",
   'dl.acceptedOk': "{name} 的订单已接受：送往厨房",
+  "so.acceptedOk": "已接受 {name} 的订单。现在可以委派或标记为已交付。",
   'dl.map': "查看地图",
   'dl.fee': "配送费",
   'dl.free': "免费",
