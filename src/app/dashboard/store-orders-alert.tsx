@@ -7,6 +7,8 @@ import { Card } from './shell';
 import { ui } from '../site-header';
 import { useT } from '../i18n';
 import { useLive } from './live';
+import { useLanguage } from '../language-selector';
+import { usePush } from '../push-client';
 
 type Alert = { eligible: boolean; pending: number; assigned: number; waiting: number; total: number };
 
@@ -47,6 +49,9 @@ export function StoreOrdersBell() {
   const [open, setOpen] = useState(false);
   const [perm, setPerm] = useState<NotificationPermission | 'none'>('none');
   useEffect(() => { if (typeof Notification !== 'undefined') setPerm(Notification.permission); }, []);
+  const { lang } = useLanguage();
+  const push = usePush(lang);
+  const ios = typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent);
   if (!a?.eligible) return null;
   const href = storeHref(path);
   return (
@@ -64,7 +69,11 @@ export function StoreOrdersBell() {
           {a.assigned > 0 && <p className="text-sm font-semibold">👷 {t('sa.assigned', { n: a.assigned })}</p>}
           {a.waiting > 0 && <p className="text-sm font-semibold">💬 {t('sa.waiting', { n: a.waiting })}</p>}
           <Link href={href} onClick={() => setOpen(false)} className={`${ui.btnPrimary} w-full`}>{t('sa.view')}</Link>
-          {perm !== 'granted' && perm !== 'none' && perm !== 'denied' && (
+          {push.state === 'off' && <button type="button" disabled={push.busy} onClick={() => void push.enable()} className={`${ui.btnGhost} w-full text-xs`}>📲 {t('sa.pushOff')}</button>}
+          {push.state === 'on' && <button type="button" disabled={push.busy} onClick={() => void push.disable()} className={`${ui.btnGhost} w-full text-xs`}>✅ {t('sa.pushOn')}</button>}
+          {push.state === 'denied' && <p className={`text-xs ${ui.muted}`}>{t('sa.pushDenied')}</p>}
+          {push.state === 'unsupported' && ios && <p className={`text-xs ${ui.muted}`}>{t('sa.pushIos')}</p>}
+          {(push.state === 'unsupported' || push.state === 'unconfigured') && perm !== 'granted' && perm !== 'none' && perm !== 'denied' && (
             <button type="button" onClick={async () => { try { setPerm(await Notification.requestPermission()); } catch { /* */ } }} className={`${ui.btnGhost} w-full text-xs`}>🔔 {t('sa.enable')}</button>
           )}
         </div>

@@ -1,4 +1,5 @@
 'use client';
+import { pushNotify } from '../../push-client';
 import { OrderChat } from './order-chat';
 import { resolveTheme } from '../../store-theme';
 import { useEffect, useMemo, useState } from 'react';
@@ -108,6 +109,7 @@ export function StoreView({ slug }: { slug: string }) {
       return;
     }
     try { localStorage.setItem(DREQ_KEY, data as string); if (method === 'pickup') localStorage.setItem(`${DREQ_KEY}_pk`, '1'); else localStorage.removeItem(`${DREQ_KEY}_pk`); } catch { /* */ }
+    pushNotify(data as string, 'new');
     setDStatus(null); setDReq(data as string); setCart([]); setOpen(false);
   };
 

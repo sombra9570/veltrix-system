@@ -1,4 +1,5 @@
 'use client';
+import { pushNotify } from '../../push-client';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
 import { ui } from '../../site-header';
@@ -34,6 +35,7 @@ export function OrderChat({ requestId, ping }: { requestId: string; ping: number
     const { error } = await supabase.rpc('public_order_say', { p_request: requestId, p_body: text });
     setBusy(false);
     if (error) { setErr(/TOO_MANY/.test(error.message) ? t('dl.errMany') : /CHAT_CLOSED/.test(error.message) ? t('oc.closed') : t('err.generic')); return; }
+    pushNotify(requestId, 'msg');
     setText(''); await load();
   };
 

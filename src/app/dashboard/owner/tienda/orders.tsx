@@ -1,4 +1,5 @@
 'use client';
+import { pushNotify } from '../../../push-client';
 import { useCallback, useEffect, useState } from 'react';
 import { rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
@@ -92,7 +93,7 @@ export function StoreOrders({ companyId, currency, flash }: { companyId: string;
     if (reason === null) return;
     void run(o.id, () => rpc('store_order_resolve', { p_request: o.id, p_accept: false, p_reason: reason }), t('tq.rejectedOk'));
   };
-  const assign = (o: Order, user: string) => run(o.id, () => rpc('store_order_assign', { p_request: o.id, p_user: user || null }));
+  const assign = (o: Order, user: string) => run(o.id, async () => { await rpc('store_order_assign', { p_request: o.id, p_user: user || null }); if (user) pushNotify(o.id, 'assigned'); });
   const done = (o: Order) => run(o.id, () => rpc('store_order_done', { p_request: o.id }), t('so.doneOk'));
 
   if (!d) return null;
