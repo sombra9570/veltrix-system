@@ -8,8 +8,10 @@ import { useT } from '../../../i18n';
 import { money, parseAmount } from '../../format';
 import { friendlyError, useOwner } from '../owner-context';
 import { ModelForm } from './model-form';
+import { NewPhotoField, uploadNewPhoto, useCanPhoto } from './new-photo';
+import { photoErrorKey } from '../../photo-picker';
 
-type Company = { id: string; legal_name: string; base_currency: string };
+type Company = { id: string; org_id: string; legal_name: string; base_currency: string };
 type Product = {
   id: string; sku: string; name: string; price: number; currency: string;
   type: 'good' | 'service'; track: boolean; unit: string; active: boolean;
@@ -35,10 +37,12 @@ export default function ProductsPage() {
   const [inMenu, setInMenu] = useState(true);
   const [query, setQuery] = useState('');
   const [busy, setBusy] = useState(false);
+  const [photo, setPhoto] = useState<File | null>(null);
+  const canPhoto = useCanPhoto(companyId);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   useEffect(() => {
-    supabase.from('companies').select('id, legal_name, base_currency').is('deleted_at', null).order('created_at')
+    supabase.from('companies').select('id, org_id, legal_name, base_currency').is('deleted_at', null).order('created_at')
       .then(({ data }) => {
         const list = (data ?? []) as Company[];
         setCompanies(list);
@@ -91,7 +95,16 @@ export default function ProductsPage() {
         // Si la carta ya llegó al límite del plan, el producto igual queda creado
         await rpc('set_product_store', { p_product: id, p_in_store: true, p_description: null }).catch(() => undefined);
       }
-      flash(true, t('prod.saved'));
+      let photoFailed = '';
+      if (photo && id && !form.id) {
+        const org = companies.find((c) => c.id === companyId)?.org_id;
+        try {
+          if (!org) throw new Error('');
+          await rpc('set_product_photo', { p_product: id, p_path: await uploadNewPhoto(org, companyId, id, photo) });
+        } catch (pe) { photoFailed = t(photoErrorKey((pe as Error).message)); }
+      }
+      setPhoto(null);
+      flash(!photoFailed, photoFailed ? `${t('prod.saved')} · ${photoFailed}` : t('prod.saved'));
       setForm(null);
       await load();
     } catch (err) {
@@ -110,7 +123,7 @@ export default function ProductsPage() {
         </div>
         <div className="flex flex-wrap gap-2 max-sm:w-full">
           {apparel && <button type="button" onClick={() => { setModelOpen(true); setForm(null); }} className={`${ui.btnPrimary} max-sm:w-full`}>🏷️ {t('mod.new')}</button>}
-          <button type="button" onClick={() => { setForm({ ...empty }); setModelOpen(false); }} className={`${apparel ? ui.btnGhost : ui.btnPrimary} max-sm:w-full`}>+ {t('prod.add')}</button>
+          <button type="button" onClick={() => { setForm({ ...empty }); setPhoto(null); setModelOpen(false); }} className={`${apparel ? ui.btnGhost : ui.btnPrimary} max-sm:w-full`}>+ {t('prod.add')}</button>
         </div>
       </div>
 
@@ -139,7 +152,7 @@ export default function ProductsPage() {
       )}
 
       {modelOpen && company && (
-        <ModelForm companyId={company.id} currency={company.base_currency} onCancel={() => setModelOpen(false)}
+        <ModelForm companyId={company.id} orgId={company.org_id} canPhoto={canPhoto} currency={company.base_currency} onCancel={() => setModelOpen(false)}
           onDone={async (text) => { setModelOpen(false); flash(true, text); await load(); }} />
       )}
 
@@ -195,6 +208,7 @@ export default function ProductsPage() {
                 <input inputMode="numeric" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value.replace(/\D/g, '') })} placeholder="0" className={ui.input} />
               </div>
             )}
+            {canPhoto && !form.id && form.type === 'good' && <NewPhotoField onFile={setPhoto} />}
             <div>
               <label className={ui.label}>{t('prod.sku')}</label>
               <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} className={ui.input} />

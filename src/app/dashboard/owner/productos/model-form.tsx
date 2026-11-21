@@ -6,13 +6,15 @@ import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import { parseAmount } from '../../format';
 import { friendlyError } from '../owner-context';
+import { NewPhotoField, uploadNewPhoto } from './new-photo';
+import { photoErrorKey } from '../../photo-picker';
 
 const PRESETS = ['XS, S, M, L, XL, XXL', '28, 30, 32, 34, 36, 38', '35, 36, 37, 38, 39, 40, 41, 42, 43, 44', 'Única'];
 const split = (v: string) => v.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
 
-/** Modelo con tallas y colores: cada combinación queda como un producto con su propio stock. Sin fotos. */
-export function ModelForm({ companyId, currency, onDone, onCancel }: {
-  companyId: string; currency: string; onDone: (text: string) => void; onCancel: () => void;
+/** Modelo con tallas y colores: cada combinación queda como un producto con su propio stock. La foto es opcional y vale para todo el modelo. */
+export function ModelForm({ companyId, orgId, canPhoto, currency, onDone, onCancel }: {
+  companyId: string; orgId: string; canPhoto?: boolean; currency: string; onDone: (text: string) => void; onCancel: () => void;
 }) {
   const { t } = useT();
   const [name, setName] = useState('');
@@ -21,6 +23,7 @@ export function ModelForm({ companyId, currency, onDone, onCancel }: {
   const [colors, setColors] = useState('');
   const [qty, setQty] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [photo, setPhoto] = useState<File | null>(null);
   const [err, setErr] = useState('');
   const sz = split(sizes); const cl = split(colors);
   const count = Math.max(sz.length, 1) * Math.max(cl.length, 1);
@@ -35,7 +38,12 @@ export function ModelForm({ companyId, currency, onDone, onCancel }: {
     setBusy(true); setErr('');
     try {
       const n = await rpc<number>('save_product_model', { p_company: companyId, p_model: name.trim(), p_price: p, p_sizes: sz, p_colors: cl, p_unit: 'unid', p_stock: Object.fromEntries(Object.entries(qty).filter(([, v]) => parseInt(String(v), 10) > 0).map(([k, v]) => [k, parseInt(String(v), 10)])) });
-      onDone(t('mod.created', { n: n ?? 0 }));
+      let extra = '';
+      if (photo) {
+        try { await rpc('set_model_photo', { p_company: companyId, p_model: name.trim(), p_path: await uploadNewPhoto(orgId, companyId, name.trim().replace(/[^a-z0-9]+/gi, '-').slice(0, 30) || 'm', photo) }); }
+        catch (pe) { extra = ` · ${t(photoErrorKey((pe as Error).message))}`; }
+      }
+      onDone(t('mod.created', { n: n ?? 0 }) + extra);
     } catch (e2) { setErr(friendlyError((e2 as Error).message, t)); }
     finally { setBusy(false); }
   };
@@ -69,6 +77,7 @@ export function ModelForm({ companyId, currency, onDone, onCancel }: {
           <p className={`mt-1 text-xs ${ui.muted}`}>{t('mod.colorsHint')}</p>
         </div>
 
+        {canPhoto && <NewPhotoField onFile={setPhoto} />}
         <div className="sm:col-span-2">
           <p className={ui.label}>{t('mod.stockByVariant')}</p>
           <div className="overflow-x-auto">
