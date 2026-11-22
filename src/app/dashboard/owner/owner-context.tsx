@@ -179,7 +179,8 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => { reload(); }, [reload]);
 
-  if (!loaded || !session) return <div className="grid min-h-dvh place-items-center bg-slate-50 dark:bg-slate-950"><Spinner /></div>;
+  // Quien no es el dueño no debe ver ni un instante el menú del administrador: pantalla de carga hasta que lo redirige
+  if (!loaded || !session || (session.role !== 'owner' && !denied)) return <div className="grid min-h-dvh place-items-center bg-slate-50 dark:bg-slate-950"><Spinner /></div>;
 
   if (denied) {
     return (
