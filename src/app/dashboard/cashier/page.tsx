@@ -492,7 +492,7 @@ function QueueTab({
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className={ui.label}>{t('cash.received')}</label>
-                <input inputMode="decimal" value={received} onChange={(e) => setReceived(e.target.value)} placeholder={String(balance)} className={ui.input} />
+                <input inputMode="decimal" value={received} onChange={(e) => setReceived(e.target.value)} placeholder={String(badAmount ? balance : toPay)} className={ui.input} />
               </div>
               <div>
                 <p className={ui.label}>{t('cash.change')}</p>
