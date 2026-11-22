@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useLanguage } from './language-selector';
 import { useT } from './i18n';
+import type { DictKey } from './i18n/es';
 
 // Vista previa de la portada: el mismo panel con la forma de cada grupo de rubros.
 // Los rubros que comparten funciones se agrupan (comercio, gastronomía, taller y servicios, calle y créditos).
@@ -16,12 +17,12 @@ const VIEWS: Record<Niche, View[]> = {
   service: ['panel', 'orders', 'cash'],
   field: ['panel', 'route', 'cash'],
 };
-const VIEW_LABEL: Record<View, string> = {
+const VIEW_LABEL: Record<View, DictKey> = {
   panel: 'home.sh.v.panel', store: 'home.sh.v.store', cash: 'home.sc.tab.cash', tables: 'home.sh.v.tables',
   menu: 'home.sh.v.menu', orders: 'home.sh.v.orders', route: 'home.sh.v.route',
 };
 // Cada grupo: tarjetas (clave, valor, variación), curva de 12 meses y medidores de rendimiento
-type Kpi = { k: string; v: string; d?: string; warn?: boolean };
+type Kpi = { k: DictKey; v: string; d?: string; warn?: boolean };
 const CURVE: Record<Niche, number[]> = {
   retail: [32, 35, 34, 41, 44, 43, 50, 56, 54, 63, 69, 78],
   food: [48, 50, 53, 52, 58, 61, 60, 66, 70, 69, 75, 82],
@@ -150,7 +151,7 @@ export function HomeShowcase() {
                 <div className={card}>
                   <p className={lbl}>{t('home.sh.perf')}</p>
                   <div className="mt-2 grid grid-cols-3 gap-1">
-                    {GAUGES[niche].map(([g, v]) => <Gauge key={g} v={v} label={t(`home.sh.g.${g}`)} />)}
+                    {GAUGES[niche].map(([g, v]) => <Gauge key={g} v={v} label={t(`home.sh.g.${g}` as DictKey)} />)}
                   </div>
                 </div>
               </div>
