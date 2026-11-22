@@ -94,7 +94,7 @@ export function HomeShowcase() {
   const toast = niche === 'retail' ? `${t('home.sh.store.new')} · +${m(52)}` : niche === 'food' ? `${t('home.sh.table', { n: 7 })} · ${t('home.sh.st.new')}` : niche === 'service' ? `${t('home.sh.job', { n: 103 })} · ${t('home.sh.st.ready')}` : `${t('home.sc.toast1', { n: 3 })} · +${m(35)}`;
 
   return (
-    <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+    <div className="relative mx-auto w-full min-w-0 max-w-xl lg:max-w-none">
       {/* Avisos flotantes: lo que pasa en vivo */}
       <div className="absolute -top-4 end-3 z-10 hidden rounded-xl border border-emerald-200 bg-white px-3 py-2 text-xs font-bold shadow-lg sm:block dark:border-emerald-500/30 dark:bg-slate-900">
         <span className="text-emerald-600 dark:text-emerald-400">● </span>{toast}
@@ -105,40 +105,40 @@ export function HomeShowcase() {
         </div>
       )}
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-2xl dark:border-slate-800 dark:bg-slate-950">
+      <div className="w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-2xl dark:border-slate-800 dark:bg-slate-950">
         {/* Barra de ventana */}
         <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-900">
           <span className="h-2.5 w-2.5 rounded-full bg-red-400" /><span className="h-2.5 w-2.5 rounded-full bg-amber-400" /><span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
           <span className="ms-2 truncate rounded-md bg-slate-100 px-2 py-0.5 text-[10px] text-slate-500 dark:bg-slate-800">veltrixsystem.app</span>
         </div>
         {/* Grupos de rubros */}
-        <div className="flex gap-1.5 overflow-x-auto border-b border-slate-200 bg-white px-2 py-2 dark:border-slate-800 dark:bg-slate-900" role="tablist">
+        <div className="grid grid-cols-4 gap-1 border-b border-slate-200 bg-white p-1.5 sm:gap-1.5 sm:px-2 dark:border-slate-800 dark:bg-slate-900" role="tablist">
           {NICHES.map((x) => (
             <button key={x} type="button" role="tab" aria-selected={niche === x} onClick={() => pickNiche(x)}
-              className={`shrink-0 cursor-pointer rounded-lg px-3 py-1.5 text-start ${niche === x ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-300 dark:hover:text-white'}`}>
-              <span className="block text-xs font-bold">{ICON[x]} {t(`home.sh.${x}`)}</span>
+              className={`min-w-0 cursor-pointer rounded-lg px-1 py-1.5 text-center sm:px-3 sm:text-start ${niche === x ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-300 dark:hover:text-white'}`}>
+              <span className="block text-base leading-none sm:hidden">{ICON[x]}</span><span className="mt-0.5 block text-[10px] font-bold leading-tight sm:mt-0 sm:text-xs"><span className="hidden sm:inline">{ICON[x]} </span>{t(`home.sh.${x}`)}</span>
               <span className={`hidden text-[10px] sm:block ${niche === x ? 'opacity-80' : 'text-slate-500'}`}>{t(`home.sh.${x}.d`)}</span>
             </button>
           ))}
         </div>
         {/* Pantallas del grupo */}
-        <div className="flex gap-1 border-b border-slate-200 bg-white px-2 pt-2 dark:border-slate-800 dark:bg-slate-900" role="tablist">
+        <div className="grid grid-cols-3 border-b border-slate-200 bg-white px-1 pt-1 sm:px-2 sm:pt-2 dark:border-slate-800 dark:bg-slate-900" role="tablist">
           {VIEWS[niche].map((x) => (
             <button key={x} type="button" role="tab" aria-selected={view === x} onClick={() => pickView(x)}
-              className={`cursor-pointer rounded-t-lg px-3 py-1.5 text-xs font-bold ${view === x ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>
+              className={`min-w-0 cursor-pointer truncate rounded-t-lg px-1 py-1.5 text-[11px] font-bold sm:px-3 sm:text-xs ${view === x ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>
               {t(VIEW_LABEL[x])}
             </button>
           ))}
         </div>
 
-        <div className="min-h-[24rem] p-3 sm:p-4">
+        <div className="min-h-[21rem] p-2.5 sm:min-h-[24rem] sm:p-4">
           {view === 'panel' && (
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {KPIS[niche].map((c) => (
                   <div key={c.k} className={card}>
                     <p className={lbl}>{t(c.k)}</p>
-                    <p className={`mt-1 whitespace-nowrap text-[15px] font-extrabold sm:text-lg ${c.warn ? 'text-amber-600 dark:text-amber-400' : ''}`}>{c.v}</p>
+                    <p className={`mt-1 whitespace-nowrap text-sm font-extrabold sm:text-lg ${c.warn ? 'text-amber-600 dark:text-amber-400' : ''}`}>{c.v}</p>
                     {c.d && <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">▲ {c.d}</p>}
                   </div>
                 ))}
