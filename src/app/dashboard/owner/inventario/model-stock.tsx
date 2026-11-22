@@ -6,7 +6,7 @@ import { useT } from '../../../i18n';
 import { friendlyError } from '../owner-context';
 import { PhotoThumb, ProductPhotoEditor } from './product-photo';
 
-export type VariantItem = { id: string; name: string; qty: number; min: number; model?: string | null; size?: string | null; color?: string | null; photo_path?: string | null; org_id?: string; company_id?: string };
+export type VariantItem = { id: string; name: string; sku?: string; qty: number; min: number; model?: string | null; size?: string | null; color?: string | null; photo_path?: string | null; org_id?: string; company_id?: string };
 
 const SIZE_ORDER = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', 'XXXL', '3XL', 'UNICA', 'ÚNICA', 'U'];
 const sizeKey = (s: string): [number, number, string] => {
@@ -98,6 +98,7 @@ export function ModelStock({ model, items, branchId, canReceive, canPhoto, onCha
                               ? <span className="inline-flex items-center gap-1"><span className="font-bold text-red-600 dark:text-red-400">0</span>
                                   <button type="button" disabled={busy} onClick={() => del(it)} aria-label={t('prod.delete')} title={t('prod.delete')} className="cursor-pointer rounded px-1 text-xs hover:bg-red-50 dark:hover:bg-red-500/10">🗑️</button></span>
                               : <span className={q <= 0 ? 'font-bold text-red-600 dark:text-red-400' : q <= Number(it.min) ? 'font-bold text-amber-600 dark:text-amber-400' : 'font-bold'}>{q}</span>}
+                          {!adding && it.sku && <span className={`block font-mono text-[10px] font-semibold ${ui.muted}`}>{it.sku}</span>}
                         </td>
                       );
                     })}

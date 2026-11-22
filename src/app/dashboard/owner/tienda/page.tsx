@@ -11,12 +11,13 @@ import { PhotoSlot } from '../../photo-picker';
 import { compressImage, extFor, storeImageUrl, storeThumbUrl, makeThumb, thumbPath } from '../../image';
 
 type Company = { id: string; legal_name: string };
-type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean; variants?: number };
+type Product = { id: string; name: string; price: number; type: string; in_store: boolean; description: string | null; photo: string | null; active: boolean; variants?: number; sku?: string | null; codes?: string | null };
 type Store = { id: string; company_id: string; branch_id: string; slug: string; name: string; description: string | null; whatsapp: string | null; logo_path: string | null; own_qr_path?: string | null; is_published: boolean; theme?: string; admin_bg?: string; address?: string | null; map_url?: string | null };
 type Admin = {
   perms?: { photo: boolean; publish: boolean; edit: boolean; orders?: boolean }; store: Store & { org_id?: string }; currency: string; max_products: number | null; branches: { id: string; name: string }[]; products: Product[] };
 
 import { COLOR_GRID, resolveAdminBg } from '../../../store-theme';
+import { SkuTag } from '../../sku-tag';
 const BUCKET = 'store-images';
 const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
 const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
@@ -351,7 +352,7 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
                   <span className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800">{img ? <img src={img} alt="" loading="lazy" onError={(e) => { if (imgFull && e.currentTarget.src !== imgFull) e.currentTarget.src = imgFull; }} className="h-full w-full object-cover" /> : '📷'}</span>
                 )}
                 <div className="min-w-0 flex-1 basis-40">
-                  <p className="truncate font-semibold">{p.name}</p>
+                  <p className="truncate font-semibold">{p.name}<SkuTag sku={p.sku} /></p>
                   <p className={`text-xs ${ui.muted}`}>{fmt(p.price)}{(p.variants ?? 1) > 1 && <> · {t('store.variants', { n: p.variants ?? 1 })}</>}</p>
                   {!p.photo && <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">📷 {t('store.needsPhoto')}</p>}
                   {p.in_store && pm.publish && (
@@ -368,7 +369,7 @@ ${logo ? `<img class="l" src="${logo}" alt="">` : ''}<h1>${esc(form.name)}</h1><
             );
                     };
           const inStore = data.products.filter((p) => p.in_store);
-          const rest = data.products.filter((p) => !p.in_store && p.name.toLowerCase().includes(pq.trim().toLowerCase()));
+          const rest = data.products.filter((p) => !p.in_store && (p.name.toLowerCase().includes(pq.trim().toLowerCase()) || (p.codes ?? '').toLowerCase().includes(pq.trim().toLowerCase())));
           return (
             <>
               {inStore.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('store.noneYet')}</p>}

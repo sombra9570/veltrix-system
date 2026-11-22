@@ -186,7 +186,7 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
 
   const list = useMemo(() => {
     const s = q.trim().toLowerCase();
-    return s ? catalog.filter((p) => p.name.toLowerCase().includes(s)) : catalog;
+    return s ? catalog.filter((p) => p.name.toLowerCase().includes(s) || (p.sku ?? '').toLowerCase().includes(s)) : catalog;
   }, [catalog, q]);
 
   const total = order.items.reduce((s, i) => s + Number(i.total), 0);

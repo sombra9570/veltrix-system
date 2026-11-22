@@ -4,13 +4,14 @@ import { rpc } from '../../../lib/supabase';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
+import { SkuTag } from '../sku-tag';
 
 /* ------------------------------------------------------------------
  * Venta a plazos de mercadería en la calle: cuotas fijas y SIN interés.
  * Solo la ve el cobrador que tiene el permiso "Vender a crédito" (lo da el administrador desde Permisos).
  * ------------------------------------------------------------------ */
 type RouteCustomer = { id: string; name: string; phone: string | null; balance: number };
-type Product = { id: string; name: string; unit_price: number };
+type Product = { id: string; name: string; unit_price: number; sku?: string | null };
 const FREQS: [number, string][] = [[1, 'daily'], [7, 'weekly'], [15, 'biweekly'], [30, 'monthly']];
 const addDays = (iso: string, n: number) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 
@@ -32,7 +33,7 @@ export function CreditSaleForm({ routeId, today, fmt, onDone }: {
   const [err, setErr] = useState('');
 
   useEffect(() => { rpc<RouteCustomer[]>('route_customers', { p_route: routeId }).then((x) => setCustomers(x ?? [])).catch(() => {}); }, [routeId]);
-  useEffect(() => { rpc<Product[]>('collector_products', { p_route: routeId }).then((x) => setProducts(x ?? [])).catch((e) => setErr((e as Error).message.includes('SALE_NO_PERMISSION') ? t('sale.e.perm') : (e as Error).message)); }, [routeId, t]);
+  useEffect(() => { rpc<Product[]>('collector_products_v2', { p_route: routeId }).then((x) => setProducts(x ?? [])).catch((e) => setErr((e as Error).message.includes('SALE_NO_PERMISSION') ? t('sale.e.perm') : (e as Error).message)); }, [routeId, t]);
   useEffect(() => { setFirst(addDays(today, every)); }, [every, today]);
 
   const custList = useMemo(() => {
@@ -41,7 +42,7 @@ export function CreditSaleForm({ routeId, today, fmt, onDone }: {
   }, [customers, q]);
   const prodList = useMemo(() => {
     const s = pq.trim().toLowerCase();
-    return (s ? products.filter((p) => p.name.toLowerCase().includes(s)) : products).slice(0, 30);
+    return (s ? products.filter((p) => p.name.toLowerCase().includes(s) || (p.sku ?? '').toLowerCase().includes(s)) : products).slice(0, 30);
   }, [products, pq]);
 
   const chosen = products.filter((p) => (items[p.id] ?? 0) > 0);
@@ -92,7 +93,7 @@ export function CreditSaleForm({ routeId, today, fmt, onDone }: {
         <ul className="max-h-48 space-y-1 overflow-y-auto">
           {prodList.map((p) => (
             <li key={p.id} className="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-800">
-              <span className="min-w-0 flex-1 truncate font-semibold">{p.name}</span>
+              <span className="min-w-0 flex-1 truncate font-semibold">{p.name}<SkuTag sku={p.sku} /></span>
               <span className={`text-xs ${ui.muted}`}>{fmt(Number(p.unit_price))}</span>
               <button type="button" onClick={() => setQty(p.id, (items[p.id] ?? 0) - 1)} className={`${ui.btnGhost} px-2 py-0.5`} aria-label="−">−</button>
               <span className="w-6 text-center font-bold">{items[p.id] ?? 0}</span>
