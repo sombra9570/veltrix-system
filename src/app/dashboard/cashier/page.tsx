@@ -10,6 +10,8 @@ import { money, shortTime, parseAmount } from '../format';
 import { QrPayBox, attachPaymentProof, useShiftQr } from '../sale-files';
 import { RestaurantInbox } from '../delivery';
 import { SkuTag } from '../sku-tag';
+import { Sheet } from '../sheet';
+import { ReceiptButtons } from '../receipt-buttons';
 
 type Method = 'cash' | 'qr_transfer' | 'card';
 type MovType = 'expense' | 'withdrawal' | 'deposit' | 'change_fund';
@@ -18,7 +20,8 @@ type Home = {
   shift: null | {
     id: string; opened_at: string; opening_cash: number; register: string; branch: string; currency: string;
     expected?: number | null; // solo si el dueño le dio permiso de ver el efectivo esperado
-    payments: { id: string; at: string; customer: string; method: Method; amount: number }[];
+    can_reverse?: boolean;
+    payments: { id: string; at: string; customer: string; method: Method; amount: number; is_reversal?: boolean; reversal?: 'pending' | 'approved' | null }[];
     movements: { id: string; at: string; type: MovType; amount: number; description: string }[];
   };
   registers: { id: string; name: string; branch: string; currency: string; busy: boolean }[];
@@ -82,6 +85,21 @@ export default function CashierPage() {
   useEffect(() => { load(); }, [load]);
   useSync(load);
 
+  // Pestañas que no aplican al negocio se ocultan (cuotas y rendiciones son de crédito y cobradores)
+  const [mods, setMods] = useState<string[] | null>(null);
+  const [hasDebts, setHasDebts] = useState(false);
+  useEffect(() => { rpc<string[]>('my_modules').then((m) => setMods(m ?? [])).catch(() => setMods([])); }, []);
+  const shiftId = home?.shift?.id;
+  useEffect(() => {
+    if (!shiftId) return;
+    rpc<Debtor[]>('cashier_find_debtors', { p_search: '' }).then((r) => setHasDebts((r ?? []).length > 0)).catch(() => setHasDebts(false));
+  }, [shiftId]);
+
+  // Pedir anular un cobro
+  const [rev, setRev] = useState<{ id: string; customer: string; amount: number } | null>(null);
+  const [revReason, setRevReason] = useState('');
+  const [sent, setSent] = useState<string[]>([]);
+
   const flash = (ok: boolean, text: string) => {
     setMsg({ ok, text });
     setTimeout(() => setMsg(null), 5000);
@@ -90,6 +108,26 @@ export default function CashierPage() {
   if (!home) return <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p>;
 
   const s = home.shift;
+  const wide = !mods || mods.length === 0;
+  const showDebts = wide || mods.includes('field_collection') || mods.includes('finance') || hasDebts;
+  const showSettle = wide || mods.includes('field_collection') || settlements.length > 0;
+  const tabsShown = TABS.filter((x) => (x.id !== 'debts' || showDebts) && (x.id !== 'settlements' || showSettle));
+  const curTab: Tab = tabsShown.some((x) => x.id === tab) ? tab : 'queue';
+  const sendReverse = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rev || !revReason.trim()) return;
+    setBusy(true);
+    try {
+      await rpc('request_reversal', { p_payment: rev.id, p_reason: revReason.trim() });
+      setSent((l) => [...l, rev.id]); setRev(null); setRevReason('');
+      flash(true, t('cash.reverseSent'));
+      await load();
+    } catch (err) {
+      const m = (err as Error).message;
+      flash(false, /REVERSAL_EXISTS/.test(m) ? t('cash.reverseExists') : cashError(m, t));
+      if (/REVERSAL_EXISTS/.test(m)) { setSent((l) => [...l, rev.id]); setRev(null); }
+    } finally { setBusy(false); }
+  };
   const fmt = (n: number, cur?: string) => money(Number(n), cur ?? s?.currency ?? 'USD', lang);
 
   return (
@@ -116,7 +154,7 @@ export default function CashierPage() {
           {/* Pestañas: en celular se deslizan; en computadora caben todas */}
           <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
             <div className="flex w-max gap-2 sm:w-auto sm:flex-wrap">
-              {TABS.map((x) => {
+              {tabsShown.map((x) => {
                 const count = x.id === 'queue' ? queue.length : x.id === 'settlements' ? settlements.length : 0;
                 return (
                   <button
@@ -124,7 +162,7 @@ export default function CashierPage() {
                     type="button"
                     onClick={() => setTab(x.id)}
                     className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition cursor-pointer ${
-                      tab === x.id
+                      curTab === x.id
                         ? 'bg-blue-600 text-white shadow-sm'
                         : 'border border-slate-300 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300'
                     }`}
@@ -132,7 +170,7 @@ export default function CashierPage() {
                     <span>{x.icon}</span>
                     <span>{t(x.label)}</span>
                     {count > 0 && (
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${tab === x.id ? 'bg-white/25' : 'bg-blue-600 text-white'}`}>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${curTab === x.id ? 'bg-white/25' : 'bg-blue-600 text-white'}`}>
                         {count}
                       </span>
                     )}
@@ -142,19 +180,19 @@ export default function CashierPage() {
             </div>
           </div>
 
-          {tab === 'queue' && (
+          {curTab === 'queue' && (
             <QueueTab queue={queue} shiftId={s.id} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
           )}
-          {tab === 'debts' && (
+          {curTab === 'debts' && (
             <DebtsTab shiftId={s.id} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
           )}
-          {tab === 'settlements' && (
+          {curTab === 'settlements' && (
             <SettlementsTab list={settlements} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
           )}
-          {tab === 'movements' && (
+          {curTab === 'movements' && (
             <MovementsTab movements={s.movements} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
           )}
-          {tab === 'payments' && (
+          {curTab === 'payments' && (
             <Card className="!p-0 overflow-hidden">
               {s.payments.length === 0 ? (
                 <p className={`p-5 text-sm ${ui.muted}`}>{t('cash.paymentsEmpty')}</p>
@@ -168,14 +206,39 @@ export default function CashierPage() {
                         <p className={`text-xs ${ui.muted}`}>{t(`cash.m.${p.method}` as DictKey)}</p>
                       </div>
                       <span className={`font-bold ${p.amount < 0 ? 'text-red-600 dark:text-red-400' : ''}`}>{fmt(p.amount)}</span>
+                      {s.can_reverse && !p.is_reversal && p.amount > 0 && !p.reversal && !sent.includes(p.id) && (
+                        <button type="button" onClick={() => { setRev({ id: p.id, customer: p.customer, amount: p.amount }); setRevReason(''); }}
+                          className={`${ui.btnGhost} !px-2.5 !py-1 text-xs`}>↩️ {t('cash.reverseBtn')}</button>
+                      )}
+                      {(p.reversal === 'pending' || sent.includes(p.id)) && !p.is_reversal && <span className="rounded-full bg-amber-50 px-2 py-1 text-xs font-bold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">⏳ {t('cash.reversePending')}</span>}
+                      {p.reversal === 'approved' && <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">{t('cash.reverseDone')}</span>}
                     </li>
                   ))}
                 </ul>
               )}
             </Card>
           )}
-          {tab === 'close' && (
-            <CloseTab shiftId={s.id} expected={s.expected ?? null} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
+          {curTab === 'close' && (
+            <CloseTab shiftId={s.id} expected={s.expected ?? null} opening={Number(s.opening_cash)} payments={s.payments} movements={s.movements} fmt={fmt} busy={busy} setBusy={setBusy} onDone={load} flash={flash} />
+          )}
+          {rev && (
+            <Sheet onClose={() => setRev(null)} label={t('pos.close')}>
+              <form onSubmit={sendReverse} className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-extrabold">↩️ {t('cash.reverseTitle')}</h2>
+                  <p className={`text-sm ${ui.muted}`}>{rev.customer} · {fmt(rev.amount)}</p>
+                  <p className={`mt-1 text-xs ${ui.muted}`}>{t('cash.reverseHint')}</p>
+                </div>
+                <div>
+                  <label className={ui.label}>{t('cash.reason')}</label>
+                  <input required autoFocus maxLength={200} value={revReason} onChange={(e) => setRevReason(e.target.value)} className={ui.input} />
+                </div>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setRev(null)} className={`${ui.btnGhost} flex-1`}>{t('cash.cancel')}</button>
+                  <button type="submit" disabled={busy || !revReason.trim()} className={`${ui.btnPrimary} flex-1`}>{busy ? t('common.wait') : t('cash.reverseSend')}</button>
+                </div>
+              </form>
+            </Sheet>
           )}
         </>
       )}
@@ -279,9 +342,13 @@ function QueueTab({
   const [received, setReceived] = useState('');
   const qr = useShiftQr(shiftId);
   const [proof, setProof] = useState<File | null>(null);
+  const [pay, setPay] = useState('');
+  const [done, setDone] = useState<string | null>(null);
 
   const pick = async (row: QueueRow) => {
     setActive(row);
+    setPay('');
+    setDone(null);
     setMethod('cash');
     setProof(null);
     setReceived('');
@@ -289,17 +356,31 @@ function QueueTab({
     try { setItems((await rpc<Item[]>('cashier_order_items_v2', { p_order: row.order_id })) ?? []); } catch { /* opcional */ }
   };
 
+  // Tras cobrar: aviso con el comprobante para imprimir o enviar
+  const doneBox = done && (
+    <Card className="flex flex-wrap items-center justify-between gap-3 lg:col-span-5">
+      <p className="font-semibold">✅ {t('cash.chargedTitle')}</p>
+      <span className="flex items-center gap-2">
+        <ReceiptButtons orderId={done} />
+        <button type="button" onClick={() => setDone(null)} className={`${ui.btnGhost} !px-3 !py-1 text-xs`}>✕</button>
+      </span>
+    </Card>
+  );
+
   if (queue.length === 0 && !active) {
-    return <Card><p className={`text-sm ${ui.muted}`}>{t('cash.queueEmpty')}</p></Card>;
+    return <div className="space-y-4">{doneBox}<Card><p className={`text-sm ${ui.muted}`}>{t('cash.queueEmpty')}</p></Card></div>;
   }
 
   const balance = active ? Number(active.balance) : 0;
+  // Monto a cobrar: por defecto el saldo completo; se puede cobrar una parte y el resto en otro método
+  const toPay = pay === '' ? balance : parseAmount(pay);
+  const badAmount = Number.isNaN(toPay) || toPay <= 0 || toPay > balance + 0.0001;
   const got = parseAmount(received);
-  const change = method === 'cash' && !Number.isNaN(got) ? got - balance : 0;
-  const short = method === 'cash' && received !== '' && (Number.isNaN(got) || got < balance);
+  const change = method === 'cash' && !Number.isNaN(got) ? got - toPay : 0;
+  const short = method === 'cash' && received !== '' && (Number.isNaN(got) || got < toPay);
 
   const charge = async () => {
-    if (!active || short) return;
+    if (!active || short || badAmount) return;
     setBusy(true);
     try {
       const uuid = crypto.randomUUID();
@@ -307,14 +388,16 @@ function QueueTab({
         p_customer: active.customer_id,
         p_origin: 'pos_counter',
         p_method: method,
-        p_amount: balance,
+        p_amount: toPay,
         p_shift: shiftId,
         p_order: active.order_id,
         p_offline_uuid: uuid,
       });
       const ok = method !== 'qr_transfer' || await attachPaymentProof(qr, uuid, proof);
       setProof(null);
-      flash(ok, ok ? t('cash.charged') : t('qr.proofFailed'));
+      const left = Math.round((balance - toPay) * 100) / 100;
+      flash(ok, !ok ? t('qr.proofFailed') : left > 0 ? t('cash.partialOk', { left: fmt(left) }) : t('cash.charged'));
+      setDone(active.order_id);
       setActive(null);
       await onDone();
     } catch (err) {
@@ -326,6 +409,7 @@ function QueueTab({
 
   return (
     <div className="grid gap-4 lg:grid-cols-5">
+      {doneBox}
       <ul className={`space-y-2 lg:col-span-3 ${active ? 'max-lg:hidden' : ''}`}>
         {queue.map((q) => (
           <li key={q.order_id}>
@@ -378,6 +462,15 @@ function QueueTab({
           </div>
 
           <div>
+            <div className="flex items-center justify-between">
+              <label className={ui.label}>{t('cash.amountToCharge')}</label>
+              {pay !== '' && <button type="button" onClick={() => setPay('')} className="text-xs font-semibold text-blue-600 hover:underline dark:text-blue-400">{t('cash.fullBalance')}</button>}
+            </div>
+            <input inputMode="decimal" value={pay} onChange={(e) => setPay(e.target.value)} placeholder={String(balance)} className={ui.input} />
+            {pay !== '' && badAmount && <p className="mt-1 text-xs font-semibold text-red-600 dark:text-red-400">{t('cash.amountInvalid')}</p>}
+          </div>
+
+          <div>
             <p className={ui.label}>{t('cash.method')}</p>
             <div className="grid grid-cols-3 gap-2">
               {METHODS.map((m) => (
@@ -412,8 +505,8 @@ function QueueTab({
           {method === 'qr_transfer' && <QrPayBox info={qr} photo={proof} onPhoto={setProof} disabled={busy} />}
           {short && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{t('cash.notEnough')}</p>}
 
-          <button type="button" onClick={charge} disabled={busy || short} className={`${ui.btnPrimary} w-full py-3 text-base`}>
-            {busy ? t('common.wait') : `${t('cash.confirm')} · ${fmt(balance)}`}
+          <button type="button" onClick={charge} disabled={busy || short || badAmount} className={`${ui.btnPrimary} w-full py-3 text-base`}>
+            {busy ? t('common.wait') : `${t('cash.confirm')} · ${fmt(badAmount ? balance : toPay)}`}
           </button>
         </Card>
       )}
@@ -682,9 +775,15 @@ function MovementsTab({
 
 /* ---------------- Cierre ciego ---------------- */
 function CloseTab({
-  shiftId, expected, fmt, busy, setBusy, onDone, flash,
-}: Common & { shiftId: string; expected: number | null; fmt: (n: number) => string }) {
+  shiftId, expected, opening, payments, movements, fmt, busy, setBusy, onDone, flash,
+}: Common & {
+  shiftId: string; expected: number | null; opening: number; fmt: (n: number) => string;
+  payments: { method: Method; amount: number }[]; movements: { type: MovType; amount: number }[];
+}) {
   const { t } = useT();
+  // El resumen solo se muestra a quien puede ver lo esperado: si no, el cierre ciego dejaría de serlo
+  const byMethod = (['cash', 'qr_transfer', 'card'] as Method[]).map((m) => ({ m, v: payments.filter((p) => p.method === m).reduce((a, p) => a + Number(p.amount), 0) })).filter((x) => x.v !== 0);
+  const byMov = (['expense', 'withdrawal', 'deposit', 'change_fund'] as MovType[]).map((m) => ({ m, v: movements.filter((x) => x.type === m).reduce((a, x) => a + Number(x.amount), 0) })).filter((x) => x.v !== 0);
   const [declared, setDeclared] = useState('');
   const [confirming, setConfirming] = useState(false);
   const n = parseAmount(declared);
@@ -705,7 +804,15 @@ function CloseTab({
   };
 
   return (
-    <div className="mx-auto w-full max-w-lg">
+    <div className="mx-auto w-full max-w-lg space-y-4">
+      {expected !== null && (
+        <Card className="space-y-2 text-sm">
+          <p className="font-extrabold">📋 {t('cash.summaryTitle')}</p>
+          <p className="flex justify-between"><span className={ui.muted}>{t('cash.sumOpening')}</span><span className="font-semibold">{fmt(opening)}</span></p>
+          {byMethod.map((x) => <p key={x.m} className="flex justify-between"><span className={ui.muted}>{t('cash.sumCollected')} · {t(`cash.m.${x.m}` as DictKey)}</span><span className="font-semibold">{fmt(x.v)}</span></p>)}
+          {byMov.map((x) => <p key={x.m} className="flex justify-between"><span className={ui.muted}>{t(`cash.mov.${x.m}` as DictKey)}</span><span className="font-semibold">{fmt(x.v)}</span></p>)}
+        </Card>
+      )}
       <Card className="space-y-4">
         {expected === null ? (
           <p className={`text-sm ${ui.muted}`}>{t('cash.closeHint')}</p>
