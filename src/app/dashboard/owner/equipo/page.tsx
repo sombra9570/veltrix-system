@@ -133,15 +133,30 @@ export default function TeamPage() {
   };
 
   // Editar cargo, rol propio y sucursal de un trabajador
-  const [ed, setEd] = useState<{ row: Row; role: string; custom: string; branchId: string } | null>(null);
+  const [ed, setEd] = useState<{ row: Row; role: string; custom: string; branchId: string; name: string; email: string } | null>(null);
   const [edBusy, setEdBusy] = useState(false);
   const [edMsg, setEdMsg] = useState<string | null>(null);
-  const openEdit = (r: Row) => { setEd({ row: r, role: r.roles[0] ?? 'cashier', custom: r.customRoleId ?? '', branchId: r.branchIds[0] ?? '' }); setEdMsg(null); };
+  const openEdit = (r: Row) => { setEd({ row: r, role: r.roles[0] ?? 'cashier', custom: r.customRoleId ?? '', branchId: r.branchIds[0] ?? '', name: r.name, email: r.email }); setEdMsg(null); };
   const saveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ed) return;
     setEdBusy(true); setEdMsg(null);
     try {
+      // Cambia a la persona del cargo (nombre y correo de ingreso) sin tocar el historial: la cuenta es la misma
+      const nm = ed.name.trim(); const em = ed.email.trim().toLowerCase();
+      if (nm && em && (nm !== ed.row.name || em !== ed.row.email.toLowerCase())) {
+        const { data: s } = await supabase.auth.getSession();
+        const res = await fetch('/api/workers/identity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${s.session?.access_token ?? ''}` },
+          body: JSON.stringify({ orgId, userId: ed.row.userId, name: nm, email: em }),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          const m = String(body.error ?? '');
+          throw new Error(/ya está en uso/.test(m) ? t('team.emailTaken') : /más de una empresa/.test(m) ? t('team.pwShared') : /administrador/.test(m) ? t('team.pwOwner') : t('team.identityFail'));
+        }
+      }
       const single = ed.row.membershipIds.length === 1;
       for (const m of ed.row.membershipIds) {
         await rpc('set_member_role', { p_membership: m, p_role: ed.custom ? null : ed.role, p_custom: ed.custom || null, p_branch: single && ed.branchId ? ed.branchId : null });
@@ -175,6 +190,38 @@ export default function TeamPage() {
       const m = err instanceof Error ? err.message : '';
       setPwMsg(/más de una empresa/.test(m) ? t('team.pwShared') : /administrador/.test(m) ? t('team.pwOwner') : t('team.pwFail'));
     } finally { setPwBusy(false); }
+  };
+
+  // Pasar el cargo a otro trabajador (la persona anterior queda inactiva con su historial)
+  const [tr, setTr] = useState<{ row: Row; to: string } | null>(null);
+  const [trBusy, setTrBusy] = useState(false);
+  const [trMsg, setTrMsg] = useState<string | null>(null);
+  const saveTransfer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tr || !tr.to) return;
+    setTrBusy(true); setTrMsg(null);
+    try {
+      await rpc('transfer_worker_post', { p_org: orgId, p_from: tr.row.userId, p_to: tr.to });
+      setTr(null); setMsg({ ok: true, text: t('team.transferDone') });
+      await Promise.all([load(), reload()]);
+    } catch (err) {
+      const m = err instanceof Error ? err.message : '';
+      setTrMsg(/SHIFT_OPEN/.test(m) ? t('team.transferShift') : friendlyError(m, t));
+    }
+    setTrBusy(false);
+  };
+  // Quitar del equipo: sale de la lista y ya no puede entrar, pero sus ventas, cobros y turnos se conservan
+  const [rm, setRm] = useState<Row | null>(null);
+  const [rmBusy, setRmBusy] = useState(false);
+  const confirmRemove = async () => {
+    if (!rm) return;
+    setRmBusy(true);
+    const { error } = await supabase.from('memberships')
+      .update({ deleted_at: new Date().toISOString(), is_active: false }).eq('org_id', orgId).eq('user_id', rm.userId).neq('role', 'owner').is('deleted_at', null);
+    setRmBusy(false);
+    if (error) { setMsg({ ok: false, text: friendlyError(error.message, t) }); setRm(null); return; }
+    setRm(null); setMsg({ ok: true, text: t('team.removed') });
+    await Promise.all([load(), reload()]);
   };
 
   const toggle = async (r: Row) => {
@@ -355,6 +402,8 @@ export default function TeamPage() {
                 <button type="button" onClick={() => toggle(r)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>
                   {r.active ? t('team.deactivate') : t('team.activate')}
                 </button>
+                {rows.length > 1 && <button type="button" onClick={() => { setTr({ row: r, to: '' }); setTrMsg(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>🔁 {t('team.transfer')}</button>}
+                <button type="button" onClick={() => setRm(r)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>🗑️ {t('team.remove')}</button>
                 </div>
               </li>
             ))}
@@ -367,7 +416,17 @@ export default function TeamPage() {
           <form onSubmit={saveEdit} className="space-y-4">
             <div>
               <h2 className="text-lg font-extrabold">✏️ {t('team.edit')}</h2>
-              <p className={`text-sm ${ui.muted}`}>{ed.row.name || ed.row.email}</p>
+              <p className={`text-sm ${ui.muted}`}>{t('team.identityHint')}</p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className={ui.label}>{t('team.name')}</label>
+                <input required className={ui.input} value={ed.name} onChange={(e) => setEd({ ...ed, name: e.target.value })} />
+              </div>
+              <div>
+                <label className={ui.label}>{t('common.email')}</label>
+                <input required type="email" className={ui.input} value={ed.email} onChange={(e) => setEd({ ...ed, email: e.target.value })} />
+              </div>
             </div>
             {!ed.custom && (
               <div>
@@ -401,6 +460,46 @@ export default function TeamPage() {
               <button type="submit" disabled={edBusy} className={`${ui.btnPrimary} flex-1`}>{edBusy ? t('common.wait') : t('prod.save')}</button>
             </div>
           </form>
+        </Sheet>
+      )}
+
+      {tr && (
+        <Sheet onClose={() => setTr(null)} label={t('pos.close')}>
+          <form onSubmit={saveTransfer} className="space-y-4">
+            <div>
+              <h2 className="text-lg font-extrabold">🔁 {t('team.transferTitle')}</h2>
+              <p className={`text-sm ${ui.muted}`}>{tr.row.name || tr.row.email}</p>
+              <p className={`mt-1 text-xs ${ui.muted}`}>{t('team.transferHint')}</p>
+            </div>
+            <div>
+              <label className={ui.label}>{t('team.transferTo')}</label>
+              <select required className={ui.input} value={tr.to} onChange={(e) => setTr({ ...tr, to: e.target.value })}>
+                <option value="">—</option>
+                {rows.filter((x) => x.userId !== tr.row.userId).map((x) => <option key={x.userId} value={x.userId}>{x.name || x.email}</option>)}
+              </select>
+            </div>
+            {trMsg && <p className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">{trMsg}</p>}
+            <div className="flex gap-2">
+              <button type="button" onClick={() => setTr(null)} className={`${ui.btnGhost} flex-1`}>{t('cash.cancel')}</button>
+              <button type="submit" disabled={trBusy || !tr.to} className={`${ui.btnPrimary} flex-1`}>{trBusy ? t('common.wait') : t('team.transferSave')}</button>
+            </div>
+          </form>
+        </Sheet>
+      )}
+
+      {rm && (
+        <Sheet onClose={() => setRm(null)} label={t('pos.close')}>
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-extrabold">🗑️ {t('team.removeTitle')}</h2>
+              <p className={`text-sm ${ui.muted}`}>{rm.name || rm.email}</p>
+              <p className={`mt-2 text-sm ${ui.muted}`}>{t('team.removeHint')}</p>
+            </div>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => setRm(null)} className={`${ui.btnGhost} flex-1`}>{t('cash.cancel')}</button>
+              <button type="button" onClick={confirmRemove} disabled={rmBusy} className={`${ui.btnPrimary} flex-1`}>{rmBusy ? t('common.wait') : t('team.removeYes')}</button>
+            </div>
+          </div>
         </Sheet>
       )}
 
