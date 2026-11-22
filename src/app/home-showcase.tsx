@@ -39,13 +39,15 @@ const GAUGES: Record<Niche, [string, number][]> = {
 function Gauge({ v, label }: { v: number; label: string }) {
   const r = 22; const len = 2 * Math.PI * r;
   return (
-    <div className="flex flex-col items-center text-center">
-      <svg viewBox="0 0 56 56" className="h-14 w-14 -rotate-90" aria-hidden>
-        <circle cx="28" cy="28" r={r} fill="none" strokeWidth="6" className="stroke-slate-200 dark:stroke-slate-800" />
-        <circle cx="28" cy="28" r={r} fill="none" strokeWidth="6" strokeLinecap="round" strokeDasharray={`${(len * v) / 100} ${len}`} className="stroke-blue-600" />
-      </svg>
-      <p className="-mt-9 mb-3 text-[11px] font-extrabold">{v}%</p>
-      <p className="text-[10px] font-semibold leading-tight text-slate-500">{label}</p>
+    <div className="flex min-w-0 flex-col items-center text-center">
+      <div className="relative h-11 w-11 sm:h-14 sm:w-14">
+        <svg viewBox="0 0 56 56" className="h-full w-full -rotate-90" aria-hidden>
+          <circle cx="28" cy="28" r={r} fill="none" strokeWidth="6" className="stroke-slate-200 dark:stroke-slate-800" />
+          <circle cx="28" cy="28" r={r} fill="none" strokeWidth="6" strokeLinecap="round" strokeDasharray={`${(len * v) / 100} ${len}`} className="stroke-blue-600" />
+        </svg>
+        <span className="absolute inset-0 grid place-items-center text-[10px] font-extrabold sm:text-[11px]">{v}%</span>
+      </div>
+      <p className="mt-1 text-[9px] font-semibold leading-tight text-slate-500 sm:text-[10px]">{label}</p>
     </div>
   );
 }
@@ -56,7 +58,7 @@ function Curve({ pts }: { pts: number[] }) {
   const line = xy.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
   const last = xy[xy.length - 1];
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="h-24 w-full text-blue-600" preserveAspectRatio="none" aria-hidden>
+    <svg viewBox={`0 0 ${w} ${h}`} className="h-14 w-full text-blue-600 sm:h-24" preserveAspectRatio="none" aria-hidden>
       <polygon points={`0,${h} ${line} ${w},${h}`} fill="currentColor" opacity="0.12" />
       <polyline points={line} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
       <circle cx={last[0]} cy={last[1]} r="3.5" fill="currentColor" />
@@ -80,8 +82,8 @@ export function HomeShowcase() {
 
   const pickNiche = (x: Niche) => { setAuto(false); setNiche(x); setView('panel'); };
   const pickView = (x: View) => { setAuto(false); setView(x); };
-  const card = 'rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900';
-  const lbl = 'text-[10px] font-semibold uppercase tracking-wide text-slate-500';
+  const card = 'rounded-xl border border-slate-200 bg-white p-2 sm:p-3 dark:border-slate-800 dark:bg-slate-900';
+  const lbl = 'text-[9px] font-semibold uppercase tracking-wide text-slate-500 sm:text-[10px]';
 
   const KPIS: Record<Niche, Kpi[]> = {
     retail: [{ k: 'home.sc.salesToday', v: m(1398), d: '+8 %' }, { k: 'home.sh.k.online', v: '14', d: '+3' }, { k: 'home.sh.k.ticket', v: m(38) }, { k: 'home.sh.k.growth', v: '+18 %', d: '12 m' }],
@@ -131,26 +133,26 @@ export function HomeShowcase() {
           ))}
         </div>
 
-        <div className="min-h-[21rem] p-2.5 sm:min-h-[24rem] sm:p-4">
+        <div className="p-2 sm:min-h-[24rem] sm:p-4">
           {view === 'panel' && (
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="space-y-2 sm:space-y-3">
+              <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4 sm:gap-2">
                 {KPIS[niche].map((c) => (
                   <div key={c.k} className={card}>
                     <p className={lbl}>{t(c.k)}</p>
-                    <p className={`mt-1 whitespace-nowrap text-sm font-extrabold sm:text-lg ${c.warn ? 'text-amber-600 dark:text-amber-400' : ''}`}>{c.v}</p>
+                    <p className={`mt-0.5 whitespace-nowrap text-sm font-extrabold sm:mt-1 sm:text-lg ${c.warn ? 'text-amber-600 dark:text-amber-400' : ''}`}>{c.v}</p>
                     {c.d && <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">▲ {c.d}</p>}
                   </div>
                 ))}
               </div>
-              <div className="grid gap-3 sm:grid-cols-[1.4fr_1fr]">
+              <div className="grid gap-2 sm:grid-cols-[1.4fr_1fr] sm:gap-3">
                 <div className={card}>
                   <p className={lbl}>{t('home.sh.growth')}</p>
                   <Curve pts={CURVE[niche]} />
                 </div>
                 <div className={card}>
                   <p className={lbl}>{t('home.sh.perf')}</p>
-                  <div className="mt-2 grid grid-cols-3 gap-1">
+                  <div className="mt-1.5 grid grid-cols-3 gap-1 sm:mt-2">
                     {GAUGES[niche].map(([g, v]) => <Gauge key={g} v={v} label={t(`home.sh.g.${g}` as DictKey)} />)}
                   </div>
                 </div>
@@ -170,7 +172,7 @@ export function HomeShowcase() {
               <div className="grid grid-cols-3 gap-2">
                 {emoji.map((e, i) => (
                   <div key={e} className={`${card} text-center`}>
-                    <p className="text-3xl">{e}</p>
+                    <p className="text-2xl sm:text-3xl">{e}</p>
                     <p className="mt-1 truncate text-[11px] font-semibold">{t('home.sh.item', { n: i + 1 })}</p>
                     <p className="text-xs font-extrabold">{m(18 + i * 7)}</p>
                     <p className="mt-1 rounded-md bg-blue-50 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">+ {t('home.sh.store.add')}</p>
