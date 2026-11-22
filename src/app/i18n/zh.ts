@@ -1533,6 +1533,8 @@ const zh: Record<DictKey, string> = {
   "perm.inv.see_cost.d": "查看进货成本和库存价值。",
   "perm.inv.photo": "为库存商品添加照片",
   "perm.inv.photo.d": "添加或更改库存中商品的可选照片。",
+  "perm.products.see_code": "查看商品编码",
+  "perm.products.see_code.d": "在订单、收款、厨房和发货中，于名称旁显示每件商品的编码。客户永远看不到。",
   "inv.photo": "商品照片",
   "inv.photoHint": "可选。盘点时便于识别，避免混淆规格。对于款式，照片适用于其所有尺码和颜色。",
   "appr.refundSale": "销售退款",

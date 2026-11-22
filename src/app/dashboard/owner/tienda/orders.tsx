@@ -9,11 +9,12 @@ import { money, shortTime } from '../../format';
 import { friendlyError } from '../owner-context';
 import { useLive } from '../../live';
 import { useSync } from '../../sync';
+import { SkuTag } from '../../sku-tag';
 
 type Order = {
   id: string; at: string; status: 'pending' | 'accepted' | 'rejected'; kind: 'pickup' | 'delivery'; customer: string; phone: string; address: string;
   lat: number | null; lng: number | null; notes: string | null; pay_pref: 'cash' | 'qr'; subtotal: number; reject_reason: string | null;
-  contact_pref: 'chat' | 'whatsapp'; chat_n: number; chat_waiting: boolean; assigned_to: string | null; assigned_name: string | null; fulfilled_at: string | null; items: { name: string; qty: number }[];
+  contact_pref: 'chat' | 'whatsapp'; chat_n: number; chat_waiting: boolean; assigned_to: string | null; assigned_name: string | null; fulfilled_at: string | null; items: { name: string; qty: number; sku?: string | null }[];
 };
 type Msg = { id: string; mine: boolean; body: string; at: string; who: string | null };
 type Data = { can_resolve: boolean; can_assign: boolean; me: string; workers: { id: string; name: string }[]; orders: Order[] };
@@ -112,7 +113,7 @@ export function StoreOrders({ companyId, currency, flash }: { companyId: string;
       {o.kind === 'delivery' && (
         <p className="text-sm">📍 {o.address}{o.lat != null && o.lng != null && <> <a href={`https://maps.google.com/?q=${o.lat},${o.lng}`} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-600 dark:text-blue-400">· {t('dl.map')}</a></>}</p>
       )}
-      <ul className="mt-1 text-sm">{o.items.map((i, k) => <li key={k}>{i.qty} × {i.name}</li>)}</ul>
+      <ul className="mt-1 text-sm">{o.items.map((i, k) => <li key={k}>{i.qty} × {i.name}<SkuTag sku={i.sku} /></li>)}</ul>
       {o.notes && <p className={`mt-1 text-sm ${ui.muted}`}>📝 {o.notes}</p>}
       <p className={`mt-1 text-xs ${ui.muted}`}>{shortTime(o.at, lang)}</p>
       {o.status === 'pending' && d.can_resolve && (

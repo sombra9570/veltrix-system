@@ -10,6 +10,7 @@ import { money, parseAmount } from './format';
 import { QrRequests, TableQrCard } from './table-qr';
 import { DeliveryRequests, DeliveryBoard, DeliverySetup, CashReceive, CourierBoard } from './delivery';
 import { useLive } from './live';
+import { SkuTag } from './sku-tag';
 
 type Branch = { id: string; name: string; company: string; currency: string };
 type Table = {
@@ -437,7 +438,7 @@ function SetupPanel({ branchId, tables, onChanged, flash }: {
 }
 
 /* ---------- Pantalla de cocina ---------- */
-type KItem = { item_id: string; order_id: string; order_type: string; table_name: string | null; description: string; qty: number; notes: string | null; modifiers: string | null; kitchen_status: 'pending' | 'preparing' | 'ready'; created_at: string };
+type KItem = { item_id: string; order_id: string; order_type: string; table_name: string | null; description: string; qty: number; notes: string | null; modifiers: string | null; kitchen_status: 'pending' | 'preparing' | 'ready'; created_at: string; sku?: string | null };
 
 export function KitchenScreen() {
   const { t, lang } = useT();
@@ -461,7 +462,15 @@ export function KitchenScreen() {
 
   const load = useCallback(async () => {
     if (!branchId) return;
-    try { setItems(await rpc<KItem[]>('get_kitchen_queue', { p_branch: branchId, p_station: null }) ?? []); } catch { /* */ }
+    try {
+      const q = (await rpc<KItem[]>('get_kitchen_queue', { p_branch: branchId, p_station: null })) ?? [];
+      let codes = new Map<string, string>();
+      try {
+        const c = q.length ? await rpc<{ item_id: string; sku: string }[]>('kitchen_item_codes', { p_branch: branchId, p_items: q.map((x) => x.item_id) }) : [];
+        codes = new Map((c ?? []).map((x) => [x.item_id, x.sku]));
+      } catch { /* sin códigos: la cocina sigue igual */ }
+      setItems(q.map((x) => ({ ...x, sku: codes.get(x.item_id) ?? null })));
+    } catch { /* */ }
     setNow(Date.now());
   }, [branchId]);
   useEffect(() => {
@@ -516,7 +525,7 @@ export function KitchenScreen() {
                           : it.kitchen_status === 'preparing' ? 'bg-blue-100 dark:bg-blue-500/15' : 'bg-amber-50 dark:bg-amber-500/10'}`}>
                       <span className="text-2xl font-extrabold">{Number(it.qty)}</span>
                       <span className="min-w-0 flex-1">
-                        <span className="block font-bold">{it.description}</span>
+                        <span className="block font-bold">{it.description}<SkuTag sku={it.sku} /></span>
                         {(it.notes || it.modifiers) && <span className="block text-xs font-semibold text-red-700 dark:text-red-300">📝 {[it.modifiers, it.notes].filter(Boolean).join(' · ')}</span>}
                       </span>
                       <span className="text-xs font-bold">{t(`rest.next.${it.kitchen_status}` as DictKey)} →</span>

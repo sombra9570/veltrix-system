@@ -1533,6 +1533,8 @@ const ja: Record<DictKey, string> = {
   "perm.inv.see_cost.d": "仕入原価と在庫評価額を見る。",
   "perm.inv.photo": "在庫商品に写真を付ける",
   "perm.inv.photo.d": "在庫の商品の任意の写真を追加・変更します。",
+  "perm.products.see_code": "商品コードを見る",
+  "perm.products.see_code.d": "注文・入金・厨房・出荷で、商品名の横に各商品のコードを表示します。お客様には表示されません。",
   "inv.photo": "商品写真",
   "inv.photoHint": "任意です。棚卸しで見分けやすく、バリエーションの取り違えを防ぎます。モデルの場合はすべてのサイズと色に適用されます。",
   "appr.refundSale": "販売の返金",

@@ -9,6 +9,6 @@ export function roleAvailable(role: string, modules: string[]): boolean {
 export function keyAvailable(key: string, modules: string[]): boolean {
   if (modules.length === 0) return true;
   if (/^(loans|routes|collector)\./.test(key)) return modules.includes('field_collection');
-  if (/^(inv|products)\./.test(key)) return modules.includes('inventory');
+  if (/^(inv|products)\./.test(key) && key !== 'products.see_code') return modules.includes('inventory');
   return true;
 }

@@ -1533,6 +1533,8 @@ const ko: Record<DictKey, string> = {
   "perm.inv.see_cost.d": "매입 원가와 재고 가치를 봅니다.",
   "perm.inv.photo": "재고 상품에 사진 추가",
   "perm.inv.photo.d": "재고 상품의 선택 사진을 추가하거나 변경합니다.",
+  "perm.products.see_code": "상품 코드 보기",
+  "perm.products.see_code.d": "주문, 수금, 주방, 출고에서 상품 이름 옆에 코드를 표시합니다. 고객에게는 절대 보이지 않습니다.",
   "inv.photo": "상품 사진",
   "inv.photoHint": "선택 사항입니다. 재고 확인 시 구분하기 쉽고 옵션 혼동을 막아 줍니다. 모델은 모든 사이즈와 색상에 적용됩니다.",
   "appr.refundSale": "판매 환불",

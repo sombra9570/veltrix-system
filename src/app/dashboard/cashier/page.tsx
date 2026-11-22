@@ -9,6 +9,7 @@ import type { DictKey } from '../../i18n/es';
 import { money, shortTime, parseAmount } from '../format';
 import { QrPayBox, attachPaymentProof, useShiftQr } from '../sale-files';
 import { RestaurantInbox } from '../delivery';
+import { SkuTag } from '../sku-tag';
 
 type Method = 'cash' | 'qr_transfer' | 'card';
 type MovType = 'expense' | 'withdrawal' | 'deposit' | 'change_fund';
@@ -28,7 +29,7 @@ type QueueRow = {
   total: number; balance: number; created_at: string;
 };
 type Settlement = { settlement_id: string; route_name: string; collector_name: string; created_at: string };
-type Item = { description: string; qty: number; unit_price: number; line_total: number };
+type Item = { description: string; qty: number; unit_price: number; line_total: number; sku?: string | null };
 
 type Tab = 'queue' | 'debts' | 'settlements' | 'movements' | 'payments' | 'close';
 const TABS: { id: Tab; icon: string; label: DictKey }[] = [
@@ -285,7 +286,7 @@ function QueueTab({
     setProof(null);
     setReceived('');
     setItems([]);
-    try { setItems((await rpc<Item[]>('cashier_order_items', { p_order: row.order_id })) ?? []); } catch { /* opcional */ }
+    try { setItems((await rpc<Item[]>('cashier_order_items_v2', { p_order: row.order_id })) ?? []); } catch { /* opcional */ }
   };
 
   if (queue.length === 0 && !active) {
@@ -363,7 +364,7 @@ function QueueTab({
               <ul className="space-y-1 text-sm">
                 {items.map((it, i) => (
                   <li key={i} className="flex justify-between gap-3">
-                    <span className="min-w-0 truncate">{Number(it.qty)} × {it.description}</span>
+                    <span className="min-w-0 truncate">{Number(it.qty)} × {it.description}<SkuTag sku={it.sku} /></span>
                     <span className="shrink-0 font-semibold">{fmt(it.line_total)}</span>
                   </li>
                 ))}

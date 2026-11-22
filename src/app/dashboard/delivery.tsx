@@ -14,16 +14,17 @@ import { PhotoPicker } from './photo-picker';
 import { QrRequests } from './table-qr';
 import Link from 'next/link';
 import { useLive } from './live';
+import { SkuTag } from './sku-tag';
 
 type Flash = (ok: boolean, text: string) => void;
 type Req = {
   id: string; at: string; customer: string; phone: string; address: string; reference: string | null; lat: number | null; lng: number | null;
   notes: string | null; pay_pref: 'qr' | 'cash'; zone: string | null; fee: number; eta_min: number | null; subtotal: number;
-  items: { name: string; qty: number; notes: string | null }[];
+  items: { name: string; qty: number; notes: string | null; sku?: string | null }[];
 };
 type Del = {
   id: string; at: string; address: string; notes: string | null; status: 'pending' | 'dispatched' | 'delivered' | 'failed'; total: number; currency: string;
-  paid: number; driver: string | null; mine: boolean; eta_min: number | null; items: { description: string; qty: number }[];
+  paid: number; driver: string | null; mine: boolean; eta_min: number | null; items: { description: string; qty: number; sku?: string | null }[];
   lat: number | null; lng: number | null; phone: string | null; customer: string | null;
   cash_mode: 'none' | 'fee' | 'full'; expected: number; collected: { amount: number; status: 'with_driver' | 'received' } | null;
 };
@@ -82,7 +83,7 @@ export function DeliveryRequests({ branchId, currency, onChanged, flash }: {
               </div>
               <p className="text-sm">📍 {r.address}{r.reference ? ` (${r.reference})` : ''} {map && <a href={map} target="_blank" rel="noreferrer" className="font-semibold text-blue-600 dark:text-blue-400">· {t('dl.map')}</a>}</p>
               <p className={`text-xs ${ui.muted}`}>{r.zone} · {r.fee > 0 ? `${t('dl.fee')} ${fmt(r.fee)}` : t('dl.free')}{r.eta_min ? ` · ~${r.eta_min} min` : ''}</p>
-              <ul className="mt-1 text-sm">{r.items.map((i, k) => <li key={k}>{i.qty} × {i.name}{i.notes ? <span className={ui.muted}> — {i.notes}</span> : null}</li>)}</ul>
+              <ul className="mt-1 text-sm">{r.items.map((i, k) => <li key={k}>{i.qty} × {i.name}<SkuTag sku={i.sku} />{i.notes ? <span className={ui.muted}> — {i.notes}</span> : null}</li>)}</ul>
               {r.notes && <p className={`mt-1 text-sm ${ui.muted}`}>📝 {r.notes}</p>}
               <p className={`mt-1 text-xs ${ui.muted}`}>{r.pay_pref === 'qr' ? `📲 ${t('tq.prefQr')}` : `💵 ${t('tq.prefCash')}`}</p>
               <div className="mt-2 grid grid-cols-2 gap-2">
@@ -185,7 +186,7 @@ export function DeliveryBoard({ branchId, currency, flash, showEmpty = false, dr
                 </span>
               </div>
               {o.notes && <p className={`text-xs ${ui.muted}`}>{o.notes}</p>}
-              <ul className="mt-1 text-sm">{o.items.map((i, k) => <li key={k}>{i.qty} × {i.description}</li>)}</ul>
+              <ul className="mt-1 text-sm">{o.items.map((i, k) => <li key={k}>{i.qty} × {i.description}<SkuTag sku={i.sku} /></li>)}</ul>
               {(o.customer || o.phone) && <p className="mt-1 text-sm">{o.customer}{o.phone && <a href={`tel:${o.phone}`} className="font-semibold text-blue-600 dark:text-blue-400"> · 📞 {o.phone}</a>}</p>}
               {o.lat != null && o.lng != null && (
                 <a href={directionsUrl(Number(o.lat), Number(o.lng))} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sm font-semibold text-blue-600 dark:text-blue-400">🧭 {t('dl.how')}</a>

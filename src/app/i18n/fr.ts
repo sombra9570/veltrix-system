@@ -1533,6 +1533,8 @@ const fr: Record<DictKey, string> = {
   "perm.inv.see_cost.d": "Voir le coût d’achat et la valeur du stock.",
   "perm.inv.photo": "Ajouter des photos aux produits de l'inventaire",
   "perm.inv.photo.d": "Ajouter ou changer la photo facultative d'un produit dans l'inventaire.",
+  "perm.products.see_code": "Voir le code de l'article",
+  "perm.products.see_code.d": "Affiche le code de chaque article à côté du nom dans les commandes, encaissements, cuisine et expédition. Le client ne le voit jamais.",
   "inv.photo": "Photo du produit",
   "inv.photoHint": "Facultative. Aide à l'identifier lors du comptage et à ne pas confondre les variantes. Pour un modèle, elle vaut pour toutes les tailles et couleurs.",
   "appr.refundSale": "Remboursement de vente",

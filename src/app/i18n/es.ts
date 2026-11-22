@@ -1542,6 +1542,8 @@ const es = {
   "perm.inv.see_cost.d": "Ver el costo de compra y el valor del inventario.",
   "perm.inv.photo": "Poner foto a productos del inventario",
   "perm.inv.photo.d": "Poner o cambiar la foto opcional de un producto en el inventario.",
+  "perm.products.see_code": "Ver el código del artículo",
+  "perm.products.see_code.d": "Muestra el código de cada artículo junto al nombre en pedidos, cobros, cocina y despacho. El cliente nunca lo ve.",
   "inv.photo": "Foto del producto",
   "inv.photoHint": "Opcional. Ayuda a identificarlo al contar y a no confundir variantes. Si es un modelo, vale para todas sus tallas y colores.",
   "appr.refundSale": "Devolución de venta",

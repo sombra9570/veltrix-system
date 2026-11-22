@@ -1533,6 +1533,8 @@ const de: Record<DictKey, string> = {
   "perm.inv.see_cost.d": "Einkaufskosten und Lagerwert sehen.",
   "perm.inv.photo": "Fotos für Inventarprodukte hinzufügen",
   "perm.inv.photo.d": "Das optionale Foto eines Produkts im Inventar hinzufügen oder ändern.",
+  "perm.products.see_code": "Artikelcode sehen",
+  "perm.products.see_code.d": "Zeigt den Code jedes Artikels neben dem Namen in Bestellungen, Zahlungen, Küche und Versand. Kunden sehen ihn nie.",
   "inv.photo": "Produktfoto",
   "inv.photoHint": "Optional. Hilft beim Zählen, das Produkt zu erkennen und Varianten nicht zu verwechseln. Bei einem Modell gilt es für alle Größen und Farben.",
   "appr.refundSale": "Rückerstattung",

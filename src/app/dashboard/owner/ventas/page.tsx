@@ -8,6 +8,7 @@ import { useT } from '../../../i18n';
 import { money, shortTime } from '../../format';
 import { Sheet, BranchOpt, isoDay } from '../../sheet';
 import { friendlyError } from '../owner-context';
+import { SkuTag } from '../../sku-tag';
 
 type Row = {
   id: string; at: string; status: 'confirmed' | 'cancelled'; condition: 'cash' | 'credit';
@@ -24,7 +25,7 @@ type List = {
 type Detail = {
   id: string; at: string; status: string; condition: string; approval: string | null; total: number; paid: number;
   currency: string; notes: string | null; customer: string | null; vendor: string | null;
-  items: { description: string; qty: number; price: number; total: number }[];
+  items: { description: string; qty: number; price: number; total: number; sku?: string | null }[];
   installments: { number: number; due: string; amount: number; paid: number }[];
   payments: { at: string; method: string; amount: number; by: string | null; origin: string }[];
 };
@@ -238,7 +239,7 @@ export default function SalesPage() {
             <ul className="divide-y divide-slate-200 rounded-xl border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
               {detail.items.map((i, k) => (
                 <li key={k} className="flex justify-between gap-3 p-3 text-sm">
-                  <span className="min-w-0"><span className="font-semibold">{Number(i.qty)} ×</span> {i.description} <span className={ui.muted}>({fmt(i.price)})</span></span>
+                  <span className="min-w-0"><span className="font-semibold">{Number(i.qty)} ×</span> {i.description}<SkuTag sku={i.sku} /> <span className={ui.muted}>({fmt(i.price)})</span></span>
                   <span className="shrink-0 font-semibold">{fmt(i.total)}</span>
                 </li>
               ))}

@@ -6,11 +6,12 @@ import { ui } from '../site-header';
 import { useT } from '../i18n';
 import { money } from './format';
 import { useLive } from './live';
+import { SkuTag } from './sku-tag';
 
 type MBranch = { id: string; name: string; company: string };
 type DOrder = {
   id: string; at: string; total: number; currency: string; customer: string | null; phone: string | null;
-  vendor: string; notes: string | null; items: { description: string; qty: number }[];
+  vendor: string; notes: string | null; items: { description: string; qty: number; sku?: string | null }[];
   delivered_at: string | null; delivered_by: string | null; note: string | null;
 };
 type Queue = { enabled: boolean; manager: boolean; orders: DOrder[] };
@@ -108,7 +109,7 @@ export function DispatchScreen() {
                         <p className="shrink-0 font-bold">{money(Number(o.total), o.currency, lang)}</p>
                       </div>
                       <ul className="rounded-xl bg-slate-50 p-3 text-sm dark:bg-slate-800/50">
-                        {o.items.map((i, k) => <li key={k}><b>{qty(i.qty)}</b> × {i.description}</li>)}
+                        {o.items.map((i, k) => <li key={k}><b>{qty(i.qty)}</b> × {i.description}<SkuTag sku={i.sku} /></li>)}
                       </ul>
                       {o.notes && <p className="text-xs">📝 {o.notes}</p>}
                       {o.delivered_at ? (
