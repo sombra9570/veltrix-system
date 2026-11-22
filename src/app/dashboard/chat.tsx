@@ -29,6 +29,9 @@ export function ChatScreen() {
   const [photos, setPhotos] = useState<Record<string, string>>({});
   const [err, setErr] = useState('');
   const [days, setDays] = useState<number | null>(null);
+  // Conversación que se está abriendo: evita mostrar mensajes de la anterior y descarta respuestas tardías
+  const [loadingMsgs, setLoadingMsgs] = useState(false);
+  const openId = useRef<string | null>(null);
   const bottom = useRef<HTMLDivElement | null>(null);
   const names = useRef<Map<string, string>>(new Map());
 
@@ -71,16 +74,21 @@ export function ChatScreen() {
   }, [photos]);
 
   const openChannel = useCallback(async (c: Channel) => {
+    const same = openId.current === c.id;
+    openId.current = c.id;
     setActive(c);
     setPicking(false);
     setErr('');
+    if (!same) { setMsgs([]); setText(''); setLoadingMsgs(true); }
     try {
       const h = await rpc<Msg[]>('chat_history', { p_channel: c.id, p_before: null, p_limit: 60 });
+      if (openId.current !== c.id) return;
       setMsgs(h ?? []);
       signPhotos(h ?? []);
       await rpc('chat_mark_read', { p_channel: c.id });
       setChannels((list) => list?.map((x) => (x.id === c.id ? { ...x, unread: 0 } : x)) ?? list);
-    } catch { setErr(t('err.generic')); }
+    } catch { if (openId.current === c.id) setErr(t('err.generic')); }
+    finally { if (openId.current === c.id) setLoadingMsgs(false); }
   }, [signPhotos, t]);
 
   // Mensajes nuevos en vivo
@@ -210,11 +218,12 @@ export function ChatScreen() {
         ) : (
           <>
             <div className="flex items-center gap-3 border-b border-slate-200 p-3 dark:border-slate-800">
-              <button type="button" onClick={() => setActive(null)} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 lg:hidden cursor-pointer dark:border-slate-700">←</button>
+              <button type="button" onClick={() => { openId.current = null; setActive(null); setMsgs([]); setLoadingMsgs(false); }} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 lg:hidden cursor-pointer dark:border-slate-700">←</button>
               <h2 className="min-w-0 flex-1 truncate font-bold">{title(active)}</h2>
             </div>
             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3">
-              {msgs.length === 0 && <p className={`py-8 text-center text-sm ${ui.muted}`}>{t('chat.empty')}</p>}
+              {loadingMsgs && msgs.length === 0 && <p className={`py-8 text-center text-sm ${ui.muted}`}>{t('common.wait')}</p>}
+              {!loadingMsgs && msgs.length === 0 && <p className={`py-8 text-center text-sm ${ui.muted}`}>{t('chat.empty')}</p>}
               {grouped.map((g) => (
                 <div key={g.day} className="space-y-2">
                   <p className={`text-center text-[11px] font-semibold uppercase ${ui.muted}`}>{g.day}</p>

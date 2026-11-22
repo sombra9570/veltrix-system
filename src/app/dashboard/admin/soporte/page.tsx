@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useVeltrixAuth } from '../../../auth-system';
@@ -292,9 +292,14 @@ function ChatTab() {
   }, []);
   const load = useCallback(async () => {
     if (!who) return;
-    try { setList((await rpc<Chat[]>('platform_chat_list', { p_with: who })) ?? []); } catch (e) { setMsg(err(e)); }
+    try {
+      const r = (await rpc<Chat[]>('platform_chat_list', { p_with: who })) ?? [];
+      if (whoRef.current === who) setList(r);
+    } catch (e) { setMsg(err(e)); }
   }, [who]);
-  useEffect(() => { load(); }, [load]);
+  // Al cambiar de contacto se limpia lo del anterior antes de cargar el nuevo
+  const whoRef = useRef(who);
+  useEffect(() => { whoRef.current = who; setList([]); setText(''); setMsg(''); load(); }, [load, who]);
   const [uid, setUid] = useState<string | null>(null);
   useEffect(() => { supabase.auth.getSession().then(({ data }) => setUid(data.session?.user.id ?? null)); }, []);
   useLiveTopic(uid ? `plat:${uid}` : null, load);
