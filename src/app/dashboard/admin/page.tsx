@@ -11,6 +11,9 @@ import { NetBanner } from '../sync';
 import { PlatformBell } from './platform-bell';
 import { PurgeOrg, SweepFiles, AutoPurgePanel } from './purge-org';
 import { BUSINESS_CATEGORIES } from '../../business-catalog';
+import { AvisosPanel } from './avisos-panel';
+import { RecursosPanel } from './recursos-panel';
+import { ActividadPanel } from './actividad-panel';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -30,7 +33,7 @@ type Metrics = {
 };
 
 type Filter = 'all' | Stage;
-type AdminTab = 'summary' | 'orgs' | 'plans' | 'tools';
+type AdminTab = 'home' | 'clients' | 'billing' | 'plans' | 'notices' | 'usage' | 'activity' | 'tools';
 // Estructura de cada organización (solo cuántas empresas, sucursales, usuarios y módulos; nunca sus datos de negocio)
 type OrgOverview = {
   org_id: string; users: number; modules: string[]; roles: Record<string, number>;
@@ -93,7 +96,7 @@ export default function GlobalCoreAdminPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
-  const [tab, setTab] = useState<AdminTab>('summary');
+  const [tab, setTab] = useState<AdminTab>('home');
   const [ov, setOv] = useState<Record<string, OrgOverview>>({});
   const [open, setOpen] = useState<string | null>(null);
   // Correo desde el dominio de Veltrix (no desde el correo personal del teléfono)
@@ -269,18 +272,22 @@ export default function GlobalCoreAdminPage() {
     <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
       {cards.map((c) => (
         <button key={c.key} onClick={() => onPick(c.key)}
-          className={`cursor-pointer rounded-xl border p-4 text-left transition ${filter === c.key && tab === 'orgs' ? c.on : 'border-slate-800 bg-slate-900/50 hover:border-slate-600'}`}>
+          className={`cursor-pointer rounded-xl border p-4 text-left transition ${filter === c.key && tab === 'clients' ? c.on : 'border-slate-800 bg-slate-900/50 hover:border-slate-600'}`}>
           <p className="text-xs font-semibold text-slate-400">{c.label}</p>
           <p className={`mt-1 text-2xl font-extrabold ${c.text}`}>{c.value}</p>
         </button>
       ))}
     </div>
   );
-  const TABS: { id: AdminTab; label: string }[] = [
-    { id: 'summary', label: '📊 Resumen' },
-    { id: 'orgs', label: `🏢 Organizaciones (${f.total})` },
-    { id: 'plans', label: '💳 Planes y cobros' },
-    { id: 'tools', label: '🛠️ Herramientas' },
+  const TABS: { id: AdminTab; icon: string; label: string; n?: number }[] = [
+    { id: 'home', icon: '📊', label: 'Inicio' },
+    { id: 'clients', icon: '🏢', label: 'Clientes', n: f.total },
+    { id: 'billing', icon: '💵', label: 'Cobros' },
+    { id: 'plans', icon: '🏷️', label: 'Planes' },
+    { id: 'notices', icon: '📣', label: 'Avisos' },
+    { id: 'usage', icon: '📦', label: 'Recursos' },
+    { id: 'activity', icon: '🧾', label: 'Actividad' },
+    { id: 'tools', icon: '🛠️', label: 'Plataforma' },
   ];
 
   return (
@@ -329,26 +336,31 @@ export default function GlobalCoreAdminPage() {
           </div>
         </header>
 
-        <RegionalStatusBar />
-
         {error && (
           <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-xs font-semibold">
             ⚠️ {error}
           </div>
         )}
 
-        <nav className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" role="tablist">
+        <div className="grid items-start gap-5 lg:grid-cols-[13rem_minmax(0,1fr)]">
+        <nav className="grid grid-cols-3 gap-1.5 lg:sticky lg:top-4 lg:grid-cols-1" role="tablist" aria-label="Secciones">
           {TABS.map((x) => (
             <button key={x.id} type="button" role="tab" aria-selected={tab === x.id} onClick={() => setTab(x.id)}
-              className={`shrink-0 cursor-pointer rounded-xl border px-4 py-2.5 text-sm font-bold ${tab === x.id ? 'border-blue-500 bg-blue-600 text-white' : 'border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-600'}`}>
-              {x.label}
+              className={`flex cursor-pointer flex-col items-center gap-0.5 rounded-xl border px-2 py-2.5 text-xs font-bold lg:flex-row lg:gap-2.5 lg:px-3 lg:text-sm ${tab === x.id ? 'border-blue-500 bg-blue-600 text-white' : 'border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-600'}`}>
+              <span className="text-base lg:text-lg" aria-hidden>{x.icon}</span>
+              <span className="truncate">{x.label}</span>
+              {x.n !== undefined && <span className={`rounded-full px-1.5 text-[10px] lg:ms-auto ${tab === x.id ? 'bg-white/25' : 'bg-slate-800 text-slate-300'}`}>{x.n}</span>}
             </button>
           ))}
+          <a href="/dashboard/admin/soporte" className="flex cursor-pointer flex-col items-center gap-0.5 rounded-xl border border-sky-500/30 bg-sky-500/10 px-2 py-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 lg:flex-row lg:gap-2.5 lg:px-3 lg:text-sm">
+            <span className="text-base lg:text-lg" aria-hidden>🎧</span><span className="truncate">Soporte</span>
+          </a>
         </nav>
+        <div className="min-w-0 space-y-6">
 
-        {tab === 'summary' && (
+        {tab === 'home' && (
         <>
-        {funnelEl((k) => { setFilter(k); setTab('orgs'); })}
+        {funnelEl((k) => { setFilter(k); setTab('clients'); })}
 
         {/* CONVERSIÓN Y BAJAS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -523,6 +535,11 @@ export default function GlobalCoreAdminPage() {
           )}
         </section>
 
+        </>
+        )}
+
+        {tab === 'billing' && (
+        <>
         {/* PAGOS POR TRANSFERENCIA O QR */}
         <TransferAdmin />
 
@@ -586,7 +603,7 @@ export default function GlobalCoreAdminPage() {
         </>
         )}
 
-        {tab === 'orgs' && (
+        {tab === 'clients' && (
           <section className="space-y-3">
             {funnelEl((k) => setFilter(k))}
             <h2 className="text-sm font-bold">
@@ -676,14 +693,21 @@ export default function GlobalCoreAdminPage() {
         )}
 
 
+        {tab === 'notices' && <AvisosPanel orgs={(m?.organizations ?? []).map((o) => ({ org_id: o.org_id, name: o.name }))} />}
+        {tab === 'usage' && <RecursosPanel />}
+        {tab === 'activity' && <ActividadPanel />}
+
         {tab === 'tools' && (
           <section className="space-y-3">
-            <h2 className="text-sm font-bold">🛠️ Herramientas de la plataforma</h2>
+            <h2 className="text-sm font-bold">🛠️ Plataforma</h2>
+            <RegionalStatusBar />
             <div className="flex flex-wrap items-start gap-2"><AutoPurgePanel onDone={setPurgeDone} /><SweepFiles onDone={setPurgeDone} /></div>
             {purgeDone && <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2 text-xs font-semibold text-emerald-300">{purgeDone}</p>}
           </section>
         )}
 
+        </div>
+        </div>
       </div>
       {mailMsg && !mail && (
         <div className="fixed inset-x-0 bottom-4 z-50 mx-auto w-fit max-w-[90vw] rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold shadow-xl">{mailMsg}</div>
