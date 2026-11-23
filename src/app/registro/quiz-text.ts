@@ -12,7 +12,7 @@ const es = {
   'sells.q': '¿Qué vende tu negocio?', 'sells.hint': 'Elige lo que mejor te describa.',
   'sells.products': 'Productos', 'sells.products.d': 'Vendo cosas: ropa, comida empacada, repuestos, medicinas…',
   'sells.services': 'Servicios', 'sells.services.d': 'Vendo mi trabajo o atención: comidas, reparaciones, citas, préstamos…',
-  'sells.both': 'Las dos cosas', 'sells.both.d': 'Vendo productos y además presto servicios.',
+  'sells.both': 'Mixto', 'sells.both.d': 'Vendo productos y además presto servicios.',
   'biz.q': '¿Cuántos negocios distintos quieres manejar aquí?', 'biz.hint': 'Un negocio puede tener varias sucursales. Aquí cuenta cada negocio diferente (por ejemplo, un restaurante y una ferretería son 2).',
   'biz.1': '1', 'biz.2': '2', 'biz.3': '3 o más',
   'br.q': '¿Cuántos locales o sucursales tienes en total?', 'br.hint': 'Cuenta todos tus locales, de todos tus negocios.',
