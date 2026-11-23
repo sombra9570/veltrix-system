@@ -10,6 +10,7 @@ import { TransferAdmin } from './transfer-admin';
 import { NetBanner } from '../sync';
 import { PlatformBell } from './platform-bell';
 import { PurgeOrg, SweepFiles, AutoPurgePanel } from './purge-org';
+import { BUSINESS_CATEGORIES } from '../../business-catalog';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -29,6 +30,23 @@ type Metrics = {
 };
 
 type Filter = 'all' | Stage;
+type AdminTab = 'summary' | 'orgs' | 'plans' | 'tools';
+// Estructura de cada organización (solo cuántas empresas, sucursales, usuarios y módulos; nunca sus datos de negocio)
+type OrgOverview = {
+  org_id: string; users: number; modules: string[]; roles: Record<string, number>;
+  limits: { companies: number; branches: number; users: number };
+  companies: { name: string; type: string; cats: string[]; branches: string[] }[];
+};
+const CAT_LABEL: Record<string, string> = Object.fromEntries(BUSINESS_CATEGORIES.map((c) => [c.id, `${c.icon} ${c.label.split(' / ')[0]}`]));
+const ROLE_LABEL: Record<string, string> = {
+  owner: 'Dueño', supervisor: 'Supervisor', cashier: 'Cajero', vendor: 'Vendedor', collector: 'Cobrador', waiter: 'Mesero',
+  kitchen: 'Cocina', technician: 'Técnico', storekeeper: 'Almacén', accountant: 'Contador', director: 'Director',
+  secretary: 'Secretaría', reception: 'Recepción', delivery: 'Delivery',
+};
+const MOD_LABEL: Record<string, string> = {
+  retail: 'Ventas', inventory: 'Inventario', purchasing: 'Compras', finance: 'Finanzas', restaurant: 'Restaurante',
+  workshop: 'Taller', field_collection: 'Cobranza en calle', distribution: 'Distribución', hr: 'Personal',
+};
 
 const STAGE_INFO: Record<Stage, { label: string; badge: string }> = {
   trial:     { label: '🧪 En prueba',  badge: 'bg-sky-500/10 text-sky-300 border-sky-500/30' },
@@ -75,6 +93,9 @@ export default function GlobalCoreAdminPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
+  const [tab, setTab] = useState<AdminTab>('summary');
+  const [ov, setOv] = useState<Record<string, OrgOverview>>({});
+  const [open, setOpen] = useState<string | null>(null);
   // Correo desde el dominio de Veltrix (no desde el correo personal del teléfono)
   const [mail, setMail] = useState<{ to: string; name: string; subject: string; text: string } | null>(null);
   // Veltrix IA: cupo mensual por organización
@@ -202,6 +223,13 @@ export default function GlobalCoreAdminPage() {
     if (loaded && (!session || session.role !== 'superadmin')) router.replace('/');
   }, [loaded, session, router]);
 
+  const loadOv = useCallback(async () => {
+    try {
+      const rows = await rpc<OrgOverview[]>('admin_org_overview');
+      setOv(Object.fromEntries((rows ?? []).map((r) => [r.org_id, r])));
+    } catch { /* la lista básica sigue funcionando */ }
+  }, []);
+
   const refresh = useCallback(async () => {
     setBusy(true);
     setError('');
@@ -215,8 +243,8 @@ export default function GlobalCoreAdminPage() {
   }, []);
 
   useEffect(() => {
-    if (loaded && session?.role === 'superadmin') refresh();
-  }, [loaded, session, refresh]);
+    if (loaded && session?.role === 'superadmin') { refresh(); loadOv(); }
+  }, [loaded, session, refresh, loadOv]);
 
   if (!loaded || !session || session.role !== 'superadmin') {
     return <div className="grid min-h-dvh place-items-center bg-slate-950"><Spinner /></div>;
@@ -234,6 +262,25 @@ export default function GlobalCoreAdminPage() {
     { key: 'paying',    label: '🟢 Pagando',       value: f.paying,    on: 'bg-emerald-950/40 border-emerald-500', text: 'text-emerald-300' },
     { key: 'grace',     label: '🟡 En gracia',     value: f.grace,     on: 'bg-amber-950/40 border-amber-500',     text: 'text-amber-300' },
     { key: 'suspended', label: '🔴 Suspendidas',   value: f.suspended, on: 'bg-red-950/40 border-red-500',         text: 'text-red-300' },
+  ];
+
+
+  const funnelEl = (onPick: (k: Filter) => void) => (
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+      {cards.map((c) => (
+        <button key={c.key} onClick={() => onPick(c.key)}
+          className={`cursor-pointer rounded-xl border p-4 text-left transition ${filter === c.key && tab === 'orgs' ? c.on : 'border-slate-800 bg-slate-900/50 hover:border-slate-600'}`}>
+          <p className="text-xs font-semibold text-slate-400">{c.label}</p>
+          <p className={`mt-1 text-2xl font-extrabold ${c.text}`}>{c.value}</p>
+        </button>
+      ))}
+    </div>
+  );
+  const TABS: { id: AdminTab; label: string }[] = [
+    { id: 'summary', label: '📊 Resumen' },
+    { id: 'orgs', label: `🏢 Organizaciones (${f.total})` },
+    { id: 'plans', label: '💳 Planes y cobros' },
+    { id: 'tools', label: '🛠️ Herramientas' },
   ];
 
   return (
@@ -290,21 +337,18 @@ export default function GlobalCoreAdminPage() {
           </div>
         )}
 
-        {/* EMBUDO DE EMPRESAS */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          {cards.map((c) => (
-            <button
-              key={c.key}
-              onClick={() => setFilter(c.key)}
-              className={`p-4 rounded-xl border text-left transition cursor-pointer ${
-                filter === c.key ? c.on : 'bg-slate-900/50 border-slate-800 hover:border-slate-600'
-              }`}
-            >
-              <p className="text-xs text-slate-400 font-semibold">{c.label}</p>
-              <p className={`text-2xl font-extrabold mt-1 ${c.text}`}>{c.value}</p>
+        <nav className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" role="tablist">
+          {TABS.map((x) => (
+            <button key={x.id} type="button" role="tab" aria-selected={tab === x.id} onClick={() => setTab(x.id)}
+              className={`shrink-0 cursor-pointer rounded-xl border px-4 py-2.5 text-sm font-bold ${tab === x.id ? 'border-blue-500 bg-blue-600 text-white' : 'border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-600'}`}>
+              {x.label}
             </button>
           ))}
-        </div>
+        </nav>
+
+        {tab === 'summary' && (
+        <>
+        {funnelEl((k) => { setFilter(k); setTab('orgs'); })}
 
         {/* CONVERSIÓN Y BAJAS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -327,6 +371,7 @@ export default function GlobalCoreAdminPage() {
           </div>
         </div>
 
+
         {/* CRECIMIENTO */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <section className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5">
@@ -348,6 +393,7 @@ export default function GlobalCoreAdminPage() {
             />
           </section>
         </div>
+
 
         {/* PRUEBAS POR VENCER */}
         <section className="bg-slate-900/60 border border-sky-900/50 rounded-2xl p-5 space-y-3">
@@ -388,7 +434,10 @@ export default function GlobalCoreAdminPage() {
             </div>
           )}
         </section>
-
+        </>
+        )}
+        {tab === 'plans' && (
+        <>
         {/* VELTRIX IA */}
         <section className="bg-slate-900/60 border border-violet-900/50 rounded-2xl p-5 space-y-3">
           <div>
@@ -534,43 +583,107 @@ export default function GlobalCoreAdminPage() {
             ))}
           </div>
         </section>
+        </>
+        )}
 
-        {/* LISTA DE ORGANIZACIONES */}
-        <section className="space-y-3">
-          <h2 className="text-sm font-bold">
-            🏢 {filter === 'all' ? 'Todas las organizaciones' : STAGE_INFO[filter].label} ({orgs.length})
-          </h2>
-          {orgs.length === 0 && (
-            <p className="text-xs text-slate-500 bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-              {busy ? 'Cargando…' : 'Todavía no hay empresas aquí. Cuando alguien se registre en veltrixsystem.app aparecerá en esta lista.'}
-            </p>
-          )}
-          <div className="mb-2 flex flex-wrap items-start gap-2"><AutoPurgePanel onDone={setPurgeDone} /><SweepFiles onDone={setPurgeDone} /></div>
-          {purgeDone && <p className="mb-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2 text-xs font-semibold text-emerald-300">{purgeDone}</p>}
-          {orgs.map((o) => (
-            <div key={o.org_id} className="p-4 rounded-xl border bg-slate-900/70 border-slate-800 flex flex-col md:flex-row justify-between gap-3">
-              <div className="space-y-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-bold">{o.name}</h3>
-                  <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-bold border ${STAGE_INFO[o.stage].badge}`}>
-                    {STAGE_INFO[o.stage].label}
-                  </span>
+        {tab === 'orgs' && (
+          <section className="space-y-3">
+            {funnelEl((k) => setFilter(k))}
+            <h2 className="text-sm font-bold">
+              🏢 {filter === 'all' ? 'Todas las organizaciones' : STAGE_INFO[filter].label} ({orgs.length})
+            </h2>
+            {orgs.length === 0 && (
+              <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-500">
+                {busy ? 'Cargando…' : 'No hay organizaciones en esta etapa.'}
+              </p>
+            )}
+            {orgs.map((o) => {
+              const d = ov[o.org_id];
+              const nBranches = d ? d.companies.reduce((a, c) => a + c.branches.length, 0) : 0;
+              const cats: string[] = d ? Array.from(new Set<string>(d.companies.flatMap((c) => c.cats))) : [];
+              const isOpen = open === o.org_id;
+              return (
+                <div key={o.org_id} className="space-y-3 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
+                  <div className="flex flex-col justify-between gap-3 md:flex-row">
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-bold">{o.name}</h3>
+                        <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${STAGE_INFO[o.stage].badge}`}>{STAGE_INFO[o.stage].label}</span>
+                        <span className="rounded-full border border-slate-700 px-2.5 py-0.5 text-[11px] font-bold text-slate-300">Plan {o.plan}</span>
+                      </div>
+                      <p className="truncate text-xs text-slate-400">{o.email}</p>
+                      <p className="text-[11px] text-slate-500">
+                        Registrada: {fmtDate(o.created_at)}
+                        {o.trial_ends_at && ` · Prueba hasta: ${fmtDate(o.trial_ends_at)}`}
+                        {` · Próximo cobro: ${fmtDate(o.next_billing_date)}`}
+                      </p>
+                    </div>
+                    <div className="self-end text-right md:self-center">
+                      <p className="text-[11px] text-slate-400">Mensualidad</p>
+                      <p className="text-lg font-bold text-emerald-400">{formatMoney(Number(o.price_usd))}</p>
+                    </div>
+                  </div>
+
+                  {d && (
+                    <>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        {([['🏢 Empresas', d.companies.length, d.limits.companies], ['📍 Sucursales', nBranches, d.limits.branches], ['👥 Usuarios', d.users, d.limits.users]] as const).map(([l, n, max]) => (
+                          <div key={l} className="rounded-lg border border-slate-800 bg-slate-950/50 px-2 py-2">
+                            <p className="text-[10px] font-semibold text-slate-400">{l}</p>
+                            <p className="text-base font-extrabold">{n}<span className="text-xs font-semibold text-slate-500"> / {max}</span></p>
+                          </div>
+                        ))}
+                      </div>
+                      {cats.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {cats.map((c) => <span key={c} className="rounded-full bg-blue-500/10 px-2.5 py-1 text-[11px] font-semibold text-blue-300">{CAT_LABEL[c] ?? c}</span>)}
+                        </div>
+                      )}
+                      <div className="flex flex-wrap gap-1.5">
+                        {d.modules.map((x) => <span key={x} className="rounded-md border border-slate-700 px-2 py-0.5 text-[10px] font-semibold text-slate-300">{MOD_LABEL[x] ?? x}</span>)}
+                      </div>
+                      <button type="button" onClick={() => setOpen(isOpen ? null : o.org_id)} className="cursor-pointer text-xs font-semibold text-sky-300 hover:underline">
+                        {isOpen ? '▲ Ocultar detalle' : '▼ Ver empresas, sucursales y equipo'}
+                      </button>
+                      {isOpen && (
+                        <div className="grid gap-3 md:grid-cols-2">
+                          <ul className="space-y-2">
+                            {d.companies.map((c) => (
+                              <li key={c.name} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3 text-xs">
+                                <p className="font-bold">{c.name}</p>
+                                <p className="text-slate-400">{c.cats.map((x) => CAT_LABEL[x] ?? x).join(' · ') || '—'}</p>
+                                <p className="mt-1 text-slate-500">📍 {c.branches.join(' · ') || 'Sin sucursales'}</p>
+                              </li>
+                            ))}
+                          </ul>
+                          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3 text-xs">
+                            <p className="mb-1 font-bold">Equipo por cargo</p>
+                            <ul className="space-y-0.5">
+                              {Object.entries(d.roles).map(([r, n]) => (
+                                <li key={r} className="flex justify-between"><span className="text-slate-300">{ROLE_LABEL[r] ?? r}</span><span className="font-bold">{n}</span></li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  <div className="flex justify-end"><PurgeOrg orgId={o.org_id} name={o.name} onDone={afterPurge} /></div>
                 </div>
-                <p className="text-xs text-slate-400">{o.email} · Plan {o.plan}</p>
-                <p className="text-[11px] text-slate-500">
-                  Registrada: {fmtDate(o.created_at)}
-                  {o.trial_ends_at && ` · Prueba hasta: ${fmtDate(o.trial_ends_at)}`}
-                  {` · Próximo cobro: ${fmtDate(o.next_billing_date)}`}
-                </p>
-              </div>
-              <div className="text-right self-end md:self-center">
-                <p className="text-[11px] text-slate-400">Mensualidad</p>
-                <p className="text-lg font-bold text-emerald-400">{formatMoney(Number(o.price_usd))}</p>
-                <PurgeOrg orgId={o.org_id} name={o.name} onDone={afterPurge} />
-              </div>
-            </div>
-          ))}
-        </section>
+              );
+            })}
+          </section>
+        )}
+
+
+        {tab === 'tools' && (
+          <section className="space-y-3">
+            <h2 className="text-sm font-bold">🛠️ Herramientas de la plataforma</h2>
+            <div className="flex flex-wrap items-start gap-2"><AutoPurgePanel onDone={setPurgeDone} /><SweepFiles onDone={setPurgeDone} /></div>
+            {purgeDone && <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2 text-xs font-semibold text-emerald-300">{purgeDone}</p>}
+          </section>
+        )}
+
       </div>
       {mailMsg && !mail && (
         <div className="fixed inset-x-0 bottom-4 z-50 mx-auto w-fit max-w-[90vw] rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold shadow-xl">{mailMsg}</div>
