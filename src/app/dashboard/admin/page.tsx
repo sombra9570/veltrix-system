@@ -135,7 +135,7 @@ export default function GlobalCoreAdminPage() {
       await Promise.all([loadPilots(), refresh()]);
     } catch (e) {
       const m = e instanceof Error ? e.message : '';
-      setPMsg(m.includes('INVALID') ? '⚠️ Revisa los números: días 1–180, descuento 0–90 %, meses 0–24.' : '⚠️ No se pudo guardar.');
+      setPMsg(m.includes('INVALID') ? '⚠️ Verifique los valores: días 1–180, descuento 0–90 %, meses 0–24.' : '⚠️ No se pudo guardar.');
     }
   };
   const clearPilot = async (org: string) => {
@@ -170,7 +170,7 @@ export default function GlobalCoreAdminPage() {
       await loadPlans();
     } catch (e) {
       const m = e instanceof Error ? e.message : '';
-      setPlanMsg(m.includes('INVALID') ? '⚠️ Revisa los valores: precios desde 0 y límites desde 1.' : '⚠️ No se pudo guardar el plan.');
+      setPlanMsg(m.includes('INVALID') ? '⚠️ Verifique los valores: precios desde 0 y límites desde 1.' : '⚠️ No se pudo guardar el plan.');
     }
   };
   // Extras pagados (usuarios, sucursales, almacenamiento)
@@ -179,7 +179,7 @@ export default function GlobalCoreAdminPage() {
   const [adEdit, setAdEdit] = useState<Record<string, Record<string, string>>>({});
   const loadAddons = useCallback(async () => { try { setAddons(await rpc<AdminAddon[]>('admin_addons') ?? []); } catch { /* */ } }, []);
   useEffect(() => { if (loaded && session?.role === 'superadmin') loadAddons(); }, [loaded, session, loadAddons]);
-  const ADDON_NAME: Record<string, string> = { user: '👤 Usuario extra', branch: '🏪 Sucursal extra', storage: '💾 Almacenamiento extra' };
+  const ADDON_NAME: Record<string, string> = { user: '👤 Usuario adicional', branch: '🏪 Sucursal adicional', storage: '💾 Almacenamiento adicional' };
   const adVal = (a: AdminAddon, k: keyof AdminAddon) => adEdit[a.code]?.[k as string] ?? String(a[k]);
   const saveAddon = async (a: AdminAddon) => {
     const v = (k: keyof AdminAddon) => Number(adVal(a, k).replace(',', '.'));
@@ -187,11 +187,11 @@ export default function GlobalCoreAdminPage() {
     try {
       await rpc('admin_save_addon', { p_code: a.code, p_price_usd: v('price_usd'), p_price_global_usd: v('price_global_usd'), p_max_units: v('max_units') });
       setAdEdit((e) => { const c = { ...e }; delete c[a.code]; return c; });
-      setPlanMsg(`✅ ${ADDON_NAME[a.code] ?? a.code} guardado. Cambia también el precio en Paddle.`);
+      setPlanMsg(`✅ ${ADDON_NAME[a.code] ?? a.code} guardado. Actualice también el precio en Paddle.`);
       await loadAddons();
     } catch (e) {
       const m = e instanceof Error ? e.message : '';
-      setPlanMsg(m.includes('INVALID') ? '⚠️ Revisa los valores: precios desde 0 y máximo entre 0 y 500.' : '⚠️ No se pudo guardar el extra.');
+      setPlanMsg(m.includes('INVALID') ? '⚠️ Verifique los valores: precios desde 0 y máximo entre 0 y 500.' : '⚠️ No se pudo guardar el complemento.');
     }
   };
   // Borrar empresas de prueba: pasos y clave de borrado en purge-org.tsx
@@ -213,8 +213,8 @@ export default function GlobalCoreAdminPage() {
       const j = await res.json().catch(() => ({}));
       if (res.ok) { setMail(null); setMailMsg('✅ Correo enviado desde Veltrix.'); }
       else setMailMsg(j.error === 'EMAIL_NOT_CONFIGURED'
-        ? '⚠️ Falta conectar el correo de Veltrix (Resend). Te guío en el chat.'
-        : '⚠️ No se pudo enviar el correo. Inténtalo otra vez.');
+        ? '⚠️ Falta configurar el correo de Veltrix (Resend).'
+        : '⚠️ No se pudo enviar el correo. Intente nuevamente.');
     } catch {
       setMailMsg('⚠️ Sin conexión.');
     } finally {
@@ -284,9 +284,9 @@ export default function GlobalCoreAdminPage() {
     { id: 'clients', icon: '🏢', label: 'Clientes', d: 'Organizaciones, empresas, sucursales, módulos y estado', n: f.total },
     { id: 'billing', icon: '💵', label: 'Cobros', d: 'Suscripciones, pagos y vencimientos' },
     { id: 'plans', icon: '🏷️', label: 'Planes', d: 'Precios, límites y funciones de cada plan' },
-    { id: 'notices', icon: '📣', label: 'Avisos', d: 'Mensajes que ven los clientes en su app' },
+    { id: 'notices', icon: '📣', label: 'Avisos', d: 'Mensajes visibles para los clientes en su aplicación' },
     { id: 'usage', icon: '📦', label: 'Recursos', d: 'Almacenamiento y consumo por cliente' },
-    { id: 'activity', icon: '🧾', label: 'Actividad', d: 'Quién hizo qué en la plataforma' },
+    { id: 'activity', icon: '🧾', label: 'Actividad', d: 'Registro de acciones realizadas en la plataforma' },
     { id: 'tools', icon: '🛠️', label: 'Plataforma', d: 'Idioma, país, limpieza y mantenimiento' },
   ];
 
@@ -404,7 +404,7 @@ export default function GlobalCoreAdminPage() {
         <section className="bg-slate-900/60 border border-sky-900/50 rounded-2xl p-5 space-y-3">
           <div>
             <h2 className="text-sm font-bold">⏰ Pruebas por vencer</h2>
-            <p className="text-[11px] text-slate-500">Escríbeles antes de que termine su prueba para convertirlos en clientes.</p>
+            <p className="text-[11px] text-slate-500">Contáctelos antes de que finalice el período de prueba para su conversión a clientes.</p>
           </div>
           {(m?.trials_expiring ?? []).length === 0 ? (
             <p className="text-xs text-slate-500">No hay empresas en prueba por ahora.</p>
@@ -426,8 +426,8 @@ export default function GlobalCoreAdminPage() {
                       type="button"
                       onClick={() => setMail({
                         to: x.email, name: x.name,
-                        subject: 'Tu prueba de Veltrix',
-                        text: `Hola, equipo de ${x.name}:\n\nTe escribimos porque a tu prueba gratis de Veltrix le ${x.days_left === 1 ? 'queda 1 día' : `quedan ${x.days_left} días`}. ¿Cómo te ha ido? Si tienes dudas o quieres ayuda para configurar tu negocio, responde este correo y te ayudamos.\n\nSaludos,\nEquipo Veltrix`,
+                        subject: 'Su período de prueba de Veltrix',
+                        text: `Estimado equipo de ${x.name}:\n\nLe escribimos porque a su período de prueba de Veltrix le ${x.days_left === 1 ? 'queda 1 día' : `quedan ${x.days_left} días`}. ¿Cómo ha sido su experiencia? Si tiene consultas o requiere asistencia para configurar su negocio, responda a este correo y le atenderemos.\n\nAtentamente,\nEquipo Veltrix`,
                       })}
                       className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer"
                     >
@@ -458,7 +458,7 @@ export default function GlobalCoreAdminPage() {
                 </div>
                 <input inputMode="numeric" value={aiEdit[o.org_id] ?? String(o.quota)} onChange={(e) => setAiEdit({ ...aiEdit, [o.org_id]: e.target.value.replace(/\D/g, '') })}
                   className="w-20 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
-                <button type="button" onClick={() => saveQuota(o.org_id)} className="bg-violet-600/20 hover:bg-violet-600/30 text-violet-200 border border-violet-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar cupo</button>
+                <button type="button" onClick={() => saveQuota(o.org_id)} className="bg-violet-600/20 hover:bg-violet-600/30 text-violet-200 border border-violet-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar cuota</button>
               </div>
             ))}
           </div>
@@ -468,7 +468,7 @@ export default function GlobalCoreAdminPage() {
         <section className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
           <div>
             <h2 className="text-sm font-bold">💲 Planes y precios</h2>
-            <p className="text-[11px] text-slate-500">Cambia precios y límites cuando quieras. Se aplican al instante en la portada, en "Mi plan" y en los límites de cada empresa. Si cambias un precio, cámbialo también en Paddle (Catálogo → Precios).</p>
+            <p className="text-[11px] text-slate-500">Modifique precios y límites en cualquier momento. Se aplican de inmediato en la portada, en "Mi plan" y en los límites de cada empresa. Si modifica un precio, actualícelo también en Paddle (Catálogo → Precios).</p>
           </div>
           {planMsg && <p className="text-xs font-semibold text-slate-200">{planMsg}</p>}
           <div className="grid gap-3 lg:grid-cols-3">
@@ -500,7 +500,7 @@ export default function GlobalCoreAdminPage() {
           </div>
           {addons.length > 0 && (
             <div className="space-y-2 pt-2">
-              <h3 className="text-xs font-bold text-slate-300">➕ Extras que el administrador de cada empresa cliente compra sin subir de plan (precio por unidad al mes)</h3>
+              <h3 className="text-xs font-bold text-slate-300">➕ Complementos que el administrador de cada empresa puede contratar sin cambiar de plan (precio mensual por unidad)</h3>
               <div className="grid gap-3 lg:grid-cols-3">
                 {addons.map((a) => (
                   <div key={a.code} className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-2 text-xs">
@@ -566,9 +566,9 @@ export default function GlobalCoreAdminPage() {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <button type="button" onClick={() => setPForm({ org: o.org_id, kind: 'pilot', a: '60', b: '50', c: '12' })} className="bg-sky-600/20 hover:bg-sky-600/30 text-sky-200 border border-sky-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">🧪 Dar piloto</button>
+                  <button type="button" onClick={() => setPForm({ org: o.org_id, kind: 'pilot', a: '60', b: '50', c: '12' })} className="bg-sky-600/20 hover:bg-sky-600/30 text-sky-200 border border-sky-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">🧪 Activar piloto</button>
                   <button type="button" onClick={() => setPForm({ org: o.org_id, kind: 'pay', a: String(o.price_now), b: '1', c: '' })} className="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-200 border border-emerald-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">💵 Registrar pago</button>
-                  {o.founder_until && <button type="button" onClick={() => clearPilot(o.org_id)} className="border border-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Quitar descuento</button>}
+                  {o.founder_until && <button type="button" onClick={() => clearPilot(o.org_id)} className="border border-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Retirar descuento</button>}
                 </div>
                 {pForm?.org === o.org_id && (
                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end border-t border-slate-800 pt-2">
@@ -714,7 +714,7 @@ export default function GlobalCoreAdminPage() {
               <h2 className="font-bold">✉️ Correo a {mail.name}</h2>
               <button type="button" onClick={() => setMail(null)} className="h-9 w-9 rounded-lg border border-slate-700 cursor-pointer">✕</button>
             </div>
-            <p className="text-xs text-slate-400">Sale desde el correo de Veltrix (veltrixsystem.app), no desde tu correo personal.</p>
+            <p className="text-xs text-slate-400">Se envía desde el correo institucional de Veltrix (veltrixsystem.app), no desde un correo personal.</p>
             <p className="text-sm"><span className="text-slate-400">Para:</span> {mail.to}</p>
             <input value={mail.subject} onChange={(e) => setMail({ ...mail, subject: e.target.value })} className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm" />
             <textarea rows={9} value={mail.text} onChange={(e) => setMail({ ...mail, text: e.target.value })} className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm" />

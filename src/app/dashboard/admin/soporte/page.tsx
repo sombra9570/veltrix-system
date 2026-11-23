@@ -150,7 +150,7 @@ function Tickets({ myId }: { myId: string }) {
 
       <div className={card}>
         {msg && <p className="mb-3 rounded-lg border border-red-500/30 bg-red-500/10 p-2 text-xs font-semibold text-red-400">{msg}</p>}
-        {!sel ? <p className="text-sm text-slate-400">Elige un ticket para verlo y responder.</p> : (
+        {!sel ? <p className="text-sm text-slate-400">Seleccione un ticket para visualizarlo y responder.</p> : (
           <div className="space-y-4">
             <div>
               <div className="flex flex-wrap items-start justify-between gap-2">
@@ -234,7 +234,7 @@ function Team() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-slate-400">Tu equipo atiende a los clientes. Nadie del equipo ve el dinero ni la operación de las empresas.</p>
+        <p className="text-sm text-slate-400">El equipo de atención gestiona las consultas de los clientes. Ningún integrante accede a la información financiera ni operativa de las empresas.</p>
         <button type="button" className={btn} onClick={() => setShow(!show)}>+ Nueva cuenta</button>
       </div>
       {msg && <p className={`rounded-lg border p-2 text-xs font-semibold ${msg.ok ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300' : 'border-red-500/30 bg-red-500/10 text-red-400'}`}>{msg.text}</p>}
