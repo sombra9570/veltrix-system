@@ -294,44 +294,28 @@ export default function GlobalCoreAdminPage() {
     <main className="min-h-dvh bg-slate-950 text-white px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:p-8">
       <div className="w-full max-w-[1600px] mx-auto space-y-6 min-w-0">
         <NetBanner />
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-6 gap-4">
-          <div>
-            <span className="text-xs font-semibold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
-              🛡️ Veltrix Core Control · Superadmin
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div className="min-w-0">
+            <span className="rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-purple-400">
+              🛡️ Superadmin
             </span>
-            <h1 className="text-3xl font-bold mt-3">
+            <h1 className="mt-2 text-xl font-bold sm:text-2xl">
               {t.globalConsole} <span className="text-blue-500">Veltrix Enterprise</span>
             </h1>
-            <p className="text-slate-400 text-sm mt-1">
-              Suscripciones, pruebas y crecimiento. Los datos internos de cada empresa son privados.
-            </p>
           </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <LanguageDropdown />
-            <div className="bg-slate-900 border border-slate-800 px-5 py-3 rounded-xl">
-              <p className="text-[11px] text-slate-400">Ingreso mensual (MRR)</p>
-              <p className="text-lg font-bold text-emerald-400">{formatMoney(m?.mrr_usd ?? 0)}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="rounded-xl border border-slate-800 bg-slate-900 px-3 py-1.5">
+              <p className="text-[10px] text-slate-400">Ingreso mensual (MRR)</p>
+              <p className="text-sm font-bold text-emerald-400">{formatMoney(m?.mrr_usd ?? 0)}</p>
             </div>
-            <button
-              onClick={refresh}
-              disabled={busy}
-              className="bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-semibold px-4 py-2.5 rounded-lg cursor-pointer disabled:opacity-50"
-            >
-              {busy ? 'Actualizando…' : '↻ Actualizar'}
+            <button onClick={refresh} disabled={busy} aria-label="Actualizar"
+              className="cursor-pointer rounded-lg border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs font-semibold hover:bg-slate-800 disabled:opacity-50">
+              {busy ? '…' : '↻'}
             </button>
             <PlatformBell />
-            <a
-              href="/dashboard/admin/soporte"
-              className="bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/20 text-xs font-semibold px-4 py-2.5 rounded-lg cursor-pointer"
-            >
-              🎧 Servicio al cliente
-            </a>
-            <button
-              onClick={logout}
-              className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-semibold px-4 py-2.5 rounded-lg cursor-pointer"
-            >
-              Cerrar sesión
+            <button onClick={logout}
+              className="cursor-pointer rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-xs font-semibold text-red-400 hover:bg-red-500/20">
+              Salir
             </button>
           </div>
         </header>
@@ -700,6 +684,7 @@ export default function GlobalCoreAdminPage() {
         {tab === 'tools' && (
           <section className="space-y-3">
             <h2 className="text-sm font-bold">🛠️ Plataforma</h2>
+            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 p-4"><span className="text-xs font-semibold text-slate-400">País, moneda e idioma del panel</span><LanguageDropdown /></div>
             <RegionalStatusBar />
             <div className="flex flex-wrap items-start gap-2"><AutoPurgePanel onDone={setPurgeDone} /><SweepFiles onDone={setPurgeDone} /></div>
             {purgeDone && <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2 text-xs font-semibold text-emerald-300">{purgeDone}</p>}
