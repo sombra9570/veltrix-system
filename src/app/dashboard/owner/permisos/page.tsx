@@ -16,8 +16,9 @@ type Data = {
 };
 
 // Qué permisos tienen sentido para cada rol (los demás no se muestran para no confundir)
-// Permisos delegables por rol (el dueño y el supervisor ya lo tienen todo en su sucursal)
+// Permisos delegables por rol (el dueño lo tiene todo; el supervisor parte con todo y el dueño le puede apagar acciones una por una)
 const ROLE_KEYS: Record<string, string[]> = {
+  supervisor: ['cash.see_expected', 'cash.expense', 'cash.withdraw', 'cash.deposit', 'cash.change_fund', 'payments.reverse', 'sales.credit', 'inv.see_cost', 'inv.adjust', 'products.price', 'products.delete', 'customers.edit', 'reports.export', 'store.publish'],
   cashier: ['products.see_code', 'cash.see_expected', 'cash.expense', 'cash.withdraw', 'cash.deposit', 'cash.change_fund', 'customers.view_docs', 'customers.upload_docs', 'payments.reverse', 'sales.cancel_request', 'store.photo', 'store.publish', 'store.edit_info', 'store.orders', 'store.assign'],
   vendor: ['products.see_code', 'sales.credit', 'inv.see_cost', 'customers.create', 'customers.edit', 'customers.view_docs', 'customers.upload_docs', 'payments.reverse', 'sales.cancel_request', 'store.photo', 'store.publish', 'store.edit_info', 'store.orders', 'store.assign'],
   collector: ['collector.expenses', 'collector.portfolio', 'collector.settings', 'loans.create', 'loans.customers', 'loans.interest', 'loans.cancel', 'loans.reschedule', 'payments.reverse', 'routes.liquidate', 'routes.invest'],
