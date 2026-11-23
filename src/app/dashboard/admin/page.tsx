@@ -33,7 +33,7 @@ type Metrics = {
 };
 
 type Filter = 'all' | Stage;
-type AdminTab = 'home' | 'clients' | 'billing' | 'plans' | 'notices' | 'usage' | 'activity' | 'tools';
+type AdminTab = 'menu' | 'home' | 'clients' | 'billing' | 'plans' | 'notices' | 'usage' | 'activity' | 'tools';
 // Estructura de cada organización (solo cuántas empresas, sucursales, usuarios y módulos; nunca sus datos de negocio)
 type OrgOverview = {
   org_id: string; users: number; modules: string[]; roles: Record<string, number>;
@@ -96,7 +96,7 @@ export default function GlobalCoreAdminPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
-  const [tab, setTab] = useState<AdminTab>('home');
+  const [tab, setTab] = useState<AdminTab>('menu');
   const [ov, setOv] = useState<Record<string, OrgOverview>>({});
   const [open, setOpen] = useState<string | null>(null);
   // Correo desde el dominio de Veltrix (no desde el correo personal del teléfono)
@@ -279,15 +279,15 @@ export default function GlobalCoreAdminPage() {
       ))}
     </div>
   );
-  const TABS: { id: AdminTab; icon: string; label: string; n?: number }[] = [
-    { id: 'home', icon: '📊', label: 'Inicio' },
-    { id: 'clients', icon: '🏢', label: 'Clientes', n: f.total },
-    { id: 'billing', icon: '💵', label: 'Cobros' },
-    { id: 'plans', icon: '🏷️', label: 'Planes' },
-    { id: 'notices', icon: '📣', label: 'Avisos' },
-    { id: 'usage', icon: '📦', label: 'Recursos' },
-    { id: 'activity', icon: '🧾', label: 'Actividad' },
-    { id: 'tools', icon: '🛠️', label: 'Plataforma' },
+  const TABS: { id: AdminTab; icon: string; label: string; d: string; n?: number }[] = [
+    { id: 'home', icon: '📊', label: 'Resumen', d: 'Embudo de clientes, conversión y bajas' },
+    { id: 'clients', icon: '🏢', label: 'Clientes', d: 'Organizaciones, empresas, sucursales, módulos y estado', n: f.total },
+    { id: 'billing', icon: '💵', label: 'Cobros', d: 'Suscripciones, pagos y vencimientos' },
+    { id: 'plans', icon: '🏷️', label: 'Planes', d: 'Precios, límites y funciones de cada plan' },
+    { id: 'notices', icon: '📣', label: 'Avisos', d: 'Mensajes que ven los clientes en su app' },
+    { id: 'usage', icon: '📦', label: 'Recursos', d: 'Almacenamiento y consumo por cliente' },
+    { id: 'activity', icon: '🧾', label: 'Actividad', d: 'Quién hizo qué en la plataforma' },
+    { id: 'tools', icon: '🛠️', label: 'Plataforma', d: 'Idioma, país, limpieza y mantenimiento' },
   ];
 
   return (
@@ -326,20 +326,29 @@ export default function GlobalCoreAdminPage() {
           </div>
         )}
 
-        <div className="grid items-start gap-5 lg:grid-cols-[13rem_minmax(0,1fr)]">
-        <nav className="grid grid-cols-3 gap-1.5 lg:sticky lg:top-4 lg:grid-cols-1" role="tablist" aria-label="Secciones">
-          {TABS.map((x) => (
-            <button key={x.id} type="button" role="tab" aria-selected={tab === x.id} onClick={() => setTab(x.id)}
-              className={`flex cursor-pointer flex-col items-center gap-0.5 rounded-xl border px-2 py-2.5 text-xs font-bold lg:flex-row lg:gap-2.5 lg:px-3 lg:text-sm ${tab === x.id ? 'border-blue-500 bg-blue-600 text-white' : 'border-slate-800 bg-slate-900/60 text-slate-300 hover:border-slate-600'}`}>
-              <span className="text-base lg:text-lg" aria-hidden>{x.icon}</span>
-              <span className="truncate">{x.label}</span>
-              {x.n !== undefined && <span className={`rounded-full px-1.5 text-[10px] lg:ms-auto ${tab === x.id ? 'bg-white/25' : 'bg-slate-800 text-slate-300'}`}>{x.n}</span>}
-            </button>
-          ))}
-          <a href="/dashboard/admin/soporte" className="flex cursor-pointer flex-col items-center gap-0.5 rounded-xl border border-sky-500/30 bg-sky-500/10 px-2 py-2.5 text-xs font-bold text-sky-300 hover:bg-sky-500/20 lg:flex-row lg:gap-2.5 lg:px-3 lg:text-sm">
-            <span className="text-base lg:text-lg" aria-hidden>🎧</span><span className="truncate">Soporte</span>
-          </a>
-        </nav>
+        <div className="space-y-5">
+        {tab === 'menu' ? (
+          <nav className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4" aria-label="Secciones">
+            {TABS.map((x) => (
+              <button key={x.id} type="button" onClick={() => setTab(x.id)}
+                className="flex min-h-32 cursor-pointer flex-col items-start gap-1.5 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-start transition hover:border-blue-500 hover:bg-slate-900">
+                <span className="flex w-full items-center justify-between"><span className="text-3xl" aria-hidden>{x.icon}</span>{x.n !== undefined && <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs font-bold text-slate-200">{x.n}</span>}</span>
+                <span className="text-base font-bold">{x.label}</span>
+                <span className="text-xs leading-snug text-slate-400">{x.d}</span>
+              </button>
+            ))}
+            <a href="/dashboard/admin/soporte" className="flex min-h-32 cursor-pointer flex-col items-start gap-1.5 rounded-2xl border border-sky-500/30 bg-sky-500/10 p-4 text-start transition hover:bg-sky-500/20">
+              <span className="text-3xl" aria-hidden>🎧</span>
+              <span className="text-base font-bold text-sky-200">Soporte</span>
+              <span className="text-xs leading-snug text-sky-300/80">Tickets, consultas y equipo de atención</span>
+            </a>
+          </nav>
+        ) : (
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={() => setTab('menu')} className="cursor-pointer rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-bold hover:bg-slate-800">← Menú</button>
+            <h2 className="text-base font-bold">{TABS.find((x) => x.id === tab)?.icon} {TABS.find((x) => x.id === tab)?.label}</h2>
+          </div>
+        )}
         <div className="min-w-0 space-y-6">
 
         {tab === 'home' && (
