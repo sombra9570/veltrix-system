@@ -2163,8 +2163,6 @@ const ko: Record<DictKey, string> = {
   "cx.set.geo": "수금 기록 시 내 위치 저장",
   "perm.collector.portfolio": "경로 채권 보기",
   "perm.collector.portfolio.d": "수금원 화면에 총 채권을 표시합니다.",
-  "perm.collector.settings": "패널 설정 사용",
-  "perm.collector.settings.d": "설정 화면을 엽니다: 알림, 결제 QR, 보고서.",
   "nav.routeInfo": "경로 정보",
   "info.period": "마지막 마감 또는 정산 이후",
   "info.note": "수금, 대출, 수수료는 결제 유형에 따라 달라집니다. 투자, 이전 현금, 지출은 전체 경로 기준입니다.",

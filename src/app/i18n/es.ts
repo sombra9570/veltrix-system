@@ -2172,8 +2172,6 @@ const es = {
   "cx.set.geo": "Guardar mi ubicación al registrar un cobro",
   "perm.collector.portfolio": "Ver la cartera de la ruta",
   "perm.collector.portfolio.d": "Muestra el total por cobrar en el panel del cobrador.",
-  "perm.collector.settings": "Usar los ajustes del panel",
-  "perm.collector.settings.d": "Abre la pantalla de ajustes: avisos, QR de pago y reportes.",
   "nav.routeInfo": "Información de la ruta",
   "info.period": "Desde el último cierre o liquidación",
   "info.note": "Cobrado, prestado y comisión cambian según el tipo de pago. Inversión, caja anterior y gastos son de toda la ruta.",

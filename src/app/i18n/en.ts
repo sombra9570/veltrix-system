@@ -2163,8 +2163,6 @@ const en: Record<DictKey, string> = {
   "cx.set.geo": "Save my location when recording a payment",
   "perm.collector.portfolio": "See the route portfolio",
   "perm.collector.portfolio.d": "Shows the total receivable on the collector panel.",
-  "perm.collector.settings": "Use panel settings",
-  "perm.collector.settings.d": "Opens the settings screen: notices, payment QR and reports.",
   "nav.routeInfo": "Route information",
   "info.period": "Since the last cash close or settlement",
   "info.note": "Collected, lent and commission change with the payment type. Investment, previous cash and expenses cover the whole route.",

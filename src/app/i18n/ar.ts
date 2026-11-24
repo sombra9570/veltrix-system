@@ -2163,8 +2163,6 @@ const ar: Record<DictKey, string> = {
   "cx.set.geo": "حفظ موقعي عند تسجيل دفعة",
   "perm.collector.portfolio": "عرض محفظة المسار",
   "perm.collector.portfolio.d": "يعرض إجمالي المستحقات في لوحة المحصّل.",
-  "perm.collector.settings": "استخدام إعدادات اللوحة",
-  "perm.collector.settings.d": "يفتح الإعدادات: الإشعارات ورمز QR والتقارير.",
   "nav.routeInfo": "معلومات المسار",
   "info.period": "منذ آخر إغلاق أو تسوية",
   "info.note": "المحصَّل والمُقرَض والعمولة تتغير حسب نوع الدفع. الاستثمار والصندوق السابق والمصروفات تخص المسار كله.",

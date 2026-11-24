@@ -2163,8 +2163,6 @@ const it: Record<DictKey, string> = {
   "cx.set.geo": "Salva la mia posizione quando registro un incasso",
   "perm.collector.portfolio": "Vedere il portafoglio del giro",
   "perm.collector.portfolio.d": "Mostra il totale da incassare nel pannello.",
-  "perm.collector.settings": "Usare le impostazioni del pannello",
-  "perm.collector.settings.d": "Apre le impostazioni: avvisi, QR di pagamento e report.",
   "nav.routeInfo": "Informazioni sul giro",
   "info.period": "Dall'ultima chiusura o liquidazione",
   "info.note": "Incassato, prestato e commissione cambiano in base al tipo di pagamento. Investimento, cassa precedente e spese riguardano tutto il giro.",

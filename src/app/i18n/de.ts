@@ -2163,8 +2163,6 @@ const de: Record<DictKey, string> = {
   "cx.set.geo": "Standort beim Erfassen einer Zahlung speichern",
   "perm.collector.portfolio": "Routen-Portfolio sehen",
   "perm.collector.portfolio.d": "Zeigt den Gesamtbetrag im Einzugs-Panel.",
-  "perm.collector.settings": "Panel-Einstellungen nutzen",
-  "perm.collector.settings.d": "Öffnet die Einstellungen: Hinweise, Zahlungs-QR, Berichte.",
   "nav.routeInfo": "Routeninformationen",
   "info.period": "Seit dem letzten Abschluss oder der letzten Abrechnung",
   "info.note": "Eingezogen, verliehen und Provision ändern sich je nach Zahlungsart. Investition, vorherige Kasse und Ausgaben gelten für die ganze Route.",

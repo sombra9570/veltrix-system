@@ -565,7 +565,7 @@ export default function CollectorPage() {
             ['perm.loans.create', !!route.can_loan], ['perm.loans.customers', route.can_customers !== false],
             ['perm.loans.interest', !!route.can_interest], ['perm.routes.liquidate', !!route.can_liquidate],
             ['perm.routes.invest', !!route.can_invest], ['perm.collector.expenses', canExpenses],
-            ['perm.collector.portfolio', !!route.can_portfolio], ['perm.collector.settings', !!route.can_settings],
+            ['perm.collector.portfolio', !!route.can_portfolio]
           ] as [DictKey, boolean][]} />
       )}
 

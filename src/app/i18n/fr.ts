@@ -2163,8 +2163,6 @@ const fr: Record<DictKey, string> = {
   "cx.set.geo": "Enregistrer ma position lors d’un encaissement",
   "perm.collector.portfolio": "Voir le portefeuille de la tournée",
   "perm.collector.portfolio.d": "Affiche le total à encaisser sur le panneau.",
-  "perm.collector.settings": "Utiliser les réglages du panneau",
-  "perm.collector.settings.d": "Ouvre les réglages : avis, QR de paiement et rapports.",
   "nav.routeInfo": "Informations de la tournée",
   "info.period": "Depuis la dernière clôture ou le dernier règlement",
   "info.note": "Encaissé, prêté et commission varient selon le type de paiement. Investissement, caisse précédente et dépenses concernent toute la tournée.",

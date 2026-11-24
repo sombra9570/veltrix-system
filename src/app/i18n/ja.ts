@@ -2163,8 +2163,6 @@ const ja: Record<DictKey, string> = {
   "cx.set.geo": "集金の記録時に位置を保存",
   "perm.collector.portfolio": "ルートの債権を見る",
   "perm.collector.portfolio.d": "集金画面に回収予定総額を表示します。",
-  "perm.collector.settings": "パネル設定を使う",
-  "perm.collector.settings.d": "設定画面を開きます：お知らせ、支払いQR、レポート。",
   "nav.routeInfo": "ルート情報",
   "info.period": "前回の締めまたは精算から",
   "info.note": "回収・貸出・手数料は支払いの種類で変わります。投資・前回の現金・経費はルート全体の数字です。",

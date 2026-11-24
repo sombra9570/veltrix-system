@@ -2163,8 +2163,6 @@ const hi: Record<DictKey, string> = {
   "cx.set.geo": "भुगतान दर्ज करते समय मेरा स्थान सहेजें",
   "perm.collector.portfolio": "रूट पोर्टफोलियो देखें",
   "perm.collector.portfolio.d": "कलेक्टर पैनल में कुल बकाया दिखाता है।",
-  "perm.collector.settings": "पैनल सेटिंग्स उपयोग करें",
-  "perm.collector.settings.d": "सेटिंग्स खोलता है: सूचनाएँ, भुगतान QR और रिपोर्ट।",
   "nav.routeInfo": "रूट की जानकारी",
   "info.period": "पिछली क्लोजिंग या निपटान के बाद से",
   "info.note": "वसूली, उधार और कमीशन भुगतान के प्रकार के अनुसार बदलते हैं। निवेश, पिछला कैश और खर्च पूरे रूट के हैं।",

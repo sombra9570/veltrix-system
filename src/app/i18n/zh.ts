@@ -2163,8 +2163,6 @@ const zh: Record<DictKey, string> = {
   "cx.set.geo": "记录收款时保存我的位置",
   "perm.collector.portfolio": "查看路线应收账款",
   "perm.collector.portfolio.d": "在收款员面板显示应收总额。",
-  "perm.collector.settings": "使用面板设置",
-  "perm.collector.settings.d": "打开设置：通知、付款二维码和报告。",
   "nav.routeInfo": "路线信息",
   "info.period": "自上次结账或结算以来",
   "info.note": "已收、已借和佣金随付款类型而变。投资、上次现金和支出为整条路线的数据。",

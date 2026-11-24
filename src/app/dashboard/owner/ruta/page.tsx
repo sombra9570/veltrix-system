@@ -27,7 +27,7 @@ type Fund = {
   liquidations: { id: string; created_at: string; expected: number; counted: number; difference: number; closing: number }[];
   moves: { at: string; type: string; amount: number; note: string | null }[];
 };
-const PERMS = ['loans.create', 'loans.customers', 'loans.interest', 'routes.liquidate', 'routes.invest', 'collector.expenses', 'collector.portfolio', 'collector.settings',
+const PERMS = ['loans.create', 'loans.customers', 'loans.interest', 'routes.liquidate', 'routes.invest', 'collector.expenses', 'collector.portfolio',
   'collector.delete_installments', 'collector.delete_credits', 'collector.delete_customers', 'loans.no_photo', 'loans.no_id_photo'];
 const NUMS: [string, string, number | null][] = [['commission_pct', 'rt.commPct', 3], ['max_loan', 'rt.maxLoan', null], ['max_cards', 'rt.maxCards', null]];
 

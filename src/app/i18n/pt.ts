@@ -2163,8 +2163,6 @@ const pt: Record<DictKey, string> = {
   "cx.set.geo": "Salvar minha localização ao registrar um pagamento",
   "perm.collector.portfolio": "Ver a carteira da rota",
   "perm.collector.portfolio.d": "Mostra o total a receber no painel do cobrador.",
-  "perm.collector.settings": "Usar os ajustes do painel",
-  "perm.collector.settings.d": "Abre a tela de ajustes: avisos, QR de pagamento e relatórios.",
   "nav.routeInfo": "Informações da rota",
   "info.period": "Desde o último fechamento ou acerto",
   "info.note": "Cobrado, emprestado e comissão mudam conforme o tipo de pagamento. Investimento, caixa anterior e despesas são de toda a rota.",
