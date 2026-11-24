@@ -69,7 +69,7 @@ function RouteCard({ r, b, onChanged, onError }: { r: SRoute; b: SBranch; onChan
   const { t, lang } = useT();
   const m = (n: number) => money(Number(n), r.currency, lang);
   const [cutting, setCutting] = useState(false);
-  const [mv, setMv] = useState<{ type: 'investment' | 'withdrawal'; amount: string; note: string } | null>(null);
+  const [mv, setMv] = useState<{ type: 'investment'; amount: string; note: string } | null>(null);
   const today = r.days[0];
   const tot = r.days.reduce((a, d) => ({ cash: a.cash + Number(d.cash), lent: a.lent + Number(d.lent) }), { cash: 0, lent: 0 });
 
@@ -129,7 +129,6 @@ function RouteCard({ r, b, onChanged, onError }: { r: SRoute; b: SBranch; onChan
         <div className="flex flex-wrap gap-2">
           {b.can_liquidate && <button type="button" onClick={() => setCutting(true)} className={`${ui.btnPrimary} !py-1.5 text-xs`}>✂️ {t('liq.cut')}</button>}
           {b.can_invest && <button type="button" onClick={() => setMv({ type: 'investment', amount: '', note: '' })} className={`${ui.btnGhost} !py-1.5 text-xs`}>➕ {t('fund.invest')}</button>}
-          {b.can_invest && <button type="button" onClick={() => setMv({ type: 'withdrawal', amount: '', note: '' })} className={`${ui.btnGhost} !py-1.5 text-xs`}>➖ {t('fund.withdraw')}</button>}
         </div>
       ) : <p className={`text-[11px] ${ui.muted}`}>🔒 {t('sup.noActions')}</p>}
       <RouteTrail routeId={r.id} currency={r.currency} />

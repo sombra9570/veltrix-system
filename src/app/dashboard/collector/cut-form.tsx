@@ -1,17 +1,16 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { rpc } from '../../../lib/supabase';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
 
 /* ---------- Corte de caja: se cuenta el efectivo, se registran las salidas por rubro y la caja queda cuadrada ---------- */
-const CATS: Record<'op_expense' | 'payment_out' | 'withdrawal', string[]> = {
+const CATS: Record<'op_expense' | 'payment_out', string[]> = {
   op_expense: ['fuel', 'food', 'transport', 'phone', 'maintenance', 'stationery', 'other'],
   payment_out: ['collector_pay', 'third_party', 'other'],
-  withdrawal: ['owner', 'bank', 'other'],
 };
-type Line = { kind: 'op_expense' | 'payment_out' | 'withdrawal'; category: string; amount: string; note: string };
+type Line = { kind: 'op_expense' | 'payment_out'; category: string; amount: string; note: string };
 
 export type Period = { since: string | null; opening: number; investments: number; withdrawals: number; collected_cash: number;
   collected_digital: number; lent: number; collector_expenses: number; expected: number };
@@ -26,6 +25,9 @@ export function CutForm({ routeId, routeName, period, m, onCancel, onDone, onErr
   const [lines, setLines] = useState<Line[]>([]);
   const [notes, setNotes] = useState('');
   const [busy, setBusy] = useState(false);
+  const [allow, setAllow] = useState<{ expenses: boolean; pay_out: boolean }>({ expenses: false, pay_out: false });
+  useEffect(() => { rpc<{ expenses: boolean; pay_out: boolean }>('route_cut_perms', { p_route: routeId }).then((r) => r && setAllow(r)).catch(() => undefined); }, [routeId]);
+  const kinds = (Object.keys(CATS) as Line['kind'][]).filter((k) => (k === 'op_expense' ? allow.expenses : allow.pay_out));
   const num = (x: string) => { const n = Number(x.replace(',', '.')); return Number.isFinite(n) ? n : NaN; };
   const c = num(counted);
   const diff = Number.isNaN(c) ? 0 : Math.round((c - Number(p.expected)) * 100) / 100;
@@ -79,7 +81,7 @@ export function CutForm({ routeId, routeName, period, m, onCancel, onDone, onErr
         {lines.map((l, i) => (
           <div key={i} className="grid grid-cols-2 gap-2 rounded-lg bg-slate-50 p-2 sm:grid-cols-[9rem_1fr_7rem_1fr_auto] dark:bg-slate-800/50">
             <select value={l.kind} onChange={(e) => { const kind = e.target.value as Line['kind']; set(i, { kind, category: CATS[kind][0] }); }} className={ui.input}>
-              {(Object.keys(CATS) as Line['kind'][]).map((k) => <option key={k} value={k}>{t(`liq.k.${k}` as DictKey)}</option>)}
+              {kinds.map((k) => <option key={k} value={k}>{t(`liq.k.${k}` as DictKey)}</option>)}
             </select>
             <select value={l.category} onChange={(e) => set(i, { category: e.target.value })} className={ui.input}>
               {CATS[l.kind].map((cat) => <option key={cat} value={cat}>{t(`liq.c.${cat}` as DictKey)}</option>)}
@@ -89,7 +91,7 @@ export function CutForm({ routeId, routeName, period, m, onCancel, onDone, onErr
             <button type="button" onClick={() => setLines(lines.filter((_, k) => k !== i))} className="text-sm font-bold text-red-600 cursor-pointer" aria-label="✕">✕</button>
           </div>
         ))}
-        <button type="button" onClick={() => setLines([...lines, { kind: 'op_expense', category: 'fuel', amount: '', note: '' }])} className={`${ui.btnGhost} !py-1.5 text-xs`}>➕ {t('liq.addLine')}</button>
+        {kinds.length > 0 && <button type="button" onClick={() => setLines([...lines, { kind: kinds[0], category: CATS[kinds[0]][0], amount: '', note: '' }])} className={`${ui.btnGhost} !py-1.5 text-xs`}>➕ {t('liq.addLine')}</button>}
       </div>
 
       <input placeholder={t('liq.notes')} value={notes} onChange={(e) => setNotes(e.target.value)} className={ui.input} />

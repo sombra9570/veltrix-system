@@ -47,7 +47,7 @@ export default function LoansPage() {
   const [busy, setBusy] = useState('');
   const [funds, setFunds] = useState<Fund[]>([]);
   const [cut, setCut] = useState<string | null>(null);
-  const [mv, setMv] = useState<{ route: string; type: 'investment' | 'withdrawal'; amount: string; note: string } | null>(null);
+  const [mv, setMv] = useState<{ route: string; type: 'investment'; amount: string; note: string } | null>(null);
 
   // Cada parte se pide por separado: tras una acción solo se vuelve a leer lo que pudo cambiar
   const loadLoans = useCallback(async () => {
@@ -226,7 +226,6 @@ export default function LoansPage() {
                   ) : (
                     <div className="flex gap-2">
                       <button type="button" onClick={() => setMv({ route: f.id, type: 'investment', amount: '', note: '' })} className={`${ui.btnGhost} !py-1.5 text-xs`}>➕ {t('fund.invest')}</button>
-                      <button type="button" onClick={() => setMv({ route: f.id, type: 'withdrawal', amount: '', note: '' })} className={`${ui.btnGhost} !py-1.5 text-xs`}>➖ {t('fund.withdraw')}</button>
                       <button type="button" onClick={() => { setMv(null); setCut(f.id); }} className={`${ui.btnPrimary} !py-1.5 text-xs`}>✂️ {t('liq.cut')}</button>
                     </div>
                   )}

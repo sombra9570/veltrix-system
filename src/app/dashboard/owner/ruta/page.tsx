@@ -27,7 +27,7 @@ type Fund = {
   liquidations: { id: string; created_at: string; expected: number; counted: number; difference: number; closing: number }[];
   moves: { at: string; type: string; amount: number; note: string | null }[];
 };
-const PERMS = ['loans.create', 'loans.customers', 'loans.interest', 'routes.liquidate', 'routes.invest', 'collector.expenses', 'collector.portfolio',
+const PERMS = ['loans.create', 'loans.customers', 'loans.interest', 'routes.liquidate', 'routes.invest', 'collector.expenses', 'collector.pay_out', 'collector.portfolio',
   'collector.delete_installments', 'collector.delete_credits', 'collector.delete_customers', 'loans.no_photo', 'loans.no_id_photo'];
 const NUMS: [string, string, number | null][] = [['commission_pct', 'rt.commPct', 3], ['max_loan', 'rt.maxLoan', null], ['max_cards', 'rt.maxCards', null]];
 
@@ -50,7 +50,7 @@ function RouteScreen() {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [perms, setPerms] = useState<Record<string, boolean | number>>({});
   const [busy, setBusy] = useState(false);
-  const [mv, setMv] = useState<{ type: 'investment' | 'withdrawal'; amount: string; note: string } | null>(null);
+  const [mv, setMv] = useState<{ type: 'investment'; amount: string; note: string } | null>(null);
 
   const load = useCallback(async () => {
     if (!orgId || !rid) return;
@@ -268,7 +268,6 @@ function RouteScreen() {
                 ) : (
                   <div className="flex gap-2">
                     <button type="button" onClick={() => setMv({ type: 'investment', amount: '', note: '' })} className={`${ui.btnGhost} !py-1.5 text-xs`}>➕ {t('fund.invest')}</button>
-                    <button type="button" onClick={() => setMv({ type: 'withdrawal', amount: '', note: '' })} className={`${ui.btnGhost} !py-1.5 text-xs`}>➖ {t('fund.withdraw')}</button>
                   </div>
                 )}
               </>

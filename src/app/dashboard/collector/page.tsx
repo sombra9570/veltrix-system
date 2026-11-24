@@ -926,7 +926,7 @@ function PeriodSheet({ route, fmt, fund, online, onChanged, onError }: {
 }) {
   const { t, lang } = useT();
   const [cutting, setCutting] = useState(false);
-  const [mv, setMv] = useState<{ type: 'investment' | 'withdrawal'; amount: string; note: string } | null>(null);
+  const [mv, setMv] = useState<{ type: 'investment'; amount: string; note: string } | null>(null);
   const moveFund = async () => {
     if (!mv) return;
     const n = parseAmount(mv.amount);
@@ -976,7 +976,6 @@ function PeriodSheet({ route, fmt, fund, online, onChanged, onError }: {
             <div className="flex flex-wrap gap-2">
               {route.can_liquidate && <button type="button" disabled={!online} onClick={() => setCutting(true)} className={`${ui.btnPrimary} !py-2 text-sm`}>✂️ {t('liq.cut')}</button>}
               {route.can_invest && <button type="button" disabled={!online} onClick={() => setMv({ type: 'investment', amount: '', note: '' })} className={`${ui.btnGhost} !py-2 text-sm`}>➕ {t('fund.invest')}</button>}
-              {route.can_invest && <button type="button" disabled={!online} onClick={() => setMv({ type: 'withdrawal', amount: '', note: '' })} className={`${ui.btnGhost} !py-2 text-sm`}>➖ {t('fund.withdraw')}</button>}
             </div>
           )}
         </div>
