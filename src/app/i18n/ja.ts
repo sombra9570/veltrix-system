@@ -2143,6 +2143,8 @@ const ja: Record<DictKey, string> = {
   "cx.nc.needAll": "必須項目が未入力です：{list}。",
   "cx.nc.consentShort": "顧客がデータと写真の使用を許可します",
   "cx.nc.needSignal": "顧客の作成にはインターネットが必要です。",
+  "cx.nc.offlineInfo": "オフライン：顧客はこの端末に保存され、接続が戻ると送信されます。位置情報はこの場所で取得します。",
+  "cx.nc.queued": "顧客を端末に保存しました。接続が戻ると送信されます。",
   "cx.nc.saved": "✅ 顧客を保存しました。リストに表示されます。",
   "cx.nc.partial": "顧客は保存されましたが、写真のアップロードに失敗しました。",
   "cx.set.title": "設定",

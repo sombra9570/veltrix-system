@@ -2143,6 +2143,8 @@ const en: Record<DictKey, string> = {
   "cx.nc.needAll": "Required data missing: {list}.",
   "cx.nc.consentShort": "Customer authorizes use of their data and photos",
   "cx.nc.needSignal": "You need internet to create customers.",
+  "cx.nc.offlineInfo": "Offline: the customer will be saved on this device and sent when the connection returns. The location is taken here.",
+  "cx.nc.queued": "Customer saved on this device. It will be sent when the connection returns.",
   "cx.nc.saved": "✅ Customer saved. It now appears in your list.",
   "cx.nc.partial": "Customer saved, but a photo failed to upload. Open it and retry.",
   "cx.set.title": "Settings",

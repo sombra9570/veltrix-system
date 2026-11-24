@@ -2152,6 +2152,8 @@ const es = {
   "cx.nc.needAll": "Faltan datos obligatorios: {list}.",
   "cx.nc.consentShort": "El cliente autoriza el uso de sus datos y fotos",
   'cx.nc.needSignal': 'Para crear clientes se requiere conexión.',
+  'cx.nc.offlineInfo': 'Sin conexión: el cliente se guardará en el dispositivo y se enviará al recuperar la señal. La ubicación se toma en este lugar.',
+  'cx.nc.queued': 'Cliente guardado en el dispositivo. Se enviará al recuperar la conexión.',
   'cx.nc.saved': '✅ Cliente guardado. Ya aparece en la lista.',
   'cx.nc.partial': 'Cliente guardado, pero una foto no se subió. Ábralo y repita la carga.',
   "cx.set.title": "Ajustes",

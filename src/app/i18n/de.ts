@@ -2143,6 +2143,8 @@ const de: Record<DictKey, string> = {
   "cx.nc.needAll": "Pflichtangaben fehlen: {list}.",
   "cx.nc.consentShort": "Der Kunde erlaubt die Nutzung seiner Daten und Fotos",
   "cx.nc.needSignal": "Zum Anlegen von Kunden ist Internet nötig.",
+  "cx.nc.offlineInfo": "Offline: Der Kunde wird auf dem Gerät gespeichert und bei Verbindung gesendet. Der Standort wird hier erfasst.",
+  "cx.nc.queued": "Kunde auf dem Gerät gespeichert. Er wird gesendet, sobald die Verbindung zurück ist.",
   "cx.nc.saved": "✅ Kunde gespeichert. Er erscheint in deiner Liste.",
   "cx.nc.partial": "Kunde gespeichert, aber ein Foto wurde nicht hochgeladen. Erneut versuchen.",
   "cx.set.title": "Einstellungen",

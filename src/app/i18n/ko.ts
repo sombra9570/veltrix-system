@@ -2143,6 +2143,8 @@ const ko: Record<DictKey, string> = {
   "cx.nc.needAll": "필수 정보가 없습니다: {list}.",
   "cx.nc.consentShort": "고객이 데이터와 사진 사용을 승인합니다",
   "cx.nc.needSignal": "고객을 만들려면 인터넷이 필요합니다.",
+  "cx.nc.offlineInfo": "오프라인: 고객이 이 기기에 저장되고 연결이 복구되면 전송됩니다. 위치는 이곳에서 가져옵니다.",
+  "cx.nc.queued": "고객이 기기에 저장되었습니다. 연결이 복구되면 전송됩니다.",
   "cx.nc.saved": "✅ 고객이 저장되어 목록에 표시됩니다.",
   "cx.nc.partial": "고객은 저장되었지만 사진 업로드에 실패했습니다. 다시 시도하세요.",
   "cx.set.title": "설정",

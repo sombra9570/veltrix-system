@@ -2143,6 +2143,8 @@ const zh: Record<DictKey, string> = {
   "cx.nc.needAll": "缺少必填信息：{list}。",
   "cx.nc.consentShort": "客户授权使用其数据和照片",
   "cx.nc.needSignal": "创建客户需要联网。",
+  "cx.nc.offlineInfo": "离线：客户将保存在本设备，网络恢复后发送。位置在此处获取。",
+  "cx.nc.queued": "客户已保存在本设备，网络恢复后将发送。",
   "cx.nc.saved": "✅ 客户已保存，已显示在列表中。",
   "cx.nc.partial": "客户已保存，但有照片未上传，请重试。",
   "cx.set.title": "设置",

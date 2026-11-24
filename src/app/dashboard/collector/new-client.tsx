@@ -6,6 +6,14 @@ import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import { compressImage, extFor } from '../image';
 import { PhotoPicker, photoErrorKey } from '../photo-picker';
+import { isNetworkError } from '../offline-sales';
+import { putFile } from './offline-files';
+
+export type CustomerOp = {
+  kind: 'customer'; id: string; at: string; route: string; name: string; ci: string; phone: string; address: string; lat: number; lng: number;
+  gName?: string; gPhone?: string; gAddress?: string; gLat?: number; gLng?: number; consent: boolean;
+  files?: { doc?: boolean; docback?: boolean; photo?: boolean; gphoto?: boolean };
+};
 
 const BUCKET = 'customer-files';
 type Gps = { lat: number; lng: number } | null;
@@ -21,7 +29,7 @@ function readGps(): Promise<Gps> {
     );
   });
   // Celular: GPS preciso. Computador (sin GPS): si falla, se reintenta con la ubicación aproximada de la red.
-  return once(true, 10000, 0).then((g) => g ?? once(false, 15000, 60000));
+  return once(true, 10000, 0).then((g) => g ?? once(false, 15000, 0));
 }
 
 function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) => void; label: string }) {
@@ -49,8 +57,8 @@ function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) 
  * Cliente nuevo de la ruta: datos, carnet por los dos lados, foto, ubicación GPS y garante.
  * Las fotos se suben al guardar, así que hace falta internet (el cobro sí funciona sin señal).
  */
-export function NewClient({ routeId, orgId, online, canLoan, saleLabel = false, needPhoto = false, needIdPhoto = false, onSaved, onLoan }: {
-  routeId: string; orgId: string; online: boolean; canLoan: boolean; saleLabel?: boolean; needPhoto?: boolean; needIdPhoto?: boolean;
+export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel = false, needPhoto = false, needIdPhoto = false, onSaved, onLoan }: {
+  routeId: string; orgId: string; online: boolean; onQueue: (op: CustomerOp) => void; canLoan: boolean; saleLabel?: boolean; needPhoto?: boolean; needIdPhoto?: boolean;
   onSaved: (id: string) => Promise<void> | void; onLoan: () => void;
 }) {
   const { t } = useT();
@@ -64,7 +72,7 @@ export function NewClient({ routeId, orgId, online, canLoan, saleLabel = false, 
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
-  const [done, setDone] = useState<{ name: string; photosOk: boolean } | null>(null);
+  const [done, setDone] = useState<{ name: string; photosOk: boolean; queued?: boolean } | null>(null);
   const set = (k: keyof typeof f, v: string) => setF((x) => ({ ...x, [k]: v }));
 
   const upload = async (id: string, file: File, kind: string) => {
@@ -88,18 +96,34 @@ export function NewClient({ routeId, orgId, online, canLoan, saleLabel = false, 
     e.preventDefault();
     setErr('');
     if (missing.length) return setErr(t('cx.nc.needAll', { list: missing.join(', ') }));
-    if (!online) return setErr(t('cx.nc.needSignal'));
     setBusy(true);
+    const newId = crypto.randomUUID();
+    // Cada cliente toma su propia lectura de ubicación en el lugar donde se crea; aquí solo se usa la que se capturó en este formulario
+    const queueIt = async () => {
+      try {
+        const files: NonNullable<CustomerOp['files']> = {};
+        for (const [k, file] of [['doc', ciFront], ['docback', ciBack], ['photo', photo], ['gphoto', gPhoto]] as const) {
+          if (file) { await putFile(`${newId}:${k}`, await compressImage(file)); files[k] = true; }
+        }
+        onQueue({ kind: 'customer', id: newId, at: new Date().toISOString(), route: routeId, name: f.name.trim(), ci: f.ci.trim(), phone: f.phone.trim(), address: f.address.trim(),
+          lat: gps!.lat, lng: gps!.lng, gName: f.gName || undefined, gPhone: f.gPhone || undefined, gAddress: f.gAddress || undefined,
+          gLat: gGps?.lat, gLng: gGps?.lng, consent, files });
+        setBusy(false);
+        setDone({ name: f.name.trim(), photosOk: true, queued: true });
+      } catch { setBusy(false); setErr(t('err.generic')); }
+    };
+    if (!online) { await queueIt(); return; }
     let id: string;
     try {
       id = await rpc<string>('collector_save_customer', {
         p_route: routeId, p_name: f.name, p_phone: f.phone || null, p_address: f.address || null, p_tax_id: f.ci || null,
         p_notes: null, p_lat: gps?.lat ?? null, p_lng: gps?.lng ?? null,
         p_g_name: f.gName || null, p_g_phone: f.gPhone || null, p_g_address: f.gAddress || null,
-        p_g_lat: gGps?.lat ?? null, p_g_lng: gGps?.lng ?? null,
+        p_g_lat: gGps?.lat ?? null, p_g_lng: gGps?.lng ?? null, p_offline_uuid: newId,
       });
     } catch (ex) {
       const m = (ex as Error).message;
+      if (isNetworkError(m)) { await queueIt(); return; }
       setErr(m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : m.includes('LOAN_MAX_CUSTOMERS') ? t('loan.e.maxCustomers')
         : m.includes('CUSTOMER_REQUIRED') ? t('cx.nc.needAll', { list: '' })
         : /fetch|network|Failed/i.test(m) ? t('loan.e.offline') : t('err.generic'));
@@ -133,6 +157,7 @@ export function NewClient({ routeId, orgId, online, canLoan, saleLabel = false, 
       <Card className="space-y-3 text-center">
         <p className="text-3xl">{done.photosOk ? '✅' : '⚠️'}</p>
         <h2 className="text-lg font-bold">{t('cx.nc.saved')}: {done.name}</h2>
+        {done.queued && <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">{t('cx.nc.queued')}</p>}
         {!done.photosOk && <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">{err || t('cx.nc.partial')}</p>}
         <div className="grid gap-2">
           {canLoan && <button type="button" onClick={onLoan} className={`${ui.btnPrimary} py-3`}>{saleLabel ? '🛍️' : '💸'} {t(saleLabel ? 'cx.newSale' : 'cx.newLoan')}</button>}
@@ -144,7 +169,7 @@ export function NewClient({ routeId, orgId, online, canLoan, saleLabel = false, 
   return (
     <form onSubmit={save} className="space-y-4">
       <h2 className="text-lg font-bold">➕ {t('cx.nc.title')}</h2>
-      {!online && <p className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">{t('cx.nc.needSignal')}</p>}
+      {!online && <p className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">{t('cx.nc.offlineInfo')}</p>}
 
       <Card className="space-y-3">
         <div><label className={ui.label}>{t('cx.nc.name')}</label><input required value={f.name} onChange={(e) => set('name', e.target.value)} className={ui.input} /></div>
@@ -179,7 +204,7 @@ export function NewClient({ routeId, orgId, online, canLoan, saleLabel = false, 
 
       {err && <p className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">{err}</p>}
       {missing.length > 0 && <p className={`text-xs ${ui.muted}`}>{t('cx.nc.needAll', { list: missing.join(', ') })}</p>}
-      <button type="submit" disabled={busy || !online || missing.length > 0} className={`${ui.btnPrimary} w-full py-3`}>{busy ? t('common.wait') : `💾 ${t('prod.save')}`}</button>
+      <button type="submit" disabled={busy || missing.length > 0} className={`${ui.btnPrimary} w-full py-3`}>{busy ? t('common.wait') : `💾 ${t('prod.save')}`}</button>
     </form>
   );
 }

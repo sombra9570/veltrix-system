@@ -2143,6 +2143,8 @@ const it: Record<DictKey, string> = {
   "cx.nc.needAll": "Dati obbligatori mancanti: {list}.",
   "cx.nc.consentShort": "Il cliente autorizza l'uso dei suoi dati e foto",
   "cx.nc.needSignal": "Serve internet per creare clienti.",
+  "cx.nc.offlineInfo": "Offline: il cliente verrà salvato sul dispositivo e inviato al ritorno della connessione. La posizione viene rilevata qui.",
+  "cx.nc.queued": "Cliente salvato sul dispositivo. Verrà inviato al ritorno della connessione.",
   "cx.nc.saved": "✅ Cliente salvato. Ora è nell’elenco.",
   "cx.nc.partial": "Cliente salvato, ma una foto non è stata caricata. Riprova.",
   "cx.set.title": "Impostazioni",

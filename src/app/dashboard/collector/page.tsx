@@ -19,7 +19,9 @@ import { CutForm } from './cut-form';
 import { SignalButton } from './signal';
 import { MenuTile } from './tiles';
 import { NearbyScreen, NEAR_METERS, distanceM } from './nearby';
-import { NewClient } from './new-client';
+import { NewClient, type CustomerOp } from './new-client';
+import { getFile, delFile } from './offline-files';
+import { extFor } from '../image';
 import { Credits } from './credits';
 import { SettingsScreen, payQrUrl } from './settings';
 
@@ -58,7 +60,8 @@ type Day = { generated_at: string; routes: Route[] };
 type Op =
   | { kind: 'payment'; id: string; at: string; route: string; customer: string; method: Method; amount: number; order?: string; lat?: number; lng?: number }
   | { kind: 'visit'; id: string; at: string; route: string; customer: string; result: VisitResult; promise_date?: string; promise_amount?: number; notes?: string; lat?: number; lng?: number }
-  | { kind: 'expense'; id: string; at: string; route: string; amount: number; description: string };
+  | { kind: 'expense'; id: string; at: string; route: string; amount: number; description: string }
+  | CustomerOp;
 
 const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
 const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
@@ -240,11 +243,31 @@ export default function CollectorPage() {
               p_notes: op.notes ?? null, p_lat: op.lat ?? null, p_lng: op.lng ?? null,
               p_offline_uuid: op.id, p_visited_at: op.at,
             });
+          } else if (op.kind === 'customer') {
+            await rpc('collector_save_customer', {
+              p_route: op.route, p_name: op.name, p_phone: op.phone || null, p_address: op.address || null, p_tax_id: op.ci || null,
+              p_notes: null, p_lat: op.lat, p_lng: op.lng, p_g_name: op.gName || null, p_g_phone: op.gPhone || null, p_g_address: op.gAddress || null,
+              p_g_lat: op.gLat ?? null, p_g_lng: op.gLng ?? null, p_offline_uuid: op.id,
+            });
+            if (op.files && (op.files.doc || op.files.docback || op.files.photo || op.files.gphoto)) {
+              const up = async (kind: 'doc' | 'docback' | 'photo' | 'gphoto'): Promise<string | null> => {
+                if (!op.files?.[kind]) return null;
+                const blob = await getFile(`${op.id}:${kind}`);
+                if (!blob) return null;
+                const path = `${load<Day | null>(DAY_KEY, null)?.routes.find((x) => x.id === op.route)?.org_id ?? ''}/${op.id}/${kind}-${Date.now()}.${extFor(blob)}`;
+                const { error } = await supabase.storage.from('customer-files').upload(path, blob, { contentType: blob.type, upsert: false });
+                if (error) throw new Error(error.message);
+                return path;
+              };
+              const [a, b, c, d] = [await up('doc'), await up('docback'), await up('photo'), await up('gphoto')];
+              await rpc('collector_set_customer_files', { p_customer: op.id, p_doc_front: a, p_doc_back: b, p_photo: c, p_g_photo: d, p_consent: op.consent });
+              for (const k of ['doc', 'docback', 'photo', 'gphoto'] as const) { await delFile(`${op.id}:${k}`).catch(() => undefined); }
+            }
           } else {
             await rpc('collector_expense', { p_route: op.route, p_amount: op.amount, p_description: op.description, p_offline_uuid: op.id });
           }
           sent++;
-          { const set = touched.get(op.route) ?? new Set<string>(); if (op.kind !== 'expense') set.add(op.customer); touched.set(op.route, set); }
+          { const set = touched.get(op.route) ?? new Set<string>(); if (op.kind === 'customer') set.add(op.id); else if (op.kind !== 'expense') set.add(op.customer); touched.set(op.route, set); }
           await new Promise((r) => setTimeout(r, 150)); // de a uno, sin saturar la señal
         } catch (err) {
           const m = (err as Error).message;
@@ -326,6 +349,11 @@ export default function CollectorPage() {
         ...d,
         routes: d.routes.map((r) => {
           if (r.id !== op.route) return r;
+          if (op.kind === 'customer') {
+            const nc: Customer = { id: op.id, name: op.name, phone: op.phone, address: op.address, lat: op.lat, lng: op.lng, balance: 0, overdue: 0, due_today: 0,
+              next_due: null, visited_today: false, tax_id: op.ci, g_name: op.gName ?? null, g_phone: op.gPhone ?? null, g_lat: op.gLat ?? null, g_lng: op.gLng ?? null, credits: [] };
+            return { ...r, customers: [...r.customers.filter((c) => c.id !== op.id), nc] };
+          }
           if (op.kind === 'expense') return { ...r, unsettled_expenses: Number(r.unsettled_expenses) + op.amount,
             days: bumpToday(r, { expenses: op.amount }),
             fund_balance: r.fund_balance === undefined ? undefined : Number(r.fund_balance) - op.amount };
@@ -496,8 +524,8 @@ export default function CollectorPage() {
             {rejected.map((r) => (
               <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white/60 p-2 dark:bg-black/20">
                 <span className="min-w-0 text-xs">
-                  <b>{r.kind === 'visit' ? '📍' : r.kind === 'expense' ? '🧾' : '💵'}{' '}
-                    {r.kind === 'visit' ? '' : fmt(r.amount)}</b>{' · '}
+                  <b>{r.kind === 'visit' ? '📍' : r.kind === 'expense' ? '🧾' : r.kind === 'customer' ? '👤' : '💵'}{' '}
+                    {r.kind === 'visit' ? '' : r.kind === 'customer' ? r.name : fmt(r.amount)}</b>{' · '}
                   {new Date(r.at).toLocaleString(lang, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   <br />{r.reason}
                 </span>
@@ -551,7 +579,7 @@ export default function CollectorPage() {
       )}
 
       {screen === 'newclient' && (
-        <NewClient routeId={route.id} orgId={route.org_id ?? ''} online={online} canLoan={canNew} saleLabel={merch} needPhoto={!route.can_no_photo} needIdPhoto={!route.can_no_id_photo}
+        <NewClient routeId={route.id} orgId={route.org_id ?? ''} online={online} onQueue={(op) => { enqueue(op); }} canLoan={canNew} saleLabel={merch} needPhoto={!route.can_no_photo} needIdPhoto={!route.can_no_id_photo}
           onSaved={async (id) => { await patch(route.id, { customers: [id] }); }}
           onLoan={() => { setPanel('loan'); }} />
       )}
