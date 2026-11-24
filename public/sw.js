@@ -1,6 +1,6 @@
 // Service worker de Veltrix: permite instalar la app y abrirla sin internet.
 // Nunca guarda datos del negocio (Supabase, /api): solo la "cáscara" de la app.
-const VERSION = 'veltrix-v4';
+const VERSION = 'veltrix-v5';
 const SHELL = ['/offline.html', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
@@ -28,18 +28,6 @@ self.addEventListener('fetch', (event) => {
       caches.match(req).then((hit) => hit || fetch(req).then((res) => {
         if (res.ok) { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); }
         return res;
-      })),
-    );
-    return;
-  }
-
-  // Entrada de la app (/app) e ingreso: se abren al instante con la última copia y se renuevan en segundo plano
-  if (req.mode === 'navigate' && (url.pathname === '/app' || url.pathname === '/ingresar')) {
-    event.respondWith(
-      caches.open(VERSION).then((c) => c.match(req).then((hit) => {
-        const net = fetch(req).then((res) => { if (res.ok) c.put(req, res.clone()); return res; });
-        if (hit) { net.catch(() => {}); return hit; }
-        return net.catch(() => caches.match('/offline.html'));
       })),
     );
     return;
