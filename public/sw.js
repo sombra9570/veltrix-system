@@ -1,6 +1,6 @@
 // Service worker de Veltrix: permite instalar la app y abrirla sin internet.
 // Nunca guarda datos del negocio (Supabase, /api): solo la "cáscara" de la app.
-const VERSION = 'veltrix-v2';
+const VERSION = 'veltrix-v3';
 const SHELL = ['/offline.html', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {

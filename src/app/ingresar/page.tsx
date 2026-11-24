@@ -54,7 +54,11 @@ export default function IngresarPage() {
   return (
     <main className="flex min-h-dvh flex-col">
       {installed ? (
-        <div className="px-4 pt-[calc(1rem+env(safe-area-inset-top))] text-center text-xl font-extrabold tracking-tight">Veltrix <span className="text-blue-600 dark:text-blue-500">System</span></div>
+        <div className="flex flex-col items-center px-4 pt-[calc(1rem+env(safe-area-inset-top))] text-center text-xl font-extrabold tracking-tight">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/veltrix-v.png" alt="" width={56} height={56} className="h-14 w-14 object-contain" />
+          <span className="mt-1">Veltrix <span className="text-blue-600 dark:text-blue-500">System</span></span>
+        </div>
       ) : <SiteHeader showAuthButtons={false} />}
 
       <div className="flex flex-1 items-center justify-center px-4 py-8 sm:py-12">
