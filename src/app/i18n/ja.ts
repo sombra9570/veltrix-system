@@ -28,6 +28,7 @@ const ja: Record<DictKey, string> = {
   'home.subtitle': '店舗、卸売業者、レストラン、修理工場、貸金業向け。従業員は自分の担当だけを見て、あなたはすべてを管理できます。',
   'home.ctaTrial': '14日間無料で試す',
   'home.ctaHaveAccount': 'アカウントをお持ちの方',
+  'home.ctaHow': '仕組みを見る',
   'home.ctaPanel': 'マイパネルへ →',
   'home.noCard': 'カード不要 · いつでも解約可能',
   'home.forYourBusiness': 'あなたの業種に合わせて設計',

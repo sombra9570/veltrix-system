@@ -28,6 +28,7 @@ const it: Record<DictKey, string> = {
   'home.subtitle': 'Per negozi, distributori, ristoranti, officine e attività di prestiti. Ogni dipendente vede solo il suo lavoro e tu controlli tutto.',
   'home.ctaTrial': 'Prova 14 giorni gratis',
   'home.ctaHaveAccount': 'Ho già un account',
+  'home.ctaHow': 'Scopri come funziona',
   'home.ctaPanel': 'Vai al mio pannello →',
   'home.noCard': 'Senza carta · Disdici quando vuoi',
   'home.forYourBusiness': 'Pensato per il tuo tipo di attività',

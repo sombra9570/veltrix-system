@@ -28,6 +28,7 @@ const zh: Record<DictKey, string> = {
   'home.subtitle': '适用于商店、分销商、餐厅、维修店和借贷业务。每位员工只能看到自己的工作，而您掌控全局。',
   'home.ctaTrial': '免费试用 14 天',
   'home.ctaHaveAccount': '我已有账户',
+  'home.ctaHow': '查看工作方式',
   'home.ctaPanel': '进入我的面板 →',
   'home.noCard': '无需银行卡 · 随时取消',
   'home.forYourBusiness': '为您的业务类型而设计',

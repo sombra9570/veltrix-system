@@ -28,6 +28,7 @@ const ar: Record<DictKey, string> = {
   'home.subtitle': 'للمتاجر والموزعين والمطاعم والورش وشركات الإقراض. يرى كل موظف عمله فقط، وأنت تتحكم في كل شيء.',
   'home.ctaTrial': 'جرّب 14 يومًا مجانًا',
   'home.ctaHaveAccount': 'لديّ حساب بالفعل',
+  'home.ctaHow': 'شاهد كيف يعمل',
   'home.ctaPanel': '← الذهاب إلى لوحتي',
   'home.noCard': 'بدون بطاقة · ألغِ في أي وقت',
   'home.forYourBusiness': 'مصمم لنوع عملك',

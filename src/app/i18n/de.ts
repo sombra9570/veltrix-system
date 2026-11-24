@@ -28,6 +28,7 @@ const de: Record<DictKey, string> = {
   'home.subtitle': 'Für Läden, Großhändler, Restaurants, Werkstätten und Kreditgeschäfte. Jeder Mitarbeiter sieht nur seine Arbeit, und Sie behalten alles im Griff.',
   'home.ctaTrial': '14 Tage kostenlos testen',
   'home.ctaHaveAccount': 'Ich habe schon ein Konto',
+  'home.ctaHow': 'So funktioniert es',
   'home.ctaPanel': 'Zu meinem Dashboard →',
   'home.noCard': 'Ohne Karte · Jederzeit kündbar',
   'home.forYourBusiness': 'Gemacht für Ihre Branche',

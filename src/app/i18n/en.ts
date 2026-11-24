@@ -28,6 +28,7 @@ const en: Record<DictKey, string> = {
   'home.subtitle': 'For shops, distributors, restaurants, workshops and lending businesses. Each employee sees only their own work and you control everything.',
   'home.ctaTrial': 'Try 14 days free',
   'home.ctaHaveAccount': 'I already have an account',
+  'home.ctaHow': 'See how it works',
   'home.ctaPanel': 'Go to my dashboard →',
   'home.noCard': 'No card required · Cancel anytime',
   'home.forYourBusiness': 'Built for your type of business',

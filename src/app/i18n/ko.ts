@@ -28,6 +28,7 @@ const ko: Record<DictKey, string> = {
   'home.subtitle': '상점, 유통업체, 식당, 정비소, 대출 사업을 위한 솔루션. 직원은 자기 업무만 보고, 총괄 관리자은 모든 것을 관리합니다.',
   'home.ctaTrial': '14일 무료 체험',
   'home.ctaHaveAccount': '이미 계정이 있어요',
+  'home.ctaHow': '작동 방식 보기',
   'home.ctaPanel': '내 대시보드로 이동 →',
   'home.noCard': '카드 불필요 · 언제든 해지 가능',
   'home.forYourBusiness': '업종에 맞춘 설계',
