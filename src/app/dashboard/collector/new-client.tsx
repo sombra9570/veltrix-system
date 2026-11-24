@@ -58,7 +58,7 @@ function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) 
  * Las fotos se suben al guardar, así que hace falta internet (el cobro sí funciona sin señal).
  */
 export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel = false, needPhoto = false, needIdPhoto = false, onSaved, onLoan }: {
-  routeId: string; orgId: string; online: boolean; onQueue: (op: CustomerOp) => void; canLoan: boolean; saleLabel?: boolean; needPhoto?: boolean; needIdPhoto?: boolean;
+  routeId: string; orgId: string; online: boolean; onQueue?: (op: CustomerOp) => void; canLoan: boolean; saleLabel?: boolean; needPhoto?: boolean; needIdPhoto?: boolean;
   onSaved: (id: string) => Promise<void> | void; onLoan: () => void;
 }) {
   const { t } = useT();
@@ -100,6 +100,7 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
     const newId = crypto.randomUUID();
     // Cada cliente toma su propia lectura de ubicación en el lugar donde se crea; aquí solo se usa la que se capturó en este formulario
     const queueIt = async () => {
+      if (!onQueue) { setBusy(false); setErr(t('cx.nc.needSignal')); return; }
       try {
         const files: NonNullable<CustomerOp['files']> = {};
         for (const [k, file] of [['doc', ciFront], ['docback', ciBack], ['photo', photo], ['gphoto', gPhoto]] as const) {
