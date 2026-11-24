@@ -25,21 +25,24 @@ export const groupsOf = (id: string): Group[] => GROUPS_OF[id] ?? ['commerce'];
 
 /** Rubro exclusivo: no se combina con ningún otro. */
 export const STREET = 'collections';
+/** Cobranza en calle y microfinanzas son un solo rubro; microfinanzas ya no se ofrece por separado. */
+export const isStreet = (id: string) => id === 'collections' || id === 'microfinance';
 
 /** ¿Se puede sumar `id` a lo ya elegido en el mismo negocio? Solo si existe un grupo que los reúne a todos. */
 export function canJoin(selected: string[], id: string): boolean {
   if (selected.includes(id)) return true;
   // Cobranza en calle es exclusiva: no se combina con ningún otro rubro.
-  if (selected.includes(STREET) || id === STREET) return false;
+  if (selected.some(isStreet) || isStreet(id)) return false;
   const all = [...selected, id];
   return GROUPS.some((g) => all.every((x) => groupsOf(x).includes(g)));
 }
 
 /** Rubros visibles según lo que vende (productos / servicios / ambos / no sé = todos). */
 export function categoriesFor(sells: Sells | null): BusinessCategory[] {
-  if (sells === 'products') return BUSINESS_CATEGORIES.filter((c) => c.kind === 'products' || groupsOf(c.id).includes('commerce'));
-  if (sells === 'services') return BUSINESS_CATEGORIES.filter((c) => c.kind === 'services');
-  return BUSINESS_CATEGORIES;
+  const all = BUSINESS_CATEGORIES.filter((c) => c.id !== 'microfinance');
+  if (sells === 'products') return all.filter((c) => c.kind === 'products' || groupsOf(c.id).includes('commerce'));
+  if (sells === 'services') return all.filter((c) => c.kind === 'services');
+  return all;
 }
 
 /** "¿Qué haces en un día normal?": ayuda a quien no sabe elegir su rubro. */

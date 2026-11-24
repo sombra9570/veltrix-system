@@ -164,7 +164,7 @@ const es = {
   'cat.lodging': 'Hotel / Hospedaje',
   'cat.transport': 'Transporte / Mensajería',
   'cat.microfinance': 'Préstamos / Microfinanzas',
-  'cat.collections': 'Cobranza en calle',
+  'cat.collections': 'Cobranza en calle y microfinanzas',
 
   // ---------- Módulos ----------
   'mod.retail': 'Punto de venta',

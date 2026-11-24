@@ -15,7 +15,7 @@ import { useQ, type QKey } from './quiz-text';
 import {
   GROUPS, ACTIVITIES, categoriesFor, primaryGroup, groupsOf, canJoin, modulesFor, rolesFor, hasRestaurant, hasSales, kindFor, UNSURE_LIMIT,
   type Sells, type Tri, type Group, type Specifics,
-  STREET,
+  STREET, isStreet,
 } from './quiz-logic';
 
 const TERMS_VERSION = '2026-11';
@@ -167,7 +167,7 @@ export default function RegistroPage() {
     } catch { /* */ }
   }, []);
 
-  const streetOnly = bizCats.some((c) => c.includes(STREET)); // cobranza en calle: un solo negocio, sin sucursales ni otros planes
+  const streetOnly = bizCats.some((c) => c.some(isStreet)); // cobranza en calle: un solo negocio, sin sucursales ni otros planes
   const nBiz = bizCount === '2' ? 2 : bizCount === '3' ? 3 : 1;
   const catsOf = (i: number) => bizCats[i] ?? [];
   const allCats = useMemo(() => [...new Set(Array.from({ length: nBiz }, (_, i) => bizCats[i] ?? []).flat())], [bizCats, nBiz]);
@@ -208,7 +208,7 @@ export default function RegistroPage() {
   const setBiz = (i: number, fn: (c: string[]) => string[]) => setBizCats((p) => { const n = [...p]; while (n.length <= i) n.push([]); n[i] = fn(n[i]); return n; });
   const toggleCat = (i: number, id: string) => {
     setError('');
-    if (id === STREET && !(bizCats[i] ?? []).includes(STREET)) { setBizCount('1'); setBranchSize('b1'); setBizCats([[STREET]]); }
+    if (id === STREET && !(bizCats[i] ?? []).some(isStreet)) { setBizCount('1'); setBranchSize('b1'); setBizCats([[STREET]]); }
     else setBiz(i, (c) => (c.includes(id) ? c.filter((x) => x !== id) : canJoin(c, id) ? [...c, id] : c));
     setRubroUnsure((p) => { const n = [...p]; n[i] = false; return n; });
   };
@@ -405,7 +405,7 @@ export default function RegistroPage() {
                                 <div className="mt-2 flex flex-wrap gap-2">
                                   {items.map((c) => {
                                     const on = sel.includes(c.id);
-                                    const ok = canJoin(sel, c.id) || (c.id === STREET && !sel.includes(STREET));
+                                    const ok = canJoin(sel, c.id) || (c.id === STREET && !sel.some(isStreet));
                                     return (
                                       <button key={c.id} type="button" disabled={!ok} aria-pressed={on} title={ok ? undefined : qq('rubro.lock')} onClick={() => toggleCat(i, c.id)}
                                         className={`rounded-full border px-3.5 py-2 text-sm font-semibold transition ${on ? 'border-blue-500 bg-blue-600 text-white cursor-pointer' : ok ? 'border-slate-300 text-slate-700 hover:border-slate-400 cursor-pointer dark:border-slate-700 dark:text-slate-300' : 'border-slate-200 text-slate-400 opacity-45 cursor-not-allowed dark:border-slate-800 dark:text-slate-600'}`}>
@@ -421,7 +421,7 @@ export default function RegistroPage() {
                         {pool.some((c) => c.id === STREET) && (
                           <p className={`mt-3 text-xs ${ui.muted}`}>ℹ️ {qq('rubro.streetOnly')}</p>
                         )}
-                        {sel.length > 0 && !sel.includes(STREET) && sel.length < pool.length && pool.some((c) => !canJoin(sel, c.id)) && (
+                        {sel.length > 0 && !sel.some(isStreet) && sel.length < pool.length && pool.some((c) => !canJoin(sel, c.id)) && (
                           <p className={`mt-3 text-xs ${ui.muted}`}>🔒 {qq('rubro.lock')}</p>
                         )}
                         {sel.length > 0 && (
