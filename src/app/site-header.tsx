@@ -85,8 +85,10 @@ export function RegionSelectors({ stacked = false }: { stacked?: boolean }) {
 
 export function Logo() {
   return (
-    <Link href="/" className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-      Veltrix <span className="text-blue-600 dark:text-blue-500">System</span>
+    <Link href="/" className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/veltrix-v.png" alt="" width={28} height={28} className="h-7 w-7 object-contain" />
+      <span>Veltrix <span className="text-blue-600 dark:text-blue-500">System</span></span>
     </Link>
   );
 }
