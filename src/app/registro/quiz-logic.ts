@@ -23,9 +23,14 @@ const GROUPS_OF: Record<string, Group[]> = {
 export const primaryGroup = (id: string): Group => (GROUPS_OF[id] ?? ['commerce'])[0];
 export const groupsOf = (id: string): Group[] => GROUPS_OF[id] ?? ['commerce'];
 
+/** Rubro exclusivo: no se combina con ningún otro. */
+export const STREET = 'collections';
+
 /** ¿Se puede sumar `id` a lo ya elegido en el mismo negocio? Solo si existe un grupo que los reúne a todos. */
 export function canJoin(selected: string[], id: string): boolean {
   if (selected.includes(id)) return true;
+  // Cobranza en calle es exclusiva: no se combina con ningún otro rubro.
+  if (selected.includes(STREET) || id === STREET) return false;
   const all = [...selected, id];
   return GROUPS.some((g) => all.every((x) => groupsOf(x).includes(g)));
 }
