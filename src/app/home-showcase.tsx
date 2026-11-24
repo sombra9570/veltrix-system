@@ -8,18 +8,18 @@ import type { DictKey } from './i18n/es';
 // Los rubros que comparten funciones se agrupan (comercio, gastronomía, taller y servicios, calle y créditos).
 // Los montos están en USD y se muestran en la moneda del visitante.
 type Niche = 'retail' | 'food' | 'service' | 'field';
-type View = 'panel' | 'store' | 'cash' | 'tables' | 'menu' | 'orders' | 'route';
+type View = 'panel' | 'store' | 'cash' | 'tables' | 'menu' | 'orders' | 'route' | 'flow';
 const NICHES: Niche[] = ['retail', 'food', 'service', 'field'];
 const ICON: Record<Niche, string> = { retail: '🛍️', food: '🍽️', service: '🔧', field: '🛵' };
 const VIEWS: Record<Niche, View[]> = {
-  retail: ['panel', 'store', 'cash'],
-  food: ['panel', 'tables', 'menu'],
-  service: ['panel', 'orders', 'cash'],
-  field: ['panel', 'route', 'cash'],
+  retail: ['panel', 'store', 'cash', 'flow'],
+  food: ['panel', 'tables', 'menu', 'flow'],
+  service: ['panel', 'orders', 'cash', 'flow'],
+  field: ['panel', 'route', 'cash', 'flow'],
 };
 const VIEW_LABEL: Record<View, DictKey> = {
   panel: 'home.sh.v.panel', store: 'home.sh.v.store', cash: 'home.sc.tab.cash', tables: 'home.sh.v.tables',
-  menu: 'home.sh.v.menu', orders: 'home.sh.v.orders', route: 'home.sh.v.route',
+  menu: 'home.sh.v.menu', orders: 'home.sh.v.orders', route: 'home.sh.v.route', flow: 'home.sh.v.flow',
 };
 // Cada grupo: tarjetas (clave, valor, variación), curva de 12 meses y medidores de rendimiento
 type Kpi = { k: DictKey; v: string; d?: string; warn?: boolean };
@@ -124,7 +124,7 @@ export function HomeShowcase() {
           ))}
         </div>
         {/* Pantallas del grupo */}
-        <div className="grid grid-cols-3 border-b border-slate-200 bg-white px-1 pt-1 sm:px-2 sm:pt-2 dark:border-slate-800 dark:bg-slate-900" role="tablist">
+        <div className="grid grid-cols-4 border-b border-slate-200 bg-white px-1 pt-1 sm:px-2 sm:pt-2 dark:border-slate-800 dark:bg-slate-900" role="tablist">
           {VIEWS[niche].map((x) => (
             <button key={x} type="button" role="tab" aria-selected={view === x} onClick={() => pickView(x)}
               className={`min-w-0 cursor-pointer truncate rounded-t-lg px-1 py-1.5 text-[11px] font-bold sm:px-3 sm:text-xs ${view === x ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}>
@@ -268,6 +268,35 @@ export function HomeShowcase() {
                   </li>
                 ))}
               </ul>
+            </div>
+          )}
+
+          {view === 'flow' && (
+            <div className="space-y-3">
+              <ol className="space-y-2">
+                {[1, 2, 3].map((i) => (
+                  <li key={i} className={`${card} flex items-start gap-3`}>
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-blue-600 text-xs font-extrabold text-white">{i}</span>
+                    <div className="min-w-0">
+                      <p className="text-xs font-extrabold text-blue-600 dark:text-blue-400">{t(`home.sh.fl.${niche}.${i}.r` as DictKey)}</p>
+                      <p className="text-xs text-slate-600 dark:text-slate-300">{t(`home.sh.fl.${niche}.${i}.a` as DictKey)}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              {niche === 'field' && (
+                <div className={card}>
+                  <p className={lbl}>🛡️ {t('home.sh.fl.ti')}</p>
+                  <dl className="mt-2 grid grid-cols-3 gap-2 text-center">
+                    {(['who', 'when', 'where'] as const).map((x) => (
+                      <div key={x} className="min-w-0 rounded-lg bg-slate-50 px-1 py-2 dark:bg-slate-800">
+                        <dt className="text-[9px] font-semibold uppercase text-slate-500">{t(`home.sh.fl.${x}` as DictKey)}</dt>
+                        <dd className="mt-0.5 text-[11px] font-extrabold leading-tight">{t(`home.sh.fl.${x === 'who' ? 'wv' : x === 'when' ? 'tv' : 'pv'}` as DictKey)}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
             </div>
           )}
 
