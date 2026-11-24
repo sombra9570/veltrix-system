@@ -143,6 +143,8 @@ export default function RegistroPage() {
   const [wantAi, setWantAi] = useState<boolean | null>(null);
 
   const [plans, setPlans] = useState<PublicPlan[]>([]);
+  const [streetPlan, setStreetPlan] = useState<{ base_bs: number; collector_bs: number; collectors_per_supervisor: number; manager_after_collectors: number; manager_free: boolean } | null>(null);
+  useEffect(() => { rpc<typeof streetPlan>('public_street_plan').then((p) => setStreetPlan(p ?? null)).catch(() => {}); }, []);
   useEffect(() => { rpc<PublicPlan[]>('public_plans').then((p) => setPlans(p ?? [])).catch(() => {}); }, []);
   const [compName, setCompName] = useState('');
   const [taxId, setTaxId] = useState('');
@@ -522,6 +524,19 @@ export default function RegistroPage() {
                   <ul className="mt-1 list-disc pl-5 text-amber-900 dark:text-amber-100">
                     {unsureList.map((u) => <li key={u}>{qq((u.startsWith('rubro') ? 'sum.d.rubro' : u === 'businesses' ? 'sum.d.biz' : u === 'branches' ? 'sum.d.br' : `sum.d.${u}`) as QKey)}</li>)}
                   </ul>
+                </div>
+              )}
+              {streetOnly && streetPlan && (
+                <div className="mt-5 rounded-2xl border border-blue-300 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
+                  <p className="text-xs font-bold uppercase text-blue-700 dark:text-blue-300">{t('street.plan.title')}</p>
+                  <ul className="mt-2 space-y-1 text-sm font-semibold">
+                    <li>💵 {t('street.plan.base', { price: Number(streetPlan.base_bs) })}</li>
+                    <li>➕ {t('street.plan.coll', { price: Number(streetPlan.collector_bs) })}</li>
+                    <li>🧭 {t('street.plan.sup', { n: streetPlan.collectors_per_supervisor })}</li>
+                    {streetPlan.manager_free && <li>🏢 {t('street.plan.mgr', { n: streetPlan.manager_after_collectors + 1 })}</li>}
+                    <li>📲 {t('street.plan.pay')}</li>
+                  </ul>
+                  <p className={`mt-2 text-xs ${ui.muted}`}>{t('need.free')}</p>
                 </div>
               )}
               {plan && !streetOnly && (

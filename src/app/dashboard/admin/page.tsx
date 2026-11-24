@@ -173,6 +173,24 @@ export default function GlobalCoreAdminPage() {
       setPlanMsg(m.includes('INVALID') ? '⚠️ Verifique los valores: precios desde 0 y límites desde 1.' : '⚠️ No se pudo guardar el plan.');
     }
   };
+  // Plan de cobranza en calle (precios en bolivianos, propios de este rubro)
+  type StreetCfg = { base_bs: number; collector_bs: number; collectors_per_supervisor: number; manager_after_collectors: number; manager_free: boolean };
+  const [street, setStreet] = useState<StreetCfg | null>(null);
+  const [stEdit, setStEdit] = useState<Record<string, string>>({});
+  const loadStreet = useCallback(async () => { try { setStreet(await rpc<StreetCfg>('public_street_plan')); } catch { /* */ } }, []);
+  useEffect(() => { if (loaded && session?.role === 'superadmin') loadStreet(); }, [loaded, session, loadStreet]);
+  const stVal = (k: keyof StreetCfg) => stEdit[k] ?? String(street?.[k] ?? '');
+  const saveStreet = async () => {
+    const n = (k: keyof StreetCfg) => Number(stVal(k).replace(',', '.'));
+    setPlanMsg('');
+    try {
+      await rpc('admin_save_street_plan', { p_base_bs: n('base_bs'), p_collector_bs: n('collector_bs'), p_collectors_per_supervisor: n('collectors_per_supervisor'), p_manager_after_collectors: n('manager_after_collectors'), p_manager_free: stEdit.manager_free !== undefined ? stEdit.manager_free === 'true' : street?.manager_free ?? true });
+      setStEdit({}); setPlanMsg('✅ Plan de cobranza en calle guardado.'); await loadStreet();
+    } catch (e) {
+      setPlanMsg((e instanceof Error ? e.message : '').includes('STREET_INVALID') ? '⚠️ Verifique los valores: precios desde 0, supervisor cada 1 a 100 cobradores.' : '⚠️ No se pudo guardar el plan.');
+    }
+  };
+
   // Extras pagados (usuarios, sucursales, almacenamiento)
   type AdminAddon = { code: string; price_usd: number; price_global_usd: number; max_units: number; unit_mb: number };
   const [addons, setAddons] = useState<AdminAddon[]>([]);
@@ -498,6 +516,33 @@ export default function GlobalCoreAdminPage() {
               </div>
             ))}
           </div>
+          {street && (
+            <div className="space-y-2 pt-2">
+              <h3 className="text-xs font-bold text-slate-300">🛵 Plan exclusivo de cobranza en calle y microfinanzas (bolivianos al mes; se muestra al cliente al final del registro)</h3>
+              <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-3 text-xs">
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                  {([['base_bs', 'Base (1 administrador + 1 cobrador), Bs'], ['collector_bs', 'Cada cobrador adicional, Bs'], ['collectors_per_supervisor', 'Un supervisor cada N cobradores'], ['manager_after_collectors', 'Gerente después del cobrador N']] as [keyof StreetCfg, string][]).map(([k, label]) => (
+                    <label key={k} className="block">
+                      <span className="block text-[11px] text-slate-400 mb-0.5">{label}</span>
+                      <input inputMode="decimal" value={stVal(k)} onChange={(e) => setStEdit({ ...stEdit, [k]: e.target.value })}
+                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
+                    </label>
+                  ))}
+                </div>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={stEdit.manager_free !== undefined ? stEdit.manager_free === 'true' : street.manager_free}
+                    onChange={(e) => setStEdit({ ...stEdit, manager_free: String(e.target.checked) })} />
+                  <span>Gerente sin costo</span>
+                </label>
+                {Object.keys(stEdit).length > 0 && (
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => setStEdit({})} className="flex-1 border border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
+                    <button type="button" onClick={saveStreet} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar</button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           {addons.length > 0 && (
             <div className="space-y-2 pt-2">
               <h3 className="text-xs font-bold text-slate-300">➕ Complementos que el administrador de cada empresa puede contratar sin cambiar de plan (precio mensual por unidad)</h3>
