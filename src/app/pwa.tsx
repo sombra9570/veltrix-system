@@ -4,6 +4,16 @@ import { useT } from './i18n';
 
 type InstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 
+/** Quita la pantalla de arranque en cuanto la app ya pintó su primera pantalla. */
+export function SplashHide() {
+  useEffect(() => {
+    const go = () => { const s = document.getElementById('vx-splash'); if (s) s.style.display = 'none'; };
+    const id = requestAnimationFrame(() => requestAnimationFrame(go));
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return null;
+}
+
 /** Registra el service worker (necesario para instalar la app y abrirla sin internet). */
 export function PwaRegister() {
   useEffect(() => {
