@@ -167,6 +167,7 @@ export default function RegistroPage() {
     } catch { /* */ }
   }, []);
 
+  const streetOnly = bizCats.some((c) => c.includes(STREET)); // cobranza en calle: un solo negocio, sin sucursales ni otros planes
   const nBiz = bizCount === '2' ? 2 : bizCount === '3' ? 3 : 1;
   const catsOf = (i: number) => bizCats[i] ?? [];
   const allCats = useMemo(() => [...new Set(Array.from({ length: nBiz }, (_, i) => bizCats[i] ?? []).flat())], [bizCats, nBiz]);
@@ -207,7 +208,8 @@ export default function RegistroPage() {
   const setBiz = (i: number, fn: (c: string[]) => string[]) => setBizCats((p) => { const n = [...p]; while (n.length <= i) n.push([]); n[i] = fn(n[i]); return n; });
   const toggleCat = (i: number, id: string) => {
     setError('');
-    setBiz(i, (c) => (c.includes(id) ? c.filter((x) => x !== id) : id === STREET ? [id] : canJoin(c, id) ? [...c, id] : c));
+    if (id === STREET && !(bizCats[i] ?? []).includes(STREET)) { setBizCount('1'); setBranchSize('b1'); setBizCats([[STREET]]); }
+    else setBiz(i, (c) => (c.includes(id) ? c.filter((x) => x !== id) : canJoin(c, id) ? [...c, id] : c));
     setRubroUnsure((p) => { const n = [...p]; n[i] = false; return n; });
   };
   const setUnsureRubro = (i: number) => {
@@ -220,8 +222,8 @@ export default function RegistroPage() {
   const stepError = (): string => {
     if (step === 0) {
       if (!sells) return qq('val.sells');
-      if (!bizCount) return qq('val.biz');
-      if (!branchSize) return qq('val.br');
+      if (!streetOnly && !bizCount) return qq('val.biz');
+      if (!streetOnly && !branchSize) return qq('val.br');
     }
     if (step === 1) {
       for (let i = 0; i < nBiz; i++) if (catsOf(i).length === 0 && !rubroUnsure[i]) return qq('rubro.missing');
@@ -351,6 +353,7 @@ export default function RegistroPage() {
               </div>
               <div className="mt-3"><Choice on={sells === 'unsure'} soft onClick={() => { setSells('unsure'); setError(''); }}>{qq('unsure')}</Choice></div>
 
+              {!streetOnly && (<>
               <h2 className="mt-8 text-lg font-bold">{qq('biz.q')}</h2>
               <p className={`text-sm ${ui.muted}`}>{qq('biz.hint')}</p>
               <div className="mt-3 grid grid-cols-3 gap-2">
@@ -364,6 +367,7 @@ export default function RegistroPage() {
                 {BRANCH_SIZES.map((z) => <Choice key={z.id} on={branchSize === z.id} onClick={() => { setBranchSize(z.id); setError(''); }}>{t(`need.br.${z.id}` as DictKey)}</Choice>)}
               </div>
               <div className="mt-2"><Choice on={branchSize === 'unsure'} soft onClick={() => { setBranchSize('unsure'); setError(''); }}>{qq('unsure')}</Choice></div>
+              </>)}
             </>
           )}
 
@@ -520,7 +524,7 @@ export default function RegistroPage() {
                   </ul>
                 </div>
               )}
-              {plan && (
+              {plan && !streetOnly && (
                 <div className="mt-5 rounded-2xl border border-blue-300 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
                   <p className="text-xs font-bold uppercase text-blue-700 dark:text-blue-300">{t('need.solPlan')}</p>
                   <p className="mt-1 text-xl font-extrabold">{plan.name} · {t('need.planPrice', { price: Number(plan.price_usd) })}</p>
