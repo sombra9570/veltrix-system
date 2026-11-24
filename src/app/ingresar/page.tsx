@@ -18,7 +18,7 @@ export default function IngresarPage() {
   const [busy, setBusy] = useState(false);
   const [mode, setMode] = useState<'login' | 'forgot'>('login');
   const { t } = useT();
-  const [installed, setInstalled] = useState(false);
+  const [installed, setInstalled] = useState<boolean | null>(null); // null: aún no se sabe (evita el parpadeo del encabezado)
   useEffect(() => { setInstalled(isInstalledApp()); }, []);
 
   // Si ya tiene sesión, directo a su panel
@@ -53,7 +53,7 @@ export default function IngresarPage() {
 
   return (
     <main className="flex min-h-dvh flex-col">
-      {installed ? (
+      {installed === null ? <div className="h-[calc(7rem+env(safe-area-inset-top))]" /> : installed ? (
         <div className="flex flex-col items-center px-4 pt-[calc(3.5rem+env(safe-area-inset-top))] text-center text-3xl font-extrabold tracking-tight">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/veltrix-v.png" alt="" width={112} height={112} className="h-28 w-28 object-contain" />

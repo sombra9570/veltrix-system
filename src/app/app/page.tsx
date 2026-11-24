@@ -8,6 +8,7 @@ import { Spinner } from '../spinner';
 export default function AppEntry() {
   const router = useRouter();
   const { loaded, session } = useVeltrixAuth();
+  useEffect(() => { router.prefetch('/ingresar'); }, [router]);
   useEffect(() => {
     if (!loaded) return;
     router.replace(session ? homeForRole(session.role) : '/ingresar');
