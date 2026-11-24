@@ -89,8 +89,15 @@ export function HomeShowcase() {
     retail: [{ k: 'home.sc.salesToday', v: m(1398), d: '+8 %' }, { k: 'home.sh.k.online', v: '14', d: '+3' }, { k: 'home.sh.k.ticket', v: m(38) }, { k: 'home.sh.k.growth', v: '+18 %', d: '12 m' }],
     food: [{ k: 'home.sc.salesToday', v: m(2150), d: '+11 %' }, { k: 'home.sh.k.tables', v: '9/14' }, { k: 'home.sh.k.prep', v: '12 min' }, { k: 'home.sh.k.ticket', v: m(17), d: '+4 %' }],
     service: [{ k: 'home.sc.salesToday', v: m(980), d: '+6 %' }, { k: 'home.sh.k.jobs', v: '17' }, { k: 'home.sh.k.done', v: '6', d: '+2' }, { k: 'home.sh.k.ticket', v: m(120) }],
-    field: [{ k: 'home.sc.collectedToday', v: m(2650), d: '+12 %' }, { k: 'home.sc.salesToday', v: m(1398), d: '+8 %' }, { k: 'home.sc.portfolio', v: m(59300) }, { k: 'home.sc.overdue', v: '4,2 %', warn: true }],
+    field: [{ k: 'home.sc.collectedToday', v: m(2650), d: '+12 %' }, { k: 'home.sc.salesToday', v: m(640), d: '+5 %' }, { k: 'home.sc.portfolio', v: m(59300) }, { k: 'home.sc.overdue', v: '4,2 %', warn: true }],
   };
+  const CASH: Record<Niche, { rows: readonly (readonly [string, number])[]; qr: number; total: number; branch: number }> = {
+    retail: { rows: [['opening', 150], ['cashSales', 842], ['expenses', -60]], qr: 531, total: 932, branch: 1 },
+    food: { rows: [['opening', 120], ['cashSales', 1265], ['expenses', -85]], qr: 640, total: 1300, branch: 1 },
+    service: { rows: [['opening', 80], ['cashSales', 415], ['expenses', -35]], qr: 290, total: 460, branch: 2 },
+    field: { rows: [['opening', 200], ['collections', 1980], ['expenses', -75]], qr: 670, total: 2105, branch: 1 },
+  };
+  const cash = CASH[niche];
   const emoji = ['👕', '👟', '👜', '🧢', '🧥', '👖'];
   const dishes = ['🍔', '🍕', '🥗', '🍜'];
   const toast = niche === 'retail' ? `${t('home.sh.store.new')} · +${m(52)}` : niche === 'food' ? `${t('home.sh.table', { n: 7 })} · ${t('home.sh.st.new')}` : niche === 'service' ? `${t('home.sh.job', { n: 103 })} · ${t('home.sh.st.ready')}` : `${t('home.sc.toast1', { n: 3 })} · +${m(35)}`;
@@ -303,17 +310,17 @@ export function HomeShowcase() {
           {view === 'cash' && (
             <div className="grid gap-3 sm:grid-cols-2">
               <div className={card}>
-                <p className={lbl}>{t('home.sc.closeTitle')} · {t('home.sc.branchN', { n: 1 })}</p>
+                <p className={lbl}>{t('home.sc.closeTitle')} · {t('home.sc.branchN', { n: cash.branch })}</p>
                 <ul className="mt-2 space-y-1.5 text-xs">
-                  {([['opening', 100], ['cashSales', 612], ['collections', 820], ['expenses', -45]] as const).map(([k, v]) => (
-                    <li key={k} className="flex justify-between"><span>{t(`home.sc.${k}`)}</span><span className={`font-bold ${v < 0 ? 'text-red-600 dark:text-red-400' : ''}`}>{v < 0 ? '−' : ''}{m(Math.abs(v))}</span></li>
+                  {cash.rows.map(([k, v]) => (
+                    <li key={k} className="flex justify-between"><span>{t(`home.sc.${k}` as DictKey)}</span><span className={`font-bold ${v < 0 ? 'text-red-600 dark:text-red-400' : ''}`}>{v < 0 ? '−' : ''}{m(Math.abs(v))}</span></li>
                   ))}
-                  <li className="flex justify-between text-slate-500"><span>{t('home.sc.qr')}</span><span className="font-bold">{m(389)}</span></li>
+                  <li className="flex justify-between text-slate-500"><span>{t('home.sc.qr')}</span><span className="font-bold">{m(cash.qr)}</span></li>
                 </ul>
               </div>
               <div className={`${card} space-y-2`}>
-                <div className="flex justify-between text-xs"><span>{t('home.sc.expected')}</span><span className="font-extrabold">{m(1487)}</span></div>
-                <div className="flex justify-between text-xs"><span>{t('home.sc.counted')}</span><span className="font-extrabold">{m(1487)}</span></div>
+                <div className="flex justify-between text-xs"><span>{t('home.sc.expected')}</span><span className="font-extrabold">{m(cash.total)}</span></div>
+                <div className="flex justify-between text-xs"><span>{t('home.sc.counted')}</span><span className="font-extrabold">{m(cash.total)}</span></div>
                 <div className="flex justify-between border-t border-slate-200 pt-2 text-sm dark:border-slate-800"><span className="font-bold">{t('home.sc.diff')}</span><span className="font-extrabold text-emerald-600 dark:text-emerald-400">{m(0)}</span></div>
                 <p className="rounded-lg bg-emerald-50 px-2 py-1.5 text-[11px] font-bold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">{t('home.sc.approved')}</p>
               </div>
