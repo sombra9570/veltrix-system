@@ -8,6 +8,7 @@ import type { DictKey } from '../../../i18n/es';
 import { useOwner } from '../owner-context';
 import { TransferPay } from './transfer-pay';
 import { StreetPlan } from './street-plan';
+import { usePlanMoney } from '../../../plan-money';
 import { ExportData } from './export-data';
 
 type PlanOpt = { code: string; name: string; price: number; max_branches: number; max_users: number; max_companies: number; max_storage_mb: number; max_store_products: number };
@@ -20,7 +21,6 @@ type Billing = {
   history: { at: string; amount: number; status: string; gateway: string; period_end: string | null }[];
 };
 
-const usd = (n: number) => `US$ ${Number(n).toFixed(2)}`;
 
 type Addons = {
   items: { code: 'user' | 'branch' | 'storage'; price: number; unit_mb: number; max: number; qty: number }[];
@@ -31,6 +31,7 @@ type Addons = {
 
 export default function PlanPage() {
   const { t, lang } = useT();
+  const { fmt: usd } = usePlanMoney();
   const { orgId, reload } = useOwner();
   const [streetBs, setStreetBs] = useState<number | null>(null);
   const [b, setB] = useState<Billing | null>(null);

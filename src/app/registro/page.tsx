@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useVeltrixAuth, homeForRole } from '../auth-system';
 import { useLanguage, COUNTRIES, CountryCode } from '../language-selector';
 import { useT, countryName } from '../i18n';
+import { usePlanMoney } from '../plan-money';
 import {
   TEAM_SIZES, BRANCH_SIZES, TEAM_ROLES, recommendPlan, type TeamRole, type PublicPlan, catKey, modKey,
 } from '../business-catalog';
@@ -116,6 +117,7 @@ export default function RegistroPage() {
   const { loaded, session, registerCompany } = useVeltrixAuth();
   const [accepted, setAccepted] = useState(false);
   const { country, lang } = useLanguage();
+  const { fmt: planMoney, isBo } = usePlanMoney();
   const { t } = useT();
   const qq = useQ();
   const changeCountry = useCountryChange();
@@ -542,17 +544,18 @@ export default function RegistroPage() {
               {plan && !streetOnly && (
                 <div className="mt-5 rounded-2xl border border-blue-300 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
                   <p className="text-xs font-bold uppercase text-blue-700 dark:text-blue-300">{t('need.solPlan')}</p>
-                  <p className="mt-1 text-xl font-extrabold">{plan.name} · {t('need.planPrice', { price: Number(plan.price_usd) })}</p>
+                  <p className="mt-1 text-xl font-extrabold">{plan.name} · {isBo ? t('need.planPriceLocal', { price: planMoney(Number(plan.price_usd)) }) : t('need.planPrice', { price: Number(plan.price_usd) })}</p>
                   <p className={`mt-1 text-sm ${ui.muted}`}>{t('need.planWhy', { users: plan.max_users, branches: plan.max_branches, storage: `${Math.round(plan.max_storage_mb / 1024)} GB` })}</p>
                   {(() => {
                     const eu = Math.max(0, teamMax + 1 - plan.max_users);
                     const eb = Math.max(0, branchMax - plan.max_branches);
                     if (!eu && !eb) return null;
                     return <p className="mt-1 text-sm font-semibold">➕ {[
-                      eu ? t('need.plusUsers', { n: eu, price: Number(plan.extra_user?.price_usd ?? 0) }) : null,
-                      eb ? t('need.plusBranches', { n: eb, price: Number(plan.extra_branch?.price_usd ?? 0) }) : null,
+                      eu ? (isBo ? t('need.plusUsersLocal', { n: eu, price: planMoney(Number(plan.extra_user?.price_usd ?? 0)) }) : t('need.plusUsers', { n: eu, price: Number(plan.extra_user?.price_usd ?? 0) })) : null,
+                      eb ? (isBo ? t('need.plusBranchesLocal', { n: eb, price: planMoney(Number(plan.extra_branch?.price_usd ?? 0)) }) : t('need.plusBranches', { n: eb, price: Number(plan.extra_branch?.price_usd ?? 0) })) : null,
                     ].filter(Boolean).join(' · ')}</p>;
                   })()}
+                  {isBo && <p className={`mt-1 text-xs ${ui.muted}`}>{t('home.taxIncluded')}</p>}
                   <p className={`mt-2 text-xs ${ui.muted}`}>{t('need.free')}</p>
                 </div>
               )}
