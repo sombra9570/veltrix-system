@@ -13,6 +13,7 @@ import { AnnouncementsBanner } from './announcements';
 import { loadAuth } from '../auth-system';
 import type { DictKey } from '../i18n/es';
 import { useLive } from './live';
+import { AiBubble } from './ia-bubble';
 
 /** Un ítem del menú puede pedir uno o varios módulos ("a,b" = basta con uno) */
 export const navHas = (modules: string[] | null, need?: string) =>
@@ -233,6 +234,7 @@ export function AppShell({
         {banner}
         <main className="mx-auto w-full min-w-0 max-w-[1600px] flex-1 px-4 pt-5 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 md:p-8">{children}</main>
       </div>
+      <AiBubble />
     </div>
     </SlotCtx.Provider>
   );
