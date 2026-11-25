@@ -117,7 +117,7 @@ export default function RegistroPage() {
   const { loaded, session, registerCompany } = useVeltrixAuth();
   const [accepted, setAccepted] = useState(false);
   const { country, lang } = useLanguage();
-  const { fmt: planMoney, isBo } = usePlanMoney();
+  const { fmt: planMoney, isBo, street: streetMoney } = usePlanMoney();
   const { t } = useT();
   const qq = useQ();
   const changeCountry = useCountryChange();
@@ -145,7 +145,7 @@ export default function RegistroPage() {
   const [wantAi, setWantAi] = useState<boolean | null>(null);
 
   const [plans, setPlans] = useState<PublicPlan[]>([]);
-  const [streetPlan, setStreetPlan] = useState<{ base_bs: number; collector_bs: number; collectors_per_supervisor: number; manager_after_collectors: number; manager_free: boolean } | null>(null);
+  const [streetPlan, setStreetPlan] = useState<{ base_bs: number; collector_bs: number; base_usd: number; collector_usd: number; collectors_per_supervisor: number; manager_after_collectors: number; manager_free: boolean } | null>(null);
   useEffect(() => { rpc<typeof streetPlan>('public_street_plan').then((p) => setStreetPlan(p ?? null)).catch(() => {}); }, []);
   useEffect(() => { rpc<PublicPlan[]>('public_plans').then((p) => setPlans(p ?? [])).catch(() => {}); }, []);
   const [compName, setCompName] = useState('');
@@ -532,12 +532,13 @@ export default function RegistroPage() {
                 <div className="mt-5 rounded-2xl border border-blue-300 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
                   <p className="text-xs font-bold uppercase text-blue-700 dark:text-blue-300">{t('street.plan.title')}</p>
                   <ul className="mt-2 space-y-1 text-sm font-semibold">
-                    <li>💵 {t('street.plan.base', { price: Number(streetPlan.base_bs) })}</li>
-                    <li>➕ {t('street.plan.coll', { price: Number(streetPlan.collector_bs) })}</li>
+                    <li>💵 {t('street.plan.base', { price: streetMoney(Number(streetPlan.base_bs), Number(streetPlan.base_usd)) })}</li>
+                    <li>➕ {t('street.plan.coll', { price: streetMoney(Number(streetPlan.collector_bs), Number(streetPlan.collector_usd)) })}</li>
                     <li>🧭 {t('street.plan.sup', { n: streetPlan.collectors_per_supervisor })}</li>
                     {streetPlan.manager_free && <li>🏢 {t('street.plan.mgr', { n: streetPlan.manager_after_collectors + 1 })}</li>}
-                    <li>📲 {t('street.plan.pay')}</li>
+                    {isBo && <li>📲 {t('street.plan.pay')}</li>}
                   </ul>
+                  {!isBo && <p className={`mt-1 text-xs ${ui.muted}`}>{t('street.plan.tax')}</p>}
                   <p className={`mt-2 text-xs ${ui.muted}`}>{t('need.free')}</p>
                 </div>
               )}

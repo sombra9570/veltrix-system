@@ -4,13 +4,15 @@ import { rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
 import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
+import { usePlanMoney } from '../../../plan-money';
 
-type State = { contracted: number; collectors_used: number; supervisors_allowed: number; supervisors_used: number; price_bs: number; collector_bs: number; pending_extra: number | null };
+type State = { contracted: number; collectors_used: number; supervisors_allowed: number; supervisors_used: number; price_bs: number; collector_bs: number; price_usd: number; collector_usd: number; pending_extra: number | null };
 
 /** Plan de cobranza en calle: cobradores contratados, monto mensual y solicitud de cobradores adicionales.
  *  Solo se muestra en las empresas con este plan. */
 export function StreetPlan({ orgId, onPrice }: { orgId: string; onPrice?: (bs: number | null) => void }) {
-  const { t, lang } = useT();
+  const { t } = useT();
+  const { street: money, isBo } = usePlanMoney();
   const [s, setS] = useState<State | null>(null);
   const [qty, setQty] = useState('1');
   const [busy, setBusy] = useState(false);
@@ -22,7 +24,6 @@ export function StreetPlan({ orgId, onPrice }: { orgId: string; onPrice?: (bs: n
   useEffect(() => { load(); }, [load]);
 
   if (!s) return null;
-  const n = (v: number) => Number(v).toLocaleString(lang, { maximumFractionDigits: 2 });
   const send = async () => {
     const q = Math.floor(Number(qty));
     if (!q || q < 1) return;
@@ -41,14 +42,15 @@ export function StreetPlan({ orgId, onPrice }: { orgId: string; onPrice?: (bs: n
       <ul className="space-y-1 text-sm font-semibold">
         <li>{t('street.mine.collectors', { n: s.contracted, used: s.collectors_used })}</li>
         <li>{t('street.mine.supervisors', { n: s.supervisors_allowed, used: s.supervisors_used })}</li>
-        <li>{t('street.mine.price', { price: n(s.price_bs) })}</li>
+        <li>{t('street.mine.price', { price: money(s.price_bs, s.price_usd) })}</li>
       </ul>
+      {!isBo && <p className={`text-xs ${ui.muted}`}>{t('street.plan.tax')}</p>}
       {s.pending_extra ? (
         <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800 dark:bg-amber-500/10 dark:text-amber-200">{t('street.mine.pending', { n: s.pending_extra })}</p>
       ) : (
         <div className="flex flex-wrap items-end gap-2">
           <label className="block">
-            <span className={ui.label}>{t('street.mine.add', { price: n(s.collector_bs) })}</span>
+            <span className={ui.label}>{t('street.mine.add', { price: money(s.collector_bs, s.collector_usd) })}</span>
             <input className={`${ui.input} w-28`} inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value.replace(/\D/g, ''))} aria-label={t('street.mine.qty')} />
           </label>
           <button type="button" disabled={busy} onClick={send} className={ui.btnPrimary}>{busy ? '…' : t('street.mine.send')}</button>

@@ -13,5 +13,9 @@ export function usePlanMoney() {
     }
     return `US$ ${Number(usd).toFixed(2)}`;
   };
-  return { fmt, isBo };
+  // Plan de cobranza en calle: bolivianos fijos en Bolivia; en el resto, dólares (más impuestos que suma la plataforma de pago)
+  const street = (bs: number, usd: number) => isBo
+    ? `Bs ${Number(bs).toLocaleString('es-BO', { maximumFractionDigits: 2 })}`
+    : `US$ ${Number(usd).toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
+  return { fmt, isBo, street };
 }
