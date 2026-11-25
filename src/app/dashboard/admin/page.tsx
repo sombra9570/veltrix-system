@@ -45,7 +45,7 @@ const CAT_LABEL: Record<string, string> = Object.fromEntries(BUSINESS_CATEGORIES
 const ROLE_LABEL: Record<string, string> = {
   owner: 'Dueño', supervisor: 'Supervisor', cashier: 'Cajero', vendor: 'Vendedor', collector: 'Cobrador', waiter: 'Mesero',
   kitchen: 'Cocina', technician: 'Técnico', storekeeper: 'Almacén', accountant: 'Contador', director: 'Director',
-  secretary: 'Secretaría', reception: 'Recepción', delivery: 'Delivery',
+  secretary: 'Secretariado', reception: 'Recepción', delivery: 'Delivery', manager: 'Gerente',
 };
 const MOD_LABEL: Record<string, string> = {
   retail: 'Ventas', inventory: 'Inventario', purchasing: 'Compras', finance: 'Finanzas', restaurant: 'Restaurante',
