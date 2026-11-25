@@ -12,7 +12,7 @@ import { useEffect, useState } from 'react';
 import { supabase, rpc } from '../lib/supabase';
 import { COUNTRIES, CountryCode, TaxRegimeId, BusinessSectorId } from './language-selector';
 
-export type UserRole = 'superadmin' | 'owner' | 'cashier' | 'vendor' | 'collector' | 'supervisor' | 'waiter' | 'kitchen' | 'technician'
+export type UserRole = 'superadmin' | 'owner' | 'cashier' | 'vendor' | 'collector' | 'supervisor' | 'manager' | 'waiter' | 'kitchen' | 'technician'
   | 'storekeeper' | 'accountant' | 'director' | 'secretary' | 'reception' | 'delivery' | 'support' | 'none'; // none: sin acceso activo (usuario desactivado o empresa sin terminar)
 
 // Panel de inicio de cada rol (un solo botón "Ingresar" para todos)
@@ -21,6 +21,7 @@ export function homeForRole(role: UserRole): string {
     case 'superadmin': return '/dashboard/admin';
     case 'owner': return '/dashboard/owner';
     case 'supervisor': return '/dashboard/supervisor';
+    case 'manager': return '/dashboard/supervisor';
     case 'cashier': return '/dashboard/cashier';
     case 'reception': return '/dashboard/cashier';
     case 'delivery': return '/dashboard/collector/entregas';
@@ -364,6 +365,8 @@ async function loadAuthImpl(): Promise<ActiveSession | null> {
     // Recepción cubre la caja y Delivery cubre la ruta de cobro: entran a esas pantallas
     if (role === 'reception' && !alsoRoles.includes('cashier')) alsoRoles.push('cashier');
     if (role === 'delivery' && !alsoRoles.includes('collector')) alsoRoles.push('collector');
+    // Gerente entra al panel de gestión de la sucursal (el mismo del supervisor)
+    if (role === 'manager' && !alsoRoles.includes('supervisor')) alsoRoles.push('supervisor');
     const s: ActiveSession = {
       userId: user.id,
       name: profile?.full_name ?? user.email ?? '',

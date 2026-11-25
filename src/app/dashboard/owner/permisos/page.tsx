@@ -124,7 +124,7 @@ export default function PermissionsPage() {
 
           {/* Por rol */}
           <div className="grid gap-4 lg:grid-cols-3">
-            {Object.entries(d?.offered ?? ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (teamRoles.length === 0 || teamRoles.includes(role) || (d?.users ?? []).some((u) => u.role === role)) && (!cobranza || role === 'cashier' || role === 'collector')).map(([role, allKeys]) => { const keys = roleKeys(role, modules, d?.offered).filter((x) => keyOk(x) && !(cobranza && role === 'cashier' && !x.startsWith('cash.'))); return (
+            {Object.entries(d?.offered ?? ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (teamRoles.length === 0 || teamRoles.includes(role) || role === 'manager' || (d?.users ?? []).some((u) => u.role === role)) && (!cobranza || role === 'cashier' || role === 'collector')).map(([role, allKeys]) => { const keys = roleKeys(role, modules, d?.offered).filter((x) => keyOk(x) && !(cobranza && role === 'cashier' && !x.startsWith('cash.'))); return (
               <Card key={role}>
                 <h2 className="font-bold">{cobranza && role === 'cashier' ? t('rt.liquidator') : k(`role.${role}`)}</h2>
                 <p className={`mb-3 text-xs ${ui.muted}`}>{t('perm.roleHint')}</p>

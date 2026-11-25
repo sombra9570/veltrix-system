@@ -96,6 +96,7 @@ export function friendlyError(msg: string, t: (k: DictKey) => string): string {
   if (msg.includes('ROLE_NOT_COMBINABLE')) return t('err.roleNotCombinable');
   if (msg.includes('REPORT_LOCKED')) return t('rep.locked');
   if (msg.includes('REPORT_NOT_PENDING')) return t('rep.notPending');
+  if (msg.includes('ROLE_NEEDS_DELIVERY')) return t('err.roleNeedsDelivery');
   if (msg.includes('ROLE_NOT_IN_NICHE')) return t('err.roleNiche');
   if (msg.includes('PLAN_TOTAL_ROLES_LIMIT')) return t('err.limitTotalRoles');
   if (msg.includes('PLAN_ROLES_LIMIT')) return t('err.limitRoles');
@@ -161,7 +162,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
     if (!session) { router.replace('/ingresar'); return; }
     if (session.role !== 'owner') {
       // supervisores y demás: a su propio panel (el de supervisor llega en el siguiente paso)
-      if (session.role === 'supervisor') setDenied(true);
+      if (session.role === 'supervisor' || session.role === 'manager') setDenied(true);
       else router.replace(homeForRole(session.role));
     }
   }, [loaded, session, router]);

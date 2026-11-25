@@ -1,5 +1,5 @@
 // Qué módulo necesita cada rol y cada permiso: lo que el negocio no tiene activo no se muestra
-const ROLE_MODULE: Record<string, string> = { collector: 'field_collection', waiter: 'restaurant', kitchen: 'restaurant', technician: 'workshop', reception: 'workshop', storekeeper: 'inventory' };
+const ROLE_MODULE: Record<string, string> = { collector: 'field_collection', waiter: 'restaurant', kitchen: 'restaurant', technician: 'workshop', storekeeper: 'inventory' };
 
 export function roleAvailable(role: string, modules: string[]): boolean {
   const m = ROLE_MODULE[role];

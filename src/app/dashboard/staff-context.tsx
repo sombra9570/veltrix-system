@@ -61,7 +61,7 @@ export function StaffProvider({
   }
 
   // Menú: el de su rol principal + las pantallas de los roles que cubre (sin repetir ni duplicar mensajes)
-  const also = (session.alsoRoles ?? []).filter((r) => r !== session.role);
+  const also = (session.alsoRoles ?? []).filter((r) => r !== session.role && !(session.role === 'manager' && r === 'supervisor'));
   const own = (ROLE_NAV as Record<string, NavItem[]>)[session.role] ?? nav;
   const menuRaw = also.length === 0 ? nav : (() => {
     const seen = new Set(own.map((n) => n.label));
@@ -80,13 +80,13 @@ export function StaffProvider({
     // Cada rol ve solo lo de su rubro. Supervisor de cobranza en calle: únicamente sus rutas, reportes, mensajes y ajustes
     // (lista cerrada, no de exclusión: así nada de otros rubros se cuela, ni siquiera mientras carga el rubro).
     .filter((n) => {
-      if (session.role !== 'supervisor') return true;
+      if (session.role !== 'supervisor' && session.role !== 'manager') return true;
       if (modules === null) return false;
       const cobranza = modules.includes('field_collection') && !modules.some((m) => ['retail', 'restaurant', 'workshop'].includes(m));
       return !cobranza || ['/dashboard/supervisor', '/dashboard/supervisor/reportes', '/dashboard/supervisor/mensajes', '/dashboard/supervisor/ajustes'].includes(n.href);
 
     })
-    .map((n) => (session.role === 'supervisor' && n.label === 'sup.navRoutes' && modules && !modules.some((m) => ['retail', 'restaurant', 'workshop'].includes(m)) ? { ...n, label: 'sup.navRoutesOnly' as DictKey } : n));
+    .map((n) => ((session.role === 'supervisor' || session.role === 'manager') && n.label === 'sup.navRoutes' && modules && !modules.some((m) => ['retail', 'restaurant', 'workshop'].includes(m)) ? { ...n, label: 'sup.navRoutesOnly' as DictKey } : n));
 
   const company = companies.find((c) => c.id === session.companyId);
   return (
