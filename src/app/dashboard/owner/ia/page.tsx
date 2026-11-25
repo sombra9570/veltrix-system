@@ -47,7 +47,8 @@ export default function AiPage() {
         setTurns((x) => x.slice(0, -1));
         setQ(text);
         const code = j.error as string;
-        setErr(code === 'AI_QUOTA_EXCEEDED' ? t('ai.quotaExceeded')
+        setErr(code === 'AI_QUOTA_DAY' ? t('ai.quotaDay')
+          : code === 'AI_QUOTA_EXCEEDED' ? t('ai.quotaExceeded')
           : code === 'AI_NOT_ENABLED' ? t('ai.notEnabled')
           : code === 'AI_NOT_CONFIGURED' ? t('ai.notConfigured')
           : t('ai.failed'));
