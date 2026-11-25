@@ -4,6 +4,7 @@ import { supabase, rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
 import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
+import { useLanguage } from '../../../language-selector';
 import type { DictKey } from '../../../i18n/es';
 import { compressImage } from '../../image';
 import { PhotoPicker } from '../../photo-picker';
@@ -15,14 +16,16 @@ type Proof = { id: string; at: string; months: number; amount: number; currency:
 
 /** Pago por transferencia o QR bancario: el cliente sube el comprobante y el superadmin lo aprueba.
  *  Si la función aún no existe o no hay datos de transferencia cargados, la sección no se muestra. */
-export function TransferPay({ orgId, monthly, currency }: { orgId: string; monthly: number; currency: string }) {
+export function TransferPay({ orgId, monthly, currency, monthlyBs }: { orgId: string; monthly: number; currency: string; monthlyBs?: number | null }) {
   const { t, lang } = useT();
+  const { activeRate, country } = useLanguage();
   const k = (key: string) => t(key as DictKey);
   const [info, setInfo] = useState<Info | null>(null);
   const [qr, setQr] = useState<string | null>(null);
   const [proofs, setProofs] = useState<Proof[]>([]);
   const [months, setMonths] = useState(1);
   const [amount, setAmount] = useState('');
+  const [edited, setEdited] = useState(false);
   const [ref, setRef] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
@@ -41,6 +44,14 @@ export function TransferPay({ orgId, monthly, currency }: { orgId: string; month
   }, [orgId]);
   useEffect(() => { load(); }, [load]);
 
+  // Monto del mes en la moneda del pago: cobranza en calle en bolivianos; el resto, el precio en dólares llevado a bolivianos
+  const isBob = info?.currency === 'BOB';
+  const localMonthly: number | null = monthlyBs != null ? monthlyBs
+    : isBob && country.currency === 'BOB' && activeRate > 0 ? Math.round(grossUp(monthly, 'BO') * activeRate * 100) / 100 : null;
+  useEffect(() => {
+    if (localMonthly != null && !edited) setAmount(String(Math.round(localMonthly * months * 100) / 100));
+  }, [localMonthly, months, edited]);
+
   if (!info || (!info.account && !info.qr_path)) return null;
 
   const send = async () => {
@@ -55,7 +66,7 @@ export function TransferPay({ orgId, monthly, currency }: { orgId: string; month
       if (up.error) throw up.error;
       await rpc('submit_payment_proof', { p_org: orgId, p_months: months, p_amount: amt, p_currency: info.currency || currency, p_reference: ref || null, p_path: path });
       setMsg({ ok: true, text: t('tp.sent') });
-      setFile(null); setRef(''); setAmount('');
+      setFile(null); setRef(''); setAmount(''); setEdited(false);
       load();
     } catch (e) {
       const m = e instanceof Error ? e.message : '';
@@ -78,7 +89,7 @@ export function TransferPay({ orgId, monthly, currency }: { orgId: string; month
           {info.bank && <div><dt className={`inline ${ui.muted}`}>{t('tp.bank')}: </dt><dd className="inline font-semibold">{info.bank}</dd></div>}
           {info.account && <div><dt className={`inline ${ui.muted}`}>{t('tp.account')}: </dt><dd className="inline font-semibold tabular-nums">{info.account}</dd></div>}
           {info.note && <p className={`pt-1 text-xs ${ui.muted}`}>{info.note}</p>}
-          <p className="pt-2 text-xs font-semibold">{t('tp.monthly', { amount: fmt(info.currency === 'BOB' ? grossUp(monthly, 'BO') : monthly, 'US$') })}{info.currency === 'BOB' ? ` · ${t('home.taxIncluded')}` : ''}</p>
+          <p className="pt-2 text-xs font-semibold">{t('tp.monthly', { amount: localMonthly != null ? fmt(localMonthly, 'Bs') : fmt(isBob ? grossUp(monthly, 'BO') : monthly, 'US$') })}{isBob && monthlyBs == null ? ` · ${t('home.taxIncluded')}` : ''}</p>
         </dl>
         {qr && <img src={qr} alt="QR" className="h-40 w-40 rounded-xl border border-slate-200 bg-white object-contain p-1 dark:border-slate-700" />}
       </div>
@@ -90,7 +101,7 @@ export function TransferPay({ orgId, monthly, currency }: { orgId: string; month
           </select>
         </label>
         <label className="block"><span className={ui.label}>{t('tp.amount', { cur: info.currency || currency })}</span>
-          <input className={ui.input} inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} />
+          <input className={ui.input} inputMode="decimal" value={amount} onChange={(e) => { setAmount(e.target.value); setEdited(true); }} />
         </label>
         <label className="block"><span className={ui.label}>{t('tp.reference')}</span>
           <input className={ui.input} value={ref} maxLength={80} onChange={(e) => setRef(e.target.value)} />

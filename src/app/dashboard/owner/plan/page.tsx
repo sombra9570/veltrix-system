@@ -32,6 +32,7 @@ type Addons = {
 export default function PlanPage() {
   const { t, lang } = useT();
   const { orgId, reload } = useOwner();
+  const [streetBs, setStreetBs] = useState<number | null>(null);
   const [b, setB] = useState<Billing | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -239,9 +240,9 @@ export default function PlanPage() {
         <a href="mailto:hola@veltrixsystem.app?subject=Pago%20Veltrix" className={`${ui.btnGhost} mt-3 max-sm:w-full`}>✉️ hola@veltrixsystem.app</a>
       </Card>
 
-      {orgId && <StreetPlan orgId={orgId} />}
+      {orgId && <StreetPlan orgId={orgId} onPrice={setStreetBs} />}
 
-      {orgId && <TransferPay orgId={orgId} monthly={Number(b.price_now)} currency="USD" />}
+      {orgId && <TransferPay orgId={orgId} monthly={Number(b.price_now)} currency="USD" monthlyBs={streetBs} />}
 
       <ExportData />
 

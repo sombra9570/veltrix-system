@@ -9,7 +9,7 @@ type State = { contracted: number; collectors_used: number; supervisors_allowed:
 
 /** Plan de cobranza en calle: cobradores contratados, monto mensual y solicitud de cobradores adicionales.
  *  Solo se muestra en las empresas con este plan. */
-export function StreetPlan({ orgId }: { orgId: string }) {
+export function StreetPlan({ orgId, onPrice }: { orgId: string; onPrice?: (bs: number | null) => void }) {
   const { t, lang } = useT();
   const [s, setS] = useState<State | null>(null);
   const [qty, setQty] = useState('1');
@@ -17,8 +17,8 @@ export function StreetPlan({ orgId }: { orgId: string }) {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   const load = useCallback(async () => {
-    try { setS(await rpc<State | null>('my_street_state', { p_org: orgId })); } catch { setS(null); }
-  }, [orgId]);
+    try { const r = await rpc<State | null>('my_street_state', { p_org: orgId }); setS(r); onPrice?.(r ? Number(r.price_bs) : null); } catch { setS(null); onPrice?.(null); }
+  }, [orgId, onPrice]);
   useEffect(() => { load(); }, [load]);
 
   if (!s) return null;
