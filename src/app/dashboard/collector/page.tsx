@@ -24,6 +24,7 @@ import { getFile, delFile } from './offline-files';
 import { extFor } from '../image';
 import { Credits } from './credits';
 import { SettingsScreen, payQrUrl } from './settings';
+import { readSaleMode, cacheSaleMode, creditErrorKey, type CreditOp } from './credit-ops';
 
 /* ------------------------------------------------------------------
  * Cobrador de calle: trabaja SIN internet.
@@ -61,11 +62,15 @@ type Op =
   | { kind: 'payment'; id: string; at: string; route: string; customer: string; method: Method; amount: number; order?: string; lat?: number; lng?: number }
   | { kind: 'visit'; id: string; at: string; route: string; customer: string; result: VisitResult; promise_date?: string; promise_amount?: number; notes?: string; lat?: number; lng?: number }
   | { kind: 'expense'; id: string; at: string; route: string; amount: number; description: string }
-  | CustomerOp;
+  | CustomerOp
+  | CreditOp;
 
 const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
 const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
 const VISITS: VisitResult[] = ['no_one_home', 'promise', 'refused', 'other'];
+
+/** Clientes de la ruta guardados en el teléfono, con la forma que usan los formularios de crédito */
+const localCust = (r: Route) => r.customers.map((c) => ({ id: c.id, name: c.name, phone: c.phone, address: c.address, balance: Number(c.balance), rating: c.rating ?? 'new' }));
 
 /** Suma un movimiento local (aún sin señal) a la fila de hoy */
 function bumpToday(r: { today: string; days?: DayRow[] }, add: Partial<Record<'cash' | 'digital' | 'payments' | 'lent' | 'expenses', number>>): DayRow[] | undefined {
@@ -219,6 +224,7 @@ export default function CollectorPage() {
   const flush = useCallback(async (force = false) => {
     let sent = 0;
     let lockedHit = false;
+    let creditSent = false;
     const touched = new Map<string, Set<string>>(); // ruta -> clientes tocados
     if (flushing.current) return;
     flushing.current = true;
@@ -263,6 +269,18 @@ export default function CollectorPage() {
               await rpc('collector_set_customer_files', { p_customer: op.id, p_doc_front: a, p_doc_back: b, p_photo: c, p_g_photo: d, p_consent: op.consent });
               for (const k of ['doc', 'docback', 'photo', 'gphoto'] as const) { await delFile(`${op.id}:${k}`).catch(() => undefined); }
             }
+          } else if (op.kind === 'loan') {
+            await rpc('create_street_loan_v2', {
+              p_route: op.route, p_customer: op.customer, p_principal: op.principal, p_interest: op.interest, p_count: op.count,
+              p_every_days: op.every, p_first_due: op.first, p_notes: op.notes, p_offline_uuid: op.id,
+            });
+            creditSent = true;
+          } else if (op.kind === 'credit_sale') {
+            await rpc('collector_credit_sale_v2', {
+              p_route: op.route, p_customer: op.customer, p_items: op.items, p_count: op.count,
+              p_every_days: op.every, p_first_due: op.first, p_notes: op.notes, p_offline_uuid: op.id,
+            });
+            creditSent = true;
           } else {
             await rpc('collector_expense', { p_route: op.route, p_amount: op.amount, p_description: op.description, p_offline_uuid: op.id });
           }
@@ -276,10 +294,12 @@ export default function CollectorPage() {
           if (isNetworkError(m) || !navigator.onLine) break;
           // Ruta bloqueada por el supervisor: lo anotado se conserva en la cola y se envía al desbloquear
           if (m.includes('ROUTE_LOCKED')) { lockedHit = true; break; }
-          const rej = [...load<(Op & { reason: string })[]>(REJ_KEY, []).filter((o) => o.id !== op.id), { ...op, reason: m }];
+          const ck = op.kind === 'loan' || op.kind === 'credit_sale' ? creditErrorKey(m) : null;
+          const why = ck ? t(ck as DictKey) : m;
+          const rej = [...load<(Op & { reason: string })[]>(REJ_KEY, []).filter((o) => o.id !== op.id), { ...op, reason: why }];
           save(REJ_KEY, rej);
           setRejected(rej);
-          flash(false, `${t('col.rejected')}: ${m}`);
+          flash(false, `${t('col.rejected')}: ${why}`);
         }
         pending = load<Op[]>(QUEUE_KEY, []).filter((o) => o.id !== op.id);
         save(QUEUE_KEY, pending);
@@ -294,7 +314,8 @@ export default function CollectorPage() {
     // Las cifras ya se calcularon en el teléfono al anotar (caja, cobrado, deuda del cliente): no se lee nada más.
     // Solo se tira del servidor al abrir / ↻ / bloqueo, si hubo rechazos, o cuando se acumulan muchas acciones.
     const hadRejects = load<unknown[]>(REJ_KEY, []).length > 0;
-    if (force || lockedHit || hadRejects || sinceSync.current >= RECONCILE_EVERY) await refresh();
+    // Un préstamo o venta a plazos enviado puede quedar pendiente de aprobación: se baja el día para ver el estado real
+    if (force || lockedHit || hadRejects || creditSent || sinceSync.current >= RECONCILE_EVERY) await refresh();
     void touched;
   }, [QUEUE_KEY, REJ_KEY, refresh, patch, t]);
 
@@ -381,15 +402,21 @@ export default function CollectorPage() {
                 due_today: Math.max(0, Number(c.due_today) - Math.max(0, paid - Number(c.overdue))),
               };
             }
+            if (op.kind === 'loan' || op.kind === 'credit_sale') {
+              return { ...c, visited_today: true, balance: Number(c.balance) + op.total };
+            }
             return { ...c, visited_today: true };
           });
+          const lentAdd = op.kind === 'loan' ? op.principal : 0;
           const cashAdd = op.kind === 'payment' && op.method === 'cash' ? op.amount : 0;
           const digAdd = op.kind === 'payment' && op.method !== 'cash' ? op.amount : 0;
           return {
             ...r, customers,
             unsettled_cash: Number(r.unsettled_cash) + cashAdd,
-            days: op.kind === 'payment' ? bumpToday(r, { cash: cashAdd, digital: digAdd, payments: 1 }) : r.days,
-            fund_balance: r.fund_balance === undefined ? undefined : Number(r.fund_balance) + cashAdd,
+            days: op.kind === 'payment' ? bumpToday(r, { cash: cashAdd, digital: digAdd, payments: 1 })
+              : op.kind === 'loan' ? bumpToday(r, { lent: lentAdd }) : r.days,
+            unsettled_loans: lentAdd ? Number(r.unsettled_loans ?? 0) + lentAdd : r.unsettled_loans,
+            fund_balance: r.fund_balance === undefined ? undefined : Number(r.fund_balance) + cashAdd - lentAdd,
             unsettled_digital: Number(r.unsettled_digital) + digAdd,
           };
         }),
@@ -403,7 +430,9 @@ export default function CollectorPage() {
   const route = day?.routes.find((r) => r.id === routeId);
   useEffect(() => {
     if (!routeId) return;
-    rpc<{ mode: 'loan' | 'merch'; can: boolean }>('collector_sale_mode', { p_route: routeId }).then((m) => setSaleMode(m ?? null)).catch(() => setSaleMode(null));
+    setSaleMode(readSaleMode(routeId)); // sin señal: lo último que se vio
+    rpc<{ mode: 'loan' | 'merch'; can: boolean }>('collector_sale_mode', { p_route: routeId })
+      .then((m) => { setSaleMode(m ?? null); if (m) cacheSaleMode(routeId, m); }).catch(() => { /* se queda con lo guardado */ });
   }, [routeId]);
   const merch = saleMode?.mode === 'merch';
   const canNew = merch ? !!saleMode?.can : !!route?.can_loan && !!route?.policy;
@@ -524,8 +553,8 @@ export default function CollectorPage() {
             {rejected.map((r) => (
               <li key={r.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-white/60 p-2 dark:bg-black/20">
                 <span className="min-w-0 text-xs">
-                  <b>{r.kind === 'visit' ? '📍' : r.kind === 'expense' ? '🧾' : r.kind === 'customer' ? '👤' : '💵'}{' '}
-                    {r.kind === 'visit' ? '' : r.kind === 'customer' ? r.name : fmt(r.amount)}</b>{' · '}
+                  <b>{r.kind === 'visit' ? '📍' : r.kind === 'expense' ? '🧾' : r.kind === 'customer' ? '👤' : r.kind === 'loan' ? '💸' : r.kind === 'credit_sale' ? '🛍️' : '💵'}{' '}
+                    {r.kind === 'visit' ? '' : r.kind === 'customer' ? r.name : r.kind === 'loan' ? fmt(r.principal) : r.kind === 'credit_sale' ? fmt(r.total) : fmt(r.amount)}</b>{' · '}
                   {new Date(r.at).toLocaleString(lang, { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   <br />{r.reason}
                 </span>
@@ -713,12 +742,14 @@ export default function CollectorPage() {
               }} />
             )}
             {panel === 'loan' && merch && (
-              <CreditSaleForm routeId={route.id} today={route.today} fmt={fmt}
+              <CreditSaleForm routeId={route.id} today={route.today} fmt={fmt} online={online} localCustomers={localCust(route)}
+                onQueue={(op) => enqueue(op)}
                 onDone={async (text, ok, customerId) => { flash(ok, text); setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
             )}
             {panel === 'loan' && !merch && route.policy && (
               <LoanForm routeId={route.id} today={route.today} policy={route.policy} canInterest={!!route.can_interest}
-                canCustomers={route.can_customers !== false} fmt={fmt}
+                canCustomers={route.can_customers !== false} fmt={fmt} online={online} localCustomers={localCust(route)}
+                fund={fund} maxLoan={Number(route.max_loan ?? 0)} onQueue={(op) => enqueue(op)}
                 onDone={async (text, ok, customerId) => { flash(ok, text); setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
             )}
             {panel === 'settle' && fund !== null && <PeriodSheet route={route} fmt={fmt} fund={fund} online={online}

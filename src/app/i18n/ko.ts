@@ -2461,6 +2461,9 @@ const ko: Record<DictKey, string> = {
   'login.deviceReleased': "기기가 해제되었거나 다른 곳에서 계정이 열려 세션이 종료되었습니다. 다시 로그인하세요.",
   'team.devRelease': "기기 해제",
   'team.devReleased': "{name}의 기기를 해제했습니다.",
+  'loan.queued': "{amount} 대출이 저장되었습니다. 신호가 돌아오면 전송됩니다.",
+  'sale.queued': "{amount} 할부 판매가 저장되었습니다. 신호가 돌아오면 전송됩니다.",
+  'loan.e.fundLocal': "금액이 노선의 사용 가능한 자금을 초과합니다.",
 };
 
 export default ko;

@@ -2461,6 +2461,9 @@ const zh: Record<DictKey, string> = {
   'login.deviceReleased': "您的会话已关闭，因为该设备已被释放或账户已在别处登录。请重新登录。",
   'team.devRelease': "释放设备",
   'team.devReleased': "已释放 {name} 的设备。",
+  'loan.queued': "{amount} 的贷款已保存，恢复信号后将自动发送。",
+  'sale.queued': "{amount} 的分期销售已保存，恢复信号后将自动发送。",
+  'loan.e.fundLocal': "金额超过路线的可用资金。",
 };
 
 export default zh;

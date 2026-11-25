@@ -2461,6 +2461,9 @@ const fr: Record<DictKey, string> = {
   'login.deviceReleased': "Votre session a été fermée car l'appareil a été libéré ou le compte a été ouvert ailleurs. Reconnectez-vous.",
   'team.devRelease': "Libérer l'appareil",
   'team.devReleased': "Appareils de {name} libérés.",
+  'loan.queued': "Prêt de {amount} enregistré. Il sera envoyé au retour du signal.",
+  'sale.queued': "Vente à crédit de {amount} enregistrée. Elle sera envoyée au retour du signal.",
+  'loan.e.fundLocal': "Le montant dépasse le fonds disponible de la tournée.",
 };
 
 export default fr;

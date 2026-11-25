@@ -5,6 +5,8 @@ import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
 import { SkuTag } from '../sku-tag';
+import { isNetworkError } from '../offline-sales';
+import { readProducts, cacheProducts, type SaleOp } from './credit-ops';
 
 /* ------------------------------------------------------------------
  * Venta a plazos de mercadería en la calle: cuotas fijas y SIN interés.
@@ -15,12 +17,13 @@ type Product = { id: string; name: string; unit_price: number; sku?: string | nu
 const FREQS: [number, string][] = [[1, 'daily'], [7, 'weekly'], [15, 'biweekly'], [30, 'monthly']];
 const addDays = (iso: string, n: number) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 
-export function CreditSaleForm({ routeId, today, fmt, onDone }: {
+export function CreditSaleForm({ routeId, today, fmt, onDone, online, localCustomers, onQueue }: {
   routeId: string; today: string; fmt: (n: number) => string; onDone: (text: string, ok: boolean, customerId?: string) => void;
+  online: boolean; localCustomers: RouteCustomer[]; onQueue: (op: SaleOp) => void;
 }) {
   const { t } = useT();
-  const [customers, setCustomers] = useState<RouteCustomer[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [customers, setCustomers] = useState<RouteCustomer[]>(localCustomers);
+  const [products, setProducts] = useState<Product[]>(() => readProducts<Product>(routeId));
   const [q, setQ] = useState('');
   const [pq, setPq] = useState('');
   const [cid, setCid] = useState('');
@@ -32,8 +35,13 @@ export function CreditSaleForm({ routeId, today, fmt, onDone }: {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
-  useEffect(() => { rpc<RouteCustomer[]>('route_customers', { p_route: routeId }).then((x) => setCustomers(x ?? [])).catch(() => {}); }, [routeId]);
-  useEffect(() => { rpc<Product[]>('collector_products_v2', { p_route: routeId }).then((x) => setProducts(x ?? [])).catch((e) => setErr((e as Error).message.includes('SALE_NO_PERMISSION') ? t('sale.e.perm') : (e as Error).message)); }, [routeId, t]);
+  useEffect(() => { if (navigator.onLine) rpc<RouteCustomer[]>('route_customers', { p_route: routeId }).then((x) => setCustomers(x ?? [])).catch(() => setCustomers(localCustomers)); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [routeId, online]);
+  useEffect(() => {
+    if (!navigator.onLine) return;
+    rpc<Product[]>('collector_products_v2', { p_route: routeId })
+      .then((x) => { setProducts(x ?? []); cacheProducts(routeId, x ?? []); })
+      .catch((e) => { const m = (e as Error).message; if (m.includes('SALE_NO_PERMISSION')) setErr(t('sale.e.perm')); else if (!isNetworkError(m)) setErr(m); });
+  }, [routeId, t, online]);
   useEffect(() => { setFirst(addDays(today, every)); }, [every, today]);
 
   const custList = useMemo(() => {
@@ -52,16 +60,25 @@ export function CreditSaleForm({ routeId, today, fmt, onDone }: {
   const each = valid ? Math.trunc((total / n) * 100) / 100 : 0;
   const setQty = (id: string, v: number) => setItems((m) => { const x = { ...m }; if (v <= 0) delete x[id]; else x[id] = v; return x; });
 
+  const queueIt = (opId: string) => {
+    onQueue({ kind: 'credit_sale', id: opId, at: new Date().toISOString(), route: routeId, customer: cid,
+      items: chosen.map((p) => ({ product_id: p.id, qty: items[p.id] })), count: n, every, first, notes: notes || null, total });
+    onDone(t('sale.queued', { amount: fmt(total) }), true);
+  };
+
   const submit = async () => {
     setBusy(true); setErr('');
+    const opId = crypto.randomUUID();
+    if (!online || !navigator.onLine) { queueIt(opId); setBusy(false); return; }
     try {
-      await rpc('collector_credit_sale', {
+      await rpc('collector_credit_sale_v2', {
         p_route: routeId, p_customer: cid, p_items: chosen.map((p) => ({ product_id: p.id, qty: items[p.id] })),
-        p_count: n, p_every_days: every, p_first_due: first, p_notes: notes || null,
+        p_count: n, p_every_days: every, p_first_due: first, p_notes: notes || null, p_offline_uuid: opId,
       });
       onDone(t('sale.created', { amount: fmt(total) }), true, cid);
     } catch (e) {
       const m = (e as Error).message;
+      if (isNetworkError(m)) { queueIt(opId); return; }
       setErr(m.includes('SALE_NO_PERMISSION') ? t('sale.e.perm') : m.includes('LOAN_OTHER_ROUTE') ? t('loan.e.otherRoute')
         : m.includes('ROUTE_LOCKED') ? t('sp.lockedInfo') : /fetch|network|Failed/i.test(m) ? t('loan.e.offline') : m);
     } finally { setBusy(false); }

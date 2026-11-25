@@ -2461,6 +2461,9 @@ const ar: Record<DictKey, string> = {
   'login.deviceReleased': "تم إغلاق جلستك لأنه تم تحرير الجهاز أو فتح الحساب في مكان آخر. سجّل الدخول مرة أخرى.",
   'team.devRelease': "تحرير الجهاز",
   'team.devReleased': "تم تحرير أجهزة {name}.",
+  'loan.queued': "تم حفظ قرض بقيمة {amount}. سيُرسل عند عودة الإشارة.",
+  'sale.queued': "تم حفظ بيع بالأقساط بقيمة {amount}. سيُرسل عند عودة الإشارة.",
+  'loan.e.fundLocal': "المبلغ يتجاوز الصندوق المتاح للمسار.",
 };
 
 export default ar;

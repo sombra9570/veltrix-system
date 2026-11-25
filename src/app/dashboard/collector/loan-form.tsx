@@ -5,6 +5,8 @@ import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
 import { parseAmount } from '../format';
+import { isNetworkError } from '../offline-sales';
+import type { LoanOp } from './credit-ops';
 
 /* ------------------------------------------------------------------
  * Préstamo en calle: el cobrador elige (o registra) al cliente, el monto, las cuotas y la frecuencia.
@@ -15,7 +17,7 @@ export type LoanPolicy = {
   interest_default: number; interest_min: number; interest_max: number; max_installments: number;
   late_daily: number; late_weekly: number; late_biweekly: number; late_monthly: number;
 };
-type RouteCustomer = { id: string; name: string; phone: string | null; address: string | null; balance: number; rating: string };
+export type RouteCustomer = { id: string; name: string; phone: string | null; address: string | null; balance: number; rating: string };
 const FREQS: [number, string][] = [[1, 'daily'], [7, 'weekly'], [15, 'biweekly'], [30, 'monthly']];
 
 export const RATING_DOT: Record<string, string> = {
@@ -24,12 +26,13 @@ export const RATING_DOT: Record<string, string> = {
 
 const addDays = (iso: string, n: number) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 
-export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fmt, onDone }: {
+export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fmt, onDone, online, localCustomers, fund, maxLoan, onQueue }: {
   routeId: string; today: string; policy: LoanPolicy; canInterest: boolean; canCustomers: boolean;
   fmt: (n: number) => string; onDone: (text: string, ok: boolean, customerId?: string) => void;
+  online: boolean; localCustomers: RouteCustomer[]; fund: number | null; maxLoan: number; onQueue: (op: LoanOp) => void;
 }) {
   const { t, lang } = useT();
-  const [customers, setCustomers] = useState<RouteCustomer[]>([]);
+  const [customers, setCustomers] = useState<RouteCustomer[]>(localCustomers);
   const [q, setQ] = useState('');
   const [cid, setCid] = useState('');
   const [newC, setNewC] = useState<{ name: string; phone: string; address: string; doc: string } | null>(null);
@@ -42,7 +45,7 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
-  useEffect(() => { rpc<RouteCustomer[]>('route_customers', { p_route: routeId }).then((x) => setCustomers(x ?? [])).catch(() => {}); }, [routeId]);
+  useEffect(() => { if (navigator.onLine) rpc<RouteCustomer[]>('route_customers', { p_route: routeId }).then((x) => setCustomers(x ?? [])).catch(() => setCustomers(localCustomers)); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [routeId, online]);
   useEffect(() => { setFirst(addDays(today, every)); }, [every, today]);
 
   const p = parseAmount(amount);
@@ -62,8 +65,19 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
     return (s ? customers.filter((c) => c.name.toLowerCase().includes(s) || (c.phone ?? '').includes(s)) : customers).slice(0, 30);
   }, [customers, q]);
 
+  // Sin señal: se guarda en el teléfono y se envía al volver. Se valida antes con lo último que se vio de la ruta.
+  const queueIt = (opId: string) => {
+    if (maxLoan > 0 && p > maxLoan) { setErr(t('loan.e.maxAmount')); return; }
+    if (fund !== null && p > fund + 0.004) { setErr(t('loan.e.fundLocal')); return; }
+    onQueue({ kind: 'loan', id: opId, at: new Date().toISOString(), route: routeId, customer: cid, principal: p, interest: canInterest ? i : null,
+      count: n, every, first, notes: notes || null, total });
+    onDone(t('loan.queued', { amount: fmt(p) }), true);
+  };
+
   const submit = async () => {
     setBusy(true); setErr('');
+    const opId = crypto.randomUUID();
+    if ((!online || !navigator.onLine) && cid && !newC) { queueIt(opId); setBusy(false); return; }
     try {
       let customer = cid;
       if (!customer && newC) {
@@ -71,15 +85,17 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
           p_route: routeId, p_name: newC.name, p_phone: newC.phone || null, p_address: newC.address || null, p_tax_id: newC.doc || null,
         });
       }
-      const r = await rpc<{ approval: string; reasons: string[] }>('create_street_loan', {
+      const r = await rpc<{ approval: string; reasons: string[] }>('create_street_loan_v2', {
         p_route: routeId, p_customer: customer, p_principal: p, p_interest: canInterest ? i : null,
-        p_count: n, p_every_days: every, p_first_due: first, p_notes: notes || null,
+        p_count: n, p_every_days: every, p_first_due: first, p_notes: notes || null, p_offline_uuid: opId,
       });
       onDone(r.approval === 'pending_supervisor'
         ? t('loan.pending', { reasons: r.reasons.map((x) => t(`loan.r.${x}` as DictKey)).join(', ') })
         : t('loan.created', { amount: fmt(p) }), true, customer ?? undefined);
     } catch (e) {
       const m = (e as Error).message;
+      // Se cortó la señal justo al enviar: se guarda con el mismo identificador (si ya había llegado, el servidor no lo repite)
+      if (cid && !newC && isNetworkError(m)) { queueIt(opId); return; }
       setErr(m.includes('LOAN_INTEREST_LOCKED') ? t('loan.e.interest') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm')
         : m.includes('LOAN_MAX_CUSTOMERS') ? t('loan.e.maxCustomers') : m.includes('LOAN_OTHER_ROUTE') ? t('loan.e.otherRoute')
         : m.includes('LOAN_ROUTE_MAX_AMOUNT') ? t('loan.e.maxAmount') : m.includes('LOAN_ROUTE_MAX_CARDS') ? t('loan.e.maxCards')
@@ -110,7 +126,7 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
             ))}
             {list.length === 0 && <li className={`text-xs ${ui.muted}`}>{t('loan.noCustomers')}</li>}
           </ul>
-          {canCustomers && <button type="button" onClick={() => { setCid(''); setNewC({ name: '', phone: '', address: '', doc: '' }); }} className={`${ui.btnGhost} w-full text-sm`}>➕ {t('loan.newCustomer')}</button>}
+          {canCustomers && online && <button type="button" onClick={() => { setCid(''); setNewC({ name: '', phone: '', address: '', doc: '' }); }} className={`${ui.btnGhost} w-full text-sm`}>➕ {t('loan.newCustomer')}</button>}
         </div>
       ) : (
         <div className="space-y-2 rounded-xl border border-blue-200 p-3 dark:border-blue-500/30">

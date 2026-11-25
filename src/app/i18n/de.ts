@@ -2461,6 +2461,9 @@ const de: Record<DictKey, string> = {
   'login.deviceReleased': "Ihre Sitzung wurde beendet, weil das Gerät freigegeben oder das Konto anderswo geöffnet wurde. Bitte melden Sie sich erneut an.",
   'team.devRelease': "Gerät freigeben",
   'team.devReleased': "Geräte von {name} freigegeben.",
+  'loan.queued': "Darlehen über {amount} gespeichert. Es wird gesendet, sobald wieder Empfang besteht.",
+  'sale.queued': "Ratenverkauf über {amount} gespeichert. Er wird gesendet, sobald wieder Empfang besteht.",
+  'loan.e.fundLocal': "Der Betrag übersteigt den verfügbaren Fonds der Route.",
 };
 
 export default de;

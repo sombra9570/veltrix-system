@@ -2461,6 +2461,9 @@ const en: Record<DictKey, string> = {
   'login.deviceReleased': "Your session was closed because this device was released or the account was opened elsewhere. Please sign in again.",
   'team.devRelease': "Release device",
   'team.devReleased': "Devices of {name} released.",
+  'loan.queued': "Loan of {amount} saved. It will be sent when the signal returns.",
+  'sale.queued': "Credit sale of {amount} saved. It will be sent when the signal returns.",
+  'loan.e.fundLocal': "The amount exceeds the route's available fund.",
 };
 
 export default en;

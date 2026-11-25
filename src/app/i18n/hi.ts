@@ -2461,6 +2461,9 @@ const hi: Record<DictKey, string> = {
   'login.deviceReleased': "आपका सत्र बंद कर दिया गया क्योंकि डिवाइस मुक्त किया गया या खाता कहीं और खोला गया। कृपया फिर से साइन इन करें।",
   'team.devRelease': "डिवाइस मुक्त करें",
   'team.devReleased': "{name} के डिवाइस मुक्त किए गए।",
+  'loan.queued': "{amount} का ऋण सहेजा गया। सिग्नल लौटने पर भेजा जाएगा।",
+  'sale.queued': "{amount} की किस्त बिक्री सहेजी गई। सिग्नल लौटने पर भेजी जाएगी।",
+  'loan.e.fundLocal': "राशि मार्ग के उपलब्ध फंड से अधिक है।",
 };
 
 export default hi;

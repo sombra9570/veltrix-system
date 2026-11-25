@@ -2470,6 +2470,9 @@ const es = {
   'login.deviceReleased': "Su sesión se cerró porque el dispositivo fue liberado o se ingresó desde otro. Vuelva a ingresar.",
   'team.devRelease': "Liberar dispositivo",
   'team.devReleased': "Dispositivos de {name} liberados.",
+  'loan.queued': "Préstamo de {amount} guardado. Se enviará al volver la señal.",
+  'sale.queued': "Venta a plazos de {amount} guardada. Se enviará al volver la señal.",
+  'loan.e.fundLocal': "El monto supera el fondo disponible de la ruta.",
 };
 
 export default es;

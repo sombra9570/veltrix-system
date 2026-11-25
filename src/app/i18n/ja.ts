@@ -2461,6 +2461,9 @@ const ja: Record<DictKey, string> = {
   'login.deviceReleased': "端末が解除された、または別の端末でログインされたため、セッションを終了しました。もう一度ログインしてください。",
   'team.devRelease': "端末を解除",
   'team.devReleased': "{name} の端末を解除しました。",
+  'loan.queued': "{amount} の融資を保存しました。電波が戻ると送信されます。",
+  'sale.queued': "{amount} の分割販売を保存しました。電波が戻ると送信されます。",
+  'loan.e.fundLocal': "金額がルートの利用可能な資金を超えています。",
 };
 
 export default ja;
