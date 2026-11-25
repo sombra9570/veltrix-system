@@ -7,6 +7,7 @@ import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
 import { useOwner } from '../owner-context';
 import { TransferPay } from './transfer-pay';
+import { StreetPlan } from './street-plan';
 import { ExportData } from './export-data';
 
 type PlanOpt = { code: string; name: string; price: number; max_branches: number; max_users: number; max_companies: number; max_storage_mb: number; max_store_products: number };
@@ -237,6 +238,8 @@ export default function PlanPage() {
         <p className={`mt-1 text-sm ${ui.muted}`}>{t('bill.qrText')}</p>
         <a href="mailto:hola@veltrixsystem.app?subject=Pago%20Veltrix" className={`${ui.btnGhost} mt-3 max-sm:w-full`}>✉️ hola@veltrixsystem.app</a>
       </Card>
+
+      {orgId && <StreetPlan orgId={orgId} />}
 
       {orgId && <TransferPay orgId={orgId} monthly={Number(b.price_now)} currency="USD" />}
 

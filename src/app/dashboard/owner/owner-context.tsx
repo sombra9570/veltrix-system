@@ -86,6 +86,8 @@ const DAY = 86_400_000;
 export function friendlyError(msg: string, t: (k: DictKey) => string): string {
   if (msg.includes('PERM_DENIED')) return t('err.permDenied');
   if (msg.includes('PLAN_LIMIT_BRANCHES')) return t('err.limitBranches');
+  if (msg.includes('STREET_COLLECTORS_LIMIT')) return t('err.streetCollectors');
+  if (msg.includes('STREET_SUPERVISORS_LIMIT')) return t('err.streetSupervisors');
   if (msg.includes('PLAN_LIMIT_USERS')) return t('err.limitUsers');
   if (msg.includes('PLAN_LIMIT_COMPANIES')) return t('err.limitCompanies');
   if (msg.includes('PLAN_COMBO_LIMIT') || msg.includes('PLAN_BIG_LIMIT')) return t('err.limitCombo');

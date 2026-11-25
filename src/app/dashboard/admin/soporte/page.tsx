@@ -8,13 +8,14 @@ import { Spinner } from '../../../spinner';
 import { useLiveTopic } from '../../live';
 import { PlatformBell } from '../platform-bell';
 import { LeadsPanel } from '../leads-panel';
+import { StreetRequests } from '../street-requests';
 
 type Ticket = { id: string; subject: string; status: 'open' | 'answered' | 'closed'; priority: string; updated_at: string; assigned_to: string | null; assigned_name: string | null; org: string | null; plan: string | null; mine: boolean };
 type Thread = {
   ticket: { id: string; subject: string; status: Ticket['status']; priority: string; created_at: string; assigned_to: string | null; assigned_name: string | null; org: string | null; plan: string | null; opener: string | null };
   messages: { id: string; kind: 'customer' | 'staff'; body: string; internal: boolean; at: string; by: string | null }[];
 };
-type Staff = { user_id: string; name: string; email: string; func: string; can_reply: boolean; can_assign: boolean; can_see_orgs: boolean; is_active: boolean };
+type Staff = { user_id: string; name: string; email: string; func: string; can_reply: boolean; can_assign: boolean; can_approve_street?: boolean; can_see_orgs: boolean; is_active: boolean };
 type Contact = { id: string; name: string; func: string; unread: number };
 type Chat = { id: string; mine: boolean; body: string; at: string };
 
@@ -63,6 +64,8 @@ export default function SupportPage() {
             <button type="button" onClick={logout} className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm font-semibold text-red-400 cursor-pointer">Cerrar sesión</button>
           </div>
         </header>
+
+        <StreetRequests />
 
         <nav className="flex gap-2">
           {tabs.map(([k, l]) => (
@@ -222,7 +225,7 @@ function Team() {
   const update = async (s: Staff, patch: Partial<Staff>) => {
     const n = { ...s, ...patch };
     try {
-      await rpc('staff_update', { p_user: n.user_id, p_func: n.func, p_reply: n.can_reply, p_assign: n.can_assign, p_orgs: n.can_see_orgs, p_active: n.is_active });
+      await rpc('staff_update', { p_user: n.user_id, p_func: n.func, p_reply: n.can_reply, p_assign: n.can_assign, p_orgs: n.can_see_orgs, p_active: n.is_active, p_street: !!n.can_approve_street });
       await load();
     } catch (e) { setMsg({ ok: false, text: err(e) }); }
   };
@@ -271,6 +274,7 @@ function Team() {
                 <Chk on={s.can_reply} label="Responde y cierra" onChange={(v) => update(s, { can_reply: v })} />
                 <Chk on={s.can_assign} label="Asigna" onChange={(v) => update(s, { can_assign: v })} />
                 <Chk on={s.can_see_orgs} label="Ve empresa y plan" onChange={(v) => update(s, { can_see_orgs: v })} />
+                <Chk on={!!s.can_approve_street} label="Aprueba cobradores adicionales (cobranza en calle)" onChange={(v) => update(s, { can_approve_street: v })} />
               </div>
             </li>
           ))}

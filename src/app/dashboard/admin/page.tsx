@@ -7,6 +7,7 @@ import { useVeltrixAuth } from '../../auth-system';
 import { rpc, supabase } from '../../../lib/supabase';
 import { Spinner } from '../../spinner';
 import { TransferAdmin } from './transfer-admin';
+import { StreetRequests } from './street-requests';
 import { NetBanner } from '../sync';
 import { PlatformBell } from './platform-bell';
 import { PurgeOrg, SweepFiles, AutoPurgePanel } from './purge-org';
@@ -580,6 +581,7 @@ export default function GlobalCoreAdminPage() {
         <>
         {/* PAGOS POR TRANSFERENCIA O QR */}
         <TransferAdmin />
+        <StreetRequests />
 
         {/* PILOTOS Y FUNDADORES */}
         <section className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
