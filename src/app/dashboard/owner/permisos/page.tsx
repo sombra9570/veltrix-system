@@ -11,6 +11,7 @@ import { roleAvailable, keyAvailable } from './availability';
 
 type Data = {
   keys: string[];
+  offered?: Record<string, string[]>;
   roles: Record<string, Record<string, boolean>>;
   users: { membership_id: string; name: string; role: string; branch: string | null; permissions: Record<string, boolean> }[];
 };
@@ -18,8 +19,8 @@ type Data = {
 // Qué permisos tienen sentido para cada rol (los demás no se muestran para no confundir)
 // Permisos delegables por rol (el dueño lo tiene todo; el supervisor parte con todo y el dueño le puede apagar acciones una por una)
 const ROLE_KEYS: Record<string, string[]> = {
-  supervisor: ['cash.see_expected', 'cash.expense', 'cash.withdraw', 'cash.deposit', 'cash.change_fund', 'payments.reverse', 'sales.credit', 'inv.see_cost', 'inv.adjust', 'products.price', 'products.delete', 'customers.edit', 'reports.export', 'store.publish', 'loans.create', 'loans.interest', 'loans.cancel', 'loans.reschedule', 'routes.invest', 'routes.liquidate', 'routes.approve_loans'],
-  cashier: ['products.see_code', 'cash.see_expected', 'cash.expense', 'cash.withdraw', 'cash.deposit', 'cash.change_fund', 'customers.view_docs', 'customers.upload_docs', 'payments.reverse', 'sales.cancel_request', 'store.photo', 'store.publish', 'store.edit_info', 'store.orders', 'store.assign'],
+  supervisor: ['cash.see_expected', 'cash.expense', 'cash.deposit', 'cash.change_fund', 'payments.reverse', 'sales.credit', 'inv.see_cost', 'inv.adjust', 'products.price', 'products.delete', 'customers.edit', 'reports.export', 'store.publish', 'loans.create', 'loans.interest', 'loans.cancel', 'loans.reschedule', 'routes.invest', 'routes.liquidate', 'routes.approve_loans'],
+  cashier: ['products.see_code', 'cash.see_expected', 'cash.expense', 'cash.deposit', 'cash.change_fund', 'customers.view_docs', 'customers.upload_docs', 'payments.reverse', 'sales.cancel_request', 'store.photo', 'store.publish', 'store.edit_info', 'store.orders', 'store.assign'],
   vendor: ['products.see_code', 'sales.credit', 'inv.see_cost', 'customers.create', 'customers.edit', 'customers.view_docs', 'customers.upload_docs', 'payments.reverse', 'sales.cancel_request', 'store.photo', 'store.publish', 'store.edit_info', 'store.orders', 'store.assign'],
   collector: ['collector.expenses', 'collector.pay_out', 'collector.portfolio', 'loans.create', 'loans.customers', 'loans.interest', 'loans.cancel', 'loans.reschedule', 'payments.reverse', 'routes.liquidate', 'routes.invest'],
   storekeeper: ['products.see_code', 'products.create', 'products.edit', 'products.price', 'products.delete', 'inv.receive', 'inv.purchase', 'inv.adjust', 'inv.out_waste', 'inv.out_damaged', 'inv.out_expired', 'inv.out_internal', 'inv.out_supplier_return', 'inv.out_other', 'inv.transfer', 'inv.see_cost', 'inv.photo', 'store.photo', 'store.publish', 'store.edit_info', 'store.orders', 'store.assign'],
@@ -32,8 +33,8 @@ const ROLE_KEYS: Record<string, string[]> = {
 
 // Cobrador de mercadería (rubro sin finanzas): cobra cuotas fijas sin interés; no presta dinero ni invierte en la ruta
 const MERCH_COLLECTOR_OUT = ['loans.create', 'loans.interest', 'routes.invest'];
-function roleKeys(role: string, modules: string[]): string[] {
-  const base = ROLE_KEYS[role] ?? [];
+function roleKeys(role: string, modules: string[], offered?: Record<string, string[]>): string[] {
+  const base = offered?.[role] ?? ROLE_KEYS[role] ?? [];
   if (role !== 'collector' || modules.length === 0 || modules.includes('finance')) return base;
   return [...base.filter((k) => !MERCH_COLLECTOR_OUT.includes(k)), 'sales.credit'];
 }
@@ -88,7 +89,7 @@ export default function PermissionsPage() {
     finally { setBusy(false); }
   };
 
-  const users = useMemo(() => (d?.users ?? []).filter((u) => ROLE_KEYS[u.role]), [d]);
+  const users = useMemo(() => (d?.users ?? []).filter((u) => (d?.offered ?? ROLE_KEYS)[u.role]), [d]);
 
   return (
     <div className="space-y-5">
@@ -123,7 +124,7 @@ export default function PermissionsPage() {
 
           {/* Por rol */}
           <div className="grid gap-4 lg:grid-cols-3">
-            {Object.entries(ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (teamRoles.length === 0 || teamRoles.includes(role) || (d?.users ?? []).some((u) => u.role === role)) && (!cobranza || role === 'cashier' || role === 'collector')).map(([role, allKeys]) => { const keys = roleKeys(role, modules).filter((x) => keyOk(x) && !(cobranza && role === 'cashier' && !x.startsWith('cash.'))); return (
+            {Object.entries(d?.offered ?? ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (teamRoles.length === 0 || teamRoles.includes(role) || (d?.users ?? []).some((u) => u.role === role)) && (!cobranza || role === 'cashier' || role === 'collector')).map(([role, allKeys]) => { const keys = roleKeys(role, modules, d?.offered).filter((x) => keyOk(x) && !(cobranza && role === 'cashier' && !x.startsWith('cash.'))); return (
               <Card key={role}>
                 <h2 className="font-bold">{cobranza && role === 'cashier' ? t('rt.liquidator') : k(`role.${role}`)}</h2>
                 <p className={`mb-3 text-xs ${ui.muted}`}>{t('perm.roleHint')}</p>
@@ -151,7 +152,7 @@ export default function PermissionsPage() {
             {users.length === 0 ? <p className={`p-5 text-sm ${ui.muted}`}>{t('perm.noUsers')}</p> : (
               <ul className="divide-y divide-slate-200 dark:divide-slate-800">
                 {users.map((u) => {
-                  const overrides = Object.keys(u.permissions ?? {}).filter((x) => roleKeys(u.role, modules).includes(x)).length;
+                  const overrides = Object.keys(u.permissions ?? {}).filter((x) => roleKeys(u.role, modules, d?.offered).includes(x)).length;
                   return (
                     <li key={u.membership_id}>
                       <button type="button" onClick={() => setOpen(open === u.membership_id ? null : u.membership_id)}
@@ -165,7 +166,7 @@ export default function PermissionsPage() {
                       </button>
                       {open === u.membership_id && (
                         <ul className="space-y-3 px-4 pb-4">
-                          {roleKeys(u.role, modules).filter((x) => keyOk(x)).map((key) => {
+                          {roleKeys(u.role, modules, d?.offered).filter((x) => keyOk(x)).map((key) => {
                             const own = u.permissions?.[key];
                             const inherited = !!d.roles[u.role]?.[key];
                             const val = own === undefined ? 'inherit' : own ? 'yes' : 'no';
