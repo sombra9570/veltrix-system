@@ -32,6 +32,8 @@ export function StaffProvider({
   // Rubros activos de la empresa: lo que no ocupa no aparece en el menú
   const [modules, setModules] = useState<string[] | null>(null);
   const [storeOk, setStoreOk] = useState(false);
+  // Veltrix IA aparece en el menú solo si el usuario tiene el permiso (aunque le falte activar su acceso individual)
+  const [aiOk, setAiOk] = useState(false);
   const uid = session?.userId;
   const cid = session?.companyId;
   useEffect(() => {
@@ -43,6 +45,11 @@ export function StaffProvider({
     if (!uid || !cid) return;
     rpc<boolean>('my_store_access', { p_company: cid }).then((b) => setStoreOk(!!b)).catch(() => setStoreOk(false));
   }, [uid, cid]);
+  useEffect(() => {
+    if (!uid) return;
+    rpc<{ allowed: boolean; reason?: string }>('ai_quota_status')
+      .then((r) => setAiOk(!!r?.allowed || r?.reason === 'AI_ADDON_REQUIRED')).catch(() => setAiOk(false));
+  }, [uid]);
   // Panel al que pertenece este usuario; si apunta aquí mismo (o a ingresar con sesión) no se redirige: evita bucles
   const target = session ? homeForRole(session.role) : '/ingresar';
   // Un rol propio también cubre las funciones de otros roles: puede entrar a sus pantallas
@@ -76,14 +83,14 @@ export function StaffProvider({
     if (extra.length === 0) return [...mine, ...chat];
     return [...mine.map((n) => ({ ...n, group: `role.${session.role}` as DictKey })), ...extra, ...chat];
   })();
-  const menu = menuRaw.filter((n) => navHas(modules, n.module)).filter((n) => !n.href.endsWith('/tienda') || storeOk)
+  const menu = menuRaw.filter((n) => navHas(modules, n.module)).filter((n) => !n.href.endsWith('/tienda') || storeOk).filter((n) => !n.ai || aiOk)
     // Cada rol ve solo lo de su rubro. Supervisor de cobranza en calle: únicamente sus rutas, reportes, mensajes y ajustes
     // (lista cerrada, no de exclusión: así nada de otros rubros se cuela, ni siquiera mientras carga el rubro).
     .filter((n) => {
       if (session.role !== 'supervisor' && session.role !== 'manager') return true;
       if (modules === null) return false;
       const cobranza = modules.includes('field_collection') && !modules.some((m) => ['retail', 'restaurant', 'workshop'].includes(m));
-      return !cobranza || ['/dashboard/supervisor', '/dashboard/supervisor/reportes', '/dashboard/supervisor/mensajes', '/dashboard/supervisor/ajustes'].includes(n.href);
+      return !cobranza || ['/dashboard/supervisor', '/dashboard/supervisor/reportes', '/dashboard/supervisor/ia', '/dashboard/supervisor/mensajes', '/dashboard/supervisor/ajustes'].includes(n.href);
 
     })
     .map((n) => ((session.role === 'supervisor' || session.role === 'manager') && n.label === 'sup.navRoutes' && modules && !modules.some((m) => ['retail', 'restaurant', 'workshop'].includes(m)) ? { ...n, label: 'sup.navRoutesOnly' as DictKey } : n));

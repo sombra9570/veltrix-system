@@ -7,10 +7,12 @@ export const ROLE_NAV = {
   { href: '/dashboard/vendor/ventas', icon: '🧾', label: 'nav.mySales' },
   { href: '/dashboard/vendor/clientes', icon: '🤝', label: 'nav.customers' },
   { href: '/dashboard/vendor/tienda', icon: '🛍️', label: 'nav.store' },
+  { href: '/dashboard/vendor/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/vendor/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   kitchen: [
   { href: '/dashboard/kitchen', icon: '🔥', label: 'nav.kitchen' },
+  { href: '/dashboard/kitchen/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/kitchen/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   supervisor: [
@@ -27,11 +29,13 @@ export const ROLE_NAV = {
   { href: '/dashboard/supervisor/tienda', icon: '🛍️', label: 'nav.store', module: 'retail,restaurant', group: 'nav.g.business' },
   { href: '/dashboard/supervisor/inventario', icon: '📦', label: 'nav.inventory', module: 'inventory', group: 'nav.g.business' },
   { href: '/dashboard/supervisor/reportes', icon: '📈', label: 'nav.reports', group: 'nav.g.reports' },
+  { href: '/dashboard/supervisor/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/supervisor/mensajes', icon: '💬', label: 'nav.messages' },
   { href: '/dashboard/supervisor/ajustes', icon: '⚙️', label: 'nav.settings' },
 ] as NavItem[],
   collector: [
   { href: '/dashboard/collector', icon: '🛵', label: 'nav.route', module: 'field_collection' },
+  { href: '/dashboard/collector/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/collector/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   storekeeper: [
@@ -39,10 +43,12 @@ export const ROLE_NAV = {
   { href: '/dashboard/storekeeper/despacho', icon: '🚚', label: 'nav.dispatch', module: 'retail' },
   { href: '/dashboard/storekeeper/productos', icon: '🏷️', label: 'nav.products' },
   { href: '/dashboard/storekeeper/tienda', icon: '📋', label: 'nav.store' },
+  { href: '/dashboard/storekeeper/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/storekeeper/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   waiter: [
   { href: '/dashboard/waiter', icon: '🍽️', label: 'nav.tables' },
+  { href: '/dashboard/waiter/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/waiter/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   director: [
@@ -51,12 +57,14 @@ export const ROLE_NAV = {
   { href: '/dashboard/director/ventas', icon: '🧾', label: 'nav.sales' },
   { href: '/dashboard/director/inventario', icon: '📦', label: 'nav.inventory' },
   { href: '/dashboard/director/clientes', icon: '🤝', label: 'nav.customers' },
+  { href: '/dashboard/director/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/director/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   secretary: [
   { href: '/dashboard/secretary', icon: '📑', label: 'nav.informes' },
   { href: '/dashboard/secretary/reportes', icon: '📈', label: 'nav.reports' },
   { href: '/dashboard/secretary/clientes', icon: '🤝', label: 'nav.customers' },
+  { href: '/dashboard/secretary/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/secretary/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   accountant: [
@@ -64,6 +72,7 @@ export const ROLE_NAV = {
   { href: '/dashboard/accountant/ventas', icon: '🧾', label: 'nav.sales' },
   { href: '/dashboard/accountant/inventario', icon: '📦', label: 'nav.inventory' },
   { href: '/dashboard/accountant/clientes', icon: '🤝', label: 'nav.customers' },
+  { href: '/dashboard/accountant/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/accountant/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   cashier: [
@@ -71,6 +80,7 @@ export const ROLE_NAV = {
   { href: '/dashboard/cashier/vender', icon: '🛒', label: 'nav.pos' },
   { href: '/dashboard/cashier/ventas', icon: '🧾', label: 'nav.mySales' },
   { href: '/dashboard/cashier/tienda', icon: '🛍️', label: 'nav.store' },
+  { href: '/dashboard/cashier/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/cashier/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   reception: [
@@ -79,16 +89,19 @@ export const ROLE_NAV = {
   { href: '/dashboard/cashier/ventas', icon: '🧾', label: 'nav.mySales' },
   { href: '/dashboard/workshop', icon: '🔧', label: 'nav.workshop', module: 'workshop' },
   { href: '/dashboard/cashier/clientes', icon: '🤝', label: 'nav.customers' },
+  { href: '/dashboard/cashier/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/cashier/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   delivery: [
   { href: '/dashboard/collector/entregas', icon: '🛵', label: 'dl.nav' },
   { href: '/dashboard/collector', icon: '🛵', label: 'nav.route', module: 'field_collection' },
   { href: '/dashboard/collector/despacho', icon: '🚚', label: 'nav.dispatch' },
+  { href: '/dashboard/collector/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/collector/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
   technician: [
   { href: '/dashboard/workshop', icon: '🔧', label: 'nav.workshop' },
+  { href: '/dashboard/workshop/ia', icon: '✨', label: 'nav.ai', ai: true },
   { href: '/dashboard/workshop/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],
 } as const;

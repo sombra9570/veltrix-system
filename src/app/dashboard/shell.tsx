@@ -20,7 +20,7 @@ export const navHas = (modules: string[] | null, need?: string) =>
 
 /** Sub-ítem desplegable del menú (por ejemplo, cada ruta activa); su texto viene de los datos, no del diccionario */
 export type NavChild = { href: string; label: string };
-export type NavItem = { href: string; icon: string; label: DictKey; soon?: boolean; module?: string; group?: DictKey; children?: NavChild[] };
+export type NavItem = { href: string; icon: string; label: DictKey; soon?: boolean; module?: string; ai?: boolean; group?: DictKey; children?: NavChild[] };
 
 function ChildLink({ child, onGo }: { child: NavChild; onGo: () => void }) {
   const pathname = usePathname();
