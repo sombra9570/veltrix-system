@@ -44,7 +44,7 @@ const TABS: { id: Tab; icon: string; label: DictKey }[] = [
   { id: 'close', icon: '🔒', label: 'cash.tabClose' },
 ];
 const METHODS: Method[] = ['cash', 'qr_transfer', 'card'];
-const MOV_TYPES: MovType[] = ['expense', 'deposit', 'change_fund'];
+const MOV_TYPES: MovType[] = ['expense', 'withdrawal', 'deposit', 'change_fund'];
 
 const okBox = 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300';
 const errBox = 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
