@@ -21,6 +21,12 @@ export default function IngresarPage() {
   const [installed, setInstalled] = useState<boolean | null>(null); // null: aún no se sabe (evita el parpadeo del encabezado)
   useEffect(() => { setInstalled(isInstalledApp()); }, []);
 
+  // Si el dueño liberó este dispositivo (o ingresó otro en su lugar), se avisa al volver aquí
+  useEffect(() => {
+    try { if (sessionStorage.getItem('vx_device_msg')) { sessionStorage.removeItem('vx_device_msg'); setError(t('login.deviceReleased')); } } catch { /* */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Si ya tiene sesión, directo a su panel
   useEffect(() => {
     if (loaded && session && session.role !== 'none') router.replace(homeForRole(session.role));
@@ -35,7 +41,7 @@ export default function IngresarPage() {
     setBusy(false);
     if (res.ok && res.session) {
       if (res.session.role !== 'none') router.push(homeForRole(res.session.role));
-    } else setError(t('login.error'));
+    } else setError(res.code === 'device' ? t('login.deviceBusy') : res.code === 'net' ? t('login.needNet') : t('login.error'));
   };
 
   const handleForgot = async (e: React.FormEvent) => {

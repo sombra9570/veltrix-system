@@ -2456,6 +2456,11 @@ const hi: Record<DictKey, string> = {
   "card.delInst": "किस्त {n} हटाएँ",
   "card.delInstDone": "किस्त {n} हटाई गई।",
   "sup.navRoutesOnly": "रूट",
+  'login.deviceBusy': "यह खाता पहले से किसी अन्य डिवाइस पर खुला है। वहाँ से लॉग आउट करें या प्रशासक से डिवाइस मुक्त करने को कहें।",
+  'login.needNet': "साइन इन के लिए इंटरनेट कनेक्शन आवश्यक है।",
+  'login.deviceReleased': "आपका सत्र बंद कर दिया गया क्योंकि डिवाइस मुक्त किया गया या खाता कहीं और खोला गया। कृपया फिर से साइन इन करें।",
+  'team.devRelease': "डिवाइस मुक्त करें",
+  'team.devReleased': "{name} के डिवाइस मुक्त किए गए।",
 };
 
 export default hi;

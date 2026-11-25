@@ -2456,6 +2456,11 @@ const en: Record<DictKey, string> = {
   "card.delInst": "Delete installment {n}",
   "card.delInstDone": "Installment {n} deleted.",
   "sup.navRoutesOnly": "Routes",
+  'login.deviceBusy': "This account is already open on another device. Sign out there or ask the administrator to release the device.",
+  'login.needNet': "An internet connection is required to sign in.",
+  'login.deviceReleased': "Your session was closed because this device was released or the account was opened elsewhere. Please sign in again.",
+  'team.devRelease': "Release device",
+  'team.devReleased': "Devices of {name} released.",
 };
 
 export default en;

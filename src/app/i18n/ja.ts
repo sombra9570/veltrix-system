@@ -2456,6 +2456,11 @@ const ja: Record<DictKey, string> = {
   "card.delInst": "{n}回目を削除",
   "card.delInstDone": "{n}回目を削除しました。",
   "sup.navRoutesOnly": "ルート",
+  'login.deviceBusy': "このアカウントは別の端末で既に開かれています。そちらでログアウトするか、管理者に端末の解除を依頼してください。",
+  'login.needNet': "ログインにはインターネット接続が必要です。",
+  'login.deviceReleased': "端末が解除された、または別の端末でログインされたため、セッションを終了しました。もう一度ログインしてください。",
+  'team.devRelease': "端末を解除",
+  'team.devReleased': "{name} の端末を解除しました。",
 };
 
 export default ja;

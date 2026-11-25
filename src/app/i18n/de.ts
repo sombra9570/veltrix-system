@@ -2456,6 +2456,11 @@ const de: Record<DictKey, string> = {
   "card.delInst": "Rate {n} löschen",
   "card.delInstDone": "Rate {n} gelöscht.",
   "sup.navRoutesOnly": "Routen",
+  'login.deviceBusy': "Dieses Konto ist bereits auf einem anderen Gerät geöffnet. Melden Sie sich dort ab oder bitten Sie den Administrator, das Gerät freizugeben.",
+  'login.needNet': "Zum Anmelden ist eine Internetverbindung erforderlich.",
+  'login.deviceReleased': "Ihre Sitzung wurde beendet, weil das Gerät freigegeben oder das Konto anderswo geöffnet wurde. Bitte melden Sie sich erneut an.",
+  'team.devRelease': "Gerät freigeben",
+  'team.devReleased': "Geräte von {name} freigegeben.",
 };
 
 export default de;

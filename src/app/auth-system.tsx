@@ -183,6 +183,58 @@ export function loadAuth(): Promise<ActiveSession | null> {
   return authInflight;
 }
 
+/* ---------- Un usuario, un dispositivo (dueño/administrador: 2) ---------- */
+const DEVICE_KEY = 'vx_device_id';
+export function deviceId(): string {
+  try {
+    let id = localStorage.getItem(DEVICE_KEY);
+    if (!id) { id = crypto.randomUUID(); localStorage.setItem(DEVICE_KEY, id); }
+    return id;
+  } catch { return 'sin-almacenamiento-' + Math.random().toString(36).slice(2, 12); }
+}
+function deviceLabel(): string {
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+  const os = /iPhone|iPad/.test(ua) ? 'iOS' : /Android/.test(ua) ? 'Android' : /Windows/.test(ua) ? 'Windows' : /Mac/.test(ua) ? 'Mac' : /Linux/.test(ua) ? 'Linux' : 'Otro';
+  const br = /Edg\//.test(ua) ? 'Edge' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : /Firefox\//.test(ua) ? 'Firefox' : 'Navegador';
+  return `${os} · ${br}`;
+}
+/** Registra el dispositivo. Devuelve 'ok', 'limit' (ya hay otro activo) o 'net' (sin conexión) */
+async function registerThisDevice(): Promise<'ok' | 'limit' | 'net'> {
+  const { error } = await supabase.rpc('register_device', { p_device: deviceId(), p_label: deviceLabel() });
+  if (!error) return 'ok';
+  if (/DEVICE_LIMIT/.test(error.message)) return 'limit';
+  return 'net';
+}
+let deviceChecking = false;
+/** Con conexión: confirma que este dispositivo sigue activo; si el dueño lo liberó, cierra la sesión */
+async function checkThisDevice() {
+  if (deviceChecking || typeof navigator === 'undefined' || !navigator.onLine) return;
+  deviceChecking = true;
+  try {
+    const { data: s } = await supabase.auth.getSession();
+    if (!s.session) return;
+    const { data, error } = await supabase.rpc('check_device', { p_device: deviceId() });
+    if (error) return; // sin red o servidor caído: no se cierra nada
+    if (data === 'new') {
+      const r = await registerThisDevice();
+      if (r === 'limit') await endSessionForDevice();
+    } else if (data === 'revoked') await endSessionForDevice();
+  } catch { /* sin conexión */ } finally { deviceChecking = false; }
+}
+async function endSessionForDevice() {
+  try { sessionStorage.setItem('vx_device_msg', '1'); } catch { /* */ }
+  await supabase.auth.signOut();
+  if (typeof window !== 'undefined') window.location.href = '/ingresar';
+}
+function startDeviceWatch() {
+  if (typeof window === 'undefined') return;
+  const run = () => { if (document.visibilityState === 'visible') void checkThisDevice(); };
+  window.addEventListener('online', () => setTimeout(run, 1500));
+  document.addEventListener('visibilitychange', run);
+  setInterval(run, 5 * 60 * 1000);
+  setTimeout(run, 4000);
+}
+
 /** Primera vez: muestra al instante la sesión guardada en el teléfono y la valida en segundo plano */
 async function startAuth() {
   if (authStarted) return;
@@ -197,6 +249,7 @@ async function startAuth() {
     }
   } catch { /* */ }
   loadAuth();
+  startDeviceWatch();
   supabase.auth.onAuthStateChange((event) => {
     if (event === 'SIGNED_OUT') {
       emitAuth({ session: null, companies: [], workers: [] });
@@ -339,10 +392,16 @@ export function useVeltrixAuth() {
   const login = async (
     emailInput: string,
     passInput: string
-  ): Promise<{ ok: boolean; error?: string; session?: ActiveSession }> => {
+  ): Promise<{ ok: boolean; error?: string; code?: 'device' | 'net'; session?: ActiveSession }> => {
     const email = emailInput.trim().toLowerCase();
     const { error } = await supabase.auth.signInWithPassword({ email, password: passInput.trim() });
     if (error) return { ok: false, error: 'Correo o contraseña incorrectos.' };
+    const dev = await registerThisDevice();
+    if (dev !== 'ok') {
+      await supabase.auth.signOut();
+      setSession(null);
+      return { ok: false, code: dev === 'limit' ? 'device' : 'net', error: dev === 'limit' ? 'Esta cuenta ya está abierta en otro dispositivo.' : 'Se necesita conexión a internet para ingresar.' };
+    }
 
     // Si se registró con confirmación por correo, termina de crear su empresa ahora
     try {
@@ -370,6 +429,8 @@ export function useVeltrixAuth() {
   };
 
   const logout = async () => {
+    // Libera este dispositivo; sin conexión no alcanza y el dueño lo libera desde Equipo
+    try { if (navigator.onLine) await supabase.rpc('release_device', { p_device: deviceId() }); } catch { /* */ }
     await supabase.auth.signOut();
     setSession(null);
     if (typeof window !== 'undefined') window.location.href = '/';

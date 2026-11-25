@@ -2456,6 +2456,11 @@ const ar: Record<DictKey, string> = {
   "card.delInst": "حذف القسط {n}",
   "card.delInstDone": "تم حذف القسط {n}.",
   "sup.navRoutesOnly": "المسارات",
+  'login.deviceBusy': "هذا الحساب مفتوح بالفعل على جهاز آخر. سجّل الخروج هناك أو اطلب من المسؤول تحرير الجهاز.",
+  'login.needNet': "يلزم الاتصال بالإنترنت لتسجيل الدخول.",
+  'login.deviceReleased': "تم إغلاق جلستك لأنه تم تحرير الجهاز أو فتح الحساب في مكان آخر. سجّل الدخول مرة أخرى.",
+  'team.devRelease': "تحرير الجهاز",
+  'team.devReleased': "تم تحرير أجهزة {name}.",
 };
 
 export default ar;

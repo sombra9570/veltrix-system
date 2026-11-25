@@ -33,6 +33,7 @@ export default function TeamPage() {
 
   const [branches, setBranches] = useState<Branch[]>([]);
   const [rows, setRows] = useState<Row[]>([]);
+  const [devs, setDevs] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'cashier', branchId: '' });
@@ -93,6 +94,10 @@ export default function TeamPage() {
       setOwnerRoles(((me ?? [])[0]?.extra_roles as string[] | undefined) ?? []);
     } catch { setOwnerRoles([]); }
     try { setCustomRoles((await rpc<{ id: string; name: string; base_role: string; also_roles: string[] }[]>('custom_roles_list', { p_org: orgId })) ?? []); } catch { setCustomRoles([]); }
+    try {
+      const d = await rpc<{ user_id: string; n: number }[]>('owner_team_devices', { p_org: orgId });
+      setDevs(Object.fromEntries((d ?? []).map((x) => [x.user_id, x.n])));
+    } catch { setDevs({}); }
     setBranches(bs);
     setRows([...byUser.values()].sort((a, b2) => Number(b2.active) - Number(a.active) || a.name.localeCompare(b2.name)));
     setForm((f) => ({ ...f, branchId: f.branchId || bs[0]?.id || '' }));
@@ -222,6 +227,15 @@ export default function TeamPage() {
     if (error) { setMsg({ ok: false, text: friendlyError(error.message, t) }); setRm(null); return; }
     setRm(null); setMsg({ ok: true, text: t('team.removed') });
     await Promise.all([load(), reload()]);
+  };
+
+  const releaseDevices = async (r: Row) => {
+    setMsg(null);
+    try {
+      await rpc('owner_release_devices', { p_org: orgId, p_user: r.userId });
+      setMsg({ ok: true, text: t('team.devReleased', { name: r.name || r.email }) });
+    } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
+    await load();
   };
 
   const toggle = async (r: Row) => {
@@ -397,6 +411,7 @@ export default function TeamPage() {
                   : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'}`}>
                   {r.active ? t('team.active') : t('team.inactive')}
                 </span>
+                {(devs[r.userId] ?? 0) > 0 && <button type="button" onClick={() => releaseDevices(r)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>📵 {t('team.devRelease')}</button>}
                 <button type="button" onClick={() => openEdit(r)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>✏️ {t('team.edit')}</button>
                 <button type="button" onClick={() => { setPw({ row: r, value: '' }); setPwMsg(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>🔑 {t('team.pwChange')}</button>
                 <button type="button" onClick={() => toggle(r)} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>

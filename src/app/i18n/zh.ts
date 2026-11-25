@@ -2456,6 +2456,11 @@ const zh: Record<DictKey, string> = {
   "card.delInst": "删除第 {n} 期",
   "card.delInstDone": "第 {n} 期已删除。",
   "sup.navRoutesOnly": "路线",
+  'login.deviceBusy': "此账户已在另一台设备上登录。请在那里退出，或请管理员释放该设备。",
+  'login.needNet': "登录需要互联网连接。",
+  'login.deviceReleased': "您的会话已关闭，因为该设备已被释放或账户已在别处登录。请重新登录。",
+  'team.devRelease': "释放设备",
+  'team.devReleased': "已释放 {name} 的设备。",
 };
 
 export default zh;

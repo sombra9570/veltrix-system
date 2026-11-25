@@ -2456,6 +2456,11 @@ const fr: Record<DictKey, string> = {
   "card.delInst": "Supprimer l'échéance {n}",
   "card.delInstDone": "Échéance {n} supprimée.",
   "sup.navRoutesOnly": "Itinéraires",
+  'login.deviceBusy': "Ce compte est déjà ouvert sur un autre appareil. Déconnectez-vous là-bas ou demandez à l'administrateur de libérer l'appareil.",
+  'login.needNet': "Une connexion internet est nécessaire pour se connecter.",
+  'login.deviceReleased': "Votre session a été fermée car l'appareil a été libéré ou le compte a été ouvert ailleurs. Reconnectez-vous.",
+  'team.devRelease': "Libérer l'appareil",
+  'team.devReleased': "Appareils de {name} libérés.",
 };
 
 export default fr;

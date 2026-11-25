@@ -2456,6 +2456,11 @@ const it: Record<DictKey, string> = {
   "card.delInst": "Elimina rata {n}",
   "card.delInstDone": "Rata {n} eliminata.",
   "sup.navRoutesOnly": "Percorsi",
+  'login.deviceBusy': "Questo account è già aperto su un altro dispositivo. Esca da lì o chieda all'amministratore di liberare il dispositivo.",
+  'login.needNet': "Per accedere è necessaria una connessione a internet.",
+  'login.deviceReleased': "La sessione è stata chiusa perché il dispositivo è stato liberato o l'account è stato aperto altrove. Acceda di nuovo.",
+  'team.devRelease': "Libera dispositivo",
+  'team.devReleased': "Dispositivi di {name} liberati.",
 };
 
 export default it;

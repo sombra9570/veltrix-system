@@ -2456,6 +2456,11 @@ const pt: Record<DictKey, string> = {
   "card.delInst": "Apagar parcela {n}",
   "card.delInstDone": "Parcela {n} apagada.",
   "sup.navRoutesOnly": "Rotas",
+  'login.deviceBusy': "Esta conta já está aberta em outro dispositivo. Encerre a sessão lá ou peça ao administrador que libere o dispositivo.",
+  'login.needNet': "É necessária conexão com a internet para entrar.",
+  'login.deviceReleased': "Sua sessão foi encerrada porque o dispositivo foi liberado ou a conta foi aberta em outro. Entre novamente.",
+  'team.devRelease': "Liberar dispositivo",
+  'team.devReleased': "Dispositivos de {name} liberados.",
 };
 
 export default pt;

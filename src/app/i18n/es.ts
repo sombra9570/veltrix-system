@@ -2465,6 +2465,11 @@ const es = {
   'card.delInst': 'Eliminar cuota {n}',
   'card.delInstDone': 'Cuota {n} eliminada.',
   "sup.navRoutesOnly": "Rutas",
+  'login.deviceBusy': "Esta cuenta ya está abierta en otro dispositivo. Cierre la sesión allí o pida al administrador que libere el dispositivo.",
+  'login.needNet': "Se necesita conexión a internet para ingresar.",
+  'login.deviceReleased': "Su sesión se cerró porque el dispositivo fue liberado o se ingresó desde otro. Vuelva a ingresar.",
+  'team.devRelease': "Liberar dispositivo",
+  'team.devReleased': "Dispositivos de {name} liberados.",
 };
 
 export default es;

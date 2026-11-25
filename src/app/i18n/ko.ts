@@ -2456,6 +2456,11 @@ const ko: Record<DictKey, string> = {
   "card.delInst": "{n}회차 삭제",
   "card.delInstDone": "{n}회차를 삭제했습니다.",
   "sup.navRoutesOnly": "경로",
+  'login.deviceBusy': "이 계정은 이미 다른 기기에서 열려 있습니다. 해당 기기에서 로그아웃하거나 관리자에게 기기 해제를 요청하세요.",
+  'login.needNet': "로그인하려면 인터넷 연결이 필요합니다.",
+  'login.deviceReleased': "기기가 해제되었거나 다른 곳에서 계정이 열려 세션이 종료되었습니다. 다시 로그인하세요.",
+  'team.devRelease': "기기 해제",
+  'team.devReleased': "{name}의 기기를 해제했습니다.",
 };
 
 export default ko;
