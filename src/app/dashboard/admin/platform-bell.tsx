@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { rpc } from '../../../lib/supabase';
 import { useLiveTopic } from '../live';
+import { BellPanel } from '../bell-panel';
 
 type Ev = { id: string; created_at: string; kind: 'lead' | 'company' | 'support_msg'; ref_id: string | null; title: string; detail: string | null; read_at: string | null };
 type Inbox = { unread: number; items: Ev[] };
@@ -60,8 +61,8 @@ export function PlatformBell() {
         🔔
         {inbox.unread > 0 && <span className="absolute -right-1.5 -top-1.5 min-w-5 rounded-full bg-red-600 px-1.5 text-center text-[11px] font-bold text-white">{inbox.unread > 99 ? '99+' : inbox.unread}</span>}
       </button>
-      {open && (
-        <div className="absolute right-0 z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] rounded-2xl border border-slate-700 bg-slate-900 p-3 shadow-2xl">
+      <BellPanel open={open} onClose={() => setOpen(false)} className="border-slate-700 bg-slate-900 text-white">
+        <div>
           <div className="flex items-center justify-between">
             <p className="text-sm font-extrabold">Avisos</p>
             {inbox.unread > 0 && <button type="button" onClick={readAll} className="text-xs font-semibold text-sky-400 cursor-pointer">Marcar todo como leído</button>}
@@ -69,7 +70,7 @@ export function PlatformBell() {
           {perm !== 'granted' && perm !== 'none' && typeof Notification !== 'undefined' && perm !== 'denied' && (
             <button type="button" onClick={askPerm} className="mt-2 w-full rounded-lg bg-sky-600/20 px-3 py-2 text-xs font-semibold text-sky-300 cursor-pointer">🔔 Activar avisos en este navegador</button>
           )}
-          <ul className="mt-2 max-h-96 space-y-1.5 overflow-y-auto">
+          <ul className="mt-2 space-y-1.5">
             {inbox.items.length === 0 && <li className="py-6 text-center text-sm text-slate-400">Sin avisos por ahora.</li>}
             {inbox.items.map((e) => (
               <li key={e.id}>
@@ -77,13 +78,13 @@ export function PlatformBell() {
                   className={`block rounded-xl border px-3 py-2 ${e.read_at ? 'border-slate-800 opacity-70' : 'border-sky-500/40 bg-sky-500/10'}`}>
                   <p className="text-xs font-bold">{KIND[e.kind].icon} {KIND[e.kind].label} <span className="font-normal text-slate-400">· {ago(e.created_at)}</span></p>
                   <p className="text-sm font-semibold">{e.title}</p>
-                  {e.detail && <p className="truncate text-xs text-slate-400">{e.detail}</p>}
+                  {e.detail && <p className="break-words text-xs text-slate-400">{e.detail}</p>}
                 </Link>
               </li>
             ))}
           </ul>
         </div>
-      )}
+      </BellPanel>
     </div>
   );
 }

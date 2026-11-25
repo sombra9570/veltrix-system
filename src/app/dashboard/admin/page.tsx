@@ -751,7 +751,7 @@ export default function GlobalCoreAdminPage() {
         </div>
       </div>
       {mailMsg && !mail && (
-        <div className="fixed inset-x-0 bottom-4 z-50 mx-auto w-fit max-w-[90vw] rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold shadow-xl">{mailMsg}</div>
+        <div className="fixed inset-x-0 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-50 mx-auto w-fit max-w-[calc(100vw-1.5rem)] break-words text-center rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold shadow-xl">{mailMsg}</div>
       )}
       {mail && (
         <div className="fixed inset-x-0 top-0 z-50 h-dvh">

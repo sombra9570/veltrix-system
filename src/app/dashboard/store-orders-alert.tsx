@@ -9,6 +9,7 @@ import { useT } from '../i18n';
 import { useLive } from './live';
 import { useLanguage } from '../language-selector';
 import { usePush } from '../push-client';
+import { BellPanel } from './bell-panel';
 
 type Alert = { eligible: boolean; pending: number; assigned: number; waiting: number; total: number };
 
@@ -61,8 +62,8 @@ export function StoreOrdersBell() {
         🔔
         {a.total > 0 && <span className="absolute -end-1.5 -top-1.5 min-w-5 rounded-full bg-red-600 px-1.5 text-center text-[11px] font-bold text-white">{a.total > 99 ? '99+' : a.total}</span>}
       </button>
-      {open && (
-        <div className="absolute end-0 z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] space-y-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
+      <BellPanel open={open} onClose={() => setOpen(false)} className="border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white">
+        <div className="space-y-2">
           <p className="text-sm font-extrabold">🧾 {t('so.title')}</p>
           {a.total === 0 && <p className={`text-sm ${ui.muted}`}>{t('sa.none')}</p>}
           {a.pending > 0 && <p className="text-sm font-semibold">🆕 {t('sa.pending', { n: a.pending })}</p>}
@@ -77,7 +78,7 @@ export function StoreOrdersBell() {
             <button type="button" onClick={async () => { try { setPerm(await Notification.requestPermission()); } catch { /* */ } }} className={`${ui.btnGhost} w-full text-xs`}>🔔 {t('sa.enable')}</button>
           )}
         </div>
-      )}
+      </BellPanel>
     </div>
   );
 }
