@@ -1058,6 +1058,8 @@ const es = {
   "perm.tables.remove_item": "Quitar ítems de la cuenta",
   "perm.workshop.remove_line.d": "Quitar líneas de una orden de taller.",
   "perm.workshop.remove_line": "Quitar líneas de la orden",
+  "perm.workshop.invoice.d": "Facturar una orden de trabajo del taller.",
+  "perm.workshop.invoice": "Facturar la orden de taller",
   "perm.cash.expense.d": "Pagar gastos menores desde la caja de su turno (con motivo).",
   "perm.cash.expense": "Registrar gastos",
   "perm.cash.movements": "Registrar gastos y retiros",

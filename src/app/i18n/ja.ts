@@ -1049,6 +1049,8 @@ const ja: Record<DictKey, string> = {
   "perm.tables.remove_item": "会計から品目を削除",
   "perm.workshop.remove_line.d": "整備作業指示から行を削除します。",
   "perm.workshop.remove_line": "作業指示から行を削除",
+  "perm.workshop.invoice.d": "整備作業指示を請求します。",
+  "perm.workshop.invoice": "作業指示を請求",
   "perm.cash.expense.d": "シフトのレジから少額の経費を支払う（理由付き）。",
   "perm.cash.expense": "経費を記録",
   "perm.cash.movements": "経費・引き出しを記録",

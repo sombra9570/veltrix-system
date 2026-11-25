@@ -1049,6 +1049,8 @@ const hi: Record<DictKey, string> = {
   "perm.tables.remove_item": "बिल से आइटम हटाना",
   "perm.workshop.remove_line.d": "वर्कशॉप कार्य आदेश से पंक्तियाँ हटाना।",
   "perm.workshop.remove_line": "कार्य आदेश से पंक्तियाँ हटाना",
+  "perm.workshop.invoice.d": "वर्कशॉप कार्य आदेश का बिल बनाना।",
+  "perm.workshop.invoice": "कार्य आदेश का बिल बनाना",
   "perm.cash.expense.d": "शिफ्ट की कैश-दराज़ से छोटे खर्च चुकाना (कारण के साथ)।",
   "perm.cash.expense": "खर्च दर्ज करना",
   "perm.cash.movements": "खर्च और निकासी दर्ज करें",

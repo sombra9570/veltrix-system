@@ -1049,6 +1049,8 @@ const zh: Record<DictKey, string> = {
   "perm.tables.remove_item": "从账单中移除项目",
   "perm.workshop.remove_line.d": "从车间工单中移除行。",
   "perm.workshop.remove_line": "从工单中移除行",
+  "perm.workshop.invoice.d": "为车间工单开具发票。",
+  "perm.workshop.invoice": "为工单开具发票",
   "perm.cash.expense.d": "用班次现金抽屉支付小额支出（需填原因）。",
   "perm.cash.expense": "记录支出",
   "perm.cash.movements": "记录支出和取款",

@@ -364,6 +364,8 @@ async function loadAuthImpl(): Promise<ActiveSession | null> {
     }
     // Recepción cubre la caja y Delivery cubre la ruta de cobro: entran a esas pantallas
     if (role === 'reception' && !alsoRoles.includes('cashier')) alsoRoles.push('cashier');
+    // En el rubro taller, Recepción también atiende las órdenes de trabajo (asesor de servicio)
+    if (role === 'reception' && !alsoRoles.includes('technician')) alsoRoles.push('technician');
     if (role === 'delivery' && !alsoRoles.includes('collector')) alsoRoles.push('collector');
     // Gerente entra al panel de gestión de la sucursal (el mismo del supervisor)
     if (role === 'manager' && !alsoRoles.includes('supervisor')) alsoRoles.push('supervisor');

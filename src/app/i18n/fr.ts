@@ -1049,6 +1049,8 @@ const fr: Record<DictKey, string> = {
   "perm.tables.remove_item": "Retirer des articles de l'addition",
   "perm.workshop.remove_line.d": "Retirer des lignes d'un ordre d'atelier.",
   "perm.workshop.remove_line": "Retirer des lignes de l'ordre",
+  "perm.workshop.invoice.d": "Facturer un ordre de travail d'atelier.",
+  "perm.workshop.invoice": "Facturer l'ordre",
   "perm.cash.expense.d": "Payer de petites dépenses depuis la caisse du service (avec motif).",
   "perm.cash.expense": "Enregistrer les dépenses",
   "perm.cash.movements": "Enregistrer dépenses et retraits",

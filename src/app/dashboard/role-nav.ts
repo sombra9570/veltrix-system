@@ -77,6 +77,7 @@ export const ROLE_NAV = {
   { href: '/dashboard/cashier', icon: '💵', label: 'nav.cash' },
   { href: '/dashboard/cashier/vender', icon: '🛒', label: 'nav.pos' },
   { href: '/dashboard/cashier/ventas', icon: '🧾', label: 'nav.mySales' },
+  { href: '/dashboard/workshop', icon: '🔧', label: 'nav.workshop', module: 'workshop' },
   { href: '/dashboard/cashier/clientes', icon: '🤝', label: 'nav.customers' },
   { href: '/dashboard/cashier/mensajes', icon: '💬', label: 'nav.messages' },
 ] as NavItem[],

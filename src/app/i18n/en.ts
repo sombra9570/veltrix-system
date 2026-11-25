@@ -1049,6 +1049,8 @@ const en: Record<DictKey, string> = {
   "perm.tables.remove_item": "Remove items from the tab",
   "perm.workshop.remove_line.d": "Remove lines from a workshop work order.",
   "perm.workshop.remove_line": "Remove lines from the work order",
+  "perm.workshop.invoice.d": "Invoice a workshop work order.",
+  "perm.workshop.invoice": "Invoice the work order",
   "perm.cash.expense.d": "Pay small expenses from the shift's cash drawer (with a reason).",
   "perm.cash.expense": "Record expenses",
   "perm.cash.movements": "Record expenses and withdrawals",

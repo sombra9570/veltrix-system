@@ -1049,6 +1049,8 @@ const ru: Record<DictKey, string> = {
   "perm.tables.remove_item": "Удалять позиции из счёта",
   "perm.workshop.remove_line.d": "Удалять строки из заказ-наряда мастерской.",
   "perm.workshop.remove_line": "Удалять строки из заказ-наряда",
+  "perm.workshop.invoice.d": "Выставлять счёт по заказ-наряду мастерской.",
+  "perm.workshop.invoice": "Выставлять счёт по заказ-наряду",
   "perm.cash.expense.d": "Оплачивать мелкие расходы из кассы смены (с указанием причины).",
   "perm.cash.expense": "Записывать расходы",
   "perm.cash.movements": "Записывать расходы и изъятия",

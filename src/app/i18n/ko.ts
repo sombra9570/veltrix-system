@@ -1049,6 +1049,8 @@ const ko: Record<DictKey, string> = {
   "perm.tables.remove_item": "계산서에서 항목 삭제",
   "perm.workshop.remove_line.d": "정비 작업 지시서에서 줄을 삭제합니다.",
   "perm.workshop.remove_line": "작업 지시서에서 줄 삭제",
+  "perm.workshop.invoice.d": "정비 작업 지시서를 청구합니다.",
+  "perm.workshop.invoice": "작업 지시서 청구",
   "perm.cash.expense.d": "근무 교대 금전함에서 소액 지출을 합니다(사유 필수).",
   "perm.cash.expense": "지출 기록",
   "perm.cash.movements": "지출·출금 기록",

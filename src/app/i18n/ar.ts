@@ -1049,6 +1049,8 @@ const ar: Record<DictKey, string> = {
   "perm.tables.remove_item": "إزالة بنود من الحساب",
   "perm.workshop.remove_line.d": "إزالة أسطر من أمر عمل الورشة.",
   "perm.workshop.remove_line": "إزالة أسطر من أمر العمل",
+  "perm.workshop.invoice.d": "إصدار فاتورة لأمر عمل الورشة.",
+  "perm.workshop.invoice": "إصدار فاتورة أمر العمل",
   "perm.cash.expense.d": "دفع مصروفات صغيرة من صندوق الوردية (مع السبب).",
   "perm.cash.expense": "تسجيل المصروفات",
   "perm.cash.movements": "تسجيل المصروفات والسحوبات",
