@@ -12,7 +12,8 @@ type Row = {
 };
 type Form = { id: string | null; kind: Kind; area: Area; country: string; topic: string; title: string; summary: string; source_name: string; source_url: string; license: string; lang: string; status: Status; verified_by: string };
 // Carpeta activa: una vista de la biblioteca (una entrada puede aparecer en varias)
-type Folder = 'all' | 'base' | 'pending' | 'verified' | 'retired' | `country:${string}`;
+type Gap = { topic: string; country_code: string; times: number; last_asked_at: string };
+type Folder = 'all' | 'base' | 'gaps' | 'pending' | 'verified' | 'retired' | `country:${string}`;
 
 const KINDS: Record<Kind, string> = { management: 'Gestión de negocios', tax_rule: 'Regla tributaria o legal', veltrix_help: 'Ayuda de Veltrix' };
 const STATUS: Record<Status, string> = { draft: 'Borrador', verified: 'Verificada', retired: 'Retirada' };
@@ -46,10 +47,12 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
   const [msg, setMsg] = useState('');
   const [review, setReview] = useState(false);
   const [skipped, setSkipped] = useState<string[]>([]);
+  const [gaps, setGaps] = useState<Gap[]>([]);
   const file = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => { try { setList((await rpc<Row[]>('admin_list_ai_knowledge')) ?? []); } catch (e) { setMsg(e instanceof Error ? e.message : 'Error'); } }, []);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { rpc<Gap[]>('admin_list_ai_knowledge_gaps').then((g) => setGaps(g ?? [])).catch(() => setGaps([])); }, []);
 
   const needsSource = f.kind !== 'veltrix_help';
   const ready = !!(f.topic.trim() && f.title.trim() && f.summary.trim() && f.summary.length <= MAX && (f.kind !== 'tax_rule' || f.country.trim()));
@@ -146,6 +149,7 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
         {folderBtn('pending', '⏳', 'Por verificar', counts.pending)}
         {folderBtn('verified', '✅', 'Verificadas', counts.verified)}
         {folderBtn('retired', '🗄️', 'Retiradas', counts.retired)}
+        {folderBtn('gaps', '🔎', 'Temas sin cobertura', gaps.length)}
       </nav>
 
       <form onSubmit={(e) => { e.preventDefault(); save('draft'); }} className="space-y-3 self-start rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5">
@@ -223,9 +227,21 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
             </div>
           </div>
         ) : <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-400">No quedan entradas por revisar en esta vista.</p>)}
-        <h2 className="text-sm font-bold">Entradas ({shown.length})</h2>
-        {shown.length === 0 && <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-500">No hay entradas en esta carpeta con ese filtro.</p>}
-        {shown.map((r) => (
+        {folder === 'gaps' && (
+          <div className="space-y-2">
+            <h2 className="text-sm font-bold">Temas consultados sin cobertura ({gaps.length})</h2>
+            {gaps.length === 0 && <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-500">Aún no hay temas consultados sin cobertura.</p>}
+            {gaps.map((g) => (
+              <div key={`${g.topic}|${g.country_code}`} className="flex items-center justify-between gap-2 rounded-xl border border-slate-800 bg-slate-900/70 p-3 text-sm">
+                <span className="font-semibold">{g.topic}</span>
+                <span className="shrink-0 text-[11px] text-slate-400">{g.country_code ? countryName(g.country_code) : 'Sin país'} · {g.times} {g.times === 1 ? 'consulta' : 'consultas'} · {new Date(g.last_asked_at).toLocaleDateString('es')}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {folder !== 'gaps' && <h2 className="text-sm font-bold">Entradas ({shown.length})</h2>}
+        {folder !== 'gaps' && shown.length === 0 && <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-500">No hay entradas en esta carpeta con ese filtro.</p>}
+        {folder !== 'gaps' && shown.map((r) => (
           <div key={r.id} className="space-y-1 rounded-xl border border-slate-800 bg-slate-900/70 p-3">
             <div className="flex items-start justify-between gap-2">
               <p className="font-bold">{r.title}</p>
@@ -261,6 +277,7 @@ function inFolder(folder: Folder) {
       case 'pending': return r.status === 'draft';
       case 'verified': return r.status === 'verified';
       case 'retired': return r.status === 'retired';
+      case 'gaps': return false;
       default: return r.country_code === folder.slice('country:'.length) && r.status !== 'retired';
     }
   };
