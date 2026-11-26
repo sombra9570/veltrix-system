@@ -531,7 +531,7 @@ export function HomeShowcase() {
                         <span className="font-bold">{t('home.mock.client', { n: c.n })} · {t(`card.f.${c.f}` as DictKey)}</span>
                         <span className="font-extrabold">{t('card.owes', { amount: m(c.owes) })}</span>
                       </div>
-                      <p className="text-[10px] text-slate-500">{t('card.progress', { done: c.states.filter((x) => x === 'p').length, total: c.total })} · {m(c.v)}{c.states.includes('l') ? ` · ${t('card.lateN', { n: 1 })}` : ''}</p>
+                      <p className="text-[10px] text-slate-500">{t('card.progress', { done: (c.states as readonly string[]).filter((x) => x === 'p').length, total: c.total })} · {m(c.v)}{(c.states as readonly string[]).includes('l') ? ` · ${t('card.lateN', { n: 1 })}` : ''}</p>
                       <div className="mt-2 grid grid-cols-6 gap-1">
                         {c.states.map((s, i) => (
                           <span key={i} className={`grid h-7 place-items-center rounded-md text-[10px] font-extrabold ${s === 'p' ? 'bg-emerald-500 text-white' : s === 'a' ? 'bg-blue-500 text-white' : s === 'l' ? 'bg-red-500 text-white' : s === 's' ? 'bg-amber-400 text-slate-900 ring-2 ring-amber-300' : 'bg-slate-100 text-slate-500 dark:bg-slate-800'}`}>{i + 1}</span>
