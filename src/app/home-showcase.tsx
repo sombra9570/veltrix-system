@@ -135,7 +135,6 @@ export function HomeShowcase() {
   const sales = day ? salesOf(day) : 0;
   const tf = totalFund(period);
   const route1 = ROUTES[0];
-  const toDeliver = route1.day.cash - route1.day.exp;
   const curveLast = niche === 'field'
     ? { day: totalFund('day').cash + totalFund('day').qr, week: totalFund('week').cash + totalFund('week').qr, month: MONTH_COLLECTED }
     : { day: sales, week: sales * 6, month: sales * 26 };
@@ -331,13 +330,9 @@ export function HomeShowcase() {
               <div className={`${card} space-y-1.5 text-xs`}>
                 <p className={lbl}>{t('cash.tabClose')} · {t('cash.openSince', { time: '08:00' })}</p>
                 <div className={row}><span>{t('cash.openingCash')}</span><span className="font-bold">{m(day.open)}</span></div>
-                <div className={row}><span>{t('home.sc.cashSales')}</span><span className="font-bold">{m(day.cash)}</span></div>
-                <div className={row}><span>{t('home.sc.expenses')}</span><span className="font-bold text-red-600 dark:text-red-400">−{m(day.exp)}</span></div>
-                <div className={`${row} text-slate-500`}><span>{t('home.sc.qr')}</span><span className="font-bold">{m(day.qr)}</span></div>
-                <div className={`${row} border-t border-slate-200 pt-2 dark:border-slate-800`}><span>{t('cash.expectedNow')}</span><span className="font-extrabold">{m(day.open + day.cash - day.exp)}</span></div>
+                <p className="text-[11px] text-slate-500">{t('cash.closeHint')}</p>
                 <div className={row}><span>{t('cash.counted')}</span><span className="font-extrabold">{m(day.open + day.cash - day.exp)}</span></div>
-                <p className="text-[11px] text-slate-500">{t('cash.diffNow', { amount: m(0) })}</p>
-                <p className="rounded-lg bg-emerald-50 px-2 py-1.5 text-[11px] font-bold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">{t('cash.closedOk')}</p>
+                <p className="rounded-lg bg-blue-600 py-2 text-center font-bold text-white">{t('cash.closeBtn')}</p>
               </div>
             </div>
           )}
@@ -374,7 +369,6 @@ export function HomeShowcase() {
               <div className={`${card} flex items-center justify-between`}>
                 <div className="min-w-0">
                   <p className="truncate text-xs font-bold">🛍️ veltrixsystem.app/tienda/…</p>
-                  <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">● {t('home.sh.store.open')}</p>
                 </div>
                 <span className="rounded-full bg-blue-600 px-3 py-1 text-[11px] font-bold text-white">🛒 3</span>
               </div>
@@ -491,14 +485,13 @@ export function HomeShowcase() {
                 <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">● {t('col.online')} · {t('col.visited', { n: 31, total: route1.clients })}</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800"><div className="h-full rounded-full bg-blue-600" style={{ width: `${Math.round((31 / route1.clients) * 100)}%` }} /></div>
-              <div className="grid grid-cols-4 gap-1.5">
-                {([['col.cash', route1.day.cash], ['col.digital', route1.day.qr], ['col.expenses', route1.day.exp], ['col.toDeliver', toDeliver]] as const).map(([k, v]) => (
+              <div className="grid grid-cols-3 gap-1.5">
+                {([['col.cash', route1.day.cash], ['col.digital', route1.day.qr], ['col.expenses', route1.day.exp]] as const).map(([k, v]) => (
                   <div key={k} className={card}><p className={lbl}>{t(k)}</p><p className="mt-0.5 whitespace-nowrap text-xs font-extrabold sm:text-sm">{m(v)}</p></div>
                 ))}
               </div>
               <div className={row}>
                 <Seg value={mode} onPick={setMode} items={[['list', t('card.viewList')], ['cards', t('card.viewCards')]]} />
-                <span className="text-[10px] text-slate-500">{t('col.offline').split(':')[0]}</span>
               </div>
 
               {mode === 'list' && (
@@ -549,7 +542,7 @@ export function HomeShowcase() {
 
           {/* ───────── Caja de la ruta: inversión, caja anterior, cobrado, prestado, gastos y entrega ───────── */}
           {view === 'fund' && (
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3">
               <div className={card}>
                 <p className={lbl}>{t('fund.title')} · {t('home.sc.routeN', { n: 1 })}</p>
                 <ul className="mt-2 space-y-1.5 text-xs">
@@ -562,13 +555,6 @@ export function HomeShowcase() {
                   <li className={`${row} text-slate-500`}><span>{t('home.sc.qr')}</span><span className="font-bold">{m(route1.day.qr)}</span></li>
                 </ul>
                 <p className="mt-2 text-[10px] text-slate-500">{t('fund.formula')}</p>
-              </div>
-              <div className={`${card} space-y-2 text-xs`}>
-                <p className={lbl}>{t('col.settle')}</p>
-                <div className={row}><span>{t('fund.deliver')}</span><span className="font-extrabold">{m(toDeliver)}</span></div>
-                <p className="text-[11px] text-slate-500">{t('fund.stays', { amount: m(currentOf(route1.day) - toDeliver) })}</p>
-                <p className="rounded-lg bg-blue-600 py-2 text-center font-bold text-white">{t('col.settleBtn')}</p>
-                <p className="text-[10px] text-slate-500">{t('col.settleHint')}</p>
               </div>
             </div>
           )}
@@ -605,10 +591,6 @@ export function HomeShowcase() {
           {/* ───────── Veltrix IA: consultas sobre los datos del negocio ───────── */}
           {view === 'ia' && (
             <div className="space-y-2 sm:space-y-3">
-              <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
-                <div className={card}><p className={lbl}>{t('ai.usage')}</p><p className="mt-0.5 text-sm font-extrabold sm:text-lg">38 / 200</p></div>
-                <div className={card}><p className={lbl}>{t('ai.usageDay')}</p><p className="mt-0.5 text-sm font-extrabold sm:text-lg">4 / 20</p></div>
-              </div>
               <div className={card}>
                 <p className={lbl}>✨ {t('ai.try')}</p>
                 <ul className="mt-2 space-y-1.5">
