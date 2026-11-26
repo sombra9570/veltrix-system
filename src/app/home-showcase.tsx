@@ -205,7 +205,7 @@ export function HomeShowcase() {
                 <div className={card}>
                   <p className={lbl}>{t('owner.toReview')}</p>
                   <p className="mt-0.5 text-sm font-extrabold sm:mt-1 sm:text-lg">{day.rev + day.set}</p>
-                  <p className="text-[10px] font-semibold text-slate-500">{t('owner.pendingReversals', { n: day.rev })} · {t('owner.pendingSettlements', { n: day.set })}</p>
+                  <p className="text-[10px] font-semibold text-slate-500">{t('owner.pendingReversals', { n: day.rev })}</p>
                 </div>
                 <div className={card}>
                   <p className={lbl}>{t('rep.kTickets')}</p>
