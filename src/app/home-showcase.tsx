@@ -9,20 +9,20 @@ import type { DictKey } from './i18n/es';
 // Las cifras de cada grupo salen de una sola fuente (DAY / ROUTES), así que el panel, la caja y las listas siempre cuadran entre sí.
 type Niche = 'retail' | 'food' | 'service' | 'field';
 type Plain = Exclude<Niche, 'field'>;
-type View = 'panel' | 'pos' | 'cash' | 'stock' | 'store' | 'tables' | 'kitchen' | 'menu' | 'orders' | 'route' | 'fund' | 'sup' | 'flow';
+type View = 'panel' | 'pos' | 'cash' | 'stock' | 'store' | 'ia' | 'tables' | 'kitchen' | 'menu' | 'orders' | 'route' | 'fund' | 'sup' | 'flow';
 type Gran = 'day' | 'week' | 'month';
 type Period = 'day' | 'week';
 const NICHES: Niche[] = ['retail', 'food', 'service', 'field'];
 const ICON: Record<Niche, string> = { retail: '🛍️', food: '🍽️', service: '🔧', field: '🛵' };
 // Pantallas de cada grupo, en el orden del flujo: administrador, rol de atención, caja y control
 const VIEWS: Record<Niche, View[]> = {
-  retail: ['panel', 'pos', 'cash', 'stock', 'store', 'flow'],
-  food: ['panel', 'tables', 'kitchen', 'cash', 'menu', 'flow'],
-  service: ['panel', 'orders', 'cash', 'flow'],
-  field: ['panel', 'route', 'fund', 'sup', 'flow'],
+  retail: ['panel', 'pos', 'cash', 'stock', 'store', 'ia', 'flow'],
+  food: ['panel', 'tables', 'kitchen', 'cash', 'menu', 'store', 'ia', 'flow'],
+  service: ['panel', 'orders', 'cash', 'ia', 'flow'],
+  field: ['panel', 'route', 'fund', 'sup', 'ia', 'flow'],
 };
 const VIEW_LABEL: Record<View, DictKey> = {
-  panel: 'home.sh.v.panel', pos: 'nav.pos', cash: 'nav.cash', stock: 'nav.inventory', store: 'home.sh.v.store',
+  panel: 'home.sh.v.panel', pos: 'nav.pos', cash: 'nav.cash', stock: 'nav.inventory', store: 'home.sh.v.store', ia: 'nav.ai',
   tables: 'nav.tables', kitchen: 'nav.kitchen', menu: 'home.sh.v.menu', orders: 'home.sh.v.orders',
   route: 'nav.route', fund: 'fund.title', sup: 'sup.title', flow: 'home.sh.v.flow',
 };
@@ -379,7 +379,7 @@ export function HomeShowcase() {
                 <span className="rounded-full bg-blue-600 px-3 py-1 text-[11px] font-bold text-white">🛒 3</span>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                {emoji.map((e, i) => (
+                {(niche === 'food' ? dishes : emoji).map((e, i) => (
                   <div key={e} className={`${card} text-center`}>
                     <p className="text-2xl sm:text-3xl">{e}</p>
                     <p className="mt-1 truncate text-[11px] font-semibold">{t('home.sh.item', { n: i + 1 })}</p>
@@ -599,6 +599,29 @@ export function HomeShowcase() {
                   );
                 })}
               </div>
+            </div>
+          )}
+
+          {/* ───────── Veltrix IA: consultas sobre los datos del negocio ───────── */}
+          {view === 'ia' && (
+            <div className="space-y-2 sm:space-y-3">
+              <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
+                <div className={card}><p className={lbl}>{t('ai.usage')}</p><p className="mt-0.5 text-sm font-extrabold sm:text-lg">38 / 200</p></div>
+                <div className={card}><p className={lbl}>{t('ai.usageDay')}</p><p className="mt-0.5 text-sm font-extrabold sm:text-lg">4 / 20</p></div>
+              </div>
+              <div className={card}>
+                <p className={lbl}>✨ {t('ai.try')}</p>
+                <ul className="mt-2 space-y-1.5">
+                  {(niche === 'field' ? (['ai.s1', 'ai.s2', 'ai.s4'] as const) : niche === 'service' ? (['ai.s5', 'ai.s6'] as const) : (['ai.s3', 'ai.s5', 'ai.s6'] as const)).map((k) => (
+                    <li key={k} className="rounded-lg bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">{t(k)}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500 dark:border-slate-800 dark:bg-slate-900">
+                <span className="min-w-0 flex-1 truncate">{t('ai.placeholder')}</span>
+                <span className="rounded-md bg-blue-600 px-2 py-1 text-[10px] font-bold text-white">➤</span>
+              </div>
+              <p className="text-[10px] text-slate-500">{t('ai.privacy')}</p>
             </div>
           )}
 
