@@ -1,0 +1,30 @@
+insert into public.ai_knowledge (kind, area, country_code, topic, title, summary, source_name, source_url, license, lang, status) values
+('management','impuestos','BR','simples_nacional_plazos_limites_revision_oficial','Brasil: Simples Nacional, plazos y límites (revisión con fuentes oficiales)',
+$k$Datos contrastados con fuentes oficiales de la Receita Federal (Perguntas e Respostas del Simples Nacional, Resolución CGSN 140/2018, nota de la Receita de dic. 2025 y página de servicio de gov.br).
+- DAS (pago) y PGDAS-D (declaración mensual): vencen el día 20 del mes siguiente al período de apuración. Si ese día no hay atención bancaria, se paga el día hábil siguiente.
+- DEFIS (declaración anual socioeconómica y fiscal): hasta el 31 de marzo del año siguiente, según la nota de la Receita de diciembre de 2025.
+- Límites: ME (microempresa) con ingresos brutos hasta R$ 360.000 al año; EPP (pequeña empresa) por encima de R$ 360.000 y hasta R$ 4.800.000. En el año de inicio de actividad los límites son proporcionales: R$ 30.000 (ME) y R$ 400.000 (EPP) por mes de actividad, contando la fracción de mes como mes entero.
+- Multas por atraso desde 2026: la multa empieza el día siguiente al vencimiento y se aplica también a declaraciones atrasadas de períodos anteriores.
+- Reforma Tributaria: desde el 1 de enero de 2027, ME y EPP del Simples deben reconocer ingresos solo por devengo (competencia); desaparece la opción por caja. La Receita informa que el PGDAS-D se está actualizando para la reforma desde noviembre de 2026.
+Importante: límites, plazos y multas pueden cambiar por nuevas resoluciones del CGSN. Confirmar vigencia antes de decidir. El MEI (microemprendedor individual) tiene reglas propias (DAS-MEI y DASN-SIMEI) que no están detalladas aquí.
+Dónde confirmar: Portal del Simples Nacional (www8.receita.fazenda.gov.br/simplesnacional), normas.receita.fazenda.gov.br (Resolución CGSN 140/2018 y sus actualizaciones) y un contador habilitado en Brasil.$k$,
+'Receita Federal do Brasil - Simples Nacional (Perguntas e Respostas; Res. CGSN 140/2018)','https://www8.receita.fazenda.gov.br/simplesnacional/arquivos/manual/perguntaosn.pdf',
+'Material informativo de la Receita Federal; no declara licencia abierta. Resumido con palabras propias, con enlace a la fuente. Pendiente de confirmación con contador.','es','draft'),
+('management','legal','BR','extranjero_administrador_no_residente_ltda_drei','Brasil: administrador extranjero o residente en el exterior en una sociedad limitada (normas DREI)',
+$k$Según las Instrucciones Normativas del DREI (IN 34/2017, IN 81/2020 y IN 11/2023, publicadas en gov.br) y una guía de la Junta Comercial de Santa Catarina (JUCESC):
+- Un extranjero puede ser socio de una empresa brasileña y también administrador. El administrador de una sociedad limitada (LTDA) puede residir en el exterior.
+- Condición: debe existir un representante residente en Brasil con poderes para recibir citaciones y notificaciones judiciales o administrativas, durante al menos 3 años después del fin de la gestión. La procuración se archiva en la Junta Comercial, en el mismo proceso o en uno autónomo.
+- Extranjeros residentes en Brasil: se presenta documento de identidad emitido por autoridad brasileña. Socios o administradores residentes en el exterior pueden actuar mediante procurador en Brasil.
+- El número de CPF se dispensa para brasileño o extranjero domiciliado en el exterior en el acto societario según una nota de la normativa; para otros trámites (CNPJ, bancos) la Receita puede exigirlo. Confirmar caso por caso.
+- Contradicción detectada: una consulta antigua de la Receita (2010) decía que el extranjero solo podía administrar con visto permanente, y un portal privado afirma que no puede ser administrador. Las IN del DREI vigentes en gov.br lo permiten con procurador, por lo que priman; igual conviene confirmar con la Junta Comercial del estado.
+- No verificado: montos de inversión para visas de inversionista y requisitos migratorios de residencia.
+Dónde confirmar: Junta Comercial del estado donde se abrirá la empresa, DREI (gov.br/empresas-e-negocios), Receita Federal (CPF/CNPJ) y un abogado o contador en Brasil.$k$,
+'DREI - Instrucciones Normativas 34/2017, 81/2020 y 11/2023; JUCESC','https://www.gov.br/empresas-e-negocios/pt-br/drei/legislacao/arquivos/legislacoes-federais/indrei342017alteradapelain75.pdf',
+'Material informativo de organismos públicos brasileños; no declara licencia abierta. Resumido con palabras propias, con enlace a la fuente. Pendiente de confirmación con contador.','es','draft'),
+('management','impuestos','BR','mei_simei_fuentes_oficiales_pendiente_confirmacion','Brasil: MEI, qué se pudo confirmar y dónde verificar',
+$k$El portal oficial gov.br de ocupaciones del MEI indica que cada ocupación se asocia a un código CNAE, que se puede elegir una ocupación principal y hasta 15 secundarias, y que conviene revisar las exigencias del Cuerpo de Bomberos y de la Vigilancia Sanitaria antes de operar.
+El portal del Simples Nacional ofrece servicios públicos para el MEI: PGMEI (generación del DAS) y DASN-SIMEI (declaración anual). Las páginas consultadas no mostraron el límite de facturación del MEI ni las fechas de vencimiento, por lo que esos datos no se incluyen aquí.
+Orientación al cliente: no asumir montos ni fechas del MEI; entrar a PGMEI y DASN-SIMEI en el portal oficial y verificar el límite anual vigente, el valor del DAS-MEI y el plazo de la declaración anual. Las licencias municipales, sanitarias y de bomberos dependen de la actividad y del municipio.
+Dónde confirmar: Portal do Empreendedor (gov.br/empresas-e-negocios), portal Simples Nacional/Simei de la Receita Federal y la prefeitura del municipio.$k$,
+'gov.br - Portal do Empreendedor y Receita Federal (Simples Nacional/Simei)','https://www8.receita.fazenda.gov.br/simplesnacional/',
+'Material informativo de organismos públicos brasileños; no declara licencia abierta. Resumido con palabras propias, con enlace a la fuente. Pendiente de confirmación con contador.','es','draft');
