@@ -552,9 +552,7 @@ export function HomeShowcase() {
                   <li className={row}><span>{t('cx.sum.lent')}</span><span className="font-bold text-red-600 dark:text-red-400">−{m(route1.day.lent)}</span></li>
                   <li className={row}><span>{t('cx.sum.expenses')}</span><span className="font-bold text-red-600 dark:text-red-400">−{m(route1.day.exp)}</span></li>
                   <li className={`${row} border-t border-slate-200 pt-2 text-sm dark:border-slate-800`}><span className="font-bold">{t('cx.sum.current')}</span><span className="font-extrabold">{m(currentOf(route1.day))}</span></li>
-                  <li className={`${row} text-slate-500`}><span>{t('home.sc.qr')}</span><span className="font-bold">{m(route1.day.qr)}</span></li>
                 </ul>
-                <p className="mt-2 text-[10px] text-slate-500">{t('fund.formula')}</p>
               </div>
             </div>
           )}
