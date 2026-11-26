@@ -49,7 +49,6 @@ export default function HomePage() {
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
             {cta}
             {!(loaded && session) && <Link href="/ingresar" className={`${ui.btnGhost} px-7 py-3`}>{t('home.ctaHaveAccount')}</Link>}
-            <a href="#demo" className={`${ui.btnGhost} px-7 py-3`}>{t('home.ctaHow')}</a>
           </div>
           <ul className="mt-6 grid grid-cols-2 gap-2 text-xs font-semibold sm:flex sm:flex-wrap sm:justify-center lg:justify-start">
             {[1, 2, 3, 4].map((i) => (
