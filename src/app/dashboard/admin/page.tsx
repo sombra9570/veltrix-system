@@ -15,6 +15,7 @@ import { BUSINESS_CATEGORIES } from '../../business-catalog';
 import { AvisosPanel } from './avisos-panel';
 import { RecursosPanel } from './recursos-panel';
 import { ActividadPanel } from './actividad-panel';
+import { ConocimientoPanel } from './conocimiento-panel';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -34,7 +35,7 @@ type Metrics = {
 };
 
 type Filter = 'all' | Stage;
-type AdminTab = 'menu' | 'home' | 'clients' | 'billing' | 'plans' | 'notices' | 'usage' | 'activity' | 'tools';
+type AdminTab = 'menu' | 'home' | 'clients' | 'billing' | 'plans' | 'notices' | 'usage' | 'activity' | 'knowledge' | 'tools';
 // Estructura de cada organización (solo cuántas empresas, sucursales, usuarios y módulos; nunca sus datos de negocio)
 type OrgOverview = {
   org_id: string; users: number; modules: string[]; roles: Record<string, number>;
@@ -306,6 +307,7 @@ export default function GlobalCoreAdminPage() {
     { id: 'notices', icon: '📣', label: 'Avisos', d: 'Mensajes visibles para los clientes en su aplicación' },
     { id: 'usage', icon: '📦', label: 'Recursos', d: 'Almacenamiento y consumo por cliente' },
     { id: 'activity', icon: '🧾', label: 'Actividad', d: 'Registro de acciones realizadas en la plataforma' },
+    { id: 'knowledge', icon: '🧠', label: 'Conocimiento IA', d: 'Biblioteca verificada que usa Veltrix IA' },
     { id: 'tools', icon: '🛠️', label: 'Plataforma', d: 'Idioma, país, limpieza y mantenimiento' },
   ];
 
@@ -736,6 +738,7 @@ export default function GlobalCoreAdminPage() {
         {tab === 'notices' && <AvisosPanel orgs={(m?.organizations ?? []).map((o) => ({ org_id: o.org_id, name: o.name }))} />}
         {tab === 'usage' && <RecursosPanel />}
         {tab === 'activity' && <ActividadPanel />}
+        {tab === 'knowledge' && <ConocimientoPanel />}
 
         {tab === 'tools' && (
           <section className="space-y-3">
