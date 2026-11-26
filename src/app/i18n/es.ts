@@ -969,7 +969,7 @@ const es = {
   'legal.creditNotice': 'Las condiciones del crédito (precio, cuotas y plazos) las define cada empresa.',
   "legal.acceptCheck": "Acepto los Términos y la Política de Privacidad",
   'legal.acceptRequired': 'Debe aceptar los términos y la política de privacidad para crear su cuenta.',
-  'ai.disclaimer': 'Orientación generada por IA con los registros del negocio. Verifique las cifras con su contador antes de presentar declaraciones.',
+  'ai.disclaimer': "Veltrix IA es un sistema de inteligencia artificial y puede cometer errores. Sus respuestas son orientativas y no reemplazan a un contador ni a otro profesional especializado en finanzas, impuestos o asuntos legales. Verifique las cifras y las normas antes de tomar decisiones o presentar declaraciones.",
   'home.h.title1': 'Todo el negocio conectado.',
   "home.h.title2": "Cada operación bajo control.",
   'home.h.subtitle': 'Gestione ventas, caja, inventario y cobranza desde un solo lugar. Cada persona trabaja desde su panel y usted ve todo el negocio.',

@@ -960,7 +960,7 @@ const fr: Record<DictKey, string> = {
   "legal.creditNotice": "Les conditions du crédit (prix, échéances et délais) sont fixées par votre entreprise.",
   "legal.acceptCheck": "J'accepte les Conditions et la Politique de confidentialité",
   "legal.acceptRequired": "Vous devez accepter les conditions et la confidentialité pour créer votre compte.",
-  "ai.disclaimer": "Conseil généré par IA à partir des données de votre entreprise. Vérifiez les chiffres avec votre comptable avant toute déclaration.",
+  'ai.disclaimer': "Veltrix IA est un système d'intelligence artificielle et peut commettre des erreurs. Ses réponses sont indicatives et ne remplacent ni un comptable ni un autre professionnel spécialisé en finance, fiscalité ou droit. Vérifiez les chiffres et les règles avant de prendre des décisions ou de déposer des déclarations.",
   "home.h.title1": "Toute votre entreprise connectée.",
   "home.h.title2": "Chaque opération sous contrôle.",
   "home.h.subtitle": "Gérez ventes, caisse, stock, crédit et équipes sur une seule plateforme. Chacun travaille avec les outils dont il a besoin et vous gardez la vision complète de votre entreprise.",

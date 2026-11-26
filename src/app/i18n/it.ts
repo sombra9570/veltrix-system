@@ -960,7 +960,7 @@ const it: Record<DictKey, string> = {
   "legal.creditNotice": "Le condizioni del credito (prezzo, rate e scadenze) le decide la tua azienda.",
   "legal.acceptCheck": "Accetto i Termini e l'Informativa sulla privacy",
   "legal.acceptRequired": "Devi accettare i termini e la privacy per creare l'account.",
-  "ai.disclaimer": "Indicazioni generate dall'IA con i dati della tua attività. Verifica le cifre con il tuo commercialista prima di presentare dichiarazioni.",
+  'ai.disclaimer': "Veltrix IA è un sistema di intelligenza artificiale e può commettere errori. Le sue risposte sono orientative e non sostituiscono un commercialista né un altro professionista specializzato in finanza, fisco o materie legali. Verifichi cifre e norme prima di prendere decisioni o presentare dichiarazioni.",
   "home.h.title1": "Tutta la tua attività connessa.",
   "home.h.title2": "Ogni operazione sotto controllo.",
   "home.h.subtitle": "Gestisci vendite, cassa, magazzino, crediti e team da un’unica piattaforma. Ognuno lavora con gli strumenti che gli servono e tu mantieni la visione completa dell’azienda.",

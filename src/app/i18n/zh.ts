@@ -960,7 +960,7 @@ const zh: Record<DictKey, string> = {
   "legal.creditNotice": "赊账条件（价格、分期和期限）由你的企业自行决定。",
   "legal.acceptCheck": "我接受服务条款和隐私政策",
   "legal.acceptRequired": "创建账户前，你必须接受服务条款和隐私政策。",
-  "ai.disclaimer": "由 AI 根据你的经营记录生成的建议。提交纳税申报前，请与会计核对数字。",
+  'ai.disclaimer': "Veltrix IA 是人工智能系统，可能出错。其回答仅供参考，不能替代会计师或其他财务、税务、法律领域的专业人士。在做决策或提交申报之前，请核实数据和相关规定。",
   "home.h.title1": "您的整个业务互联互通。",
   "home.h.title2": "每项操作尽在掌控。",
   "home.h.subtitle": "在一个平台上管理销售、收银、库存、信贷和团队。每个人使用自己需要的工具，您始终掌握公司全局。",

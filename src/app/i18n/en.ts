@@ -960,7 +960,7 @@ const en: Record<DictKey, string> = {
   "legal.creditNotice": "Credit terms (price, installments and periods) are set by your company.",
   "legal.acceptCheck": "I accept the Terms and the Privacy Policy",
   "legal.acceptRequired": "You must accept the terms and privacy policy to create your account.",
-  "ai.disclaimer": "AI-generated guidance based on your business records. Check the figures with your accountant before filing any tax return.",
+  'ai.disclaimer': "Veltrix IA is an artificial intelligence system and may make mistakes. Its answers are for guidance only and do not replace an accountant or another professional specialized in finance, taxes or legal matters. Verify figures and rules before making decisions or filing returns.",
   "home.h.title1": "Your whole business connected.",
   "home.h.title2": "Every operation under control.",
   "home.h.subtitle": "Manage sales, cash, inventory, credit and teams from one platform. Each person works with the tools they need while you keep the full picture of your company.",
