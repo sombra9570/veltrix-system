@@ -11,7 +11,7 @@ import { suggestedRoles } from '../../../business-catalog';
 
 const ROLES = ['supervisor', 'manager', 'cashier', 'vendor', 'collector', 'waiter', 'kitchen', 'technician', 'storekeeper', 'accountant', 'secretary', 'director', 'reception', 'delivery'] as const;
 // Roles que solo tienen sentido si el módulo de su rubro está activo
-const ROLE_MODULE: Partial<Record<(typeof ROLES)[number], string>> = { collector: 'field_collection', waiter: 'restaurant', kitchen: 'restaurant', technician: 'workshop', storekeeper: 'inventory' };
+const ROLE_MODULE: Partial<Record<(typeof ROLES)[number], string>> = { collector: 'field_collection', waiter: 'restaurant', kitchen: 'restaurant', storekeeper: 'inventory' };
 // Delivery necesita tienda, restaurante o cobranza en ruta (se valida también en el servidor)
 const DELIVERY_MODULES = ['retail', 'restaurant', 'distribution'];
 

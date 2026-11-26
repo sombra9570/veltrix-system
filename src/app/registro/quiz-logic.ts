@@ -66,7 +66,9 @@ export function rolesFor(cats: string[], sp: Specifics): TeamRole[] {
   if (sp.delivery === 'no') r.delete('delivery');
   if (sp.delivery === 'yes') r.add('delivery');
   if (sp.credit === 'yes') r.add('collector');
-  return [...r];
+  // Solo los cargos que el rubro ofrece según la matriz
+  const allowed = new Set<TeamRole>(suggestedRoles(cats));
+  return [...r].filter((x) => allowed.has(x));
 }
 
 export const hasRestaurant = (cats: string[]) => suggestedModules(cats).includes('restaurant');

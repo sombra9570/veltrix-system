@@ -91,17 +91,27 @@ export const modKey = (m: ModuleCode) => `mod.${m}` as DictKey;
 export const TEAM_ROLES = ['cashier', 'vendor', 'waiter', 'kitchen', 'collector', 'supervisor', 'storekeeper', 'accountant', 'technician', 'reception', 'delivery', 'manager'] as const;
 export type TeamRole = (typeof TEAM_ROLES)[number];
 
+// Roles que ofrece cada rubro (matriz aprobada; espejo de la tabla rubro_roles en la base de datos)
+const TIENDA: TeamRole[] = ['vendor', 'cashier', 'storekeeper', 'delivery'];
+const CREDITO_MAYORISTA: TeamRole[] = ['vendor', 'cashier', 'storekeeper', 'delivery', 'collector', 'supervisor'];
+const COMIDA: TeamRole[] = ['waiter', 'kitchen', 'cashier', 'storekeeper', 'delivery', 'reception'];
+const TALLER: TeamRole[] = ['technician', 'cashier', 'storekeeper', 'reception'];
+const SERVICIOS: TeamRole[] = ['technician', 'reception', 'cashier'];
+const COBRANZA: TeamRole[] = ['collector', 'supervisor'];
+export const RUBRO_ROLES: Record<string, TeamRole[]> = {
+  grocery: TIENDA, hardware: TIENDA, pharmacy: TIENDA, clothing: TIENDA, tech: TIENDA, auto_parts: TIENDA, bakery: TIENDA, stationery: TIENDA, agro: TIENDA,
+  credit_sales: CREDITO_MAYORISTA, wholesale: CREDITO_MAYORISTA,
+  restaurant: COMIDA, fast_food: COMIDA,
+  mechanic: TALLER, tech_repair: TALLER,
+  beauty: SERVICIOS, health: SERVICIOS, laundry: SERVICIOS, gym: SERVICIOS, education: SERVICIOS,
+  lodging: ['technician', 'reception', 'cashier', 'waiter', 'kitchen'],
+  transport: ['supervisor', 'delivery', 'cashier', 'reception', 'collector'],
+  collections: COBRANZA, microfinance: COBRANZA,
+};
+
 export function suggestedRoles(categoryIds: string[]): TeamRole[] {
-  const mods = new Set<ModuleCode>();
-  for (const id of categoryIds) BUSINESS_CATEGORIES.find((c) => c.id === id)?.modules.forEach((m) => mods.add(m));
   const r = new Set<TeamRole>();
-  if (mods.has('retail') || mods.has('distribution')) { r.add('vendor'); r.add('cashier'); }
-  if (mods.has('restaurant')) { r.add('waiter'); r.add('kitchen'); r.add('cashier'); }
-  if (mods.has('workshop')) { r.add('technician'); r.add('cashier'); }
-  if (mods.has('inventory')) r.add('storekeeper');
-  if (mods.has('retail') || mods.has('restaurant') || mods.has('distribution')) r.add('delivery');
-  if (mods.has('workshop') || mods.has('retail') || mods.has('restaurant') || mods.has('distribution')) r.add('reception');
-  if (mods.has('field_collection')) { r.add('collector'); r.add('supervisor'); }
+  for (const id of categoryIds) RUBRO_ROLES[id]?.forEach((x) => r.add(x));
   return TEAM_ROLES.filter((x) => r.has(x));
 }
 
