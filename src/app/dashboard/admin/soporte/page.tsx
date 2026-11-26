@@ -15,11 +15,11 @@ type Thread = {
   ticket: { id: string; subject: string; status: Ticket['status']; priority: string; created_at: string; assigned_to: string | null; assigned_name: string | null; org: string | null; plan: string | null; opener: string | null };
   messages: { id: string; kind: 'customer' | 'staff'; body: string; internal: boolean; at: string; by: string | null }[];
 };
-type Staff = { user_id: string; name: string; email: string; func: string; can_reply: boolean; can_assign: boolean; can_approve_street?: boolean; can_see_orgs: boolean; is_active: boolean };
+type Staff = { user_id: string; name: string; email: string; func: string; can_reply: boolean; can_assign: boolean; can_approve_street?: boolean; can_see_orgs: boolean; can_edit_knowledge?: boolean; can_verify_knowledge?: boolean; is_active: boolean };
 type Contact = { id: string; name: string; func: string; unread: number };
 type Chat = { id: string; mine: boolean; body: string; at: string };
 
-const FUNCS: Record<string, string> = { support: 'Atención al cliente', technical: 'Soporte técnico', billing: 'Cobros y facturación', sales: 'Ventas' };
+const FUNCS: Record<string, string> = { support: 'Atención al cliente', technical: 'Soporte técnico', billing: 'Cobros y facturación', sales: 'Ventas', accounting: 'Contador' };
 const ST: Record<Ticket['status'], { label: string; cls: string }> = {
   open: { label: 'Por atender', cls: 'bg-amber-500/15 text-amber-300' },
   answered: { label: 'Respondido', cls: 'bg-sky-500/15 text-sky-300' },
@@ -40,6 +40,10 @@ export default function SupportPage() {
 
   useEffect(() => {
     if (loaded && (!session || (session.role !== 'superadmin' && session.role !== 'support'))) router.replace('/');
+  }, [loaded, session, router]);
+  useEffect(() => {
+    if (!loaded || session?.role !== 'support') return;
+    rpc<{ func: string | null }>('knowledge_my_access').then((a) => { if (a?.func === 'accounting') router.replace('/dashboard/admin/contador'); }).catch(() => { /* */ });
   }, [loaded, session, router]);
 
   if (!loaded || !session || (session.role !== 'superadmin' && session.role !== 'support')) {
@@ -198,7 +202,7 @@ function Team() {
   const [list, setList] = useState<Staff[]>([]);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [show, setShow] = useState(false);
-  const [f, setF] = useState({ name: '', email: '', password: '', func: 'support', canReply: true, canAssign: false, canSeeOrgs: true });
+  const [f, setF] = useState({ name: '', email: '', password: '', func: 'support', canReply: true, canAssign: false, canSeeOrgs: true, canEditKnowledge: false, canVerifyKnowledge: false });
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -216,7 +220,7 @@ function Team() {
       });
       const j = await res.json();
       if (!res.ok) throw new Error(j.error ?? 'No se pudo crear');
-      setShow(false); setF({ name: '', email: '', password: '', func: 'support', canReply: true, canAssign: false, canSeeOrgs: true });
+      setShow(false); setF({ name: '', email: '', password: '', func: 'support', canReply: true, canAssign: false, canSeeOrgs: true, canEditKnowledge: false, canVerifyKnowledge: false });
       setMsg({ ok: true, text: 'Cuenta creada. Entra con su correo y contraseña.' }); await load();
     } catch (e) { setMsg({ ok: false, text: err(e) }); }
     setBusy(false);
@@ -225,7 +229,7 @@ function Team() {
   const update = async (s: Staff, patch: Partial<Staff>) => {
     const n = { ...s, ...patch };
     try {
-      await rpc('staff_update', { p_user: n.user_id, p_func: n.func, p_reply: n.can_reply, p_assign: n.can_assign, p_orgs: n.can_see_orgs, p_active: n.is_active, p_street: !!n.can_approve_street });
+      await rpc('staff_update', { p_user: n.user_id, p_func: n.func, p_reply: n.can_reply, p_assign: n.can_assign, p_orgs: n.can_see_orgs, p_active: n.is_active, p_street: !!n.can_approve_street, p_kb_edit: !!n.can_edit_knowledge, p_kb_verify: !!n.can_verify_knowledge });
       await load();
     } catch (e) { setMsg({ ok: false, text: err(e) }); }
   };
@@ -255,6 +259,8 @@ function Team() {
             <Chk on={f.canReply} label="Puede responder y cerrar tickets" onChange={(v) => setF({ ...f, canReply: v })} />
             <Chk on={f.canAssign} label="Puede asignar tickets" onChange={(v) => setF({ ...f, canAssign: v })} />
             <Chk on={f.canSeeOrgs} label="Ve el nombre y plan de la empresa" onChange={(v) => setF({ ...f, canSeeOrgs: v })} />
+            <Chk on={f.canEditKnowledge} label="Redacta y edita borradores de la biblioteca de la IA" onChange={(v) => setF({ ...f, canEditKnowledge: v })} />
+            <Chk on={f.canVerifyKnowledge} label="Verifica, publica y retira entradas de la biblioteca de la IA" onChange={(v) => setF({ ...f, canVerifyKnowledge: v })} />
           </div>
           <button type="button" disabled={busy || !f.name || !f.email || f.password.length < 8} className={btn} onClick={create}>Crear cuenta</button>
         </div>
@@ -274,6 +280,8 @@ function Team() {
                 <Chk on={s.can_reply} label="Responde y cierra" onChange={(v) => update(s, { can_reply: v })} />
                 <Chk on={s.can_assign} label="Asigna" onChange={(v) => update(s, { can_assign: v })} />
                 <Chk on={s.can_see_orgs} label="Ve empresa y plan" onChange={(v) => update(s, { can_see_orgs: v })} />
+                <Chk on={!!s.can_edit_knowledge} label="Redacta borradores de la biblioteca de la IA" onChange={(v) => update(s, { can_edit_knowledge: v })} />
+                <Chk on={!!s.can_verify_knowledge} label="Verifica, publica y retira entradas de la biblioteca de la IA" onChange={(v) => update(s, { can_verify_knowledge: v })} />
                 <Chk on={!!s.can_approve_street} label="Aprueba cobradores adicionales (cobranza en calle)" onChange={(v) => update(s, { can_approve_street: v })} />
               </div>
             </li>

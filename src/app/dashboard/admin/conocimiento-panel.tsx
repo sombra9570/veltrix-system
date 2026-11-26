@@ -35,7 +35,8 @@ const countryName = (code: string) => {
 const norm = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
 // Biblioteca de conocimiento de Veltrix IA: la IA solo usa las entradas verificadas, con su fuente y licencia.
-export function ConocimientoPanel() {
+export type KnowledgeAccess = { edit: boolean; verify: boolean };
+export function ConocimientoPanel({ access = { edit: true, verify: true } }: { access?: KnowledgeAccess }) {
   const [list, setList] = useState<Row[]>([]);
   const [f, setF] = useState<Form>(EMPTY);
   const [folder, setFolder] = useState<Folder>('all');
@@ -43,6 +44,8 @@ export function ConocimientoPanel() {
   const [q, setQ] = useState('');
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
+  const [review, setReview] = useState(false);
+  const [skipped, setSkipped] = useState<string[]>([]);
   const file = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => { try { setList((await rpc<Row[]>('admin_list_ai_knowledge')) ?? []); } catch (e) { setMsg(e instanceof Error ? e.message : 'Error'); } }, []);
@@ -50,7 +53,7 @@ export function ConocimientoPanel() {
 
   const needsSource = f.kind !== 'veltrix_help';
   const ready = !!(f.topic.trim() && f.title.trim() && f.summary.trim() && f.summary.length <= MAX && (f.kind !== 'tax_rule' || f.country.trim()));
-  const canVerify = ready && !!f.verified_by.trim() && (!needsSource || (f.source_url.trim() && f.license.trim()));
+  const canVerify = access.verify && ready && (!needsSource || (f.source_url.trim() && f.license.trim()));
 
   const call = (r: { id: string | null; kind: Kind; area: Area; country: string | null; topic: string; title: string; summary: string; source_name: string | null; source_url: string | null; license: string | null; lang: string; verified_by: string | null }, status: Status) =>
     rpc('admin_save_ai_knowledge', {
@@ -111,6 +114,16 @@ export function ConocimientoPanel() {
       .filter((r) => !s || norm(`${r.title} ${r.topic} ${r.summary} ${r.source_name ?? ''}`).includes(s));
   }, [list, folder, area, q]);
 
+  const queue = useMemo(() => shown.filter((r) => r.status === 'draft' && !skipped.includes(r.id)), [shown, skipped]);
+  const cur = queue[0];
+  const reviewVerify = async (r: Row) => {
+    setBusy(true); setMsg('');
+    try {
+      await call({ id: r.id, kind: r.kind, area: r.area, country: r.country_code, topic: r.topic, title: r.title, summary: r.summary, source_name: r.source_name, source_url: r.source_url, license: r.license, lang: r.lang, verified_by: null }, 'verified');
+      setMsg('✅ Entrada verificada'); await load();
+    } catch (e) { setMsg(e instanceof Error ? e.message : 'No fue posible verificar'); } finally { setBusy(false); }
+  };
+
   const inp = 'w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm';
   const lbl = 'text-[11px] font-semibold text-slate-400';
   const folderBtn = (id: Folder, icon: string, label: string, n: number, sub = false) => (
@@ -163,11 +176,13 @@ export function ConocimientoPanel() {
           <label className="space-y-1"><span className={lbl}>Licencia o condiciones de uso</span><input value={f.license} onChange={(e) => setF({ ...f, license: e.target.value })} className={inp} /></label>
         </div>
         <label className="block space-y-1"><span className={lbl}>Enlace de la fuente</span><input type="url" value={f.source_url} onChange={(e) => setF({ ...f, source_url: e.target.value })} className={inp} /></label>
-        <label className="block space-y-1"><span className={lbl}>Verificado por (nombre de quien revisó)</span><input value={f.verified_by} onChange={(e) => setF({ ...f, verified_by: e.target.value })} className={inp} /></label>
+        <p className="text-[11px] text-slate-500">Al verificar, la entrada queda registrada con tu nombre y la fecha de hoy.</p>
         {msg && <p className="text-xs font-semibold text-amber-300">{msg}</p>}
         <div className="grid grid-cols-2 gap-2">
-          <button type="submit" disabled={busy || !ready} className="cursor-pointer rounded-xl border border-slate-600 bg-slate-800 py-3 text-sm font-bold disabled:opacity-50">Guardar borrador</button>
-          <button type="button" disabled={busy || !canVerify} onClick={() => save('verified')} className="cursor-pointer rounded-xl bg-blue-600 py-3 text-sm font-bold disabled:opacity-50">Marcar verificada</button>
+          <button type="submit" disabled={busy || !ready || !access.edit} className="cursor-pointer rounded-xl border border-slate-600 bg-slate-800 py-3 text-sm font-bold disabled:opacity-50">Guardar borrador</button>
+          {access.verify
+            ? <button type="button" disabled={busy || !canVerify} onClick={() => save('verified')} className="cursor-pointer rounded-xl bg-blue-600 py-3 text-sm font-bold disabled:opacity-50">Marcar verificada</button>
+            : <p className="grid place-items-center rounded-xl border border-slate-800 px-2 text-center text-[11px] text-slate-500">La verificación la realiza quien tiene ese permiso.</p>}
         </div>
         {f.id && <button type="button" onClick={() => setF(EMPTY)} className="w-full cursor-pointer text-xs font-semibold text-slate-400 hover:underline">Cancelar edición</button>}
       </form>
@@ -183,6 +198,31 @@ export function ConocimientoPanel() {
             </button>
           ))}
         </div>
+        {access.verify && (
+          <button type="button" onClick={() => { setReview(!review); setSkipped([]); }} className="w-full cursor-pointer rounded-xl border border-blue-500/50 bg-blue-600/10 px-3 py-2 text-sm font-bold text-blue-200 hover:bg-blue-600/20">
+            {review ? 'Salir de la revisión rápida' : `⚡ Revisión rápida (${shown.filter((r) => r.status === 'draft').length} por verificar en esta vista)`}
+          </button>
+        )}
+        {review && access.verify && (cur ? (
+          <div className="space-y-2 rounded-2xl border border-blue-500/40 bg-slate-900 p-4">
+            <p className="text-[11px] font-semibold text-slate-400">Pendientes en esta vista: {queue.length}</p>
+            <p className="font-bold">{cur.title}</p>
+            <p className="whitespace-pre-wrap text-sm text-slate-200">{cur.summary}</p>
+            <div className="space-y-1 rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-slate-300">
+              <p><b>Fuente:</b> {cur.source_url ? <a href={cur.source_url} target="_blank" rel="noreferrer" className="text-blue-400 underline">{cur.source_name || cur.source_url}</a> : 'sin enlace'}</p>
+              <p><b>Licencia o condiciones:</b> {cur.license || 'sin dato'}</p>
+              <p><b>País:</b> {cur.country_code ? countryName(cur.country_code) : 'Base general'} · <b>Área:</b> {AREAS[cur.area]?.label}</p>
+            </div>
+            {msg && <p className="text-xs font-semibold text-amber-300">{msg}</p>}
+            {cur.kind !== 'veltrix_help' && !(cur.source_url && cur.license) && <p className="text-xs text-rose-300">Falta el enlace o la licencia: edita la entrada antes de verificarla.</p>}
+            <div className="grid grid-cols-2 gap-2">
+              <button type="button" disabled={busy || (cur.kind !== 'veltrix_help' && !(cur.source_url && cur.license))} onClick={() => reviewVerify(cur)} className="cursor-pointer rounded-xl bg-emerald-600 py-2.5 text-sm font-bold disabled:opacity-50">✅ Verificar</button>
+              <button type="button" onClick={() => edit(cur)} className="cursor-pointer rounded-xl border border-slate-600 py-2.5 text-sm font-bold">✏️ Corregir</button>
+              <button type="button" onClick={() => setSkipped([...skipped, cur.id])} className="cursor-pointer rounded-xl border border-slate-700 py-2.5 text-sm font-semibold text-slate-300">⏭ Omitir</button>
+              <button type="button" disabled={busy} onClick={() => retire(cur)} className="cursor-pointer rounded-xl border border-red-500/40 py-2.5 text-sm font-semibold text-red-300">🗄️ Retirar</button>
+            </div>
+          </div>
+        ) : <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-400">No quedan entradas por revisar en esta vista.</p>)}
         <h2 className="text-sm font-bold">Entradas ({shown.length})</h2>
         {shown.length === 0 && <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-500">No hay entradas en esta carpeta con ese filtro.</p>}
         {shown.map((r) => (
@@ -190,8 +230,8 @@ export function ConocimientoPanel() {
             <div className="flex items-start justify-between gap-2">
               <p className="font-bold">{r.title}</p>
               <div className="flex shrink-0 gap-3 text-xs font-semibold">
-                <button type="button" onClick={() => edit(r)} className="cursor-pointer text-blue-400 hover:underline">Editar</button>
-                {r.status !== 'retired' && <button type="button" disabled={busy} onClick={() => retire(r)} className="cursor-pointer text-red-400 hover:underline">Retirar</button>}
+                {(access.verify || (access.edit && r.status === 'draft')) && <button type="button" onClick={() => edit(r)} className="cursor-pointer text-blue-400 hover:underline">Editar</button>}
+                {access.verify && r.status !== 'retired' && <button type="button" disabled={busy} onClick={() => retire(r)} className="cursor-pointer text-red-400 hover:underline">Retirar</button>}
               </div>
             </div>
             <p className="line-clamp-3 text-xs text-slate-300">{r.summary}</p>
