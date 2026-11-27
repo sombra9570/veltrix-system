@@ -32,7 +32,8 @@ type Addons = {
 export default function PlanPage() {
   const { t, lang } = useT();
   const { fmt: usd } = usePlanMoney();
-  const { orgId, reload } = useOwner();
+  const { orgId, reload, overview } = useOwner();
+  const isStreet = !!overview?.street; // cobranza en calle y microfinanzas: no se muestran planes, solo cobradores y supervisores contratados
   const [streetBs, setStreetBs] = useState<number | null>(null);
   const [b, setB] = useState<Billing | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -122,6 +123,7 @@ export default function PlanPage() {
           : 'border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300'}`}>{msg.text}</p>
       )}
 
+      {!isStreet && (<>
       <Card className="space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -240,6 +242,8 @@ export default function PlanPage() {
         <p className={`mt-1 text-sm ${ui.muted}`}>{t('bill.qrText')}</p>
         <a href="mailto:hola@veltrixsystem.app?subject=Pago%20Veltrix" className={`${ui.btnGhost} mt-3 max-sm:w-full`}>✉️ hola@veltrixsystem.app</a>
       </Card>
+
+      </>)}
 
       {orgId && <StreetPlan orgId={orgId} onPrice={setStreetBs} />}
 
