@@ -128,14 +128,14 @@ export default function RegistroPage() {
   // 1) Qué vende, cuántos negocios y sucursales
   const [sells, setSells] = useState<Sells | null>(null);
   const [bizCount, setBizCount] = useState<'1' | '2' | '3' | 'unsure' | null>(null);
-  const [branchSize, setBranchSize] = useState<string | null>(null); // b1..b4 | unsure
+  const [bizBranches, setBizBranches] = useState<(string | null)[]>([null]); // sucursales de cada negocio: b1..b4 | unsure
   // 2) Rubro de cada negocio
   const [bizCats, setBizCats] = useState<string[][]>([[]]);
   const [rubroUnsure, setRubroUnsure] = useState<boolean[]>([false]);
   const [guide, setGuide] = useState<(Group | 'ask' | null)[]>([null]);
   // 3) Equipo
   const [teamSize, setTeamSize] = useState<string | null>(null);   // s0..s6 | unsure
-  const [roles, setRoles] = useState<TeamRole[]>([]);
+  const [bizRoles, setBizRoles] = useState<TeamRole[][]>([[]]); // cargos de cada negocio (según su rubro)
   // 4) Detalles
   const [tables, setTables] = useState<Tri | null>(null);
   const [delivery, setDelivery] = useState<Tri | null>(null);
@@ -177,13 +177,22 @@ export default function RegistroPage() {
   const sp: Specifics = { tables, delivery, credit };
   const solo = teamSize === 's0';
   const teamMax = teamSize === 'unsure' ? 1 : TEAM_SIZES.find((x) => x.id === teamSize)?.max ?? 0;
-  const branchMax = BRANCH_SIZES.find((x) => x.id === branchSize)?.max ?? 1;
+  const branchOf = (i: number) => BRANCH_SIZES.find((x) => x.id === bizBranches[i])?.max ?? 1;
+  const branchMax = Array.from({ length: nBiz }, (_, i) => branchOf(i)).reduce((a, b) => a + b, 0); // total de sucursales de todos los negocios
+  const branchAll = Array.from({ length: nBiz }, (_, i) => bizBranches[i] ?? null);
+  const branchSize: string | null = !branchAll.every(Boolean) ? null : branchAll.includes('unsure') ? 'unsure' : (BRANCH_SIZES.find((x) => x.max >= branchMax)?.id ?? 'b4');
   const modules = modulesFor(allCats, sp);
-  const allowedRoles = suggestedRoles(allCats); // solo los cargos que la matriz permite para el/los rubros elegidos
-  const shownRoles = roles.filter((x) => allowedRoles.includes(x)); // el cliente decide; no vienen marcados de entrada
-  const toggleRole = (r: TeamRole) => setRoles(shownRoles.includes(r) ? shownRoles.filter((x) => x !== r) : [...shownRoles, r]);
-  const addRoles = (add: TeamRole[]) => setRoles((cur) => [...new Set([...cur, ...add])]);
-  const dropRoles = (rem: TeamRole[]) => setRoles((cur) => cur.filter((x) => !rem.includes(x)));
+  const allowedFor = (i: number) => suggestedRoles(catsOf(i)); // solo los cargos que la matriz permite para el rubro de ese negocio
+  const allowedRoles = suggestedRoles(allCats);
+  const shownBy = (i: number) => (bizRoles[i] ?? []).filter((x) => allowedFor(i).includes(x)); // el cliente decide; no vienen marcados de entrada
+  const shownRoles = [...new Set(Array.from({ length: nBiz }, (_, i) => shownBy(i)).flat())];
+  const toggleRole = (i: number, r: TeamRole) => setBizRoles((p) => { const n = [...p]; while (n.length <= i) n.push([]); const cur = shownBy(i); n[i] = cur.includes(r) ? cur.filter((x) => x !== r) : [...cur, r]; return n; });
+  // Marca los cargos que implica una respuesta, solo en los negocios cuyo rubro los permite
+  const addRoles = (add: TeamRole[], fits: (cats: string[]) => boolean) => setBizRoles((p) => Array.from({ length: nBiz }, (_, i) => {
+    const cur = p[i] ?? [];
+    return fits(catsOf(i)) ? [...new Set([...cur, ...add.filter((r) => allowedFor(i).includes(r))])] : cur;
+  }));
+  const dropRoles = (rem: TeamRole[]) => setBizRoles((p) => p.map((c) => c.filter((x) => !rem.includes(x))));
   const plan = recommendPlan(plans, teamMax, branchMax);
 
   const showTables = hasRestaurant(allCats);
@@ -205,7 +214,7 @@ export default function RegistroPage() {
   }, [sells, bizCount, branchSize, rubroUnsure, nBiz, teamSize, tables, delivery, credit, showTables, showDelivery, showCredit]);
 
   const quizAnswers = (): Record<string, unknown> => ({
-    sells, businesses: bizCount, branches: branchSize, rubros: Array.from({ length: nBiz }, (_, i) => bizCats[i] ?? []), team: teamSize,
+    sells, businesses: bizCount, branches: branchSize, branches_by_biz: branchAll, rubros: Array.from({ length: nBiz }, (_, i) => bizCats[i] ?? []), team: teamSize,
     tables, delivery, credit, invoice, ai: wantAi, unsure: unsureList, step, lang,
   });
 
@@ -213,7 +222,7 @@ export default function RegistroPage() {
   const setBiz = (i: number, fn: (c: string[]) => string[]) => setBizCats((p) => { const n = [...p]; while (n.length <= i) n.push([]); n[i] = fn(n[i]); return n; });
   const toggleCat = (i: number, id: string) => {
     setError('');
-    if (id === STREET && !(bizCats[i] ?? []).some(isStreet)) { setBizCount('1'); setBranchSize('b1'); setBizCats([[STREET]]); }
+    if (id === STREET && !(bizCats[i] ?? []).some(isStreet)) { setBizCount('1'); setBizBranches(['b1']); setBizCats([[STREET]]); }
     else setBiz(i, (c) => (c.includes(id) ? c.filter((x) => x !== id) : canJoin(c, id) ? [...c, id] : c));
     setRubroUnsure((p) => { const n = [...p]; n[i] = false; return n; });
   };
@@ -228,11 +237,11 @@ export default function RegistroPage() {
     if (step === 0) {
       if (!sells) return qq('val.sells');
       if (!streetOnly && !bizCount) return qq('val.biz');
-      if (!streetOnly && !branchSize) return qq('val.br');
     }
     if (step === 1 && !teamSize) return qq('val.team');
     if (step === 2) {
       for (let i = 0; i < nBiz; i++) if (catsOf(i).length === 0 && !rubroUnsure[i]) return qq('rubro.missing');
+      if (!streetOnly && !branchAll.every(Boolean)) return qq('val.br');
     }
     if (step === 3) {
       if ((showTables && !tables) || (showDelivery && !delivery) || (showCredit && !credit) || !invoice || wantAi === null) return qq('det.missing');
@@ -277,7 +286,7 @@ export default function RegistroPage() {
       try {
         await rpc('save_onboarding', { p_data: {
           sells, businesses: bizCount, businesses_n: nBiz, rubros: Array.from({ length: nBiz }, (_, i) => bizCats[i] ?? []),
-          team: teamSize, team_max: teamMax, branches: branchSize, branches_max: branchMax, roles: solo ? [] : shownRoles,
+          team: teamSize, team_max: teamMax, branches: branchSize, branches_by_biz: branchAll, branches_max: branchMax, roles: solo ? [] : shownRoles,
           tables, delivery, credit, invoice, ai: wantAi, plan: plan?.code ?? null, categories: allCats, unsure: unsureList,
         } });
       } catch { /* el diagnóstico es un extra: no frena el registro */ }
@@ -365,13 +374,6 @@ export default function RegistroPage() {
                 {(['1', '2', '3'] as const).map((v) => <Choice key={v} on={bizCount === v} onClick={() => { setBizCount(v); setError(''); }}>{qq(`biz.${v}` as QKey)}</Choice>)}
               </div>
               <div className="mt-2"><Choice on={bizCount === 'unsure'} soft onClick={() => { setBizCount('unsure'); setError(''); }}>{qq('unsure')}</Choice></div>
-
-              <h2 className="mt-8 text-lg font-bold">{qq('br.q')}</h2>
-              <p className={`text-sm ${ui.muted}`}>{qq('br.hint')}</p>
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {BRANCH_SIZES.map((z) => <Choice key={z.id} on={branchSize === z.id} onClick={() => { setBranchSize(z.id); setError(''); }}>{t(`need.br.${z.id}` as DictKey)}</Choice>)}
-              </div>
-              <div className="mt-2"><Choice on={branchSize === 'unsure'} soft onClick={() => { setBranchSize('unsure'); setError(''); }}>{qq('unsure')}</Choice></div>
               </>)}
             </>
           )}
@@ -443,6 +445,16 @@ export default function RegistroPage() {
                         )}
                       </>
                     )}
+                    {!streetOnly && (
+                      <div className="mt-6">
+                        <h3 className="text-base font-bold">{nBiz === 1 ? qq('br.q') : qq('br.qn', { n: i + 1 })}</h3>
+                        <p className={`text-sm ${ui.muted}`}>{nBiz === 1 ? qq('br.hint') : qq('br.hintn')}</p>
+                        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                          {BRANCH_SIZES.map((z) => <Choice key={z.id} on={bizBranches[i] === z.id} onClick={() => { setBizBranches((p) => { const n = [...p]; while (n.length <= i) n.push(null); n[i] = z.id; return n; }); setError(''); }}>{t(`need.br.${z.id}` as DictKey)}</Choice>)}
+                        </div>
+                        <div className="mt-2"><Choice on={bizBranches[i] === 'unsure'} soft onClick={() => { setBizBranches((p) => { const n = [...p]; while (n.length <= i) n.push(null); n[i] = 'unsure'; return n; }); setError(''); }}>{qq('unsure')}</Choice></div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -467,24 +479,33 @@ export default function RegistroPage() {
             <>
               <h2 className="text-lg font-bold">{qq('det.title')}</h2>
               <div className="mt-4">
-                {showTables && <TriRow q={qq('det.tables')} value={tables} onChange={(v) => { setTables(v); setError(''); if (v === 'yes') addRoles(['waiter', 'kitchen']); if (v === 'no') dropRoles(['waiter']); }} unsureLabel={qq('unsure')} />}
-                {showDelivery && <TriRow q={qq('det.delivery')} value={delivery} onChange={(v) => { setDelivery(v); setError(''); if (v === 'yes') addRoles(['delivery']); if (v === 'no') dropRoles(['delivery']); }} unsureLabel={qq('unsure')} />}
-                {showCredit && <TriRow q={qq('det.credit')} value={credit} onChange={(v) => { setCredit(v); setError(''); if (v === 'yes') addRoles(['collector']); if (v === 'no') dropRoles(['collector']); }} unsureLabel={qq('unsure')} />}
+                {showTables && <TriRow q={qq('det.tables')} value={tables} onChange={(v) => { setTables(v); setError(''); if (v === 'yes') addRoles(['waiter', 'kitchen'], hasRestaurant); if (v === 'no') dropRoles(['waiter']); }} unsureLabel={qq('unsure')} />}
+                {showDelivery && <TriRow q={qq('det.delivery')} value={delivery} onChange={(v) => { setDelivery(v); setError(''); if (v === 'yes') addRoles(['delivery'], (c) => hasRestaurant(c) || hasSales(c)); if (v === 'no') dropRoles(['delivery']); }} unsureLabel={qq('unsure')} />}
+                {showCredit && <TriRow q={qq('det.credit')} value={credit} onChange={(v) => { setCredit(v); setError(''); if (v === 'yes') addRoles(['collector'], hasSales); if (v === 'no') dropRoles(['collector']); }} unsureLabel={qq('unsure')} />}
               {!solo && allowedRoles.length > 0 && (
                 <>
                   <h2 className="mt-6 text-lg font-bold">{qq('team.rolesQ')}</h2>
                   <p className={`text-sm ${ui.muted}`}>{qq('team.rolesHint')}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {allowedRoles.map((r) => {
-                      const on = shownRoles.includes(r);
-                      return (
-                        <button key={r} type="button" aria-pressed={on} onClick={() => toggleRole(r)}
-                          className={`rounded-full border px-3 py-1.5 text-sm font-semibold cursor-pointer ${on ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 dark:border-slate-700'}`}>
-                          {on ? '✓ ' : ''}{t(`role.${r}` as DictKey)}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  {Array.from({ length: nBiz }, (_, i) => {
+                    const list = allowedFor(i);
+                    if (!list.length) return null;
+                    return (
+                      <div key={i} className="mt-3">
+                        {nBiz > 1 && <p className="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">{qq('biz.name', { n: i + 1 })} · {catsOf(i).map((c) => t(catKey(c))).join(' · ')}</p>}
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {list.map((r) => {
+                            const on = shownBy(i).includes(r);
+                            return (
+                              <button key={r} type="button" aria-pressed={on} onClick={() => toggleRole(i, r)}
+                                className={`rounded-full border px-3 py-1.5 text-sm font-semibold cursor-pointer ${on ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300 dark:border-slate-700'}`}>
+                                {on ? '✓ ' : ''}{t(`role.${r}` as DictKey)}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </>
               )}
 
