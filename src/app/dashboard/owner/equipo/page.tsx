@@ -105,6 +105,8 @@ export default function TeamPage() {
   }, [orgId]);
 
   useEffect(() => { load(); }, [load]);
+  // El cargo por defecto ('cashier') puede no existir en este rubro: el selector mostraba otro pero se enviaba el oculto
+  useEffect(() => { if (roles.length > 0 && !form.role.startsWith('custom:') && !(roles as readonly string[]).includes(form.role)) setForm((f) => ({ ...f, role: roles[0] })); }, [roles, form.role]);
 
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
