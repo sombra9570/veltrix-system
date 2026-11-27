@@ -28,7 +28,7 @@ type Fund = {
   moves: { at: string; type: string; amount: number; note: string | null }[];
 };
 const PERMS = ['loans.create', 'loans.customers', 'loans.interest', 'routes.liquidate', 'routes.invest', 'collector.expenses', 'collector.pay_out', 'collector.portfolio',
-  'collector.delete_installments', 'collector.delete_credits', 'collector.delete_customers', 'loans.no_photo', 'loans.no_id_photo'];
+  'collector.delete_installments', 'collector.delete_credits', 'collector.delete_customers', 'loans.no_photo', 'loans.no_id_photo', 'customers.photo_gallery'];
 const NUMS: [string, string, number | null][] = [['commission_pct', 'rt.commPct', 3], ['max_loan', 'rt.maxLoan', null], ['max_cards', 'rt.maxCards', null]];
 
 const toCredit = (k: RawCredit): Credit => ({
