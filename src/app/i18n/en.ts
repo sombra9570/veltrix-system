@@ -1113,6 +1113,8 @@ const en: Record<DictKey, string> = {
   "perm.routes.assign": "Assign routes to collectors and supervisors",
   "perm.reports.supervisors": "View supervisor reports",
   "perm.collectors.rate": "Rate collectors",
+  "perm.customers.photo_gallery": "Customer photos from the gallery",
+  "perm.customers.photo_gallery.d": "If off, the collector does not see the upload buttons and can only take the photo with the phone camera.",
   "rate.overall": "Overall rating",
   "rate.punctuality": "Punctuality",
   "rate.temperament": "Character",

@@ -1113,6 +1113,8 @@ const zh: Record<DictKey, string> = {
   "perm.routes.assign": "给收款员和主管分配路线",
   "perm.reports.supervisors": "查看主管报告",
   "perm.collectors.rate": "评价收款员",
+  "perm.customers.photo_gallery": "从相册上传客户照片",
+  "perm.customers.photo_gallery.d": "关闭后，收款员看不到上传按钮，只能用手机相机拍照。",
   "rate.overall": "总体评分",
   "rate.punctuality": "守时",
   "rate.temperament": "性格",

@@ -57,8 +57,8 @@ function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) 
  * Cliente nuevo de la ruta: datos, carnet por los dos lados, foto, ubicación GPS y garante.
  * Las fotos se suben al guardar, así que hace falta internet (el cobro sí funciona sin señal).
  */
-export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel = false, needPhoto = false, needIdPhoto = false, onSaved, onLoan }: {
-  routeId: string; orgId: string; online: boolean; onQueue?: (op: CustomerOp) => void; canLoan: boolean; saleLabel?: boolean; needPhoto?: boolean; needIdPhoto?: boolean;
+export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel = false, needPhoto = false, needIdPhoto = false, allowGallery = true, onSaved, onLoan }: {
+  routeId: string; orgId: string; online: boolean; onQueue?: (op: CustomerOp) => void; canLoan: boolean; saleLabel?: boolean; needPhoto?: boolean; needIdPhoto?: boolean; allowGallery?: boolean;
   onSaved: (id: string) => Promise<void> | void; onLoan: () => void;
 }) {
   const { t } = useT();
@@ -184,9 +184,9 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
 
       <Card className="space-y-3">
         <p className="font-bold">🪪 {t('cx.nc.docs')}{needIdPhoto || needPhoto ? ' *' : ''}</p>
-        <div><label className={ui.label}>{t('cx.nc.ciFront')}</label><PhotoPicker value={ciFront} onChange={setCiFront} disabled={busy} /></div>
-        <div><label className={ui.label}>{t('cx.nc.ciBack')}</label><PhotoPicker value={ciBack} onChange={setCiBack} disabled={busy} /></div>
-        <div><label className={ui.label}>{t('cx.nc.photo')}</label><PhotoPicker value={photo} onChange={setPhoto} facing="user" disabled={busy} /></div>
+        <div><label className={ui.label}>{t('cx.nc.ciFront')}</label><PhotoPicker value={ciFront} onChange={setCiFront} cameraOnly={!allowGallery} disabled={busy} /></div>
+        <div><label className={ui.label}>{t('cx.nc.ciBack')}</label><PhotoPicker value={ciBack} onChange={setCiBack} cameraOnly={!allowGallery} disabled={busy} /></div>
+        <div><label className={ui.label}>{t('cx.nc.photo')}</label><PhotoPicker value={photo} onChange={setPhoto} cameraOnly={!allowGallery} facing="user" disabled={busy} /></div>
       </Card>
 
       <Card className="space-y-3">
@@ -195,7 +195,7 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
         <div><label className={ui.label}>{t('cx.nc.gPhone')}</label><input type="tel" inputMode="tel" value={f.gPhone} onChange={(e) => set('gPhone', e.target.value)} className={ui.input} /></div>
         <div><label className={ui.label}>{t('cx.nc.gAddress')}</label><input value={f.gAddress} onChange={(e) => set('gAddress', e.target.value)} className={ui.input} /></div>
         <GpsButton value={gGps} onChange={setGGps} label={t('cx.nc.gGpsBtn')} />
-        <div><label className={ui.label}>{t('cx.nc.gPhoto')}</label><PhotoPicker value={gPhoto} onChange={setGPhoto} facing="user" disabled={busy} /></div>
+        <div><label className={ui.label}>{t('cx.nc.gPhoto')}</label><PhotoPicker value={gPhoto} onChange={setGPhoto} cameraOnly={!allowGallery} facing="user" disabled={busy} /></div>
       </Card>
 
       <label className="flex items-start gap-2 text-sm">

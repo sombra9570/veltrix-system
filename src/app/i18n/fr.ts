@@ -1113,6 +1113,8 @@ const fr: Record<DictKey, string> = {
   "perm.routes.assign": "Affecter des tournées aux collecteurs et superviseurs",
   "perm.reports.supervisors": "Voir les rapports des superviseurs",
   "perm.collectors.rate": "Évaluer les collecteurs",
+  "perm.customers.photo_gallery": "Photos du client depuis la galerie",
+  "perm.customers.photo_gallery.d": "Si désactivé, le collecteur ne voit pas les boutons d'envoi et ne peut prendre la photo qu'avec l'appareil photo du téléphone.",
   "rate.overall": "Évaluation générale",
   "rate.punctuality": "Ponctualité",
   "rate.temperament": "Caractère",

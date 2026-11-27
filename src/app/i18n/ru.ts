@@ -1113,6 +1113,8 @@ const ru: Record<DictKey, string> = {
   "perm.routes.assign": "Назначать маршруты сборщикам и супервайзерам",
   "perm.reports.supervisors": "Просматривать отчёты супервайзеров",
   "perm.collectors.rate": "Оценивать сборщиков",
+  "perm.customers.photo_gallery": "Фото клиента из галереи",
+  "perm.customers.photo_gallery.d": "Если выключено, сборщик не видит кнопок загрузки и может только сфотографировать камерой телефона.",
   "rate.overall": "Общая оценка",
   "rate.punctuality": "Пунктуальность",
   "rate.temperament": "Характер",

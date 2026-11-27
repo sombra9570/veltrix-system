@@ -9,8 +9,8 @@ import { useT } from '../i18n';
  * Muestra una miniatura para confirmar que la foto quedó cargada, y permite quitarla.
  * La compresión y la subida las hace quien lo usa (compressImage).
  */
-export function PhotoPicker({ value, onChange, facing = 'environment', disabled }: {
-  value: File | null; onChange: (f: File | null) => void; facing?: 'environment' | 'user'; disabled?: boolean;
+export function PhotoPicker({ value, onChange, facing = 'environment', disabled, cameraOnly = false }: {
+  value: File | null; onChange: (f: File | null) => void; facing?: 'environment' | 'user'; disabled?: boolean; cameraOnly?: boolean;
 }) {
   const { t } = useT();
   const [url, setUrl] = useState<string | null>(null);
@@ -30,15 +30,15 @@ export function PhotoPicker({ value, onChange, facing = 'environment', disabled 
 
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-2 gap-2">
+      <div className={`grid ${cameraOnly ? 'grid-cols-1' : 'grid-cols-2'} gap-2`}>
         <label className={`${ui.btnGhost} relative flex cursor-pointer items-center justify-center !px-3 !py-2 text-sm ${disabled ? 'opacity-50' : ''}`}>
           📷 {t('photo.take')}
           <input type="file" accept="image/*" capture={facing} disabled={disabled} onChange={pick} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
         </label>
-        <label className={`${ui.btnGhost} relative flex cursor-pointer items-center justify-center !px-3 !py-2 text-sm ${disabled ? 'opacity-50' : ''}`}>
+        {!cameraOnly && <label className={`${ui.btnGhost} relative flex cursor-pointer items-center justify-center !px-3 !py-2 text-sm ${disabled ? 'opacity-50' : ''}`}>
           🖼️ {t('photo.pick')}
           <input type="file" accept="image/*" disabled={disabled} onChange={pick} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" />
-        </label>
+        </label>}
       </div>
       {value && url && (
         <div className="flex items-center gap-3 rounded-xl border border-slate-200 p-2 dark:border-slate-800">

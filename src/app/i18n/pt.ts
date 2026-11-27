@@ -1113,6 +1113,8 @@ const pt: Record<DictKey, string> = {
   "perm.routes.assign": "Atribuir rotas a cobradores e supervisores",
   "perm.reports.supervisors": "Ver relatórios de supervisores",
   "perm.collectors.rate": "Avaliar cobradores",
+  "perm.customers.photo_gallery": "Fotos do cliente da galeria",
+  "perm.customers.photo_gallery.d": "Se desligar, o cobrador não vê os botões de envio e só pode tirar a foto com a câmera do celular.",
   "rate.overall": "Avaliação geral",
   "rate.punctuality": "Pontualidade",
   "rate.temperament": "Caráter",

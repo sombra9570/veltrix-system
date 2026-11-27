@@ -1113,6 +1113,8 @@ const ko: Record<DictKey, string> = {
   "perm.routes.assign": "수금원과 감독자에게 경로 배정",
   "perm.reports.supervisors": "감독자 보고서 보기",
   "perm.collectors.rate": "수금원 평가",
+  "perm.customers.photo_gallery": "갤러리에서 고객 사진 올리기",
+  "perm.customers.photo_gallery.d": "끄면 수금 담당자에게 업로드 버튼이 보이지 않고 휴대폰 카메라로만 촬영할 수 있습니다.",
   "rate.overall": "종합 평가",
   "rate.punctuality": "시간 준수",
   "rate.temperament": "성격",

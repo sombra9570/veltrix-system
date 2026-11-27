@@ -1113,6 +1113,8 @@ const de: Record<DictKey, string> = {
   "perm.routes.assign": "Routen Kassierern und Supervisoren zuweisen",
   "perm.reports.supervisors": "Berichte der Supervisoren ansehen",
   "perm.collectors.rate": "Kassierer bewerten",
+  "perm.customers.photo_gallery": "Kundenfotos aus der Galerie",
+  "perm.customers.photo_gallery.d": "Wenn aus, sieht der Kassierer keine Upload-Schaltflächen und kann das Foto nur mit der Handykamera aufnehmen.",
   "rate.overall": "Gesamtbewertung",
   "rate.punctuality": "Pünktlichkeit",
   "rate.temperament": "Charakter",

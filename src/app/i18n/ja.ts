@@ -1113,6 +1113,8 @@ const ja: Record<DictKey, string> = {
   "perm.routes.assign": "集金担当と監督者にルートを割り当て",
   "perm.reports.supervisors": "監督者のレポートを見る",
   "perm.collectors.rate": "集金担当を評価",
+  "perm.customers.photo_gallery": "ギャラリーからの顧客写真",
+  "perm.customers.photo_gallery.d": "オフにすると、集金担当はアップロードボタンが表示されず、スマホのカメラで撮影のみ可能になります。",
   "rate.overall": "総合評価",
   "rate.punctuality": "時間厳守",
   "rate.temperament": "性格",

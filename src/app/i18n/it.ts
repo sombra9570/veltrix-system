@@ -1113,6 +1113,8 @@ const it: Record<DictKey, string> = {
   "perm.routes.assign": "Assegnare percorsi a collettori e supervisori",
   "perm.reports.supervisors": "Vedere i report dei supervisori",
   "perm.collectors.rate": "Valutare i collettori",
+  "perm.customers.photo_gallery": "Foto del cliente dalla galleria",
+  "perm.customers.photo_gallery.d": "Se disattivato, l'incaricato non vede i pulsanti di caricamento e può solo scattare la foto con la fotocamera del telefono.",
   "rate.overall": "Valutazione generale",
   "rate.punctuality": "Puntualità",
   "rate.temperament": "Carattere",

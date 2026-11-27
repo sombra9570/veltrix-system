@@ -1122,6 +1122,8 @@ const es = {
   "perm.routes.assign": "Asignar rutas a cobradores y supervisores",
   "perm.reports.supervisors": "Ver reportes de supervisores",
   "perm.collectors.rate": "Calificar cobradores",
+  "perm.customers.photo_gallery": "Fotos del cliente desde la galería",
+  "perm.customers.photo_gallery.d": "Si lo apagas, el cobrador no ve los botones para subir archivos y solo puede tomar la foto con la cámara del celular.",
   "rate.overall": "Calificación general",
   "rate.punctuality": "Puntualidad",
   "rate.temperament": "Carácter",

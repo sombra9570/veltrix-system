@@ -1113,6 +1113,8 @@ const hi: Record<DictKey, string> = {
   "perm.routes.assign": "वसूली कर्मियों और पर्यवेक्षकों को रूट सौंपें",
   "perm.reports.supervisors": "पर्यवेक्षकों की रिपोर्ट देखें",
   "perm.collectors.rate": "वसूली कर्मियों का मूल्यांकन करें",
+  "perm.customers.photo_gallery": "गैलरी से ग्राहक की फ़ोटो",
+  "perm.customers.photo_gallery.d": "बंद करने पर कलेक्टर को अपलोड बटन नहीं दिखेंगे और वह केवल फ़ोन के कैमरे से फ़ोटो ले सकेगा।",
   "rate.overall": "कुल मूल्यांकन",
   "rate.punctuality": "समय-पालन",
   "rate.temperament": "स्वभाव",

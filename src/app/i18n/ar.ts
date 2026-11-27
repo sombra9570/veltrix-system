@@ -1113,6 +1113,8 @@ const ar: Record<DictKey, string> = {
   "perm.routes.assign": "تعيين المسارات للمحصّلين والمشرفين",
   "perm.reports.supervisors": "عرض تقارير المشرفين",
   "perm.collectors.rate": "تقييم المحصّلين",
+  "perm.customers.photo_gallery": "صور العميل من المعرض",
+  "perm.customers.photo_gallery.d": "عند الإيقاف لا يرى المحصّل أزرار الرفع ويمكنه التصوير بكاميرا الهاتف فقط.",
   "rate.overall": "التقييم العام",
   "rate.punctuality": "الالتزام بالمواعيد",
   "rate.temperament": "الطبع",
