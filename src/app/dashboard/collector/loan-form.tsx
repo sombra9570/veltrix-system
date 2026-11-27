@@ -98,7 +98,7 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
       if (cid && !newC && isNetworkError(m)) { queueIt(opId); return; }
       setErr(m.includes('LOAN_INTEREST_LOCKED') ? t('loan.e.interest') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm')
         : m.includes('LOAN_MAX_CUSTOMERS') ? t('loan.e.maxCustomers') : m.includes('LOAN_OTHER_ROUTE') ? t('loan.e.otherRoute')
-        : m.includes('LOAN_ROUTE_MAX_AMOUNT') ? t('loan.e.maxAmount') : m.includes('LOAN_ROUTE_MAX_CARDS') ? t('loan.e.maxCards')
+        : m.includes('LOAN_CUSTOMER_CAP') ? t('loan.e.customerCap') : m.includes('LOAN_ROUTE_MAX_AMOUNT') ? t('loan.e.maxAmount') : m.includes('LOAN_ROUTE_MAX_CARDS') ? t('loan.e.maxCards')
         : m.includes('ROUTE_LOCKED') ? t('sp.lockedInfo') : m.includes('LOAN_NEEDS_PHOTO') ? t('loan.e.photo') : m.includes('LOAN_NEEDS_ID') ? t('loan.e.id')
         : /fetch|network|Failed/i.test(m) ? t('loan.e.offline') : m);
     } finally { setBusy(false); }

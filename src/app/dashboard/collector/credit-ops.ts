@@ -22,7 +22,7 @@ export const cacheSaleMode = (route: string, v: unknown) => write(`vx_col_salemo
 export function creditErrorKey(m: string): string | null {
   const map: [string, string][] = [
     ['LOAN_INTEREST_LOCKED', 'loan.e.interest'], ['LOAN_NO_PERMISSION', 'loan.e.perm'], ['LOAN_MAX_CUSTOMERS', 'loan.e.maxCustomers'],
-    ['LOAN_OTHER_ROUTE', 'loan.e.otherRoute'], ['LOAN_ROUTE_MAX_AMOUNT', 'loan.e.maxAmount'], ['LOAN_ROUTE_MAX_CARDS', 'loan.e.maxCards'],
+    ['LOAN_OTHER_ROUTE', 'loan.e.otherRoute'], ['LOAN_ROUTE_MAX_AMOUNT', 'loan.e.maxAmount'], ['LOAN_CUSTOMER_CAP', 'loan.e.customerCap'], ['LOAN_ROUTE_MAX_CARDS', 'loan.e.maxCards'],
     ['LOAN_NEEDS_PHOTO', 'loan.e.photo'], ['LOAN_NEEDS_ID', 'loan.e.id'], ['SALE_NO_PERMISSION', 'sale.e.perm'],
   ];
   return map.find(([c]) => m.includes(c))?.[1] ?? null;

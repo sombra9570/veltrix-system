@@ -19,7 +19,7 @@ type Screen = 'home' | 'list' | 'map' | 'settings' | 'info' | 'liq';
 type RawCredit = { id: string; created: string; total: number; every_days: number | null; i?: [number, string, number, number, string | null][] };
 type Cust = {
   id: string; name: string; phone: string | null; address: string | null; tax_id: string | null; lat: number | null; lng: number | null;
-  rating: string; balance: number; overdue: number; credits: RawCredit[];
+  rating: string; balance: number; overdue: number; credits: RawCredit[]; credit_cap?: number | null;
 };
 type RouteRow = { id: string; name: string; collector: string | null; currency: string; permissions: Record<string, boolean | number> };
 type Fund = {
@@ -47,6 +47,8 @@ function RouteScreen() {
   const [fund, setFund] = useState<Fund | null>(null);
   const [sel, setSel] = useState<Cust | null>(null);
   const [q, setQ] = useState('');
+  const [capIn, setCapIn] = useState('');
+  useEffect(() => { setCapIn(sel?.credit_cap != null ? String(sel.credit_cap) : ''); }, [sel]);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [perms, setPerms] = useState<Record<string, boolean | number>>({});
   const [busy, setBusy] = useState(false);
@@ -119,6 +121,15 @@ function RouteScreen() {
   // Días de retraso de la cuota impaga más antigua del cliente
   const lateDays = (c: Cust) => Math.max(0, ...c.credits.flatMap((k) => (k.i ?? []).filter(([, , amount, paid]) => Number(amount) - Number(paid) > 0.004)
     .map(([, due]) => Math.floor((new Date(today + 'T12:00:00').getTime() - new Date(due.slice(0, 10) + 'T12:00:00').getTime()) / 86_400_000))));
+  const saveCap = async (c: Cust) => {
+    const n = capIn.trim() === '' ? null : Number(capIn.replace(',', '.'));
+    if (n !== null && (!Number.isFinite(n) || n <= 0)) { setMsg({ ok: false, text: t('cap.invalid') }); return; }
+    try {
+      const v = await rpc<number | null>('set_customer_credit_cap', { p_customer: c.id, p_cap: n });
+      setSel({ ...c, credit_cap: v }); setCusts((a) => a.map((x) => x.id === c.id ? { ...x, credit_cap: v } : x));
+      setMsg({ ok: true, text: t('cap.saved') });
+    } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
+  };
   const writeOff = async (c: Cust) => {
     if (!window.confirm(t('rt.writeOffConfirm'))) return;
     try {
@@ -177,6 +188,14 @@ function RouteScreen() {
             {sel.address && <p className={ui.muted}>📍 {sel.address}</p>}
             {sel.tax_id && <p className={ui.muted}>🪪 {sel.tax_id}</p>}
             <p className="pt-1 font-bold">{t('rt.owes', { amount: m(sel.balance) })}{Number(sel.overdue) > 0 && <span className="text-red-600 dark:text-red-400"> · {t('rt.late', { amount: m(sel.overdue) })}</span>}</p>
+          </Card>
+          <Card className="space-y-2">
+            <label className={ui.label}>{t('cap.label')}</label>
+            <div className="flex gap-2">
+              <input inputMode="decimal" value={capIn} onChange={(e) => setCapIn(e.target.value)} placeholder={t('cap.none')} className={ui.input} />
+              <button type="button" onClick={() => saveCap(sel)} className={`${ui.btnPrimary} shrink-0`}>{t('cap.save')}</button>
+            </div>
+            <p className={`text-xs ${ui.muted}`}>{t('cap.hint')}</p>
           </Card>
           {sel.credits.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('card.noCards')}</p></Card> : sel.credits.map((k) => (
             <Card key={k.id}>
