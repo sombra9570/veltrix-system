@@ -1844,6 +1844,8 @@ const es = {
   'street.mine.error': 'No se pudo enviar la solicitud.',
   'err.streetCollectors': 'Alcanzó el máximo de cobradores contratados. Solicite cobradores adicionales en Mi plan.',
   'err.streetSupervisors': 'Alcanzó el máximo de supervisores disponibles según los cobradores contratados.',
+  "err.streetManagerLocked": "El gerente se activa desde el cobrador {n} y solo puede haber uno.",
+  "err.streetManagerLimit": "Solo se puede tener un gerente.",
   'need.planPrice': "{price} USD al mes",
   'need.planPriceLocal': '{price} al mes',
   'need.plusUsersLocal': '+{n} trabajador(es) adicional(es) a {price}/mes c/u',

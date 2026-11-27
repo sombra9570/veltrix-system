@@ -1835,6 +1835,8 @@ const ar: Record<DictKey, string> = {
   'street.mine.error': 'تعذّر إرسال الطلب.',
   'err.streetCollectors': 'بلغتَ الحد الأقصى للمحصّلين المتعاقد عليهم. اطلب محصّلين إضافيين من «خطتي».',
   'err.streetSupervisors': 'بلغتَ الحد الأقصى للمشرفين المتاحين وفق المحصّلين المتعاقد عليهم.',
+  "err.streetManagerLocked": "يمكن تفعيل المدير ابتداءً من المحصّل رقم {n} ولا يُسمح إلا بمدير واحد.",
+  "err.streetManagerLimit": "يُسمح بمدير واحد فقط.",
   'need.planPrice': "{price} دولار شهرياً",
   'need.planPriceLocal': '{price} شهريًا',
   'need.plusUsersLocal': '+{n} موظف إضافي بسعر {price} شهريًا لكل منهم',

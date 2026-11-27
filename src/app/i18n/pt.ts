@@ -1835,6 +1835,8 @@ const pt: Record<DictKey, string> = {
   'street.mine.error': 'Não foi possível enviar a solicitação.',
   'err.streetCollectors': 'Você atingiu o máximo de cobradores contratados. Solicite cobradores adicionais em Meu plano.',
   'err.streetSupervisors': 'Você atingiu o máximo de supervisores disponíveis para os cobradores contratados.',
+  "err.streetManagerLocked": "O gerente é ativado a partir do cobrador {n} e só pode haver um.",
+  "err.streetManagerLimit": "Só é permitido um gerente.",
   'need.planPrice': "{price} USD por mês",
   'need.planPriceLocal': '{price} por mês',
   'need.plusUsersLocal': '+{n} trabalhador(es) adicional(is) a {price}/mês cada',

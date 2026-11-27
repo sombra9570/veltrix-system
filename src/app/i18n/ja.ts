@@ -1835,6 +1835,8 @@ const ja: Record<DictKey, string> = {
   'street.mine.error': '申請を送信できませんでした。',
   'err.streetCollectors': '契約済み集金担当の上限に達しました。「マイプラン」で追加を申請してください。',
   'err.streetSupervisors': '契約済み集金担当に対するスーパーバイザーの上限に達しました。',
+  "err.streetManagerLocked": "マネージャーは集金担当 {n} 人目から有効にでき、1 人のみです。",
+  "err.streetManagerLimit": "マネージャーは 1 人のみ登録できます。",
   'need.planPrice': "月額 {price} USD",
   'need.planPriceLocal': '月額 {price}',
   'need.plusUsersLocal': '追加の従業員 {n} 名（1名あたり月額 {price}）',

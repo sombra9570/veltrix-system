@@ -26,7 +26,7 @@ export default function TeamPage() {
   // En planes chicos solo se ofrecen los cargos propios del nicho del negocio
   // Primero los cargos que el dueño confirmó al registrarse; si no hay, los del nicho
   const nicheRoles: string[] | null = teamRoles.length ? teamRoles : niches.length ? suggestedRoles(niches) : null;
-  const roles = ROLES.filter((r) => (!(['secretary', 'director'] as string[]).includes(r) || ['pro', 'enterprise', 'enterprise_plus'].includes(overview?.org.plan_code ?? '')) && (!ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!)) && (r !== 'delivery' || modules.length === 0 || modules.some((m) => DELIVERY_MODULES.includes(m))) && (!nicheRoles || nicheRoles.includes(r) || r === 'secretary' || r === 'director' || r === 'manager'));
+  const roles = ROLES.filter((r) => (!(['secretary', 'director'] as string[]).includes(r) || ['pro', 'enterprise', 'enterprise_plus'].includes(overview?.org.plan_code ?? '')) && (!ROLE_MODULE[r] || modules.length === 0 || modules.includes(ROLE_MODULE[r]!)) && (r !== 'delivery' || modules.length === 0 || modules.some((m) => DELIVERY_MODULES.includes(m))) && (!nicheRoles || nicheRoles.includes(r) || r === 'secretary' || r === 'director' || r === 'manager') && (r !== 'manager' || !overview?.street || !!overview.street.manager_ok));
   const { t } = useT();
   const roleLabel = (r: string) => t(`role.${r}` as DictKey);
   const coverage = (c: { base_role: string; also_roles: string[] }) => [c.base_role, ...(c.also_roles ?? [])].map(roleLabel).join(' + ');

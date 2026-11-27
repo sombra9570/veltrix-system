@@ -1835,6 +1835,8 @@ const en: Record<DictKey, string> = {
   'street.mine.error': 'The request could not be sent.',
   'err.streetCollectors': 'You have reached the maximum of contracted collectors. Request additional collectors in My plan.',
   'err.streetSupervisors': 'You have reached the maximum of supervisors available for the contracted collectors.',
+  "err.streetManagerLocked": "The manager can be activated from collector {n}, and only one is allowed.",
+  "err.streetManagerLimit": "Only one manager is allowed.",
   'need.planPrice': "{price} USD per month",
   'need.planPriceLocal': '{price} per month',
   'need.plusUsersLocal': '+{n} additional worker(s) at {price}/month each',

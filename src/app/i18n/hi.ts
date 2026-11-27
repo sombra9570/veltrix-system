@@ -1835,6 +1835,8 @@ const hi: Record<DictKey, string> = {
   'street.mine.error': 'अनुरोध नहीं भेजा जा सका।',
   'err.streetCollectors': 'अनुबंधित कलेक्टरों की अधिकतम सीमा पूरी हो गई। "मेरी योजना" में अतिरिक्त कलेक्टर का अनुरोध करें।',
   'err.streetSupervisors': 'अनुबंधित कलेक्टरों के अनुसार उपलब्ध सुपरवाइज़रों की सीमा पूरी हो गई।',
+  "err.streetManagerLocked": "मैनेजर {n}वें कलेक्टर से सक्रिय हो सकता है और केवल एक ही हो सकता है।",
+  "err.streetManagerLimit": "केवल एक मैनेजर की अनुमति है।",
   'need.planPrice': "{price} USD प्रति माह",
   'need.planPriceLocal': '{price} प्रति माह',
   'need.plusUsersLocal': '+{n} अतिरिक्त कर्मचारी, प्रत्येक {price}/माह',

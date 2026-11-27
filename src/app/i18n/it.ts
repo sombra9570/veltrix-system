@@ -1835,6 +1835,8 @@ const it: Record<DictKey, string> = {
   'street.mine.error': 'Impossibile inviare la richiesta.',
   'err.streetCollectors': 'Hai raggiunto il massimo di incaricati contrattati. Richiedine altri in Il mio piano.',
   'err.streetSupervisors': 'Hai raggiunto il massimo di supervisori disponibili per gli incaricati contrattati.',
+  "err.streetManagerLocked": "Il gestore si attiva dall'incaricato {n} e ne può esistere uno solo.",
+  "err.streetManagerLimit": "È consentito un solo gestore.",
   'need.planPrice': "{price} USD al mese",
   'need.planPriceLocal': '{price} al mese',
   'need.plusUsersLocal': '+{n} lavoratore/i aggiuntivo/i a {price}/mese ciascuno',

@@ -1835,6 +1835,8 @@ const zh: Record<DictKey, string> = {
   'street.mine.error': '无法发送申请。',
   'err.streetCollectors': '已达到已签约收款员上限。请在“我的方案”中申请增加。',
   'err.streetSupervisors': '已达到已签约收款员对应的主管上限。',
+  "err.streetManagerLocked": "从第 {n} 位收款员起可启用经理，且只能有一位。",
+  "err.streetManagerLimit": "只允许一位经理。",
   'need.planPrice': "每月 {price} 美元",
   'need.planPriceLocal': '每月 {price}',
   'need.plusUsersLocal': '另加 {n} 名员工，每人每月 {price}',

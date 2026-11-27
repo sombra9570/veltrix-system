@@ -1835,6 +1835,8 @@ const ru: Record<DictKey, string> = {
   'street.mine.error': 'Не удалось отправить запрос.',
   'err.streetCollectors': 'Достигнут максимум подключённых сборщиков. Запросите дополнительных в разделе «Мой тариф».',
   'err.streetSupervisors': 'Достигнут максимум доступных супервайзеров для подключённых сборщиков.',
+  "err.streetManagerLocked": "Менеджер доступен начиная со сборщика {n}, и он может быть только один.",
+  "err.streetManagerLimit": "Разрешён только один менеджер.",
   'need.planPrice': "{price} USD в месяц",
   'need.planPriceLocal': '{price} в месяц',
   'need.plusUsersLocal': '+{n} доп. сотрудник(ов) по {price}/мес каждый',

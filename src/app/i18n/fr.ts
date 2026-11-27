@@ -1835,6 +1835,8 @@ const fr: Record<DictKey, string> = {
   'street.mine.error': 'La demande n’a pas pu être envoyée.',
   'err.streetCollectors': 'Vous avez atteint le maximum de collecteurs contractés. Demandez des collecteurs supplémentaires dans Mon forfait.',
   'err.streetSupervisors': 'Vous avez atteint le maximum de superviseurs disponibles pour les collecteurs contractés.',
+  "err.streetManagerLocked": "Le gérant s'active à partir du collecteur {n}, et il n'y en a qu'un.",
+  "err.streetManagerLimit": "Un seul gérant est autorisé.",
   'need.planPrice': "{price} USD par mois",
   'need.planPriceLocal': '{price} par mois',
   'need.plusUsersLocal': '+{n} employé(s) supplémentaire(s) à {price}/mois chacun',

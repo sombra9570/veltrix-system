@@ -16,7 +16,7 @@ export type Overview = {
     trial_ends_at: string | null; next_billing_date: string | null; grace_ends_at: string | null;
     is_pilot?: boolean; founder_discount_pct?: number; founder_until?: string | null; price_now?: number;
   };
-  street?: { collectors: { used: number; max: number }; supervisors: { used: number; max: number } } | null;
+  street?: { collectors: { used: number; max: number }; supervisors: { used: number; max: number }; manager_min?: number; manager_ok?: boolean } | null;
   usage: Record<'companies' | 'branches' | 'users' | 'storage_mb', { used: number; max: number | null }>;
   today: { currency: string; amount: number; count: number }[];
   open_shifts: number;
@@ -89,6 +89,8 @@ export function friendlyError(msg: string, t: (k: DictKey) => string): string {
   if (msg.includes('PLAN_LIMIT_BRANCHES')) return t('err.limitBranches');
   if (msg.includes('STREET_COLLECTORS_LIMIT')) return t('err.streetCollectors');
   if (msg.includes('STREET_SUPERVISORS_LIMIT')) return t('err.streetSupervisors');
+  if (msg.includes('STREET_MANAGER_LOCKED')) return t('err.streetManagerLocked').replace('{n}', msg.match(/STREET_MANAGER_LOCKED:(\d+)/)?.[1] ?? '6');
+  if (msg.includes('STREET_MANAGER_LIMIT')) return t('err.streetManagerLimit');
   if (msg.includes('PLAN_LIMIT_USERS')) return t('err.limitUsers');
   if (msg.includes('PLAN_LIMIT_COMPANIES')) return t('err.limitCompanies');
   if (msg.includes('PLAN_COMBO_LIMIT') || msg.includes('PLAN_BIG_LIMIT')) return t('err.limitCombo');

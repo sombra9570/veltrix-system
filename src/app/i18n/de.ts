@@ -1835,6 +1835,8 @@ const de: Record<DictKey, string> = {
   'street.mine.error': 'Die Anfrage konnte nicht gesendet werden.',
   'err.streetCollectors': 'Die Höchstzahl gebuchter Kassierer ist erreicht. Fordern Sie unter Mein Tarif weitere an.',
   'err.streetSupervisors': 'Die Höchstzahl verfügbarer Supervisoren für die gebuchten Kassierer ist erreicht.',
+  "err.streetManagerLocked": "Der Manager wird ab dem Kassierer {n} freigeschaltet, und es ist nur einer erlaubt.",
+  "err.streetManagerLimit": "Nur ein Manager ist erlaubt.",
   'need.planPrice': "{price} USD pro Monat",
   'need.planPriceLocal': '{price} pro Monat',
   'need.plusUsersLocal': '+{n} zusätzliche(r) Mitarbeiter zu je {price}/Monat',

@@ -1835,6 +1835,8 @@ const ko: Record<DictKey, string> = {
   'street.mine.error': '요청을 보내지 못했습니다.',
   'err.streetCollectors': '계약된 수금 담당 최대 인원에 도달했습니다. 내 요금제에서 추가를 요청하세요.',
   'err.streetSupervisors': '계약된 수금 담당에 따른 수퍼바이저 최대 인원에 도달했습니다.',
+  "err.streetManagerLocked": "매니저는 수금 담당자 {n}명째부터 활성화할 수 있으며 한 명만 가능합니다.",
+  "err.streetManagerLimit": "매니저는 한 명만 가능합니다.",
   'need.planPrice': "월 {price} USD",
   'need.planPriceLocal': '월 {price}',
   'need.plusUsersLocal': '추가 직원 {n}명 (1인당 월 {price})',
