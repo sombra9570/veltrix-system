@@ -96,3 +96,9 @@ main, section, header, footer, nav, aside {
 [data-app-shell] { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 [data-app-shell] input, [data-app-shell] textarea, [data-app-shell] select, [data-app-shell] [contenteditable="true"],
 [data-app-shell] a[href^="tel:"], [data-app-shell] a[href*="wa.me"] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+
+/* Una cuadrícula sin columnas definidas se ensancha con su contenido más ancho y se sale de la pantalla en el celular.
+   Se fija una sola columna que nunca supera el ancho disponible (las cuadrículas con grid-cols no cambian). */
+.grid:not([class*="grid-cols"]):not([class*="grid-flow"]):not([class*="grid-template"]):not([class*="place-items"]):not([class*="auto-cols"]) {
+  grid-template-columns: minmax(0, 1fr);
+}

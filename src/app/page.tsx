@@ -37,8 +37,8 @@ export default function HomePage() {
       <SiteHeader showAuthButtons={!(loaded && session)} />
 
       {/* PORTADA: resultado claro + prueba visual + confianza, todo en la primera pantalla */}
-      <section className={`${wrap} grid items-center gap-12 pt-8 pb-10 sm:pt-12 lg:grid-cols-[1fr_1.2fr] lg:pt-16`}>
-        <div className="text-center lg:text-start">
+      <section className={`${wrap} grid grid-cols-[minmax(0,1fr)] items-center gap-12 pt-8 pb-10 sm:pt-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] lg:pt-16`}>
+        <div className="min-w-0 text-center lg:text-start">
           <span className="rounded-full border border-blue-300 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300">
             {t('home.badge')}
           </span>
