@@ -49,6 +49,8 @@ function RouteScreen() {
   const [sel, setSel] = useState<Cust | null>(null);
   const [q, setQ] = useState('');
   const [capIn, setCapIn] = useState('');
+  const [edit, setEdit] = useState<{ name: string; phone: string; address: string; tax_id: string } | null>(null);
+  useEffect(() => { setEdit(null); }, [sel?.id]);
   useEffect(() => { setCapIn(sel?.credit_cap != null ? String(sel.credit_cap) : ''); }, [sel]);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [perms, setPerms] = useState<Record<string, boolean | number>>({});
@@ -132,6 +134,25 @@ function RouteScreen() {
       setMsg({ ok: true, text: t('cap.saved') });
     } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
   };
+  const saveEdit = async (c: Cust) => {
+    if (!edit || !edit.name.trim()) return;
+    try {
+      await rpc('owner_update_customer', { p_customer: c.id, p_name: edit.name, p_phone: edit.phone, p_address: edit.address, p_tax_id: edit.tax_id });
+      const n = { name: edit.name.trim(), phone: edit.phone.trim() || null, address: edit.address.trim() || null, tax_id: edit.tax_id.trim() || null };
+      setSel({ ...c, ...n }); setCusts((a) => a.map((x) => x.id === c.id ? { ...x, ...n } : x)); setEdit(null);
+      setMsg({ ok: true, text: t('cust.saved') });
+    } catch (e) { setMsg({ ok: false, text: friendlyError((e as Error).message, t) }); }
+  };
+  const removeCust = async (c: Cust) => {
+    if (!window.confirm(t('col.delConfirm'))) return;
+    try {
+      await rpc('collector_delete_customer', { p_customer: c.id });
+      setSel(null); await load(); setMsg({ ok: true, text: t('col.delCustomer') });
+    } catch (e) {
+      const m = (e as Error).message;
+      setMsg({ ok: false, text: m.includes('AFTER_CLOSE') ? t('col.delClosed') : m.includes('CUSTOMER_HAS_DEBT') ? t('col.delDebt') : m.includes('cobros') ? t('col.delPaid') : friendlyError(m, t) });
+    }
+  };
   const writeOff = async (c: Cust) => {
     if (!window.confirm(t('rt.writeOffConfirm'))) return;
     try {
@@ -189,6 +210,25 @@ function RouteScreen() {
             {sel.phone && <p><a href={whatsappLink(sel.phone)} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-600 dark:text-blue-400">📞 {sel.phone}</a></p>}
             {sel.address && <p className={ui.muted}>📍 {sel.address}</p>}
             {sel.tax_id && <p className={ui.muted}>🪪 {sel.tax_id}</p>}
+            {edit && (
+              <div className="space-y-2 pt-2">
+                <input value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} placeholder={t('cx.nc.name')} className={ui.input} />
+                <input value={edit.tax_id} onChange={(e) => setEdit({ ...edit, tax_id: e.target.value })} placeholder={t('cx.nc.ci')} className={ui.input} />
+                <input type="tel" inputMode="tel" value={edit.phone} onChange={(e) => setEdit({ ...edit, phone: e.target.value })} placeholder={t('cx.nc.phone')} className={ui.input} />
+                <input value={edit.address} onChange={(e) => setEdit({ ...edit, address: e.target.value })} placeholder={t('cx.nc.address')} className={ui.input} />
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setEdit(null)} className={`${ui.btnGhost} flex-1`}>{t('prod.cancel')}</button>
+                  <button type="button" onClick={() => saveEdit(sel)} disabled={!edit.name.trim()} className={`${ui.btnPrimary} flex-1`}>{t('prod.save')}</button>
+                </div>
+              </div>
+            )}
+            {!edit && (
+              <div className="grid grid-cols-2 gap-2 pt-2">
+                <button type="button" onClick={() => setEdit({ name: sel.name, phone: sel.phone ?? '', address: sel.address ?? '', tax_id: sel.tax_id ?? '' })} className={`${ui.btnGhost} text-sm`}>✏️ {t('cust.editTitle')}</button>
+                <button type="button" onClick={() => removeCust(sel)}
+                  className="rounded-xl border border-red-300 px-3 py-2 text-sm font-bold text-red-600 cursor-pointer dark:border-red-500/40 dark:text-red-400">🗑️ {t('col.delCustomer')}</button>
+              </div>
+            )}
             <p className="pt-1 font-bold">{t('rt.owes', { amount: m(sel.balance) })}{Number(sel.overdue) > 0 && <span className="text-red-600 dark:text-red-400"> · {t('rt.late', { amount: m(sel.overdue) })}</span>}</p>
           </Card>
           <Card className="space-y-2">
