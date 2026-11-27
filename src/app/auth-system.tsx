@@ -101,7 +101,9 @@ function daysOverdueFrom(status: string, graceEndsAt: string | null): number {
 }
 
 function regionFromBrowser() {
-  const code = (readLocal('veltrix_country') as CountryCode | null) ?? 'BO';
+  let geo: string | null = null;
+  try { geo = sessionStorage.getItem('veltrix_geo'); } catch { /* */ }
+  const code = ((readLocal('veltrix_country') ?? geo) as CountryCode | null) ?? 'BO';
   const country = COUNTRIES.find((c) => c.code === code) ?? COUNTRIES[0];
   const regime = (readLocal('veltrix_tax_regime') as TaxRegimeId | null) ?? 'general';
   const sector = (readLocal('veltrix_sector') as BusinessSectorId | null) ?? 'standard';
@@ -131,6 +133,11 @@ async function finishRegistration(details: NewCompany, email: string) {
   const { data: userData } = await supabase.auth.getUser();
   const uid = userData.user?.id;
   if (uid) await supabase.from('profiles').update({ email }).eq('id', uid);
+  // País y ciudad aproximados (por la conexión), para soporte; si falla no afecta el registro
+  try {
+    const { data: ses } = await supabase.auth.getSession();
+    await fetch('/api/geo', { method: 'POST', headers: { Authorization: `Bearer ${ses.session?.access_token ?? ''}` } });
+  } catch { /* */ }
 
   const { data: comp } = await supabase.from('companies').select('id').limit(1).single();
   if (comp) {

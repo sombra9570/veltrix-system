@@ -39,7 +39,7 @@ type Filter = 'all' | Stage;
 type AdminTab = 'menu' | 'home' | 'clients' | 'billing' | 'plans' | 'notices' | 'usage' | 'activity' | 'knowledge' | 'tools';
 // Estructura de cada organización (solo cuántas empresas, sucursales, usuarios y módulos; nunca sus datos de negocio)
 type OrgOverview = {
-  org_id: string; users: number; modules: string[]; roles: Record<string, number>;
+  org_id: string; signup_country?: string | null; signup_city?: string | null; users: number; modules: string[]; roles: Record<string, number>;
   limits: { companies: number; branches: number; users: number };
   companies: { name: string; type: string; cats: string[]; branches: string[] }[];
 };
@@ -673,6 +673,7 @@ export default function GlobalCoreAdminPage() {
                         <span className="rounded-full border border-slate-700 px-2.5 py-0.5 text-[11px] font-bold text-slate-300">Plan {o.plan}</span>
                       </div>
                       <p className="truncate text-xs text-slate-400">{o.email}</p>
+                      {d?.signup_country && <p className="text-[11px] text-slate-400">📍 {[d.signup_city, d.signup_country].filter(Boolean).join(', ')}</p>}
                       <p className="text-[11px] text-slate-500">
                         Registrada: {fmtDate(o.created_at)}
                         {o.trial_ends_at && ` · Prueba hasta: ${fmtDate(o.trial_ends_at)}`}
