@@ -8,7 +8,7 @@ import { useLanguage, COUNTRIES, CountryCode } from '../language-selector';
 import { useT, countryName } from '../i18n';
 import { usePlanMoney } from '../plan-money';
 import {
-  TEAM_SIZES, BRANCH_SIZES, TEAM_ROLES, recommendPlan, type TeamRole, type PublicPlan, catKey, modKey,
+  TEAM_SIZES, BRANCH_SIZES, suggestedRoles, recommendPlan, type TeamRole, type PublicPlan, catKey, modKey,
 } from '../business-catalog';
 import { SiteHeader, SiteFooter, ui, useCountryChange, PasswordInput } from '../site-header';
 import type { DictKey } from '../i18n/es';
@@ -181,7 +181,8 @@ export default function RegistroPage() {
   const branchMax = BRANCH_SIZES.find((x) => x.id === branchSize)?.max ?? 1;
   const modules = modulesFor(allCats, sp);
   const suggested = rolesFor(allCats, sp);
-  const shownRoles = rolesTouched ? roles : suggested;
+  const allowedRoles = suggestedRoles(allCats); // solo los cargos que la matriz permite para el/los rubros elegidos
+  const shownRoles = (rolesTouched ? roles : suggested).filter((x) => allowedRoles.includes(x));
   const toggleRole = (r: TeamRole) => { setRolesTouched(true); const cur = shownRoles; setRoles(cur.includes(r) ? cur.filter((x) => x !== r) : [...cur, r]); };
   const plan = recommendPlan(plans, teamMax, branchMax);
 
@@ -464,7 +465,7 @@ export default function RegistroPage() {
                   <h2 className="mt-6 text-lg font-bold">{qq('team.rolesQ')}</h2>
                   <p className={`text-sm ${ui.muted}`}>{qq('team.rolesHint')}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {TEAM_ROLES.map((r) => {
+                    {allowedRoles.map((r) => {
                       const on = shownRoles.includes(r);
                       return (
                         <button key={r} type="button" aria-pressed={on} onClick={() => toggleRole(r)}
