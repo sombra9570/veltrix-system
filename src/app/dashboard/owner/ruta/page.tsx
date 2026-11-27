@@ -6,7 +6,7 @@ import { Card, useHeaderSlot } from '../../shell';
 import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
-import { money } from '../../format';
+import { money, whatsappLink } from '../../format';
 import { useOwner, friendlyError } from '../owner-context';
 import { MenuTile } from '../../collector/tiles';
 import { CreditCard, type Credit } from '../../collector/credit-card';
@@ -184,7 +184,7 @@ function RouteScreen() {
         <div className="space-y-3">
           <Card className="space-y-1 text-sm">
             <p className="text-lg font-extrabold">{sel.name}</p>
-            {sel.phone && <p><a href={`tel:${sel.phone}`} className="font-semibold text-blue-600 dark:text-blue-400">📞 {sel.phone}</a></p>}
+            {sel.phone && <p><a href={whatsappLink(sel.phone)} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-600 dark:text-blue-400">📞 {sel.phone}</a></p>}
             {sel.address && <p className={ui.muted}>📍 {sel.address}</p>}
             {sel.tax_id && <p className={ui.muted}>🪪 {sel.tax_id}</p>}
             <p className="pt-1 font-bold">{t('rt.owes', { amount: m(sel.balance) })}{Number(sel.overdue) > 0 && <span className="text-red-600 dark:text-red-400"> · {t('rt.late', { amount: m(sel.overdue) })}</span>}</p>

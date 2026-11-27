@@ -6,7 +6,7 @@ import { Card, useHeaderSlot } from '../shell';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
-import { money, parseAmount } from '../format';
+import { money, parseAmount, whatsappLink } from '../format';
 import { useStaff } from '../staff-context';
 import { useSync } from '../sync';
 import { isNetworkError } from '../offline-sales';
@@ -857,7 +857,7 @@ function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, cards, locked = fal
       </div>
       {c.next_due && <p className={`text-xs ${ui.muted}`}>{t('col.nextDue', { date: new Date(c.next_due + 'T12:00:00').toLocaleDateString(lang) })}</p>}
       <div className="grid grid-cols-2 gap-2">
-        {c.phone ? <a href={`tel:${c.phone}`} className={ui.btnGhost}>📞 {t('col.call')}</a> : <span />}
+        {c.phone ? <a href={whatsappLink(c.phone)} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>📞 {t('col.call')}</a> : <span />}
         {map ? <a href={map} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>📍 {t('col.map')}</a> : <span />}
       </div>
       {qr && c.phone && <button type="button" onClick={sendQr} disabled={!online} className={`${ui.btnGhost} w-full`}>📲 {t('cx.cs.sendQr')}</button>}
