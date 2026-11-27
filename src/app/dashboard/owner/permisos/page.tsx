@@ -31,6 +31,9 @@ const ROLE_KEYS: Record<string, string[]> = {
   technician: ['customers.create', 'customers.edit', 'customers.view_docs', 'customers.upload_docs'],
 };
 
+// Permisos del supervisor en cobranza (los mismos que se ajustan por supervisor en su pantalla)
+const COBRANZA_SUPERVISOR = ['loans.customers', 'payments.record_installment', 'payments.record_partial', 'loans.create', 'loans.interest', 'routes.invest', 'routes.liquidate', 'collector.expenses', 'collector.pay_out', 'collector.delete_installments', 'collector.delete_credits', 'collector.delete_customers', 'collector.delete_expenses'];
+
 // Cobrador de mercadería (rubro sin finanzas): cobra cuotas fijas sin interés; no presta dinero ni invierte en la ruta
 const MERCH_COLLECTOR_OUT = ['loans.create', 'loans.interest', 'routes.invest'];
 function roleKeys(role: string, modules: string[], offered?: Record<string, string[]>): string[] {
@@ -134,16 +137,16 @@ export default function PermissionsPage() {
 
           {/* Por rol */}
           <div className="grid gap-4 lg:grid-cols-3">
-            {Object.entries(d?.offered ?? ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (teamRoles.length === 0 || teamRoles.includes(role) || role === 'manager' || (d?.users ?? []).some((u) => u.role === role)) && (!cobranza || role === 'cashier' || role === 'collector')).map(([role, allKeys]) => { const keys = roleKeys(role, modules, d?.offered).filter((x) => keyOk(x) && !(cobranza && role === 'cashier' && !x.startsWith('cash.'))); return (
+            {Object.entries(d?.offered ?? ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (teamRoles.length === 0 || teamRoles.includes(role) || role === 'manager' || (d?.users ?? []).some((u) => u.role === role)) && (!cobranza || role === 'supervisor' || role === 'collector')).map(([role, allKeys]) => { const keys = roleKeys(role, modules, d?.offered).filter((x) => keyOk(x) && !(cobranza && role === 'supervisor' && !COBRANZA_SUPERVISOR.includes(x))); return (
               <Card key={role}>
-                <h2 className="font-bold">{cobranza && role === 'cashier' ? t('rt.liquidator') : k(`role.${role}`)}</h2>
+                <h2 className="font-bold">{k(`role.${role}`)}</h2>
                 <p className={`mb-3 text-xs ${ui.muted}`}>{t('perm.roleHint')}</p>
                 <ul className="space-y-3">
                   {keys.map((key) => (
                     <li key={key} className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-sm font-semibold">{k(`perm.${key}`)}</p>
-                        <p className={`text-xs ${ui.muted}`}>{k(`perm.${key}.d`)}</p>
+                        {k(`perm.${key}.d`) !== `perm.${key}.d` && <p className={`text-xs ${ui.muted}`}>{k(`perm.${key}.d`)}</p>}
                       </div>
                       <Toggle on={!!d.roles[role]?.[key]} disabled={busy} label={k(`perm.${key}`)} onChange={(v) => setRole(role, key, v)} />
                     </li>
