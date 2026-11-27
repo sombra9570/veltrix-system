@@ -90,3 +90,9 @@ main, section, header, footer, nav, aside {
     scroll-behavior: auto !important;
   }
 }
+
+/* Dentro de la app no se selecciona texto al mantener presionado (sin menú de copiar ni "buscar en el navegador").
+   Solo se puede seleccionar al escribir en un campo y en los números de teléfono (enlaces de llamada/WhatsApp). */
+[data-app-shell] { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+[data-app-shell] input, [data-app-shell] textarea, [data-app-shell] select, [data-app-shell] [contenteditable="true"],
+[data-app-shell] a[href^="tel:"], [data-app-shell] a[href*="wa.me"] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }

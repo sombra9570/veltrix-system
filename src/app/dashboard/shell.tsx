@@ -177,7 +177,7 @@ export function AppShell({
 
   return (
     <SlotCtx.Provider value={setSlot}>
-    <div className="flex min-h-dvh bg-slate-50 dark:bg-slate-950">
+    <div data-app-shell className="flex min-h-dvh bg-slate-50 dark:bg-slate-950">
       {/* Menú lateral fijo en computador y tableta ancha */}
       <aside className="hidden w-64 shrink-0 border-r border-slate-200 bg-white lg:block dark:border-slate-800 dark:bg-slate-900/60">
         <div className="sticky top-0 h-dvh">{menu}</div>
