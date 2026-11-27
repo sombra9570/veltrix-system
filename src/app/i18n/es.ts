@@ -1330,6 +1330,7 @@ const es = {
   "loan.count": "Cuotas",
   "loan.every": "Frecuencia",
   "loan.firstDue": "Primera cuota",
+  "loan.creditDate": "Fecha del crédito",
   "loan.total": "Total a pagar",
   "loan.each": "Cuota ({n})",
   "loan.ends": "Termina",

@@ -1321,6 +1321,7 @@ const ja: Record<DictKey, string> = {
   "loan.count": "回数",
   "loan.every": "頻度",
   "loan.firstDue": "初回期日",
+  "loan.creditDate": "クレジット日",
   "loan.total": "返済総額",
   "loan.each": "1回あたり ({n})",
   "loan.ends": "完了",

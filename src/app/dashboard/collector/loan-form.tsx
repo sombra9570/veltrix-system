@@ -164,8 +164,8 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
           </select>
         </div>
         <div className="col-span-2">
-          <label className={ui.label}>{t('loan.firstDue')}</label>
-          <input type="date" min={today} value={first} onChange={(e) => setFirst(e.target.value)} className={ui.input} />
+          <label className={ui.label}>{t('loan.creditDate')}</label>
+          <input type="date" value={today} readOnly className={ui.input} />
         </div>
         <div className="col-span-2">
           <label className={ui.label}>{t('cust.notes')}</label>

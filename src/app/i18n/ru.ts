@@ -1321,6 +1321,7 @@ const ru: Record<DictKey, string> = {
   "loan.count": "Платежи",
   "loan.every": "Частота",
   "loan.firstDue": "Первый платёж",
+  "loan.creditDate": "Дата кредита",
   "loan.total": "Всего к оплате",
   "loan.each": "Платёж ({n})",
   "loan.ends": "Окончание",
