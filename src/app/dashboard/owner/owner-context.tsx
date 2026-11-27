@@ -244,6 +244,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
           .filter((n) => !n.href.endsWith('/tienda') || storeEnabled)
           .map((n) => (n.href.endsWith('/rutas') ? { ...n, children: routes.map((r) => ({ href: `/dashboard/owner/ruta?r=${r.id}`, label: r.name })) }
             : n.href.endsWith('/supervisores') ? { ...n, children: sups.map((x) => ({ href: `/dashboard/owner/supervisor?s=${x.membership_id}`, label: x.name })) } : n))
+          .map((n) => (overview?.street && n.href.endsWith('/plan') ? { ...n, label: 'street.nav' as const } : n))
           .map((n) => (cobranza && n.group === 'nav.g.sell' ? { ...n, group: 'nav.g.routesSup' as const } : n))}
         orgName={o?.name ?? ''}
         userName={session.name || session.email}
@@ -256,8 +257,8 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
         {o && (
           <Link href="/dashboard/owner/plan"
             className="mt-8 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-xs text-slate-500 hover:border-blue-300 dark:border-slate-800">
-            <span>💳 {overview?.street ? t('street.mine.title') : t('owner.planStrip', { plan: o.plan_name })}{o.next_billing_date ? ` · ${t('owner.renews', { date: new Date(o.next_billing_date.slice(0, 10) + 'T12:00:00').toLocaleDateString() })}` : ''}</span>
-            <span className="font-bold text-blue-600 dark:text-blue-400">{t('owner.changePlan')} →</span>
+            <span>💳 {overview?.street ? t('street.nav') : t('owner.planStrip', { plan: o.plan_name })}{o.next_billing_date ? ` · ${t('owner.renews', { date: new Date(o.next_billing_date.slice(0, 10) + 'T12:00:00').toLocaleDateString() })}` : ''}</span>
+            <span className="font-bold text-blue-600 dark:text-blue-400">{overview?.street ? t('street.manage') : t('owner.changePlan')} →</span>
           </Link>
         )}
       </AppShell>

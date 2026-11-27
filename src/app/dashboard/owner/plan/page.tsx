@@ -113,7 +113,7 @@ export default function PlanPage() {
   return (
     <div className="space-y-5">
       <div className="min-w-0">
-        <h1 className="text-xl font-extrabold sm:text-2xl">💳 {t('nav.plan')}</h1>
+        <h1 className="text-xl font-extrabold sm:text-2xl">💳 {isStreet ? t('street.nav') : t('nav.plan')}</h1>
         <p className={`text-sm ${ui.muted}`}>{t('bill.subtitle')}</p>
       </div>
 
