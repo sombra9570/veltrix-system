@@ -48,20 +48,13 @@ export function DeliveryMap({ points, height = 260, names = false }: { points: M
     loadLeaflet().then((L) => {
       if (dead || !box.current || map.current) return;
       map.current = L.map(box.current, { zoomControl: true }).setView([-17.78, -63.18], 13);
-      // Con una clave de MapTiler (NEXT_PUBLIC_MAPTILER_KEY) se usa su servicio comercial para calles y satélite.
-      // Sin clave se usa OpenStreetMap y Esri (sirven para pruebas y poco uso; con muchos usuarios conviene la clave).
+      // Con una clave de MapTiler (NEXT_PUBLIC_MAPTILER_KEY) se usa su servicio comercial para las calles.
+      // Sin clave se usa OpenStreetMap (sirve para pruebas y poco uso; con muchos usuarios conviene la clave).
       const key = process.env.NEXT_PUBLIC_MAPTILER_KEY;
       const streets = key
         ? L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`, { maxZoom: 20, tileSize: 512, zoomOffset: -1, attribution: '© MapTiler © OpenStreetMap' })
         : L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' });
-      const sat = key
-        ? L.tileLayer(`https://api.maptiler.com/maps/hybrid/{z}/{x}/{y}.jpg?key=${key}`, { maxZoom: 20, tileSize: 512, zoomOffset: -1, attribution: '© MapTiler © OpenStreetMap' })
-        : L.layerGroup([
-          L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Esri, Maxar, Earthstar Geographics' }),
-          L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 }),
-        ]);
       streets.addTo(map.current);
-      L.control.layers({ [`🗺️ ${tr.current('dl.mapStreet')}`]: streets, [`🛰️ ${tr.current('dl.mapSat')}`]: sat }, undefined, { position: 'topright', collapsed: false }).addTo(map.current);
       layer.current = L.layerGroup().addTo(map.current);
       setReady(true);
     }).catch(() => setError(true));

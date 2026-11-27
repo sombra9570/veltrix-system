@@ -2141,8 +2141,6 @@ const hi: Record<DictKey, string> = {
   'roles.pickHint': "अपने प्लान के अनुसार अधिकतम {n} भूमिकाएँ चुनें। ⭐ शुरुआती स्क्रीन दर्शाता है।",
   'roles.count': "{b} में से {a} भूमिकाएँ",
   'roles.limitReached': "आप अपने प्लान की भूमिका सीमा तक पहुँच गए हैं।",
-  'dl.mapStreet': "सड़कें",
-  'dl.mapSat': "सैटेलाइट",
   'nav.g.today': "आज",
   'nav.g.sell': "बिक्री और वसूली",
   'nav.g.business': "मेरा व्यवसाय",

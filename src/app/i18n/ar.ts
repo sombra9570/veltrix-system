@@ -2141,8 +2141,6 @@ const ar: Record<DictKey, string> = {
   'roles.pickHint': "اختر حتى {n} أدوار حسب خطتك. النجمة ⭐ تحدد شاشة البدء.",
   'roles.count': "{a} من {b} أدوار",
   'roles.limitReached': "وصلت إلى الحد الأقصى للأدوار في خطتك.",
-  'dl.mapStreet': "الشوارع",
-  'dl.mapSat': "قمر صناعي",
   'nav.g.today': "اليوم",
   'nav.g.sell': "البيع والتحصيل",
   'nav.g.business': "عملي",

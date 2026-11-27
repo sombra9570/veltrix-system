@@ -2150,8 +2150,6 @@ const es = {
   'roles.pickHint': 'Seleccione hasta {n} roles según el plan. La ⭐ indica la pantalla con la que inicia.',
   'roles.count': "{a} de {b} roles",
   'roles.limitReached': 'Se alcanzó el máximo de roles del plan.',
-  'dl.mapStreet': "Calles",
-  'dl.mapSat': "Satélite",
   'nav.g.today': "Hoy",
   'nav.g.sell': 'Ventas y cobros',
   'nav.g.business': "Mi negocio",

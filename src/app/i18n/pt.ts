@@ -2141,8 +2141,6 @@ const pt: Record<DictKey, string> = {
   'roles.pickHint': "Escolha até {n} papéis conforme seu plano. A ⭐ marca a tela inicial.",
   'roles.count': "{a} de {b} papéis",
   'roles.limitReached': "Você atingiu o máximo de papéis do plano.",
-  'dl.mapStreet': "Ruas",
-  'dl.mapSat': "Satélite",
   'nav.g.today': "Hoje",
   'nav.g.sell': "Vender e receber",
   'nav.g.business': "Meu negócio",

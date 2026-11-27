@@ -2141,8 +2141,6 @@ const zh: Record<DictKey, string> = {
   'roles.pickHint': "按套餐最多选 {n} 个角色。⭐ 标记起始页面。",
   'roles.count': "{a}/{b} 个角色",
   'roles.limitReached': "已达到套餐的角色上限。",
-  'dl.mapStreet': "街道",
-  'dl.mapSat': "卫星",
   'nav.g.today': "今天",
   'nav.g.sell': "销售与收款",
   'nav.g.business': "我的业务",
