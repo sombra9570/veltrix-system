@@ -33,6 +33,8 @@ const ROLE_KEYS: Record<string, string[]> = {
 
 // Permisos del supervisor en cobranza (los mismos que se ajustan por supervisor en su pantalla)
 const COBRANZA_SUPERVISOR = ['loans.customers', 'payments.record_installment', 'payments.record_partial', 'loans.create', 'loans.interest', 'routes.invest', 'routes.liquidate', 'collector.expenses', 'collector.pay_out', 'collector.delete_installments', 'collector.delete_credits', 'collector.delete_customers', 'collector.delete_expenses'];
+const COBRANZA_SUPERVISOR_ALL = [...COBRANZA_SUPERVISOR, 'collectors.rate'];
+const COBRANZA_MANAGER = [...COBRANZA_SUPERVISOR, 'perms.manage', 'routes.assign', 'reports.supervisors'];
 
 // Cobrador de mercadería (rubro sin finanzas): cobra cuotas fijas sin interés; no presta dinero ni invierte en la ruta
 const MERCH_COLLECTOR_OUT = ['loans.create', 'loans.interest', 'routes.invest'];
@@ -137,7 +139,7 @@ export default function PermissionsPage() {
 
           {/* Por rol */}
           <div className="grid gap-4 lg:grid-cols-3">
-            {Object.entries(d?.offered ?? ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (teamRoles.length === 0 || teamRoles.includes(role) || role === 'manager' || (d?.users ?? []).some((u) => u.role === role)) && (!cobranza || role === 'supervisor' || role === 'collector')).map(([role, allKeys]) => { const keys = roleKeys(role, modules, d?.offered).filter((x) => keyOk(x) && !(cobranza && role === 'supervisor' && !COBRANZA_SUPERVISOR.includes(x))); return (
+            {Object.entries(d?.offered ?? ROLE_KEYS).filter(([role]) => roleAvailable(role, modules) && (teamRoles.length === 0 || teamRoles.includes(role) || role === 'manager' || (d?.users ?? []).some((u) => u.role === role)) && (!cobranza || role === 'supervisor' || role === 'collector' || (role === 'manager' && (d?.users ?? []).some((u) => u.role === 'manager')))).map(([role, allKeys]) => { const keys = roleKeys(role, modules, d?.offered).filter((x) => keyOk(x) && !(cobranza && (role === 'supervisor' || role === 'manager') && !(role === 'manager' ? COBRANZA_MANAGER : COBRANZA_SUPERVISOR_ALL).includes(x))); return (
               <Card key={role}>
                 <h2 className="font-bold">{k(`role.${role}`)}</h2>
                 <p className={`mb-3 text-xs ${ui.muted}`}>{t('perm.roleHint')}</p>

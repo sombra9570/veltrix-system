@@ -38,18 +38,6 @@ const toCredit = (k: RawCredit): Credit => ({
   installments: (k.i ?? []).map(([n, due, amount, paid, last_at]) => ({ id: `${k.id}:${n}`, n, due, amount: Number(amount), paid: Number(paid), last_at })),
 });
 
-function Stars({ onPick, label }: { onPick: (n: number) => void; label: string }) {
-  const [v, setV] = useState(0);
-  return (
-    <div className="flex items-center gap-2">
-      <span className="text-xs font-semibold">{label}</span>
-      {[1, 2, 3, 4, 5].map((n) => (
-        <button key={n} type="button" onClick={() => { setV(n); onPick(n); }} className={`text-2xl cursor-pointer ${n <= v ? 'text-amber-500' : 'text-slate-300 dark:text-slate-600'}`} aria-label={String(n)}>★</button>
-      ))}
-    </div>
-  );
-}
-
 function RateRow({ cur, busy, onPick }: { cur: string | null; busy: boolean; onPick: (r: string) => void }) {
   const { t } = useT();
   return (
@@ -64,6 +52,63 @@ function RateRow({ cur, busy, onPick }: { cur: string | null; busy: boolean; onP
         ))}
       </div>
     </div>
+  );
+}
+
+const RATE_KEYS = ['overall', 'punctuality', 'temperament', 'efficiency', 'responsibility', 'communication', 'condition', 'vehicle_care'] as const;
+const RATE_LABEL: Record<(typeof RATE_KEYS)[number], DictKey> = {
+  overall: 'cr.overall', punctuality: 'cr.punctuality', temperament: 'cr.temperament', efficiency: 'cr.efficiency',
+  responsibility: 'cr.responsibility', communication: 'cr.communication', condition: 'cr.condition', vehicle_care: 'cr.vehicle',
+};
+
+/** Calificación mensual del cobrador por criterios (1 a 5 estrellas): la hace el supervisor en ruta y solo la ve el administrador */
+function RateCollector({ route, collector }: { route: string; collector: string | null }) {
+  const { t } = useT();
+  const [scores, setScores] = useState<Record<string, number>>({});
+  const [notes, setNotes] = useState('');
+  const [rated, setRated] = useState<boolean | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  useEffect(() => { rpc<boolean>('sup_collector_rated', { p_route: route }).then((v) => setRated(!!v)).catch(() => setRated(false)); }, [route]);
+  const complete = RATE_KEYS.every((k) => scores[k] >= 1);
+  const save = async () => {
+    if (!complete) return setMsg({ ok: false, text: t('cr.needAll') });
+    setBusy(true); setMsg(null);
+    try {
+      await rpc('sup_rate_collector', { p_route: route, p_scores: scores, p_notes: notes.trim() || null });
+      setRated(true); setMsg({ ok: true, text: t('cr.done') });
+    } catch (e) {
+      const m = (e as Error).message ?? '';
+      setMsg({ ok: false, text: m.includes('RATING_ALREADY_THIS_MONTH') ? t('cr.already') : m.includes('RATING_NEEDS_SUPERVISION') ? t('cr.needSupervision') : m });
+    } finally { setBusy(false); }
+  };
+  return (
+    <Card className="space-y-3">
+      <p className="font-bold">🛵 {collector ?? '—'}</p>
+      {rated ? <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{msg?.ok ? msg.text : t('cr.already')}</p> : (
+        <>
+          <ul className="space-y-2">
+            {RATE_KEYS.map((k) => (
+              <li key={k} className="flex items-center justify-between gap-3">
+                <span className="min-w-0 text-sm font-semibold">{t(RATE_LABEL[k])}</span>
+                <span className="flex shrink-0">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button key={n} type="button" onClick={() => setScores((x) => ({ ...x, [k]: n }))} aria-label={`${n}`}
+                      className={`text-2xl cursor-pointer ${n <= (scores[k] ?? 0) ? 'text-amber-500' : 'text-slate-300 dark:text-slate-600'}`}>★</button>
+                  ))}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div>
+            <label className={ui.label}>{t('cr.notes')}</label>
+            <textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} className={ui.input} />
+          </div>
+          {msg && !msg.ok && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{msg.text}</p>}
+          <button type="button" disabled={busy} onClick={save} className={`${ui.btnPrimary} w-full`}>💾 {t('cr.save')}</button>
+        </>
+      )}
+    </Card>
   );
 }
 
@@ -345,12 +390,7 @@ export default function SupPanel() {
         </Card>
       )}
 
-      {screen === 'rate' && (
-        <Card className="space-y-3">
-          <p className="font-bold">🛵 {d.collector ?? '—'}</p>
-          <Stars label={t('sp.rateCollector')} onPick={(n) => run(() => log('rate_collector', { score: n }), t('sp.done'))} />
-        </Card>
-      )}
+      {screen === 'rate' && rid && <RateCollector route={rid} collector={d.collector} />}
     </div>
   );
 }
