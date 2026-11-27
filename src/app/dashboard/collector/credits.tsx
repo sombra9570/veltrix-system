@@ -6,7 +6,7 @@ import { CreditCard, freqOf, type Credit, type Freq, type Method } from './credi
 import type { LoanPolicy } from './loan-form';
 
 export function Credits({ c, filter, today, policy, fmt, onSave, locked = false, onReverse }: {
-  locked?: boolean; onReverse?: (order: string, n: number) => Promise<void> | void;
+  locked?: boolean; onReverse?: (order: string, ns: number[]) => Promise<void> | void;
   c: { credits?: Credit[] }; filter: Freq | 'all'; today: string; policy?: LoanPolicy; fmt: (n: number) => string;
   onSave: (order: string, amount: number, method: Method) => void;
 }) {
@@ -38,7 +38,7 @@ export function Credits({ c, filter, today, policy, fmt, onSave, locked = false,
             <p className="text-right"><span className={ui.muted}>{t('card.hValue')}: </span><span className="font-bold">{fmt(Number(k.installments[0]?.amount ?? 0))}</span></p>
             <p className="col-span-2"><span className={ui.muted}>{t('loan.count')}: </span><span className="font-bold">{k.installments.length}</span><span className={ui.muted}> · {t(`card.f.${f}` as DictKey)} · </span><span className="font-bold">{fmt(Number(k.total))}</span></p>
           </div>
-          <CreditCard credit={k} today={today} fmt={fmt} readOnly={locked} onReverse={onReverse ? (n) => onReverse(k.id, n) : undefined} onSave={(amount, method) => onSave(k.id, amount, method)} />
+          <CreditCard credit={k} today={today} fmt={fmt} readOnly={locked} onReverse={onReverse ? (ns) => onReverse(k.id, ns) : undefined} onSave={(amount, method) => onSave(k.id, amount, method)} />
         </div>
         );
       })}

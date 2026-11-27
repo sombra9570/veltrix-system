@@ -2396,6 +2396,7 @@ const ru: Record<DictKey, string> = {
   "col.delConfirm": "Уверены? Это нельзя отменить.",
   "col.delDebt": "У клиента есть долг: удалить нельзя.",
   "col.delPaid": "По кредиту есть платежи: сначала отмените их.",
+  'col.delClosed': "Закрытие кассы или расчёт уже выполнены: удалить нельзя.",
   "perm.collector.delete_installments": "Удалять взносы",
   "perm.collector.delete_installments.d": "Сборщик может удалять взносы.",
   "perm.collector.delete_credits": "Удалять кредиты",

@@ -2396,6 +2396,7 @@ const ar: Record<DictKey, string> = {
   "col.delConfirm": "هل أنت متأكد؟ لا يمكن التراجع.",
   "col.delDebt": "على العميل دين: لا يمكن حذفه.",
   "col.delPaid": "للقرض مدفوعات: يجب عكسها أولاً.",
+  'col.delClosed': "تم الإغلاق أو التسوية بالفعل: لا يمكن الحذف.",
   "perm.collector.delete_installments": "حذف الأقساط",
   "perm.collector.delete_installments.d": "يمكن للمحصّل حذف الأقساط.",
   "perm.collector.delete_credits": "حذف القروض",

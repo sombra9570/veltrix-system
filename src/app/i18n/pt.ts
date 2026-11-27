@@ -2396,6 +2396,7 @@ const pt: Record<DictKey, string> = {
   "col.delConfirm": "Tem certeza? Isso não pode ser desfeito.",
   "col.delDebt": "O cliente tem dívida: não pode ser apagado.",
   "col.delPaid": "O crédito tem cobranças: estorne-as primeiro.",
+  'col.delClosed': "O fechamento ou a liquidação já foi feito: não é possível excluir.",
   "perm.collector.delete_installments": "Apagar parcelas",
   "perm.collector.delete_installments.d": "O cobrador pode apagar parcelas.",
   "perm.collector.delete_credits": "Apagar créditos",

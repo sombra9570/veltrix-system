@@ -160,12 +160,12 @@ export default function CollectorPage() {
 
   const flash = (ok: boolean, text: string) => { setMsg({ ok, text }); setTimeout(() => setMsg(null), 5000); };
   // Borrar cuota (revertir un cobro): solo con señal y si el administrador lo permitió en la ruta
-  const reverseInst = async (customerId: string, order: string, n: number) => {
+  const reverseInst = async (customerId: string, order: string, ns: number[]) => {
     if (!navigator.onLine) { flash(false, t('loan.e.offline')); return; }
-    try { await rpc('collector_delete_installment', { p_order: order, p_n: n }); await patch(routeId, { customers: [customerId], totals: true }); flash(true, t('card.delInstDone', { n })); }
+    try { await rpc('collector_delete_installments', { p_order: order, p_numbers: ns }); await patch(routeId, { customers: [customerId], totals: true }); flash(true, t('card.delInstDone', { n: ns.join(', ') })); }
     catch (e) {
       const m = (e as Error).message;
-      flash(false, m.includes('ROUTE_LOCKED') ? t('sp.lockedInfo') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic'));
+      flash(false, m.includes('AFTER_CLOSE') ? t('col.delClosed') : m.includes('ROUTE_LOCKED') ? t('sp.lockedInfo') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic'));
     }
   };
 
@@ -668,7 +668,7 @@ export default function CollectorPage() {
                 </div>
                 <button type="button" onClick={() => { setSel(c); setPanel(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>👤 {t('card.profile')}</button>
               </div>
-              <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? (o, n) => reverseInst(c.id, o, n) : undefined} c={c} filter={freq} today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
+              <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? (o, ns) => reverseInst(c.id, o, ns) : undefined} c={c} filter={freq} today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
               {(c.credits ?? []).length === 0 && <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>}
             </Card>
           ))}
@@ -715,7 +715,7 @@ export default function CollectorPage() {
             {sel && !panel && (
               <CustomerSheet locked={!!route.locked} c={selNow ?? sel} fmt={fmt} qr={route.pay_qr ?? null} online={online} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
                 cards={<>
-                  <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? (o, n) => reverseInst(sel.id, o, n) : undefined} c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
+                  <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? (o, ns) => reverseInst(sel.id, o, ns) : undefined} c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
                   <DeleteActions c={selNow ?? sel} canCredits={!!route.can_delete_credits} canCustomer={!!route.can_delete_customers} online={online}
                     onDone={(what) => { const cid = sel.id; setSel(null); setPanel(null); void patch(route.id, what === 'customer' ? { removed: [cid], totals: true } : { customers: [cid], totals: true }); }} />
                 </>} />
@@ -798,7 +798,7 @@ function DeleteActions({ c, canCredits, canCustomer, online, onDone }: { c: Cust
     try { await rpc(fn, args); onDone(fn === 'collector_delete_customer' ? 'customer' : 'credit'); }
     catch (e) {
       const m = (e as Error).message;
-      setErr(m.includes('CUSTOMER_HAS_DEBT') ? t('col.delDebt') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : m.includes('cobros') ? t('col.delPaid') : t('err.generic'));
+      setErr(m.includes('AFTER_CLOSE') ? t('col.delClosed') : m.includes('CUSTOMER_HAS_DEBT') ? t('col.delDebt') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : m.includes('cobros') ? t('col.delPaid') : t('err.generic'));
     } finally { setBusy(false); }
   };
   return (

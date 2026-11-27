@@ -42,7 +42,7 @@ export function CreditCard({ credit, today, fmt, onSave, readOnly = false, onRev
   credit: Credit; today: string; fmt: (n: number) => string;
   onSave: (amount: number, method: Method) => void; readOnly?: boolean;
   /** Borrar cuota = revertir un cobro ya hecho; solo si quien mira tiene ese permiso */
-  onReverse?: (n: number) => Promise<void> | void;
+  onReverse?: (ns: number[]) => Promise<void> | void;
 }) {
   const { t, lang } = useT();
   const list = useMemo(() => [...credit.installments].sort((a, b) => a.n - b.n), [credit]);
@@ -50,7 +50,7 @@ export function CreditCard({ credit, today, fmt, onSave, readOnly = false, onRev
   const [upTo, setUpTo] = useState(-1);          // índice de la última casilla seleccionada
   const [abono, setAbono] = useState<string | null>(null);
   const [method, setMethod] = useState<Method>('cash');
-  const [revN, setRevN] = useState<number | null>(null);
+  const [revSel, setRevSel] = useState<number[]>([]); // cuotas pagadas marcadas para borrar (varias a la vez)
   const [revBusy, setRevBusy] = useState(false);
 
   const open = list.reduce((s, i) => s + Math.max(0, bal(i)), 0);
@@ -86,13 +86,14 @@ export function CreditCard({ credit, today, fmt, onSave, readOnly = false, onRev
           const selected = abono === null && firstOpen >= 0 && idx >= firstOpen && idx <= upTo;
           const willFill = !!pv && !was && (full || paid > Number(i.paid));
           const late = !was && i.due < today;
-          const cls = was ? 'border-emerald-400 bg-emerald-500 text-white'
+          const cls = was && revSel.includes(i.n) ? 'border-red-500 bg-red-600 text-white'
+            : was ? 'border-emerald-400 bg-emerald-500 text-white'
             : selected || willFill ? 'border-blue-500 bg-blue-600 text-white'
             : partial ? 'border-amber-400 bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300'
             : late ? 'border-red-400 bg-white text-red-600 dark:bg-slate-900 dark:text-red-400'
             : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900';
           return (
-            <button key={i.id} type="button" onClick={() => (was ? setRevN((v) => (v === i.n ? null : i.n)) : tap(idx))} disabled={was && !onReverse}
+            <button key={i.id} type="button" onClick={() => (was ? setRevSel((v) => (v.includes(i.n) ? v.filter((x) => x !== i.n) : [...v, i.n])) : tap(idx))} disabled={was && !onReverse}
               title={`${t('card.inst', { n: i.n })} · ${fmt(Number(i.amount))}`}
               className={`relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-lg border-2 text-center leading-tight transition cursor-pointer disabled:cursor-default ${cls}`}>
               {partial && !selected && !willFill && (
@@ -107,14 +108,14 @@ export function CreditCard({ credit, today, fmt, onSave, readOnly = false, onRev
         })}
       </div>
 
-      {onReverse && revN !== null && (
+      {onReverse && revSel.length > 0 && (
         <div className="space-y-2 rounded-xl border border-red-300 bg-red-50 p-3 text-sm dark:border-red-500/30 dark:bg-red-500/10">
-          <p className="font-semibold text-red-700 dark:text-red-300">{t('card.delInstHint', { n: revN })}</p>
+          <p className="font-semibold text-red-700 dark:text-red-300">{t('card.delInstHint', { n: [...revSel].sort((a, b) => a - b).join(', ') })}</p>
           <div className="grid grid-cols-2 gap-2">
-            <button type="button" disabled={revBusy} onClick={() => setRevN(null)} className={`${ui.btnGhost} !py-2 text-xs`}>✕ {t('card.cancel')}</button>
+            <button type="button" disabled={revBusy} onClick={() => setRevSel([])} className={`${ui.btnGhost} !py-2 text-xs`}>✕ {t('card.cancel')}</button>
             <button type="button" disabled={revBusy}
-              onClick={async () => { setRevBusy(true); try { await onReverse(revN); } finally { setRevBusy(false); setRevN(null); } }}
-              className="rounded-xl bg-red-600 px-3 py-2 text-xs font-bold text-white cursor-pointer disabled:opacity-50">🗑️ {t('card.delInst', { n: revN })}</button>
+              onClick={async () => { setRevBusy(true); try { await onReverse([...revSel].sort((a, b) => a - b)); } finally { setRevBusy(false); setRevSel([]); } }}
+              className="rounded-xl bg-red-600 px-3 py-2 text-xs font-bold text-white cursor-pointer disabled:opacity-50">🗑️ {t('card.delInst', { n: [...revSel].sort((a, b) => a - b).join(', ') })}</button>
           </div>
         </div>
       )}

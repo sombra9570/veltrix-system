@@ -121,9 +121,9 @@ export default function SupPanel() {
     setSel((x) => (x && x.id === id ? { ...x, ...fields } : x));
   };
   const rate = (c: Cust, r: string) => run(async () => { await rpc('sup_rate_customer', { p_route: rid, p_customer: c.id, p_rating: r }); patchCust(c.id, { sup_rating: r }); }, t('sp.done'));
-  const reverse = async (order: string, n: number) => {
+  const reverse = async (order: string, ns: number[]) => {
     try {
-      await rpc('collector_delete_installment', { p_order: order, p_n: n });
+      await rpc('collector_delete_installments', { p_order: order, p_numbers: ns });
       const cid = d?.customers.find((c) => c.credits.some((k) => k.id === order))?.id;
       const [row, tot] = await Promise.all([
         cid ? rpc<(Omit<Cust, 'credits'> & { credits: RawCredit[] }) | null>('collector_customer_row', { p_route: rid, p_customer: cid }) : Promise.resolve(null),
@@ -131,8 +131,8 @@ export default function SupPanel() {
       ]);
       setD((x) => (x ? { ...x, balance: tot.fund_balance, period: tot.period, portfolio: tot.portfolio,
         customers: x.customers.map((c) => (row && c.id === row.id ? { ...c, ...row, credits: (row.credits ?? []).map(toCredit) } : c)) } : x));
-      setMsg({ ok: true, text: t('card.delInstDone', { n }) }); }
-    catch (e) { const m = (e as Error).message; setMsg({ ok: false, text: m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic') }); }
+      setMsg({ ok: true, text: t('card.delInstDone', { n: ns.join(', ') }) }); }
+    catch (e) { const m = (e as Error).message; setMsg({ ok: false, text: m.includes('AFTER_CLOSE') ? t('col.delClosed') : m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic') }); }
   };
 
   const box = (ok: boolean) => ok ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300'
@@ -304,7 +304,7 @@ export default function SupPanel() {
           {sel.credits.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('card.noCards')}</p></Card> : sel.credits.map((k) => (
             <Card key={k.id}>
               <p className={`mb-2 text-xs ${ui.muted}`}>{new Date(k.created).toLocaleDateString(lang)} · {m(k.total)}</p>
-              <CreditCard credit={k} today={today} fmt={m} onSave={() => undefined} readOnly onReverse={d.can_delete_installments ? (n) => reverse(k.id, n) : undefined} />
+              <CreditCard credit={k} today={today} fmt={m} onSave={() => undefined} readOnly onReverse={d.can_delete_installments ? (ns) => reverse(k.id, ns) : undefined} />
             </Card>
           ))}
         </div>
