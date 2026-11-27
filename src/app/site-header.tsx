@@ -87,9 +87,20 @@ export function Logo() {
   return (
     <Link href="/" className="flex items-center gap-2 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/veltrix-v.png" alt="" width={28} height={28} className="h-7 w-7 object-contain" />
+      <img src="/veltrix-v.png" alt="" width={36} height={36} className="h-9 w-9 object-contain" />
       <span>Veltrix <span className="text-blue-600 dark:text-blue-500">System</span></span>
     </Link>
+  );
+}
+
+/** Marca de Veltrix para las pantallas internas (menú, consolas): logo y nombre, en tamaño ajustable */
+export function BrandMark({ size = 28, className = '' }: { size?: number; className?: string }) {
+  return (
+    <span className={`inline-flex items-center gap-2 font-extrabold tracking-tight text-slate-900 dark:text-white ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/veltrix-v.png" alt="" width={size} height={size} style={{ width: size, height: size }} className="object-contain" />
+      <span>Veltrix <span className="text-blue-600 dark:text-blue-500">System</span></span>
+    </span>
   );
 }
 

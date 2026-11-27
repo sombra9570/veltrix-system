@@ -6,7 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { ThemeToggle } from '../theme';
 import { StoreOrdersBell } from './store-orders-alert';
 import { HelpButton } from './help';
-import { RegionSelectors, ui } from '../site-header';
+import { BrandMark, RegionSelectors, ui } from '../site-header';
 import { useT } from '../i18n';
 import { useSync, SyncButton, NetBanner } from './sync';
 import { AnnouncementsBanner } from './announcements';
@@ -101,9 +101,7 @@ export function AppShell({
   const menu = (
     <nav className="safe-top safe-bottom flex h-full flex-col">
       <div className="px-5 py-5">
-        <Link href="/" className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
-          Veltrix <span className="text-blue-600 dark:text-blue-500">System</span>
-        </Link>
+        <Link href="/" aria-label="Veltrix System"><BrandMark size={28} className="text-lg" /></Link>
         <p className="mt-1 truncate text-xs font-semibold text-slate-500 dark:text-slate-400">{orgName}</p>
       </div>
 

@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../../language-selector';
+import { BrandMark } from '../../site-header';
 import { LanguageDropdown, RegionalStatusBar, translations } from './regional-tools';
 import { useVeltrixAuth } from '../../auth-system';
 import { rpc, supabase } from '../../../lib/supabase';
@@ -317,7 +318,8 @@ export default function GlobalCoreAdminPage() {
         <NetBanner />
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div className="min-w-0">
-            <span className="rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-purple-400">
+            <BrandMark size={28} className="mb-2 !text-white" />
+            <span className="block w-fit rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-purple-400">
               🛡️ Superadmin
             </span>
             <h1 className="mt-2 text-xl font-bold sm:text-2xl">

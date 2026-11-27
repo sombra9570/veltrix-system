@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { rpc } from '../../../lib/supabase';
+import { rpc, supabase } from '../../../lib/supabase';
 import { useOwner } from './owner-context';
 import { Card, UsageBar } from '../shell';
 import { ApprovalsTray } from '../approvals';
@@ -118,7 +118,14 @@ function CobranzaHome() {
   const [funds, setFunds] = useState<CFund[] | null>(null);
   const [period, setPeriod] = useState<'day' | 'week'>('day');
   useEffect(() => { if (orgId) rpc<CFund[]>('route_funds_admin', { p_org: orgId }).then((f) => setFunds(f ?? [])).catch(() => setFunds([])); }, [orgId]);
-  const cur = funds?.[0]?.currency ?? 'USD';
+  // Sin rutas todavía: la moneda es la de la empresa (no dólares)
+  const [baseCur, setBaseCur] = useState<string | null>(null);
+  useEffect(() => {
+    if (!orgId) return;
+    supabase.from('companies').select('base_currency').eq('org_id', orgId).is('deleted_at', null).limit(1)
+      .then(({ data }) => setBaseCur(data?.[0]?.base_currency ?? null));
+  }, [orgId]);
+  const cur = funds?.[0]?.currency ?? baseCur ?? 'USD';
   const rows = (f: CFund) => (f.days ?? []).slice(0, period === 'day' ? 1 : 7);
   const collected = (f: CFund) => rows(f).reduce((a, d) => a + Number(d.cash) + Number(d.digital), 0);
   const lent = (f: CFund) => rows(f).reduce((a, d) => a + Number(d.lent), 0);
