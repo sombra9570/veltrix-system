@@ -17,7 +17,8 @@ type Product = { id: string; name: string; unit_price: number; sku?: string | nu
 const FREQS: [number, string][] = [[1, 'daily'], [7, 'weekly'], [15, 'biweekly'], [30, 'monthly']];
 const addDays = (iso: string, n: number) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 
-export function CreditSaleForm({ routeId, today, fmt, onDone, online, localCustomers, onQueue }: {
+export function CreditSaleForm({ routeId, today, fmt, onDone, online, localCustomers, onQueue, fixedCustomer }: {
+  fixedCustomer?: { id: string; name: string };
   routeId: string; today: string; fmt: (n: number) => string; onDone: (text: string, ok: boolean, customerId?: string) => void;
   online: boolean; localCustomers: RouteCustomer[]; onQueue: (op: SaleOp) => void;
 }) {
@@ -26,7 +27,7 @@ export function CreditSaleForm({ routeId, today, fmt, onDone, online, localCusto
   const [products, setProducts] = useState<Product[]>(() => readProducts<Product>(routeId));
   const [q, setQ] = useState('');
   const [pq, setPq] = useState('');
-  const [cid, setCid] = useState('');
+  const [cid, setCid] = useState(fixedCustomer?.id ?? '');
   const [items, setItems] = useState<Record<string, number>>({});
   const [count, setCount] = useState('4');
   const [every, setEvery] = useState(7);
@@ -87,6 +88,12 @@ export function CreditSaleForm({ routeId, today, fmt, onDone, online, localCusto
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-bold">🛍️ {t('sale.title')}</h2>
+      {fixedCustomer ? (
+        <div className="space-y-1 rounded-xl border border-blue-200 bg-blue-50 p-3 dark:border-blue-500/30 dark:bg-blue-500/10">
+          <p className={`text-xs ${ui.muted}`}>{t('loan.customer')}</p>
+          <p className="font-bold">{fixedCustomer.name}</p>
+        </div>
+      ) : (
       <div className="space-y-2">
         <label className={ui.label}>{t('loan.customer')}</label>
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('loan.search')} className={ui.input} />
@@ -103,6 +110,7 @@ export function CreditSaleForm({ routeId, today, fmt, onDone, online, localCusto
           {custList.length === 0 && <li className={`text-xs ${ui.muted}`}>{t('loan.noCustomers')}</li>}
         </ul>
       </div>
+      )}
 
       <div className="space-y-2">
         <label className={ui.label}>{t('sale.items')}</label>

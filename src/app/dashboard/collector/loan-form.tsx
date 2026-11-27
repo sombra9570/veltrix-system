@@ -26,15 +26,16 @@ export const RATING_DOT: Record<string, string> = {
 
 const addDays = (iso: string, n: number) => { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 
-export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fmt, onDone, online, localCustomers, fund, maxLoan, onQueue }: {
+export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fmt, onDone, online, localCustomers, fund, maxLoan, onQueue, fixedCustomer }: {
   routeId: string; today: string; policy: LoanPolicy; canInterest: boolean; canCustomers: boolean;
   fmt: (n: number) => string; onDone: (text: string, ok: boolean, customerId?: string) => void;
   online: boolean; localCustomers: RouteCustomer[]; fund: number | null; maxLoan: number; onQueue: (op: LoanOp) => void;
+  fixedCustomer?: { id: string; name: string };
 }) {
   const { t, lang } = useT();
   const [customers, setCustomers] = useState<RouteCustomer[]>(localCustomers);
   const [q, setQ] = useState('');
-  const [cid, setCid] = useState('');
+  const [cid, setCid] = useState(fixedCustomer?.id ?? '');
   const [newC, setNewC] = useState<{ name: string; phone: string; address: string; doc: string } | null>(null);
   const [amount, setAmount] = useState('');
   const [interest, setInterest] = useState(String(policy.interest_default));
@@ -109,7 +110,12 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
       <h2 className="text-lg font-bold">💸 {t('loan.title')}</h2>
 
       {/* Cliente */}
-      {!newC ? (
+      {fixedCustomer ? (
+        <div className="space-y-1 rounded-xl border border-blue-200 bg-blue-50 p-3 dark:border-blue-500/30 dark:bg-blue-500/10">
+          <p className={`text-xs ${ui.muted}`}>{t('loan.customer')}</p>
+          <p className="font-bold">{fixedCustomer.name}</p>
+        </div>
+      ) : !newC ? (
         <div className="space-y-2">
           <label className={ui.label}>{t('loan.customer')}</label>
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('loan.search')} className={ui.input} />

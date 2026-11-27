@@ -134,6 +134,8 @@ export default function CollectorPage() {
   const [sel, setSel] = useState<Customer | null>(null);
   const [saleMode, setSaleMode] = useState<{ mode: 'loan' | 'merch'; can: boolean } | null>(null);
   const [panel, setPanel] = useState<'pay' | 'visit' | 'expense' | 'settle' | 'loan' | null>(null);
+  const [loanFor, setLoanFor] = useState<{ id: string; name: string } | null>(null);
+  useEffect(() => { if (panel !== 'loan') setLoanFor(null); }, [panel]);
   const [view, setView] = useState<'cards' | 'list'>('list');
   const [freq, setFreq] = useState<Freq | 'all'>('all');
   // Se dibujan de a 25 clientes (tarjetas pesan): "Ver más" agrega el resto
@@ -614,7 +616,7 @@ export default function CollectorPage() {
       {screen === 'newclient' && (
         <NewClient routeId={route.id} orgId={route.org_id ?? ''} online={online} onQueue={(op) => { enqueue(op); }} canLoan={canNew} saleLabel={merch} needPhoto={!route.can_no_photo} needIdPhoto={!route.can_no_id_photo} allowGallery={route.can_gallery !== false}
           onSaved={async (id) => { await patch(route.id, { customers: [id] }); }}
-          onLoan={() => { setPanel('loan'); }} />
+          onLoan={(c) => { setLoanFor(c); setPanel('loan'); }} />
       )}
 
       {screen === 'settings' && (
@@ -746,15 +748,15 @@ export default function CollectorPage() {
               }} />
             )}
             {panel === 'loan' && merch && (
-              <CreditSaleForm routeId={route.id} today={route.today} fmt={fmt} online={online} localCustomers={localCust(route)}
+              <CreditSaleForm routeId={route.id} today={route.today} fmt={fmt} online={online} localCustomers={localCust(route)} fixedCustomer={loanFor ?? undefined}
                 onQueue={(op) => enqueue(op)}
-                onDone={async (text, ok, customerId) => { flash(ok, text); setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
+                onDone={async (text, ok, customerId) => { flash(ok, text); if (loanFor) menu(); setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
             )}
             {panel === 'loan' && !merch && route.policy && (
               <LoanForm routeId={route.id} today={route.today} policy={route.policy} canInterest={!!route.can_interest}
                 canCustomers={route.can_customers !== false} fmt={fmt} online={online} localCustomers={localCust(route)}
-                fund={fund} maxLoan={Number(route.max_loan ?? 0)} onQueue={(op) => enqueue(op)}
-                onDone={async (text, ok, customerId) => { flash(ok, text); setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
+                fund={fund} maxLoan={Number(route.max_loan ?? 0)} onQueue={(op) => enqueue(op)} fixedCustomer={loanFor ?? undefined}
+                onDone={async (text, ok, customerId) => { flash(ok, text); if (loanFor) menu(); setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
             )}
             {panel === 'settle' && fund !== null && <PeriodSheet route={route} fmt={fmt} fund={fund} online={online}
               onChanged={async (text) => { flash(true, text); await patch(route.id, { totals: true }); }} onError={(text) => flash(false, text)} />}

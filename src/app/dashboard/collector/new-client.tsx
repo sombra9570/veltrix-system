@@ -61,7 +61,7 @@ function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) 
  */
 export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel = false, needPhoto = false, needIdPhoto = false, allowGallery = true, onSaved, onLoan }: {
   routeId: string; orgId: string; online: boolean; onQueue?: (op: CustomerOp) => void; canLoan: boolean; saleLabel?: boolean; needPhoto?: boolean; needIdPhoto?: boolean; allowGallery?: boolean;
-  onSaved: (id: string) => Promise<void> | void; onLoan: () => void;
+  onSaved: (id: string) => Promise<void> | void; onLoan: (c: { id: string; name: string }) => void;
 }) {
   const { t } = useT();
   const [f, setF] = useState({ name: '', ci: '', phone: '', address: '', gName: '', gPhone: '', gAddress: '' });
@@ -74,7 +74,7 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
-  const [done, setDone] = useState<{ name: string; photosOk: boolean; queued?: boolean } | null>(null);
+  const [done, setDone] = useState<{ name: string; photosOk: boolean; queued?: boolean; id?: string } | null>(null);
   const set = (k: keyof typeof f, v: string) => setF((x) => ({ ...x, [k]: v }));
 
   const upload = async (id: string, file: File, kind: string) => {
@@ -112,7 +112,8 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
           lat: gps!.lat, lng: gps!.lng, gName: f.gName || undefined, gPhone: f.gPhone || undefined, gAddress: f.gAddress || undefined,
           gLat: gGps?.lat, gLng: gGps?.lng, consent, files });
         setBusy(false);
-        setDone({ name: f.name.trim(), photosOk: true, queued: true });
+        setDone({ name: f.name.trim(), photosOk: true, queued: true, id: newId });
+        if (canLoan) onLoan({ id: newId, name: f.name.trim() });
       } catch { setBusy(false); setErr(t('err.generic')); }
     };
     if (!online) { await queueIt(); return; }
@@ -151,8 +152,9 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
       setErr(m.startsWith('PHOTO') || m.includes('PHOTO_') ? t(photoErrorKey(m)) : t('err.generic'));
     }
     setBusy(false);
-    setDone({ name: f.name.trim(), photosOk });
+    setDone({ name: f.name.trim(), photosOk, id });
     await onSaved(id);
+    if (canLoan && photosOk) onLoan({ id, name: f.name.trim() });
   };
 
   if (done) {
@@ -163,7 +165,7 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
         {done.queued && <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">{t('cx.nc.queued')}</p>}
         {!done.photosOk && <p className="text-sm font-semibold text-amber-700 dark:text-amber-300">{err || t('cx.nc.partial')}</p>}
         <div className="grid gap-2">
-          {canLoan && <button type="button" onClick={onLoan} className={`${ui.btnPrimary} py-3`}>{saleLabel ? '🛍️' : '💸'} {t(saleLabel ? 'cx.newSale' : 'cx.newLoan')}</button>}
+          {canLoan && <button type="button" onClick={() => done.id && onLoan({ id: done.id, name: done.name })} className={`${ui.btnPrimary} py-3`}>{saleLabel ? '🛍️' : '💸'} {t(saleLabel ? 'cx.newSale' : 'cx.newLoan')}</button>}
         </div>
       </Card>
     );
