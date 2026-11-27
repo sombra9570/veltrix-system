@@ -15,6 +15,7 @@ import { NewClient } from '../collector/new-client';
 import { CutForm, type Period } from '../collector/cut-form';
 import { DeliveryMap, type MapPoint } from '../delivery-map';
 import { RATING_DOT } from '../collector/loan-form';
+import { useBackButton } from '../use-back';
 
 /* Panel del supervisor de cobranza: sus rutas asignadas; cada acción queda grabada y al terminar se envía el reporte al administrador */
 type RawCredit = { id: string; created: string; total: number; every_days: number | null; i?: [number, string, number, number, string | null][] };
@@ -146,6 +147,7 @@ export default function SupPanel() {
     else if (screen !== 'home') setScreen('home');
     else if (rid) { setRid(null); loadList(); }
   };
+  useBackButton((sel ? 1 : 0) + (screen !== 'home' ? 1 : 0) + (rid ? 1 : 0), back);
   const titles: Record<string, string> = { list: 'rt.list', pending: 'cx.pending', newclient: 'cx.newClient', map: 'rt.map', info: 'nav.routeInfo', liq: 'rt.liq', notes: 'sp.notes', rate: 'sp.rateCollector' };
   useHeaderSlot({
     title: userName,

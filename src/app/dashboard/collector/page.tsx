@@ -24,6 +24,7 @@ import { getFile, delFile } from './offline-files';
 import { extFor } from '../image';
 import { Credits } from './credits';
 import { SettingsScreen, payQrUrl } from './settings';
+import { useBackButton } from '../use-back';
 import { readSaleMode, cacheSaleMode, creditErrorKey, type CreditOp } from './credit-ops';
 
 /* ------------------------------------------------------------------
@@ -150,6 +151,9 @@ export default function CollectorPage() {
   const go = (sc: Screen) => { setHist((h) => [...h, screen]); setScreen(sc); setSel(null); setPanel(null); };
   const back = () => { setHist((h) => { const n = [...h]; setScreen(n.pop() ?? 'home'); return n; }); setSel(null); setPanel(null); };
   const menu = () => { setHist([]); setScreen('home'); setSel(null); setPanel(null); };
+  useBackButton((sel ? 1 : 0) + (panel ? 1 : 0) + (screen !== 'home' ? 1 : 0), () => {
+    if (sel && panel) setPanel(null); else if (sel || panel) { setSel(null); setPanel(null); } else back();
+  });
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   // Último cobro, para ofrecer el comprobante por WhatsApp
   const [receipt, setReceipt] = useState<{ phone: string; text: string } | null>(null);

@@ -13,6 +13,7 @@ import { CreditCard, type Credit } from '../../collector/credit-card';
 import { CutForm, type Period } from '../../collector/cut-form';
 import { DeliveryMap, type MapPoint } from '../../delivery-map';
 import { RATING_DOT } from '../../collector/loan-form';
+import { useBackButton } from '../../use-back';
 
 /* Pantalla de una ruta de cobro (administrador): lista de clientes, mapa, ajustes, información y liquidación */
 type Screen = 'home' | 'list' | 'map' | 'settings' | 'info' | 'liq';
@@ -80,6 +81,7 @@ function RouteScreen() {
     else if (screen !== 'home') setScreen('home');
     else router.push('/dashboard/owner/rutas');
   };
+  useBackButton((sel ? 1 : 0) + (screen !== 'home' ? 1 : 0), back);
   useHeaderSlot(route ? {
     title: route.name,
     subtitle: sel ? sel.name : screen === 'home' ? (route.collector ?? '') : t(({ list: 'rt.list', map: 'rt.map', settings: 'rt.settings', info: 'nav.routeInfo', liq: 'rt.liq' } as Record<string, string>)[screen] as DictKey),
