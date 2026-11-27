@@ -57,8 +57,8 @@ function RateRow({ cur, busy, onPick }: { cur: string | null; busy: boolean; onP
 
 const RATE_KEYS = ['overall', 'punctuality', 'temperament', 'efficiency', 'responsibility', 'communication', 'condition', 'vehicle_care'] as const;
 const RATE_LABEL: Record<(typeof RATE_KEYS)[number], DictKey> = {
-  overall: 'cr.overall', punctuality: 'cr.punctuality', temperament: 'cr.temperament', efficiency: 'cr.efficiency',
-  responsibility: 'cr.responsibility', communication: 'cr.communication', condition: 'cr.condition', vehicle_care: 'cr.vehicle',
+  overall: 'rate.overall', punctuality: 'rate.punctuality', temperament: 'rate.temperament', efficiency: 'rate.efficiency',
+  responsibility: 'rate.responsibility', communication: 'rate.communication', condition: 'rate.condition', vehicle_care: 'rate.vehicle',
 };
 
 /** Calificación mensual del cobrador por criterios (1 a 5 estrellas): la hace el supervisor en ruta y solo la ve el administrador */
@@ -72,20 +72,20 @@ function RateCollector({ route, collector }: { route: string; collector: string 
   useEffect(() => { rpc<boolean>('sup_collector_rated', { p_route: route }).then((v) => setRated(!!v)).catch(() => setRated(false)); }, [route]);
   const complete = RATE_KEYS.every((k) => scores[k] >= 1);
   const save = async () => {
-    if (!complete) return setMsg({ ok: false, text: t('cr.needAll') });
+    if (!complete) return setMsg({ ok: false, text: t('rate.needAll') });
     setBusy(true); setMsg(null);
     try {
       await rpc('sup_rate_collector', { p_route: route, p_scores: scores, p_notes: notes.trim() || null });
-      setRated(true); setMsg({ ok: true, text: t('cr.done') });
+      setRated(true); setMsg({ ok: true, text: t('rate.done') });
     } catch (e) {
       const m = (e as Error).message ?? '';
-      setMsg({ ok: false, text: m.includes('RATING_ALREADY_THIS_MONTH') ? t('cr.already') : m.includes('RATING_NEEDS_SUPERVISION') ? t('cr.needSupervision') : m });
+      setMsg({ ok: false, text: m.includes('RATING_ALREADY_THIS_MONTH') ? t('rate.already') : m.includes('RATING_NEEDS_SUPERVISION') ? t('rate.needSupervision') : m });
     } finally { setBusy(false); }
   };
   return (
     <Card className="space-y-3">
       <p className="font-bold">🛵 {collector ?? '—'}</p>
-      {rated ? <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{msg?.ok ? msg.text : t('cr.already')}</p> : (
+      {rated ? <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{msg?.ok ? msg.text : t('rate.already')}</p> : (
         <>
           <ul className="space-y-2">
             {RATE_KEYS.map((k) => (
@@ -101,11 +101,11 @@ function RateCollector({ route, collector }: { route: string; collector: string 
             ))}
           </ul>
           <div>
-            <label className={ui.label}>{t('cr.notes')}</label>
+            <label className={ui.label}>{t('rate.notes')}</label>
             <textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} className={ui.input} />
           </div>
           {msg && !msg.ok && <p className="text-sm font-semibold text-red-600 dark:text-red-400">{msg.text}</p>}
-          <button type="button" disabled={busy} onClick={save} className={`${ui.btnPrimary} w-full`}>💾 {t('cr.save')}</button>
+          <button type="button" disabled={busy} onClick={save} className={`${ui.btnPrimary} w-full`}>💾 {t('rate.save')}</button>
         </>
       )}
     </Card>

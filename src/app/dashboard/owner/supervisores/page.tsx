@@ -8,7 +8,7 @@ import { useT } from '../../../i18n';
 import { useOwner } from '../owner-context';
 
 type Rating = { id: string; period: string; collector: string | null; rated_by: string | null; route: string | null; overall: number; punctuality: number; temperament: number; efficiency: number; responsibility: number; communication: number; condition: number; vehicle_care: number; notes: string | null };
-const RATING_COLS = [['punctuality', 'cr.punctuality'], ['temperament', 'cr.temperament'], ['efficiency', 'cr.efficiency'], ['responsibility', 'cr.responsibility'], ['communication', 'cr.communication'], ['condition', 'cr.condition'], ['vehicle_care', 'cr.vehicle']] as const;
+const RATING_COLS = [['punctuality', 'rate.punctuality'], ['temperament', 'rate.temperament'], ['efficiency', 'rate.efficiency'], ['responsibility', 'rate.responsibility'], ['communication', 'rate.communication'], ['condition', 'rate.condition'], ['vehicle_care', 'rate.vehicle']] as const;
 
 export default function SupervisorsPage() {
   const { t } = useT();
@@ -29,14 +29,14 @@ export default function SupervisorsPage() {
           ))}
         </div>
       )}
-      <h2 className="pt-2 text-lg font-extrabold">⭐ {t('cr.title')}</h2>
-      {ratings.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('cr.empty')}</p></Card> : (
+      <h2 className="pt-2 text-lg font-extrabold">⭐ {t('rate.title')}</h2>
+      {ratings.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('rate.empty')}</p></Card> : (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {ratings.map((r) => (
             <Card key={r.id} className="space-y-1">
               <p className="font-bold">🛵 {r.collector ?? '—'} · {r.period.slice(0, 7)}</p>
-              <p className={`text-xs ${ui.muted}`}>{r.route ?? ''}{r.rated_by ? ` · ${t('cr.by')} ${r.rated_by}` : ''}</p>
-              <p className="text-sm font-semibold">{t('cr.overall')}: {'★'.repeat(r.overall)}<span className="text-slate-300 dark:text-slate-600">{'★'.repeat(5 - r.overall)}</span></p>
+              <p className={`text-xs ${ui.muted}`}>{r.route ?? ''}{r.rated_by ? ` · ${t('rate.by')} ${r.rated_by}` : ''}</p>
+              <p className="text-sm font-semibold">{t('rate.overall')}: {'★'.repeat(r.overall)}<span className="text-slate-300 dark:text-slate-600">{'★'.repeat(5 - r.overall)}</span></p>
               <ul className="text-xs">
                 {RATING_COLS.map(([k, label]) => <li key={k} className="flex justify-between"><span>{t(label)}</span><b>{r[k]}/5</b></li>)}
               </ul>
