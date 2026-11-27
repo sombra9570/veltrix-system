@@ -2396,7 +2396,7 @@ const zh: Record<DictKey, string> = {
   "col.delConfirm": "确定吗？此操作无法撤销。",
   "col.delDebt": "客户有欠款，无法删除。",
   "col.delPaid": "该贷款有收款，需先冲销。",
-  'col.delClosed': "已完成结账或结算，无法再删除。",
+  'col.delClosed': "已完成结算，无法再删除。",
   "perm.collector.delete_installments": "删除分期",
   "perm.collector.delete_installments.d": "收款员可删除分期。",
   "perm.collector.delete_credits": "删除贷款",

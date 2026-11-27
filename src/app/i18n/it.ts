@@ -2396,7 +2396,7 @@ const it: Record<DictKey, string> = {
   "col.delConfirm": "Sicuro? Non si può annullare.",
   "col.delDebt": "Il cliente ha un debito: non si può eliminare.",
   "col.delPaid": "Il credito ha incassi: stornali prima.",
-  'col.delClosed': "La chiusura o la liquidazione è già stata fatta: non si può più eliminare.",
+  'col.delClosed': "La liquidazione è già stata fatta: non si può più eliminare.",
   "perm.collector.delete_installments": "Elimina rate",
   "perm.collector.delete_installments.d": "L'incassatore può eliminare rate.",
   "perm.collector.delete_credits": "Elimina crediti",

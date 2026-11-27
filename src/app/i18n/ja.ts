@@ -2396,7 +2396,7 @@ const ja: Record<DictKey, string> = {
   "col.delConfirm": "よろしいですか？元に戻せません。",
   "col.delDebt": "顧客に残高があるため削除できません。",
   "col.delPaid": "入金があるため、先に取り消してください。",
-  'col.delClosed': "締めまたは精算がすでに行われたため、削除できません。",
+  'col.delClosed': "精算がすでに行われたため、削除できません。",
   "perm.collector.delete_installments": "分割を削除",
   "perm.collector.delete_installments.d": "集金担当が分割を削除できます。",
   "perm.collector.delete_credits": "クレジットを削除",

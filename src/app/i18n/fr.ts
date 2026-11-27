@@ -2396,7 +2396,7 @@ const fr: Record<DictKey, string> = {
   "col.delConfirm": "Sûr ? Action irréversible.",
   "col.delDebt": "Le client a une dette : suppression impossible.",
   "col.delPaid": "Le crédit a des encaissements : annulez-les d'abord.",
-  'col.delClosed': "La clôture ou le règlement a déjà été effectué : suppression impossible.",
+  'col.delClosed': "La liquidation a déjà été effectuée : suppression impossible.",
   "perm.collector.delete_installments": "Supprimer des échéances",
   "perm.collector.delete_installments.d": "Le collecteur peut supprimer des échéances.",
   "perm.collector.delete_credits": "Supprimer des crédits",

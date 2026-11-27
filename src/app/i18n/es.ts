@@ -2405,7 +2405,7 @@ const es = {
   'col.delConfirm': '¿Confirma la eliminación? Esta acción no se puede deshacer.',
   'col.delDebt': 'El cliente tiene deuda: no se puede eliminar.',
   'col.delPaid': 'El crédito tiene cobros: primero deben revertirse.',
-  'col.delClosed': 'Ya se hizo el cierre o la liquidación: no se puede borrar.',
+  'col.delClosed': "Ya se hizo la liquidación: no se puede borrar.",
   'perm.collector.delete_installments': 'Eliminar cuotas',
   'perm.collector.delete_installments.d': 'El cobrador puede eliminar cuotas.',
   'perm.collector.delete_credits': 'Eliminar créditos',

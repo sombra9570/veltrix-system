@@ -2396,7 +2396,7 @@ const hi: Record<DictKey, string> = {
   "col.delConfirm": "क्या आप सुनिश्चित हैं? यह वापस नहीं होगा।",
   "col.delDebt": "ग्राहक पर बकाया है: हटा नहीं सकते।",
   "col.delPaid": "ऋण में वसूली है: पहले उसे पलटें।",
-  'col.delClosed': "समापन या निपटान हो चुका है: अब हटाया नहीं जा सकता।",
+  'col.delClosed': "निपटान हो चुका है: अब हटाया नहीं जा सकता।",
   "perm.collector.delete_installments": "किस्तें हटाएँ",
   "perm.collector.delete_installments.d": "कलेक्टर किस्तें हटा सकता है।",
   "perm.collector.delete_credits": "ऋण हटाएँ",

@@ -2396,7 +2396,7 @@ const ko: Record<DictKey, string> = {
   "col.delConfirm": "확실합니까? 되돌릴 수 없습니다.",
   "col.delDebt": "고객에게 미수금이 있어 삭제할 수 없습니다.",
   "col.delPaid": "수금 내역이 있어 먼저 취소해야 합니다.",
-  'col.delClosed': "마감 또는 정산이 이미 완료되어 삭제할 수 없습니다.",
+  'col.delClosed': "정산이 이미 완료되어 삭제할 수 없습니다.",
   "perm.collector.delete_installments": "할부 삭제",
   "perm.collector.delete_installments.d": "수금원이 할부를 삭제할 수 있습니다.",
   "perm.collector.delete_credits": "대출 삭제",

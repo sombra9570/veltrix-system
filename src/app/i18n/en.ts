@@ -2396,7 +2396,7 @@ const en: Record<DictKey, string> = {
   "col.delConfirm": "Are you sure? This cannot be undone.",
   "col.delDebt": "The customer has debt: it cannot be deleted.",
   "col.delPaid": "The credit has payments: reverse them first.",
-  'col.delClosed': "The cash close or settlement has already been done: it can no longer be deleted.",
+  'col.delClosed': "The settlement has already been done: it can no longer be deleted.",
   "perm.collector.delete_installments": "Delete installments",
   "perm.collector.delete_installments.d": "The collector can delete installments.",
   "perm.collector.delete_credits": "Delete credits",

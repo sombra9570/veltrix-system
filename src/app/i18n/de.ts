@@ -2396,7 +2396,7 @@ const de: Record<DictKey, string> = {
   "col.delConfirm": "Sicher? Das lässt sich nicht rückgängig machen.",
   "col.delDebt": "Der Kunde hat Schulden: Löschen nicht möglich.",
   "col.delPaid": "Der Kredit hat Zahlungen: erst stornieren.",
-  'col.delClosed': "Kassenabschluss oder Abrechnung sind bereits erfolgt: Löschen nicht mehr möglich.",
+  'col.delClosed': "Die Abrechnung ist bereits erfolgt: Löschen nicht mehr möglich.",
   "perm.collector.delete_installments": "Raten löschen",
   "perm.collector.delete_installments.d": "Der Inkassant darf Raten löschen.",
   "perm.collector.delete_credits": "Kredite löschen",
