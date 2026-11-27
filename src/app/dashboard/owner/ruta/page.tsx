@@ -116,6 +116,19 @@ function RouteScreen() {
   const box = (ok: boolean) => ok ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300'
     : 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400';
   const today = new Date().toISOString().slice(0, 10);
+  // Días de retraso de la cuota impaga más antigua del cliente
+  const lateDays = (c: Cust) => Math.max(0, ...c.credits.flatMap((k) => (k.i ?? []).filter(([, , amount, paid]) => Number(amount) - Number(paid) > 0.004)
+    .map(([, due]) => Math.floor((new Date(today + 'T12:00:00').getTime() - new Date(due.slice(0, 10) + 'T12:00:00').getTime()) / 86_400_000))));
+  const writeOff = async (c: Cust) => {
+    if (!window.confirm(t('rt.writeOffConfirm'))) return;
+    try {
+      await rpc('owner_write_off_customer', { p_customer: c.id });
+      setSel(null); await load(); setMsg({ ok: true, text: t('rt.writeOffDone') });
+    } catch (e) {
+      const m = (e as Error).message;
+      setMsg({ ok: false, text: m.includes('WRITEOFF_TOO_EARLY') ? t('rt.writeOffEarly') : friendlyError(m, t) });
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -171,6 +184,10 @@ function RouteScreen() {
               <CreditCard credit={toCredit(k)} today={today} fmt={m} onSave={() => undefined} readOnly />
             </Card>
           ))}
+          {lateDays(sel) >= 180 && (
+            <button type="button" onClick={() => writeOff(sel)}
+              className="w-full rounded-xl border border-red-300 px-3 py-2 text-sm font-bold text-red-600 cursor-pointer dark:border-red-500/40 dark:text-red-400">🗑️ {t('rt.writeOff')}</button>
+          )}
         </div>
       )}
 

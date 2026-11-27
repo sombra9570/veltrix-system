@@ -56,6 +56,7 @@ export default function PermissionsPage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [open, setOpen] = useState<string | null>(null);
+  const [info, setInfo] = useState(false);
   const k = (key: string) => t(key as DictKey);
 
   const load = useCallback(async () => {
@@ -96,7 +97,16 @@ export default function PermissionsPage() {
       <div className="min-w-0">
         <h1 className="text-xl font-extrabold sm:text-2xl">🔐 {t('nav.permissions')}</h1>
         <p className={`text-sm ${ui.muted}`}>{t('perm.subtitle')}</p>
+        <button type="button" onClick={() => setInfo((v) => !v)} aria-expanded={info} className={`${ui.btnGhost} mt-3 !py-2 text-sm`}>ℹ️ {t('perm.info.btn')}</button>
       </div>
+      {info && (
+        <Card className="!p-0 overflow-hidden">
+          <h2 className="border-b border-slate-200 p-4 font-bold dark:border-slate-800">{t('perm.info.title')}</h2>
+          <ul className="divide-y divide-slate-200 text-sm dark:divide-slate-800">
+            {(['r1', 'r2', 'r3', 'r4', 'r5'] as const).map((r) => <li key={r} className="p-4">{t(`perm.info.${r}` as DictKey)}</li>)}
+          </ul>
+        </Card>
+      )}
       {err && <p className="rounded-xl border border-red-300 bg-red-50 p-3 text-sm font-semibold text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-400">{err}</p>}
 
       {!d ? <p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p> : (
