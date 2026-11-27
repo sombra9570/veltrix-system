@@ -13,7 +13,8 @@ type Data = {
 
 export default function InvitePage() {
   const { t, lang } = useT();
-  const { orgId } = useOwner();
+  const { orgId, overview } = useOwner();
+  const isStreet = !!overview?.street;
   const [d, setD] = useState<Data | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -40,7 +41,7 @@ export default function InvitePage() {
     <div className="space-y-5">
       <div className="min-w-0">
         <h1 className="text-xl font-extrabold sm:text-2xl">🎁 {t('nav.invite')}</h1>
-        <p className={`text-sm ${ui.muted}`}>{t('ref.subtitle2')}</p>
+        <p className={`text-sm ${ui.muted}`}>{t(isStreet ? 'ref.street.sub' : 'ref.subtitle2')}</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
@@ -49,11 +50,11 @@ export default function InvitePage() {
             {[1, 2, 3].map((i) => (
               <li key={i} className="flex gap-3">
                 <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-blue-600 text-sm font-extrabold text-white">{i}</span>
-                <p className="text-sm">{t((i === 3 ? 'ref.step3b' : `ref.step${i}`) as 'ref.step1')}</p>
+                <p className="text-sm">{t((i === 3 ? (isStreet ? 'ref.street.step3' : 'ref.step3b') : `ref.step${i}`) as 'ref.step1')}</p>
               </li>
             ))}
           </ol>
-          <p className="rounded-xl bg-amber-50 p-3 text-xs font-semibold text-amber-800 dark:bg-amber-500/10 dark:text-amber-300">⚠️ {t('ref.rulePlan')}</p>
+          {!isStreet && <p className="rounded-xl bg-amber-50 p-3 text-xs font-semibold text-amber-800 dark:bg-amber-500/10 dark:text-amber-300">⚠️ {t('ref.rulePlan')}</p>}
           {d && (
             <>
               <div>
@@ -84,7 +85,7 @@ export default function InvitePage() {
           </div>
           <h2 className="mb-2 mt-5 text-sm font-bold">{t('ref.tiersTitle')}</h2>
           <ul className="grid grid-cols-2 gap-2 text-sm">
-            {[[1, '15%'], [2, '20%'], [3, '30%'], [4, '30%']].map(([n, prize]) => {
+            {(isStreet ? [[1, '20%']] : [[1, '15%'], [2, '20%'], [3, '30%'], [4, '30%']]).map(([n, prize]) => {
               const done = (d?.paying ?? 0) >= Number(n);
               return (
                 <li key={n} className={`rounded-xl border p-2.5 ${done ? 'border-emerald-300 bg-emerald-50 dark:border-emerald-500/30 dark:bg-emerald-500/10' : 'border-slate-200 dark:border-slate-800'}`}>
@@ -110,7 +111,7 @@ export default function InvitePage() {
               ))}
             </ul>
           )}
-          <p className={`mt-4 text-xs ${ui.muted}`}>{t('ref.rulePlan')} {t('ref.rules2')}</p>
+          <p className={`mt-4 text-xs ${ui.muted}`}>{isStreet ? t('ref.street.rules') : `${t('ref.rulePlan')} ${t('ref.rules2')}`}</p>
         </Card>
       </div>
     </div>
