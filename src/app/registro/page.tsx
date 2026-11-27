@@ -14,13 +14,13 @@ import { SiteHeader, SiteFooter, ui, useCountryChange, PasswordInput } from '../
 import type { DictKey } from '../i18n/es';
 import { useQ, type QKey } from './quiz-text';
 import {
-  GROUPS, ACTIVITIES, categoriesFor, primaryGroup, groupsOf, canJoin, modulesFor, rolesFor, hasRestaurant, hasSales, kindFor, UNSURE_LIMIT,
+  GROUPS, ACTIVITIES, categoriesFor, primaryGroup, groupsOf, canJoin, modulesFor, hasRestaurant, hasSales, kindFor, UNSURE_LIMIT,
   type Sells, type Tri, type Group, type Specifics,
   STREET, isStreet,
 } from './quiz-logic';
 
 const TERMS_VERSION = '2026-11';
-const STEP_KEYS: QKey[] = ['step.sells', 'step.rubro', 'step.team', 'step.details', 'step.summary', 'step.account'];
+const STEP_KEYS: QKey[] = ['step.sells', 'step.team', 'step.rubro', 'step.details', 'step.summary', 'step.account'];
 const LAST = STEP_KEYS.length - 1;
 
 /** Botón de opción: grande, claro, con marca de elegido. */
@@ -136,7 +136,6 @@ export default function RegistroPage() {
   // 3) Equipo
   const [teamSize, setTeamSize] = useState<string | null>(null);   // s0..s6 | unsure
   const [roles, setRoles] = useState<TeamRole[]>([]);
-  const [rolesTouched, setRolesTouched] = useState(false);
   // 4) Detalles
   const [tables, setTables] = useState<Tri | null>(null);
   const [delivery, setDelivery] = useState<Tri | null>(null);
@@ -180,10 +179,11 @@ export default function RegistroPage() {
   const teamMax = teamSize === 'unsure' ? 1 : TEAM_SIZES.find((x) => x.id === teamSize)?.max ?? 0;
   const branchMax = BRANCH_SIZES.find((x) => x.id === branchSize)?.max ?? 1;
   const modules = modulesFor(allCats, sp);
-  const suggested = rolesFor(allCats, sp);
   const allowedRoles = suggestedRoles(allCats); // solo los cargos que la matriz permite para el/los rubros elegidos
-  const shownRoles = (rolesTouched ? roles : suggested).filter((x) => allowedRoles.includes(x));
-  const toggleRole = (r: TeamRole) => { setRolesTouched(true); const cur = shownRoles; setRoles(cur.includes(r) ? cur.filter((x) => x !== r) : [...cur, r]); };
+  const shownRoles = roles.filter((x) => allowedRoles.includes(x)); // el cliente decide; no vienen marcados de entrada
+  const toggleRole = (r: TeamRole) => setRoles(shownRoles.includes(r) ? shownRoles.filter((x) => x !== r) : [...shownRoles, r]);
+  const addRoles = (add: TeamRole[]) => setRoles((cur) => [...new Set([...cur, ...add])]);
+  const dropRoles = (rem: TeamRole[]) => setRoles((cur) => cur.filter((x) => !rem.includes(x)));
   const plan = recommendPlan(plans, teamMax, branchMax);
 
   const showTables = hasRestaurant(allCats);
@@ -230,10 +230,10 @@ export default function RegistroPage() {
       if (!streetOnly && !bizCount) return qq('val.biz');
       if (!streetOnly && !branchSize) return qq('val.br');
     }
-    if (step === 1) {
+    if (step === 1 && !teamSize) return qq('val.team');
+    if (step === 2) {
       for (let i = 0; i < nBiz; i++) if (catsOf(i).length === 0 && !rubroUnsure[i]) return qq('rubro.missing');
     }
-    if (step === 2 && !teamSize) return qq('val.team');
     if (step === 3) {
       if ((showTables && !tables) || (showDelivery && !delivery) || (showCredit && !credit) || !invoice || wantAi === null) return qq('det.missing');
     }
@@ -255,7 +255,7 @@ export default function RegistroPage() {
     if (msg) return;
     if (step < LAST) {
       // Muchas dudas, o ningún rubro claro: lo atendemos en persona en vez de armarle algo que no necesita
-      if (step <= 3 && (unsureList.length >= UNSURE_LIMIT || (step >= 1 && allCats.length === 0))) { setHelpMode('auto'); return; }
+      if (step <= 3 && (unsureList.length >= UNSURE_LIMIT || (step >= 2 && allCats.length === 0))) { setHelpMode('auto'); return; }
       return setStep(step + 1);
     }
 
@@ -376,7 +376,7 @@ export default function RegistroPage() {
             </>
           )}
 
-          {!helpMode && step === 1 && (
+          {!helpMode && step === 2 && (
             <>
               {Array.from({ length: nBiz }, (_, i) => {
                 const sel = catsOf(i);
@@ -449,7 +449,7 @@ export default function RegistroPage() {
             </>
           )}
 
-          {!helpMode && step === 2 && (
+          {!helpMode && step === 1 && (
             <>
               <h2 className="text-lg font-bold">{qq('team.q')}</h2>
               <p className={`text-sm ${ui.muted}`}>{qq('team.hint')}</p>
@@ -460,7 +460,17 @@ export default function RegistroPage() {
 
               {teamSize === 's0' && <p className="mt-6 rounded-xl border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200">🙋 {qq('team.solo')}</p>}
               {(teamSize === 's1' || teamSize === 's2') && <p className="mt-6 rounded-xl border border-blue-300 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-200">💡 {qq('team.small')}</p>}
-              {teamSize && teamSize !== 's0' && (
+            </>
+          )}
+
+          {!helpMode && step === 3 && (
+            <>
+              <h2 className="text-lg font-bold">{qq('det.title')}</h2>
+              <div className="mt-4">
+                {showTables && <TriRow q={qq('det.tables')} value={tables} onChange={(v) => { setTables(v); setError(''); if (v === 'yes') addRoles(['waiter', 'kitchen']); if (v === 'no') dropRoles(['waiter']); }} unsureLabel={qq('unsure')} />}
+                {showDelivery && <TriRow q={qq('det.delivery')} value={delivery} onChange={(v) => { setDelivery(v); setError(''); if (v === 'yes') addRoles(['delivery']); if (v === 'no') dropRoles(['delivery']); }} unsureLabel={qq('unsure')} />}
+                {showCredit && <TriRow q={qq('det.credit')} value={credit} onChange={(v) => { setCredit(v); setError(''); if (v === 'yes') addRoles(['collector']); if (v === 'no') dropRoles(['collector']); }} unsureLabel={qq('unsure')} />}
+              {!solo && allowedRoles.length > 0 && (
                 <>
                   <h2 className="mt-6 text-lg font-bold">{qq('team.rolesQ')}</h2>
                   <p className={`text-sm ${ui.muted}`}>{qq('team.rolesHint')}</p>
@@ -477,16 +487,6 @@ export default function RegistroPage() {
                   </div>
                 </>
               )}
-            </>
-          )}
-
-          {!helpMode && step === 3 && (
-            <>
-              <h2 className="text-lg font-bold">{qq('det.title')}</h2>
-              <div className="mt-4">
-                {showTables && <TriRow q={qq('det.tables')} value={tables} onChange={(v) => { setTables(v); setError(''); }} unsureLabel={qq('unsure')} />}
-                {showDelivery && <TriRow q={qq('det.delivery')} value={delivery} onChange={(v) => { setDelivery(v); setError(''); }} unsureLabel={qq('unsure')} />}
-                {showCredit && <TriRow q={qq('det.credit')} value={credit} onChange={(v) => { setCredit(v); setError(''); }} unsureLabel={qq('unsure')} />}
 
                 <h3 className="mt-5 text-base font-bold first:mt-0">{qq('det.invoice')}</h3>
                 <div className="mt-2 grid grid-cols-3 gap-2">
