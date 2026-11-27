@@ -1322,6 +1322,7 @@ const zh: Record<DictKey, string> = {
   "loan.every": "频率",
   "loan.firstDue": "首期日期",
   "loan.creditDate": "信贷日期",
+  "loan.payDate": "付款日期",
   "loan.total": "应还总额",
   "loan.each": "每期 ({n})",
   "loan.ends": "结束",

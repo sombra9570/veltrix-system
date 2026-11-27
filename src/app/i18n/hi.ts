@@ -1322,6 +1322,7 @@ const hi: Record<DictKey, string> = {
   "loan.every": "आवृत्ति",
   "loan.firstDue": "पहली किस्त",
   "loan.creditDate": "क्रेडिट की तारीख",
+  "loan.payDate": "भुगतान की तारीख",
   "loan.total": "कुल देय",
   "loan.each": "किस्त ({n})",
   "loan.ends": "समाप्ति",

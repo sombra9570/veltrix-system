@@ -1322,6 +1322,7 @@ const ar: Record<DictKey, string> = {
   "loan.every": "التكرار",
   "loan.firstDue": "القسط الأول",
   "loan.creditDate": "تاريخ الائتمان",
+  "loan.payDate": "تاريخ الدفع",
   "loan.total": "الإجمالي المستحق",
   "loan.each": "القسط ({n})",
   "loan.ends": "ينتهي",

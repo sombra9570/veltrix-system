@@ -1322,6 +1322,7 @@ const ko: Record<DictKey, string> = {
   "loan.every": "주기",
   "loan.firstDue": "첫 회차",
   "loan.creditDate": "대출 날짜",
+  "loan.payDate": "납부일",
   "loan.total": "총 상환액",
   "loan.each": "회당 ({n})",
   "loan.ends": "종료",

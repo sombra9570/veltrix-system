@@ -1331,6 +1331,7 @@ const es = {
   "loan.every": "Frecuencia",
   "loan.firstDue": "Primera cuota",
   "loan.creditDate": "Fecha del crédito",
+  "loan.payDate": "Fecha de pago",
   "loan.total": "Total a pagar",
   "loan.each": "Cuota ({n})",
   "loan.ends": "Termina",

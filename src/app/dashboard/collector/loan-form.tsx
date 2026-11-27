@@ -39,6 +39,7 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
   const [newC, setNewC] = useState<{ name: string; phone: string; address: string; doc: string } | null>(null);
   const [amount, setAmount] = useState('');
   const [interest, setInterest] = useState(String(policy.interest_default));
+  const COUNT_BY_EVERY: Record<number, string> = { 1: '24', 7: '4', 15: '2', 30: '1' };
   const [count, setCount] = useState('24');
   const [every, setEvery] = useState(1);
   const [first, setFirst] = useState(addDays(today, 1));
@@ -47,7 +48,7 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
   const [err, setErr] = useState('');
 
   useEffect(() => { if (navigator.onLine) rpc<RouteCustomer[]>('route_customers', { p_route: routeId }).then((x) => setCustomers(x ?? [])).catch(() => setCustomers(localCustomers)); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [routeId, online]);
-  useEffect(() => { setFirst(addDays(today, every)); }, [every, today]);
+  useEffect(() => { if (!(every === 30 && parseInt(count, 10) === 1)) setFirst(addDays(today, every)); }, [every, today, count]);
 
   const p = parseAmount(amount);
   const i = canInterest ? parseAmount(interest) : Number(policy.interest_default);
@@ -165,10 +166,16 @@ export function LoanForm({ routeId, today, policy, canInterest, canCustomers, fm
         </div>
         <div>
           <label className={ui.label}>{t('loan.every')}</label>
-          <select value={every} onChange={(e) => setEvery(Number(e.target.value))} className={ui.input}>
+          <select value={every} onChange={(e) => { const v = Number(e.target.value); setEvery(v); setCount(COUNT_BY_EVERY[v] ?? '24'); }} className={ui.input}>
             {FREQS.map(([d, k]) => <option key={d} value={d}>{t(`card.f.${k}` as DictKey)}</option>)}
           </select>
         </div>
+        {every === 30 && n === 1 && (
+          <div className="col-span-2">
+            <label className={ui.label}>{t('loan.payDate')}</label>
+            <input type="date" min={today} value={first} onChange={(e) => setFirst(e.target.value)} className={ui.input} />
+          </div>
+        )}
         <div className="col-span-2">
           <label className={ui.label}>{t('loan.creditDate')}</label>
           <input type="date" value={today} readOnly className={ui.input} />

@@ -1322,6 +1322,7 @@ const de: Record<DictKey, string> = {
   "loan.every": "Häufigkeit",
   "loan.firstDue": "Erste Rate",
   "loan.creditDate": "Kreditdatum",
+  "loan.payDate": "Zahlungsdatum",
   "loan.total": "Gesamt zu zahlen",
   "loan.each": "Rate ({n})",
   "loan.ends": "Endet",
