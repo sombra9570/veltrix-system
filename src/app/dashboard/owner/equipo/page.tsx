@@ -255,7 +255,8 @@ export default function TeamPage() {
   };
 
   const users = overview?.usage.users;
-  const full = users && users.max !== null && users.used >= users.max;
+  const street = overview?.street ?? null; // cobranza en calle: se rige por cobradores y supervisores contratados, no por un plan general
+  const full = !street && users && users.max !== null && users.used >= users.max;
   const branchName = (id: string) => branches.find((b) => b.id === id)?.name ?? '';
 
   return (
@@ -266,7 +267,12 @@ export default function TeamPage() {
           <p className={`text-sm ${ui.muted}`}>{t('team.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
-          {users && (
+          {street ? (
+            <span className={`text-right text-sm font-semibold ${ui.muted}`}>
+              {t('street.mine.collectors', { n: street.collectors.max, used: street.collectors.used })}<br />
+              {t('street.mine.supervisors', { n: street.supervisors.max, used: street.supervisors.used })}
+            </span>
+          ) : users && (
             <span className={`text-sm font-semibold ${ui.muted}`}>
               {users.max === null ? users.used : t('owner.of', { used: users.used, max: users.max })}
             </span>
