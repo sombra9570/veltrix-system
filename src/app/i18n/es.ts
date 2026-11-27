@@ -2238,6 +2238,7 @@ const es = {
   "cx.near.refresh": "Actualizar ubicación",
   'cx.near.locating': 'Buscando su ubicación…',
   'cx.near.noGps': 'No fue posible obtener su ubicación. Active el GPS y otorgue el permiso.',
+  "cx.nc.gpsDenied": "El permiso de ubicación está bloqueado. Actívalo para este sitio en los ajustes del navegador (candado junto a la dirección → Permisos → Ubicación) y vuelve a intentar.",
   "cx.near.none": "No hay clientes a menos de {m} m.",
   "cx.near.noSaved": "Estos clientes no tienen ubicación guardada.",
   "cx.near.dist": "a {m} m",

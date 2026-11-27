@@ -2229,6 +2229,7 @@ const ja: Record<DictKey, string> = {
   "cx.near.refresh": "位置を更新",
   "cx.near.locating": "現在地を取得中…",
   "cx.near.noGps": "位置を取得できません。GPSをオンにして許可してください。",
+  "cx.nc.gpsDenied": "位置情報の権限がブロックされています。ブラウザの設定（アドレス横の鍵アイコン → 権限 → 位置情報）でこのサイトに許可してから、もう一度お試しください。",
   "cx.near.none": "{m} m 以内に顧客はいません。",
   "cx.near.noSaved": "これらの顧客には位置情報がありません。",
   "cx.near.dist": "{m} m",

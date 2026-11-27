@@ -2229,6 +2229,7 @@ const fr: Record<DictKey, string> = {
   "cx.near.refresh": "Actualiser la position",
   "cx.near.locating": "Recherche de votre position…",
   "cx.near.noGps": "Position introuvable. Activez le GPS et autorisez l’accès.",
+  "cx.nc.gpsDenied": "L'autorisation de localisation est bloquée. Autorisez-la pour ce site dans les réglages du navigateur (cadenas près de l'adresse → Autorisations → Localisation) puis réessayez.",
   "cx.near.none": "Aucun client à moins de {m} m.",
   "cx.near.noSaved": "Ces clients n’ont pas de position enregistrée.",
   "cx.near.dist": "à {m} m",

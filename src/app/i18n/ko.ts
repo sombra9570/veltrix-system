@@ -2229,6 +2229,7 @@ const ko: Record<DictKey, string> = {
   "cx.near.refresh": "위치 새로고침",
   "cx.near.locating": "위치 확인 중…",
   "cx.near.noGps": "위치를 가져올 수 없습니다. GPS를 켜고 권한을 허용하세요.",
+  "cx.nc.gpsDenied": "위치 권한이 차단되어 있습니다. 브라우저 설정(주소 옆 자물쇠 → 권한 → 위치)에서 이 사이트를 허용한 뒤 다시 시도하세요.",
   "cx.near.none": "{m} m 이내에 고객이 없습니다.",
   "cx.near.noSaved": "이 고객들은 저장된 위치가 없습니다.",
   "cx.near.dist": "{m} m",

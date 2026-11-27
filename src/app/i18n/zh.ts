@@ -2229,6 +2229,7 @@ const zh: Record<DictKey, string> = {
   "cx.near.refresh": "刷新位置",
   "cx.near.locating": "正在定位…",
   "cx.near.noGps": "无法获取位置，请开启 GPS 并授权。",
+  "cx.nc.gpsDenied": "定位权限已被阻止。请在浏览器设置中为此网站允许定位（地址栏旁的锁图标 → 权限 → 位置），然后重试。",
   "cx.near.none": "{m} 米内没有客户。",
   "cx.near.noSaved": "这些客户没有保存位置。",
   "cx.near.dist": "距离 {m} 米",

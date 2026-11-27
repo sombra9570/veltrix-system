@@ -18,29 +18,31 @@ export type CustomerOp = {
 const BUCKET = 'customer-files';
 type Gps = { lat: number; lng: number } | null;
 
-/** Ubicación precisa del teléfono (hasta 15 s) */
-function readGps(): Promise<Gps> {
-  const once = (high: boolean, timeout: number, maxAge: number) => new Promise<Gps>((resolve) => {
-    if (!('geolocation' in navigator)) return resolve(null);
+/** Ubicación precisa del teléfono (hasta 15 s). Devuelve también el motivo si falla: 'denied' (permiso negado) u 'other'. */
+type GpsRead = { g: Gps; err: 'denied' | 'other' | null };
+function readGps(): Promise<GpsRead> {
+  const once = (high: boolean, timeout: number, maxAge: number) => new Promise<GpsRead>((resolve) => {
+    if (!('geolocation' in navigator)) return resolve({ g: null, err: 'other' });
     navigator.geolocation.getCurrentPosition(
-      (p) => resolve({ lat: +p.coords.latitude.toFixed(6), lng: +p.coords.longitude.toFixed(6) }),
-      () => resolve(null),
+      (p) => resolve({ g: { lat: +p.coords.latitude.toFixed(6), lng: +p.coords.longitude.toFixed(6) }, err: null }),
+      (e) => resolve({ g: null, err: e.code === 1 ? 'denied' : 'other' }),
       { enableHighAccuracy: high, timeout, maximumAge: maxAge },
     );
   });
   // Celular: GPS preciso. Computador (sin GPS): si falla, se reintenta con la ubicación aproximada de la red.
-  return once(true, 10000, 0).then((g) => g ?? once(false, 15000, 0));
+  // Si el permiso está negado no se reintenta: hay que activarlo en el navegador.
+  return once(true, 10000, 0).then((r) => (r.g || r.err === 'denied' ? r : once(false, 15000, 0)));
 }
 
 function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) => void; label: string }) {
   const { t } = useT();
   const [busy, setBusy] = useState(false);
-  const [fail, setFail] = useState(false);
+  const [fail, setFail] = useState<'denied' | 'other' | null>(null);
   const get = async () => {
-    setBusy(true); setFail(false);
-    const g = await readGps();
+    setBusy(true); setFail(null);
+    const r = await readGps();
     setBusy(false);
-    if (g) onChange(g); else setFail(true);
+    if (r.g) onChange(r.g); else setFail(r.err ?? 'other');
   };
   return (
     <div className="space-y-1">
@@ -48,7 +50,7 @@ function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) 
         📍 {busy ? t('common.wait') : value ? t('cx.nc.gpsSet') : label}
       </button>
       {value && <p className={`text-xs ${ui.muted}`}>{value.lat}, {value.lng} · {t('cx.nc.gpsRetry')}</p>}
-      {fail && <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">{t('cx.near.noGps')}</p>}
+      {fail && <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">{fail === 'denied' ? t('cx.nc.gpsDenied') : t('cx.near.noGps')}</p>}
     </div>
   );
 }
