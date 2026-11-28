@@ -19,7 +19,7 @@ export type ProfCust = {
 export type ProfTab = 'info' | 'acc' | 'loc' | 'chg';
 
 /** Lista: solo el nombre del cliente (con su color de calificación). Al tocarlo se abre la ficha. */
-export function CustomerNames({ list, onPick, selId }: { list: { id: string; name: string; rating?: string; visited_today?: boolean }[]; onPick: (id: string) => void; selId?: string | null }) {
+export function CustomerNames({ list, onPick, selId }: { list: { id: string; name: string; rating?: string; overdue?: number }[]; onPick: (id: string) => void; selId?: string | null }) {
   const { t } = useT();
   return (
     <ul className="space-y-2">
@@ -27,7 +27,7 @@ export function CustomerNames({ list, onPick, selId }: { list: { id: string; nam
       {list.map((c) => (
         <li key={c.id}>
           <button type="button" onClick={() => onPick(c.id)}
-            className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer ${ui.card} ${selId === c.id ? 'ring-2 ring-blue-500' : ''}`}>
+            className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer ${ui.card} ${Number(c.overdue ?? 0) > 0 ? '!border-2 !border-red-500' : ''} ${selId === c.id ? 'ring-2 ring-blue-500' : ''}`}>
             <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${RATING_DOT[c.rating ?? 'new'] ?? RATING_DOT.new}`} />
             <span className="min-w-0 flex-1 break-words font-bold leading-tight">{c.name}</span>
             <span className={`shrink-0 ${ui.muted}`}>›</span>
