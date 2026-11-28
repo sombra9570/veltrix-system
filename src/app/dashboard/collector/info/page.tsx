@@ -18,7 +18,7 @@ type Cust = { id: string; name: string; balance: number; credits?: Credit[] };
 type R = {
   id: string; name: string; branch: string; currency: string; today: string;
   unsettled_cash: number; unsettled_digital: number; unsettled_expenses: number; unsettled_loans?: number;
-  fund_balance?: number; commission_pct?: number; period?: { investments: number };
+  fund_balance?: number; commission_pct?: number; period?: { investments: number; opening?: number };
   customers: Cust[];
 };
 type D = { generated_at: string; routes: R[] };
@@ -81,10 +81,9 @@ export default function RouteInfoPage() {
 
   const fmt = (n: number) => money(Number(n), r.currency, lang);
   const sp = split[r.id]?.[freq] ?? { collected: 0, lent: 0 };
-  const loans = Number(r.unsettled_loans ?? 0);
   const fund = r.fund_balance === undefined ? null : Number(r.fund_balance);
-  const inHand = Number(r.unsettled_cash) - Number(r.unsettled_expenses) - loans;
-  const opening = fund === null ? 0 : fund - inHand;
+  // Caja anterior = lo que quedó al cerrar la última liquidación; sin liquidación anterior es 0
+  const opening = Number(r.period?.opening ?? 0);
   const pct = Number(r.commission_pct ?? 3);
 
   const rows: [string, string, string?][] = [
