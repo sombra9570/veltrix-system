@@ -38,6 +38,26 @@ export function CustomerNames({ list, onPick, selId }: { list: { id: string; nam
   );
 }
 
+/** Filtro por frecuencia de cobro (todos / diaria / semanal / quincenal / mensual), igual en todos los roles */
+export type FreqFilter = 'all' | 'daily' | 'weekly' | 'biweekly' | 'monthly';
+export function FreqChips({ customers, freq, onFreq }: { customers: { credits?: Credit[] }[]; freq: FreqFilter; onFreq: (f: FreqFilter) => void }) {
+  const { t } = useT();
+  return (
+    <div className="flex flex-wrap gap-1">
+      {(['all', 'daily', 'weekly', 'biweekly', 'monthly'] as const).map((f) => {
+        const n = f === 'all' ? customers.length : customers.filter((c) => (c.credits ?? []).some((k) => freqOf(k) === f)).length;
+        if (f !== 'all' && n === 0) return null;
+        return (
+          <button key={f} type="button" onClick={() => onFreq(f)}
+            className={`rounded-full px-3 py-1 text-xs font-bold cursor-pointer ${freq === f ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'border border-slate-300 dark:border-slate-700'}`}>
+            {f === 'all' ? t('card.all') : t(`card.f.${f}` as DictKey)} · {n}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 /** Barra inferior de la ficha */
 export function ProfileTabs({ tab, onTab, canChange }: { tab: ProfTab; onTab: (t: ProfTab) => void; canChange: boolean }) {
   const { t } = useT();

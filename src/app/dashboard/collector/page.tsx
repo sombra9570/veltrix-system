@@ -23,7 +23,7 @@ import { NewClient, GpsButton, type CustomerOp } from './new-client';
 import { getFile, delFile } from './offline-files';
 import { extFor } from '../image';
 import { Credits } from './credits';
-import { CustomerNames, CustomerProfile, ProfileTabs } from '../customer-profile';
+import { CustomerNames, CustomerProfile, FreqChips, ProfileTabs } from '../customer-profile';
 import { SettingsScreen, payQrUrl } from './settings';
 import { useBackButton } from '../use-back';
 import { readSaleMode, cacheSaleMode, creditErrorKey, type CreditOp } from './credit-ops';
@@ -140,7 +140,7 @@ export default function CollectorPage() {
   const [loanFor, setLoanFor] = useState<{ id: string; name: string } | null>(null);
   useEffect(() => { if (panel !== 'loan') setLoanFor(null); }, [panel]);
   useEffect(() => { setSheetTab('info'); setSheetAcct(null); }, [sel?.id]);
-  const freq: Freq | 'all' = 'all';
+  const [freq, setFreq] = useState<Freq | 'all'>('all');
   // Se dibujan de a 25 clientes (tarjetas pesan): "Ver más" agrega el resto
   const [limit, setLimit] = useState(25);
   useEffect(() => { setLimit(25); }, [freq, routeId]);
@@ -636,6 +636,7 @@ export default function CollectorPage() {
       {screen === 'list' && (
         <>
           <input type="search" placeholder={t('cx.search')} value={q} onChange={(e) => setQ(e.target.value)} className={ui.input} />
+          <FreqChips customers={route.customers} freq={freq} onFreq={setFreq} />
           <CustomerNames list={shownQ} selId={sel?.id} onPick={(id) => { const c = shownQ.find((x) => x.id === id); if (c) { setSel(c); setPanel(null); } }} />
           <ShowMore rest={shownAllQ.length - shownQ.length} onClick={() => setLimit((x) => x + 25)} />
         </>

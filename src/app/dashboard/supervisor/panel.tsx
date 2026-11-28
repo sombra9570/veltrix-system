@@ -11,7 +11,7 @@ import { MenuTile } from '../collector/tiles';
 import { freqOf, type Credit, type Freq } from '../collector/credit-card';
 import { ShowMore } from '../paged';
 import { Credits } from '../collector/credits';
-import { CustomerNames, CustomerProfile, ProfileTabs, type ProfTab } from '../customer-profile';
+import { CustomerNames, CustomerProfile, FreqChips, ProfileTabs, type ProfTab } from '../customer-profile';
 import { NewClient } from '../collector/new-client';
 import { CutForm, type Period } from '../collector/cut-form';
 import { DeliveryMap, type MapPoint } from '../delivery-map';
@@ -126,7 +126,7 @@ export default function SupPanel() {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState('');
   const [phone, setPhone] = useState('');
-  const freq: Freq | 'all' = 'all';
+  const [freq, setFreq] = useState<Freq | 'all'>('all');
   const [sheetTab, setSheetTab] = useState<ProfTab>('info');
   const [sheetAcct, setSheetAcct] = useState<string | null>(null);
   useEffect(() => { setSheetTab('info'); setSheetAcct(null); }, [sel?.id]);
@@ -273,6 +273,7 @@ export default function SupPanel() {
       {screen === 'list' && !sel && (
         <div className="space-y-3">
           <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('cust.search')} className={ui.input} />
+          <FreqChips customers={d.customers} freq={freq} onFreq={setFreq} />
           <CustomerNames list={list} onPick={(id) => { const c = list.find((x) => x.id === id); if (c) { setSel(c); setPhone(c.phone ?? ''); } }} />
           <ShowMore rest={listAll.length - list.length} onClick={() => setLimit((x) => x + 25)} />
         </div>

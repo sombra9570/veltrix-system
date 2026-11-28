@@ -9,10 +9,10 @@ import type { DictKey } from '../../../i18n/es';
 import { money } from '../../format';
 import { useOwner, friendlyError } from '../owner-context';
 import { MenuTile } from '../../collector/tiles';
-import { CreditCard, type Credit } from '../../collector/credit-card';
+import { CreditCard, freqOf, type Credit } from '../../collector/credit-card';
 import { CutForm, type Period } from '../../collector/cut-form';
 import { DeliveryMap, type MapPoint } from '../../delivery-map';
-import { CustomerNames, CustomerProfile, ProfileTabs, type ProfTab } from '../../customer-profile';
+import { CustomerNames, CustomerProfile, FreqChips, ProfileTabs, type FreqFilter, type ProfTab } from '../../customer-profile';
 import { useBackButton } from '../../use-back';
 
 /* Pantalla de una ruta de cobro (administrador): lista de clientes, mapa, ajustes, información y liquidación */
@@ -51,6 +51,7 @@ function RouteScreen() {
   const [sheetAcct, setSheetAcct] = useState<string | null>(null);
   useEffect(() => { setSheetTab('info'); setSheetAcct(null); }, [sel?.id]);
   const [q, setQ] = useState('');
+  const [freq, setFreq] = useState<FreqFilter>('all');
   const [capIn, setCapIn] = useState('');
   const [edit, setEdit] = useState<{ name: string; phone: string; address: string; tax_id: string } | null>(null);
   useEffect(() => { setEdit(null); }, [sel?.id]);
@@ -98,8 +99,8 @@ function RouteScreen() {
   const m = useCallback((n: number) => money(Number(n), cur, lang), [cur, lang]);
   const list = useMemo(() => {
     const s = q.trim().toLowerCase();
-    return custs.filter((c) => !s || c.name.toLowerCase().includes(s) || (c.address ?? '').toLowerCase().includes(s) || (c.phone ?? '').includes(s));
-  }, [custs, q]);
+    return custs.filter((c) => (freq === 'all' || c.credits.some((k) => freqOf(toCredit(k)) === freq)) && (!s || c.name.toLowerCase().includes(s) || (c.address ?? '').toLowerCase().includes(s) || (c.phone ?? '').includes(s)));
+  }, [custs, q, freq]);
   const points: MapPoint[] = custs.filter((c) => c.lat != null && c.lng != null).map((c) => ({
     lat: Number(c.lat), lng: Number(c.lng), label: c.name, icon: Number(c.overdue) > 0 ? '🔴' : '📍',
   }));
@@ -185,6 +186,7 @@ function RouteScreen() {
       {screen === 'list' && !sel && (
         <div className="space-y-3">
           <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('cust.search')} className={ui.input} />
+          <FreqChips customers={custs.map((c) => ({ credits: c.credits.map(toCredit) }))} freq={freq} onFreq={setFreq} />
           <CustomerNames list={list} onPick={(id) => { const c = list.find((x) => x.id === id); if (c) setSel(c); }} />
         </div>
       )}
