@@ -19,7 +19,7 @@ import { CutForm } from './cut-form';
 import { SignalButton } from './signal';
 import { MenuTile } from './tiles';
 import { NearbyScreen, NEAR_METERS, distanceM } from './nearby';
-import { NewClient, type CustomerOp } from './new-client';
+import { NewClient, GpsButton, type CustomerOp } from './new-client';
 import { getFile, delFile } from './offline-files';
 import { extFor } from '../image';
 import { Credits } from './credits';
@@ -49,7 +49,7 @@ type Route = {
   unsettled_cash: number; unsettled_digital: number; unsettled_expenses: number; unsettled_loans?: number;
   fund_balance?: number; fund_float?: number;
   period?: Period; liquidations?: Liquidation[]; days?: DayRow[]; can_liquidate?: boolean; can_invest?: boolean;
-  policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_no_photo?: boolean; can_no_id_photo?: boolean; can_gallery?: boolean; can_interest?: boolean;
+  policy?: LoanPolicy; can_loan?: boolean; can_customers?: boolean; can_no_photo?: boolean; can_no_id_photo?: boolean; can_gallery?: boolean; can_change_loc?: boolean; can_interest?: boolean;
   can_expenses?: boolean; can_portfolio?: boolean; can_settings?: boolean; can_delete_credits?: boolean; can_delete_customers?: boolean; can_delete_installments?: boolean; commission_pct?: number; locked?: boolean; max_loan?: number; pay_qr?: string | null; pay_qr_note?: string | null; org_id?: string; branch_id?: string; own_qr?: boolean; notices_unread?: number;
   customers: Customer[]; settlements: Settlement[];
 };
@@ -134,7 +134,7 @@ export default function CollectorPage() {
   const [sel, setSel] = useState<Customer | null>(null);
   const [saleMode, setSaleMode] = useState<{ mode: 'loan' | 'merch'; can: boolean } | null>(null);
   const [panel, setPanel] = useState<'pay' | 'visit' | 'expense' | 'settle' | 'loan' | null>(null);
-  const [sheetTab, setSheetTab] = useState<'info' | 'acc'>('info');
+  const [sheetTab, setSheetTab] = useState<'info' | 'acc' | 'loc' | 'chg'>('info');
   const [sheetAcct, setSheetAcct] = useState<string | null>(null);
   const [loanFor, setLoanFor] = useState<{ id: string; name: string } | null>(null);
   useEffect(() => { if (panel !== 'loan') setLoanFor(null); }, [panel]);
@@ -723,7 +723,8 @@ export default function CollectorPage() {
 
             {sel && !panel && (
               <CustomerSheet locked={!!route.locked} c={selNow ?? sel} fmt={fmt} qr={route.pay_qr ?? null} online={online} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
-                tab={sheetTab} acct={sheetAcct} onAcct={setSheetAcct}
+                tab={sheetTab} acct={sheetAcct} onAcct={setSheetAcct} canChange={!!route.can_change_loc && !route.locked}
+                onSaveLoc={async (lat, lng) => { try { await rpc('collector_set_customer_location', { p_route: route.id, p_customer: sel.id, p_lat: lat, p_lng: lng }); await patch(route.id, { customers: [sel.id] }); flash(true, t('cx.loc.saved')); setSheetTab('loc'); } catch (e) { const m = (e as Error).message; flash(false, m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic')); } }}
                 renderCards={(only) => (
                   <Credits only={only} locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? (o, ns) => reverseInst(sel.id, o, ns) : undefined} c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
                 )}
@@ -732,11 +733,11 @@ export default function CollectorPage() {
             )}
             {sel && !panel && (
               <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] dark:border-slate-800 dark:bg-slate-900">
-                <div className="mx-auto grid max-w-xl grid-cols-2">
-                  {([['info', '👤', 'cx.tab.info'], ['acc', '💳', 'cx.tab.accounts']] as const).map(([k, ic, lk]) => (
+                <div className="mx-auto flex max-w-xl">
+                  {([['info', '👤', 'cx.tab.info'], ['acc', '💳', 'cx.tab.accounts'], ['loc', '📍', 'cx.tab.loc'], ...(route.can_change_loc && !route.locked ? [['chg', '🎯', 'cx.tab.changeLoc']] : [])] as [typeof sheetTab, string, string][]).map(([k, ic, lk]) => (
                     <button key={k} type="button" onClick={() => { setSheetTab(k); setSheetAcct(null); }}
-                      className={`flex flex-col items-center gap-0.5 py-2 text-xs font-bold cursor-pointer ${sheetTab === k ? 'text-blue-600 dark:text-blue-400' : ui.muted}`}>
-                      <span className="text-2xl leading-none">{ic}</span>{t(lk as DictKey)}
+                      className={`flex min-w-0 flex-1 flex-col items-center gap-0.5 px-1 py-2 text-[11px] font-bold cursor-pointer ${sheetTab === k ? 'text-blue-600 dark:text-blue-400' : ui.muted}`}>
+                      <span className="text-2xl leading-none">{ic}</span><span className="max-w-full truncate">{t(lk as DictKey)}</span>
                     </button>
                   ))}
                 </div>
@@ -839,9 +840,10 @@ function DeleteActions({ c, canCredits, canCustomer, online, onDone }: { c: Cust
   );
 }
 
-function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, tab, acct, onAcct, renderCards, extra, locked = false }: {
+function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, tab, acct, onAcct, renderCards, extra, canChange, onSaveLoc, locked = false }: {
+  canChange: boolean; onSaveLoc: (lat: number, lng: number) => Promise<void>;
   locked?: boolean; c: Customer; fmt: (n: number) => string; qr: string | null; online: boolean; onPay: () => void; onVisit: () => void;
-  tab: 'info' | 'acc'; acct: string | null; onAcct: (id: string | null) => void; renderCards: (only?: string) => ReactNode; extra: ReactNode;
+  tab: 'info' | 'acc' | 'loc' | 'chg'; acct: string | null; onAcct: (id: string | null) => void; renderCards: (only?: string) => ReactNode; extra: ReactNode;
 }) {
   const { t, lang } = useT();
   const map = c.lat != null && c.lng != null
@@ -873,8 +875,32 @@ function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, tab, acct, onAcct, 
     return () => { off = true; };
   }, [c.id]);
   const credits = c.credits ?? [];
+  const [newGps, setNewGps] = useState<{ lat: number; lng: number } | null>(null);
+  const [savingLoc, setSavingLoc] = useState(false);
   const ro = 'rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900';
 
+  if (tab === 'loc') {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold">📍 {c.name}</h2>
+        {c.address && <p className={ro}>{c.address}</p>}
+        {c.lat != null && c.lng != null && <p className={`text-xs ${ui.muted}`}>{c.lat}, {c.lng}</p>}
+        {map ? <a href={map} target="_blank" rel="noopener noreferrer" className={`${ui.btnPrimary} w-full py-3`}>📍 {t('col.map')}</a> : <p className={`text-sm ${ui.muted}`}>{t('cx.loc.none')}</p>}
+      </div>
+    );
+  }
+  if (tab === 'chg' && canChange) {
+    return (
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold">📍 {t('cx.tab.changeLoc')}</h2>
+        <GpsButton value={newGps} onChange={setNewGps} label={t('cx.nc.gpsBtn')} />
+        <button type="button" disabled={!newGps || savingLoc || !online} className={`${ui.btnPrimary} w-full py-3`}
+          onClick={async () => { if (!newGps) return; setSavingLoc(true); try { await onSaveLoc(newGps.lat, newGps.lng); setNewGps(null); } finally { setSavingLoc(false); } }}>
+          💾 {t('cx.loc.save')}
+        </button>
+      </div>
+    );
+  }
   if (tab === 'acc') {
     if (acct) return <div className="space-y-4">{renderCards(acct)}</div>;
     return (

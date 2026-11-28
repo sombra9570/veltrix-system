@@ -34,7 +34,7 @@ function readGps(): Promise<GpsRead> {
   return once(true, 10000, 0).then((r) => (r.g || r.err === 'denied' ? r : once(false, 15000, 0)));
 }
 
-function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) => void; label: string }) {
+export function GpsButton({ value, onChange, label }: { value: Gps; onChange: (g: Gps) => void; label: string }) {
   const { t } = useT();
   const [busy, setBusy] = useState(false);
   const [fail, setFail] = useState<'denied' | 'other' | null>(null);
