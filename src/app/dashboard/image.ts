@@ -22,7 +22,14 @@ export async function compressImage(file: File, maxSide = 1600, quality = 0.8, m
     ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
     // WebP; si el navegador no lo sabe (Safari), JPEG
     let blob = await toBlob(canvas, 'image/webp', q);
-    if (!blob || blob.type !== 'image/webp') blob = await toBlob(canvas, 'image/jpeg', q);
+    if (!blob || blob.type !== 'image/webp') {
+      // JPEG no tiene transparencia: se pone fondo blanco para que un PNG transparente no quede negro
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'source-over';
+      blob = await toBlob(canvas, 'image/jpeg', q);
+    }
     if (!blob) throw new Error('PHOTO_UNREADABLE');
     best = blob;
     if (blob.size <= maxBytes) return blob;

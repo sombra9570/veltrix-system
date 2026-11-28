@@ -32,9 +32,14 @@ export function OrgLogo({ path, name, size = 32 }: { path?: string | null; name:
   const url = orgLogoUrl(path);
   const [bad, setBad] = useState(false);
   if (!url || bad) return null;
-  // eslint-disable-next-line @next/next/no-img-element
-  return <img src={url} alt={name} width={size} height={size} onError={() => setBad(true)}
-    className="shrink-0 rounded-lg object-contain" style={{ width: size, height: size }} />;
+  // Siempre sobre un fondo blanco redondeado: se ve bien en modo día y noche, con PNG transparente o logos oscuros
+  return (
+    <span className="grid shrink-0 place-items-center overflow-hidden rounded-lg bg-white ring-1 ring-slate-200 dark:ring-slate-600"
+      style={{ width: size, height: size, padding: Math.max(2, Math.round(size / 10)) }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={url} alt={name} onError={() => setBad(true)} className="h-full w-full object-contain" />
+    </span>
+  );
 }
 
 /** Editor del administrador: nombre y logo de su empresa */
@@ -79,7 +84,7 @@ export function BrandingCard({ orgId }: { orgId: string }) {
     <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
       <p className="text-sm font-bold">{t('brand.title')}</p>
       <div className="mt-3 flex items-center gap-3">
-        <div className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
+        <div className="grid h-16 w-16 shrink-0 place-items-center rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
           {b?.logo ? <OrgLogo path={b.logo} name={b.name} size={64} /> : <span className={`text-[10px] ${ui.muted}`}>{t('brand.noLogo')}</span>}
         </div>
         <div className="flex flex-wrap gap-2">
