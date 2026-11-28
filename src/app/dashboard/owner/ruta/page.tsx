@@ -6,13 +6,13 @@ import { Card, useHeaderSlot } from '../../shell';
 import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
-import { money, whatsappLink } from '../../format';
+import { money } from '../../format';
 import { useOwner, friendlyError } from '../owner-context';
 import { MenuTile } from '../../collector/tiles';
 import { CreditCard, type Credit } from '../../collector/credit-card';
 import { CutForm, type Period } from '../../collector/cut-form';
 import { DeliveryMap, type MapPoint } from '../../delivery-map';
-import { RATING_DOT } from '../../collector/loan-form';
+import { CustomerNames, CustomerProfile, ProfileTabs, type ProfTab } from '../../customer-profile';
 import { useBackButton } from '../../use-back';
 
 /* Pantalla de una ruta de cobro (administrador): lista de clientes, mapa, ajustes, información y liquidación */
@@ -47,6 +47,9 @@ function RouteScreen() {
   const [custs, setCusts] = useState<Cust[]>([]);
   const [fund, setFund] = useState<Fund | null>(null);
   const [sel, setSel] = useState<Cust | null>(null);
+  const [sheetTab, setSheetTab] = useState<ProfTab>('info');
+  const [sheetAcct, setSheetAcct] = useState<string | null>(null);
+  useEffect(() => { setSheetTab('info'); setSheetAcct(null); }, [sel?.id]);
   const [q, setQ] = useState('');
   const [capIn, setCapIn] = useState('');
   const [edit, setEdit] = useState<{ name: string; phone: string; address: string; tax_id: string } | null>(null);
@@ -79,11 +82,12 @@ function RouteScreen() {
   useEffect(() => { setScreen('home'); setSel(null); setMv(null); setRoute(undefined); load(); }, [load]);
 
   const back = () => {
-    if (sel) setSel(null);
+    if (sel && sheetTab === 'acc' && sheetAcct) setSheetAcct(null);
+    else if (sel) setSel(null);
     else if (screen !== 'home') setScreen('home');
     else router.push('/dashboard/owner/rutas');
   };
-  useBackButton((sel ? 1 : 0) + (screen !== 'home' ? 1 : 0), back);
+  useBackButton((sel ? 1 : 0) + (sel && sheetTab === 'acc' && sheetAcct ? 1 : 0) + (screen !== 'home' ? 1 : 0), back);
   useHeaderSlot(route ? {
     title: route.name,
     subtitle: sel ? sel.name : screen === 'home' ? (route.collector ?? '') : t(({ list: 'rt.list', map: 'rt.map', settings: 'rt.settings', info: 'nav.routeInfo', liq: 'rt.liq' } as Record<string, string>)[screen] as DictKey),
@@ -179,58 +183,42 @@ function RouteScreen() {
       )}
 
       {screen === 'list' && !sel && (
-        <Card className="space-y-3">
+        <div className="space-y-3">
           <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('cust.search')} className={ui.input} />
-          {list.length === 0 ? <p className={`text-sm ${ui.muted}`}>{t('rt.noCust')}</p> : (
-            <ul className="divide-y divide-slate-200 dark:divide-slate-800">
-              {list.map((c) => (
-                <li key={c.id}>
-                  <button type="button" onClick={() => setSel(c)} className="flex w-full items-center gap-3 py-3 text-start cursor-pointer">
-                    <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${RATING_DOT[c.rating] ?? RATING_DOT.new}`} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold">{c.name}</span>
-                      <span className={`block truncate text-xs ${ui.muted}`}>{c.address ?? c.phone ?? '—'}</span>
-                    </span>
-                    <span className="shrink-0 text-end text-xs">
-                      <b className="block">{t('rt.owes', { amount: m(c.balance) })}</b>
-                      {Number(c.overdue) > 0 && <span className="font-semibold text-red-600 dark:text-red-400">{t('rt.late', { amount: m(c.overdue) })}</span>}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
+          <CustomerNames list={list} onPick={(id) => { const c = list.find((x) => x.id === id); if (c) setSel(c); }} />
+        </div>
       )}
 
       {screen === 'list' && sel && (
-        <div className="space-y-3">
-          <Card className="space-y-1 text-sm">
-            <p className="text-lg font-extrabold">{sel.name}</p>
-            {sel.phone && <p><a href={whatsappLink(sel.phone)} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-600 dark:text-blue-400">📞 {sel.phone}</a></p>}
-            {sel.address && <p className={ui.muted}>📍 {sel.address}</p>}
-            {sel.tax_id && <p className={ui.muted}>🪪 {sel.tax_id}</p>}
+        <div className="pb-24">
+          <CustomerProfile c={{ ...sel, credits: sel.credits.map(toCredit) }} fmt={m} online tab={sheetTab} acct={sheetAcct} onAcct={setSheetAcct} canChange={false}
+            renderCards={(only) => <>{sel.credits.filter((k) => k.id === only).map((k) => (
+              <Card key={k.id}>
+                <p className={`mb-2 text-xs ${ui.muted}`}>{new Date(k.created).toLocaleDateString(lang)} · {m(k.total)}</p>
+                <CreditCard credit={toCredit(k)} today={today} fmt={m} onSave={() => undefined} readOnly />
+              </Card>
+            ))}</>}
+            extra={<>
             {edit && (
-              <div className="space-y-2 pt-2">
-                <input value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} placeholder={t('cx.nc.name')} className={ui.input} />
-                <input value={edit.tax_id} onChange={(e) => setEdit({ ...edit, tax_id: e.target.value })} placeholder={t('cx.nc.ci')} className={ui.input} />
-                <input type="tel" inputMode="tel" value={edit.phone} onChange={(e) => setEdit({ ...edit, phone: e.target.value })} placeholder={t('cx.nc.phone')} className={ui.input} />
-                <input value={edit.address} onChange={(e) => setEdit({ ...edit, address: e.target.value })} placeholder={t('cx.nc.address')} className={ui.input} />
-                <div className="flex gap-2">
-                  <button type="button" onClick={() => setEdit(null)} className={`${ui.btnGhost} flex-1`}>{t('prod.cancel')}</button>
-                  <button type="button" onClick={() => saveEdit(sel)} disabled={!edit.name.trim()} className={`${ui.btnPrimary} flex-1`}>{t('prod.save')}</button>
+                <div className="space-y-2 pt-2">
+                  <input value={edit.name} onChange={(e) => setEdit({ ...edit, name: e.target.value })} placeholder={t('cx.nc.name')} className={ui.input} />
+                  <input value={edit.tax_id} onChange={(e) => setEdit({ ...edit, tax_id: e.target.value })} placeholder={t('cx.nc.ci')} className={ui.input} />
+                  <input type="tel" inputMode="tel" value={edit.phone} onChange={(e) => setEdit({ ...edit, phone: e.target.value })} placeholder={t('cx.nc.phone')} className={ui.input} />
+                  <input value={edit.address} onChange={(e) => setEdit({ ...edit, address: e.target.value })} placeholder={t('cx.nc.address')} className={ui.input} />
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => setEdit(null)} className={`${ui.btnGhost} flex-1`}>{t('prod.cancel')}</button>
+                    <button type="button" onClick={() => saveEdit(sel)} disabled={!edit.name.trim()} className={`${ui.btnPrimary} flex-1`}>{t('prod.save')}</button>
+                  </div>
                 </div>
-              </div>
-            )}
-            {!edit && (
-              <div className="grid grid-cols-2 gap-2 pt-2">
-                <button type="button" onClick={() => setEdit({ name: sel.name, phone: sel.phone ?? '', address: sel.address ?? '', tax_id: sel.tax_id ?? '' })} className={`${ui.btnGhost} text-sm`}>✏️ {t('cust.editTitle')}</button>
-                <button type="button" onClick={() => removeCust(sel)}
-                  className="rounded-xl border border-red-300 px-3 py-2 text-sm font-bold text-red-600 cursor-pointer dark:border-red-500/40 dark:text-red-400">🗑️ {t('col.delCustomer')}</button>
-              </div>
-            )}
-            <p className="pt-1 font-bold">{t('rt.owes', { amount: m(sel.balance) })}{Number(sel.overdue) > 0 && <span className="text-red-600 dark:text-red-400"> · {t('rt.late', { amount: m(sel.overdue) })}</span>}</p>
-          </Card>
+              )}
+              {!edit && (
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  <button type="button" onClick={() => setEdit({ name: sel.name, phone: sel.phone ?? '', address: sel.address ?? '', tax_id: sel.tax_id ?? '' })} className={`${ui.btnGhost} text-sm`}>✏️ {t('cust.editTitle')}</button>
+                  <button type="button" onClick={() => removeCust(sel)}
+                    className="rounded-xl border border-red-300 px-3 py-2 text-sm font-bold text-red-600 cursor-pointer dark:border-red-500/40 dark:text-red-400">🗑️ {t('col.delCustomer')}</button>
+                </div>
+              )}
+              <p className="pt-1 font-bold">{t('rt.owes', { amount: m(sel.balance) })}{Number(sel.overdue) > 0 && <span className="text-red-600 dark:text-red-400"> · {t('rt.late', { amount: m(sel.overdue) })}</span>}</p>
           <Card className="space-y-2">
             <label className={ui.label}>{t('cap.label')}</label>
             <div className="flex gap-2">
@@ -239,16 +227,12 @@ function RouteScreen() {
             </div>
             <p className={`text-xs ${ui.muted}`}>{t('cap.hint')}</p>
           </Card>
-          {sel.credits.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('card.noCards')}</p></Card> : sel.credits.map((k) => (
-            <Card key={k.id}>
-              <p className={`mb-2 text-xs ${ui.muted}`}>{new Date(k.created).toLocaleDateString(lang)} · {m(k.total)}</p>
-              <CreditCard credit={toCredit(k)} today={today} fmt={m} onSave={() => undefined} readOnly />
-            </Card>
-          ))}
           {lateDays(sel) >= 180 && (
             <button type="button" onClick={() => writeOff(sel)}
               className="w-full rounded-xl border border-red-300 px-3 py-2 text-sm font-bold text-red-600 cursor-pointer dark:border-red-500/40 dark:text-red-400">🗑️ {t('rt.writeOff')}</button>
           )}
+            </>} />
+          <ProfileTabs tab={sheetTab} canChange={false} onTab={(k) => { setSheetTab(k); setSheetAcct(null); }} />
         </div>
       )}
 

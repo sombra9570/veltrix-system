@@ -6,14 +6,14 @@ import { Card, useHeaderSlot } from '../shell';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
-import { money, parseAmount, whatsappLink } from '../format';
+import { money, parseAmount } from '../format';
 import { useStaff } from '../staff-context';
 import { useSync } from '../sync';
 import { isNetworkError } from '../offline-sales';
 import { ShowMore } from '../paged';
-import { CreditCard, applyPayment, freqOf, type Credit, type Freq, type Method } from './credit-card';
+import { applyPayment, freqOf, type Credit, type Freq, type Method } from './credit-card';
 import { CreditSaleForm } from './credit-sale-form';
-import { LoanForm, RATING_DOT, type LoanPolicy } from './loan-form';
+import { LoanForm, type LoanPolicy } from './loan-form';
 import { DaysTable, type DayRow } from './days-table';
 import { CutForm } from './cut-form';
 import { SignalButton } from './signal';
@@ -23,6 +23,7 @@ import { NewClient, GpsButton, type CustomerOp } from './new-client';
 import { getFile, delFile } from './offline-files';
 import { extFor } from '../image';
 import { Credits } from './credits';
+import { CustomerNames, CustomerProfile, ProfileTabs } from '../customer-profile';
 import { SettingsScreen, payQrUrl } from './settings';
 import { useBackButton } from '../use-back';
 import { readSaleMode, cacheSaleMode, creditErrorKey, type CreditOp } from './credit-ops';
@@ -139,7 +140,7 @@ export default function CollectorPage() {
   const [loanFor, setLoanFor] = useState<{ id: string; name: string } | null>(null);
   useEffect(() => { if (panel !== 'loan') setLoanFor(null); }, [panel]);
   useEffect(() => { setSheetTab('info'); setSheetAcct(null); }, [sel?.id]);
-  const [freq, setFreq] = useState<Freq | 'all'>('all');
+  const freq: Freq | 'all' = 'all';
   // Se dibujan de a 25 clientes (tarjetas pesan): "Ver más" agrega el resto
   const [limit, setLimit] = useState(25);
   useEffect(() => { setLimit(25); }, [freq, routeId]);
@@ -635,45 +636,8 @@ export default function CollectorPage() {
       {screen === 'list' && (
         <>
           <input type="search" placeholder={t('cx.search')} value={q} onChange={(e) => setQ(e.target.value)} className={ui.input} />
-      {/* Vista: tarjetas o lista, y frecuencia de cobro */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex flex-wrap gap-1">
-          {(['all', 'daily', 'weekly', 'biweekly', 'monthly'] as const).map((f) => {
-            const n = f === 'all' ? route.customers.length : route.customers.filter((c) => c.credits?.some((k) => freqOf(k) === f)).length;
-            if (f !== 'all' && n === 0) return null;
-            return (
-              <button key={f} type="button" onClick={() => setFreq(f)}
-                className={`rounded-full px-3 py-1 text-xs font-bold cursor-pointer ${freq === f ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'border border-slate-300 dark:border-slate-700'}`}>
-                {f === 'all' ? t('card.all') : t(`card.f.${f}` as DictKey)} · {n}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Clientes del día: primero los vencidos */}
-      {<ul className="space-y-2">
-        {shownQ.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('col.noCustomers')}</p></Card>}
-        {shownQ.map((c) => (
-          <li key={c.id}>
-            <button type="button" onClick={() => { setSel(c); setPanel(null); }}
-              className={`flex w-full items-center gap-3 rounded-2xl p-4 text-left transition cursor-pointer ${ui.card} ${c.visited_today ? 'opacity-60' : ''} ${sel?.id === c.id ? 'ring-2 ring-blue-500' : ''}`}>
-              <span className="text-xl">{c.visited_today ? '✅' : Number(c.overdue) > 0 ? '🔴' : Number(c.due_today) > 0 ? '🟡' : '⚪'}</span>
-              <div className="min-w-0 flex-1">
-                <p className="flex items-start gap-1.5 break-words font-bold leading-tight"><span className="mt-1.5"><Dot r={c.rating} /></span><span className="min-w-0">{c.name}</span></p>
-                <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
-                {c.last_visit && <Note v={c.last_visit} />}
-              </div>
-              <div className="shrink-0 text-right">
-                <p className="whitespace-nowrap text-sm font-extrabold">{fmt(Number(c.overdue) + Number(c.due_today))}</p>
-                <p className={`text-[11px] ${ui.muted}`}>{t('col.ofBalance', { amount: fmt(c.balance) })}</p>
-              </div>
-            </button>
-          </li>
-        ))}
-      </ul>}
-      {<ShowMore rest={shownAllQ.length - shownQ.length} onClick={() => setLimit((x) => x + 25)} />}
-
+          <CustomerNames list={shownQ} selId={sel?.id} onPick={(id) => { const c = shownQ.find((x) => x.id === id); if (c) { setSel(c); setPanel(null); } }} />
+          <ShowMore rest={shownAllQ.length - shownQ.length} onClick={() => setLimit((x) => x + 25)} />
         </>
       )}
 
@@ -688,27 +652,18 @@ export default function CollectorPage() {
             </div>
 
             {sel && !panel && (
-              <CustomerSheet locked={!!route.locked} c={selNow ?? sel} fmt={fmt} qr={route.pay_qr ?? null} online={online} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
-                tab={sheetTab} acct={sheetAcct} onAcct={setSheetAcct} canChange={!!route.can_change_loc && !route.locked}
+              <CustomerProfile c={selNow ?? sel} fmt={fmt} online={online} tab={sheetTab} acct={sheetAcct} onAcct={setSheetAcct}
+                canChange={!!route.can_change_loc && !route.locked}
                 onSaveLoc={async (lat, lng) => { try { await rpc('collector_set_customer_location', { p_route: route.id, p_customer: sel.id, p_lat: lat, p_lng: lng }); await patch(route.id, { customers: [sel.id] }); flash(true, t('cx.loc.saved')); setSheetTab('loc'); } catch (e) { const m = (e as Error).message; flash(false, m.includes('LOAN_NO_PERMISSION') ? t('loan.e.perm') : t('err.generic')); } }}
                 renderCards={(only) => (
                   <Credits only={only} locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? (o, ns) => reverseInst(sel.id, o, ns) : undefined} c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
                 )}
-                extra={<DeleteActions c={selNow ?? sel} canCredits={!!route.can_delete_credits} canCustomer={!!route.can_delete_customers} online={online}
-                  onDone={(what) => { const cid = sel.id; setSel(null); setPanel(null); void patch(route.id, what === 'customer' ? { removed: [cid], totals: true } : { customers: [cid], totals: true }); }} />} />
+                extra={<CollectorActions c={selNow ?? sel} qr={route.pay_qr ?? null} online={online} locked={!!route.locked} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}>
+                  <DeleteActions c={selNow ?? sel} canCredits={!!route.can_delete_credits} canCustomer={!!route.can_delete_customers} online={online}
+                    onDone={(what) => { const cid = sel.id; setSel(null); setPanel(null); void patch(route.id, what === 'customer' ? { removed: [cid], totals: true } : { customers: [cid], totals: true }); }} />
+                </CollectorActions>} />
             )}
-            {sel && !panel && (
-              <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] dark:border-slate-800 dark:bg-slate-900">
-                <div className="mx-auto flex max-w-xl">
-                  {([['info', '👤', 'cx.tab.info'], ['acc', '💳', 'cx.tab.accounts'], ['loc', '📍', 'cx.tab.loc'], ...(route.can_change_loc && !route.locked ? [['chg', '🎯', 'cx.tab.changeLoc']] : [])] as [typeof sheetTab, string, string][]).map(([k, ic, lk]) => (
-                    <button key={k} type="button" onClick={() => { setSheetTab(k); setSheetAcct(null); }}
-                      className={`flex min-w-0 flex-1 flex-col items-center gap-0.5 px-1 py-2 text-[11px] font-bold cursor-pointer ${sheetTab === k ? 'text-blue-600 dark:text-blue-400' : ui.muted}`}>
-                      <span className="text-2xl leading-none">{ic}</span><span className="max-w-full truncate">{t(lk as DictKey)}</span>
-                    </button>
-                  ))}
-                </div>
-              </nav>
-            )}
+            {sel && !panel && <ProfileTabs tab={sheetTab} canChange={!!route.can_change_loc && !route.locked} onTab={(k) => { setSheetTab(k); setSheetAcct(null); }} />}
             {sel && panel === 'pay' && (
               <PayForm c={sel} fmt={fmt} onDone={(method, amount) => {
                 pay(sel.id, method, amount);
@@ -769,12 +724,6 @@ function Note({ v }: { v: NonNullable<Customer['last_visit']> }) {
 
 /* ---------- Ficha rápida del cliente ---------- */
 /* ---------- Créditos del cliente: una tarjeta por crédito, todas dentro del mismo cliente ---------- */
-function Dot({ r }: { r?: string }) {
-  const { t } = useT();
-  if (!r) return null;
-  return <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${RATING_DOT[r] ?? RATING_DOT.new}`} title={t(`rating.${r}` as DictKey)} />;
-}
-
 /** Borrar créditos o al cliente: solo si el administrador lo permitió en los ajustes de la ruta */
 function DeleteActions({ c, canCredits, canCustomer, online, onDone }: { c: Customer; canCredits: boolean; canCustomer: boolean; online: boolean; onDone: (what: 'credit' | 'customer') => void }) {
   const { t } = useT();
@@ -806,15 +755,8 @@ function DeleteActions({ c, canCredits, canCustomer, online, onDone }: { c: Cust
   );
 }
 
-function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, tab, acct, onAcct, renderCards, extra, canChange, onSaveLoc, locked = false }: {
-  canChange: boolean; onSaveLoc: (lat: number, lng: number) => Promise<void>;
-  locked?: boolean; c: Customer; fmt: (n: number) => string; qr: string | null; online: boolean; onPay: () => void; onVisit: () => void;
-  tab: 'info' | 'acc' | 'loc' | 'chg'; acct: string | null; onAcct: (id: string | null) => void; renderCards: (only?: string) => ReactNode; extra: ReactNode;
-}) {
-  const { t, lang } = useT();
-  const map = c.lat != null && c.lng != null
-    ? `https://maps.google.com/?q=${c.lat},${c.lng}`
-    : c.address ? `https://maps.google.com/?q=${encodeURIComponent(c.address)}` : null;
+function CollectorActions({ c, qr, online, locked, onPay, onVisit, children }: { c: Customer; qr: string | null; online: boolean; locked: boolean; onPay: () => void; onVisit: () => void; children: ReactNode }) {
+  const { t } = useT();
   const sendQr = async () => {
     const phone = c.phone?.replace(/[^\d]/g, '') ?? '';
     if (!qr || phone.length < 7) return;
@@ -822,127 +764,16 @@ function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, tab, acct, onAcct, 
     if (!url) return;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(t('cx.cs.qrMsg', { name: c.name, url }))}`, '_blank', 'noopener');
   };
-  const initials = c.name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join('');
-  const [photo, setPhoto] = useState<string | null>(null);
-  useEffect(() => {
-    let off = false;
-    setPhoto(null);
-    if (!navigator.onLine) return;
-    (async () => {
-      try {
-        const { data } = await supabase.from('customers').select('photo_path').eq('id', c.id).maybeSingle();
-        const path = (data as { photo_path?: string | null } | null)?.photo_path;
-        if (!path) return;
-        const { data: u } = await supabase.storage.from('customer-files').createSignedUrl(path, 600);
-        if (!off && u?.signedUrl) setPhoto(u.signedUrl);
-      } catch { /* sin foto: se muestran las iniciales */ }
-    })();
-    return () => { off = true; };
-  }, [c.id]);
-  const credits = c.credits ?? [];
-  const [newGps, setNewGps] = useState<{ lat: number; lng: number } | null>(null);
-  const [savingLoc, setSavingLoc] = useState(false);
-  const ro = 'rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900';
-
-  if (tab === 'loc') {
-    return (
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold">📍 {c.name}</h2>
-        {c.address && <p className={ro}>{c.address}</p>}
-        {c.lat != null && c.lng != null && <p className={`text-xs ${ui.muted}`}>{c.lat}, {c.lng}</p>}
-        {map ? <a href={map} target="_blank" rel="noopener noreferrer" className={`${ui.btnPrimary} w-full py-3`}>📍 {t('col.map')}</a> : <p className={`text-sm ${ui.muted}`}>{t('cx.loc.none')}</p>}
-      </div>
-    );
-  }
-  if (tab === 'chg' && canChange) {
-    return (
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold">📍 {t('cx.tab.changeLoc')}</h2>
-        <GpsButton value={newGps} onChange={setNewGps} label={t('cx.nc.gpsBtn')} />
-        <button type="button" disabled={!newGps || savingLoc || !online} className={`${ui.btnPrimary} w-full py-3`}
-          onClick={async () => { if (!newGps) return; setSavingLoc(true); try { await onSaveLoc(newGps.lat, newGps.lng); setNewGps(null); } finally { setSavingLoc(false); } }}>
-          💾 {t('cx.loc.save')}
-        </button>
-      </div>
-    );
-  }
-  if (tab === 'acc') {
-    if (acct) return <div className="space-y-4">{renderCards(acct)}</div>;
-    return (
-      <div className="space-y-3">
-        {credits.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('card.noCards')}</p>}
-        {credits.map((k) => {
-          const debt = k.installments.reduce((a, i) => a + Math.max(0, Number(i.amount) - Number(i.paid)), 0);
-          const paid = k.installments.filter((i) => Number(i.amount) - Number(i.paid) <= 0.004).length;
-          return (
-            <button key={k.id} type="button" onClick={() => onAcct(k.id)}
-              className={`w-full space-y-2 rounded-2xl p-4 text-left cursor-pointer ${ui.card}`}>
-              <div className="flex items-center justify-between gap-2">
-                <p className="font-bold">💳 {new Date(k.created).toLocaleDateString(lang)}</p>
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold dark:bg-slate-800">{t(`card.f.${freqOf(k)}` as DictKey)}</span>
-              </div>
-              <div className="grid grid-cols-3 gap-2 text-center text-sm">
-                <div><p className={`text-[11px] ${ui.muted}`}>{t('cx.acc.amount')}</p><p className="font-extrabold">{fmt(Number(k.total))}</p></div>
-                <div><p className={`text-[11px] ${ui.muted}`}>{t('cx.acc.debt')}</p><p className={`font-extrabold ${debt > 0 ? '' : 'text-emerald-600 dark:text-emerald-400'}`}>{fmt(debt)}</p></div>
-                <div><p className={`text-[11px] ${ui.muted}`}>{t('cx.acc.paid')}</p><p className="font-extrabold">{paid}/{k.installments.length}</p></div>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-4 rounded-3xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
-        {photo
-          // eslint-disable-next-line @next/next/no-img-element
-          ? <img src={photo} alt={c.name} onError={() => setPhoto(null)} className="h-24 w-24 shrink-0 rounded-full object-cover" />
-          : <span className="grid h-24 w-24 shrink-0 place-items-center rounded-full bg-blue-600 text-3xl font-extrabold text-white">{initials || '👤'}</span>}
-        <div className="min-w-0 flex-1">
-          <h2 className="break-words text-lg font-bold leading-tight">{c.name}</h2>
-          {c.phone && <p className="truncate text-sm font-semibold text-blue-700 dark:text-blue-300">{c.phone}</p>}
-          {c.tax_id && <p className={`truncate text-xs ${ui.muted}`}>{t('cx.cs.ci')}: {c.tax_id}</p>}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-2 text-center">
-        <div className="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/50">
-          <p className={`text-[11px] uppercase ${ui.muted}`}>{t('cust.overdue')}</p>
-          <p className={`font-extrabold ${Number(c.overdue) > 0 ? 'text-red-600 dark:text-red-400' : ''}`}>{fmt(c.overdue)}</p>
-        </div>
-        <div className="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/50">
-          <p className={`text-[11px] uppercase ${ui.muted}`}>{t('col.dueToday')}</p>
-          <p className="font-extrabold">{fmt(c.due_today)}</p>
-        </div>
-        <div className="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/50">
-          <p className={`text-[11px] uppercase ${ui.muted}`}>{t('cust.balance')}</p>
-          <p className="font-extrabold">{fmt(c.balance)}</p>
-        </div>
-      </div>
-      {c.next_due && <p className={`text-xs ${ui.muted}`}>{t('col.nextDue', { date: new Date(c.next_due + 'T12:00:00').toLocaleDateString(lang) })}</p>}
-
-      {c.phone && (
-        <div className="flex items-center gap-2">
-          <p className={`min-w-0 flex-1 truncate ${ro}`}>{c.phone}</p>
-          <a href={whatsappLink(c.phone)} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-emerald-500 text-xl text-white">💬</a>
-          <a href={`tel:${c.phone.replace(/[^\d+]/g, '')}`} aria-label={t('col.call')} className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-blue-600 text-xl text-white">📞</a>
-        </div>
-      )}
-      {c.business && <p className={ro}>💼 {t('cx.cs.business')}: <b>{c.business}</b></p>}
-      {c.address && <p className={ro}>📍 {c.address}</p>}
-      {(c.g_name || c.g_phone) && (
-        <p className={`text-xs ${ui.muted}`}>{t('cx.cs.guarantor')}: {c.g_name ?? '—'}{c.g_phone ? ` · ${c.g_phone}` : ''}</p>
-      )}
-      {map && <a href={map} target="_blank" rel="noopener noreferrer" className={`${ui.btnGhost} w-full`}>📍 {t('col.map')}</a>}
+    <>
+      {c.last_visit && <Note v={c.last_visit} />}
       {qr && c.phone && <button type="button" onClick={sendQr} disabled={!online} className={`${ui.btnGhost} w-full`}>📲 {t('cx.cs.sendQr')}</button>}
       <div className="grid grid-cols-2 gap-2">
         <button type="button" disabled={locked} onClick={onVisit} className={ui.btnGhost}>📝 {t('col.visit')}</button>
         <button type="button" disabled={locked} onClick={onPay} className={`${ui.btnPrimary} py-3`}>💵 {t('col.collect')}</button>
       </div>
-      {extra}
-    </div>
+      {children}
+    </>
   );
 }
 

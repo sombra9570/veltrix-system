@@ -8,13 +8,13 @@ import type { DictKey } from '../../i18n/es';
 import { money } from '../format';
 import { useStaff } from '../staff-context';
 import { MenuTile } from '../collector/tiles';
-import { CreditCard, freqOf, type Credit, type Freq } from '../collector/credit-card';
+import { freqOf, type Credit, type Freq } from '../collector/credit-card';
 import { ShowMore } from '../paged';
 import { Credits } from '../collector/credits';
+import { CustomerNames, CustomerProfile, ProfileTabs, type ProfTab } from '../customer-profile';
 import { NewClient } from '../collector/new-client';
 import { CutForm, type Period } from '../collector/cut-form';
 import { DeliveryMap, type MapPoint } from '../delivery-map';
-import { RATING_DOT } from '../collector/loan-form';
 import { useBackButton } from '../use-back';
 
 /* Panel del supervisor de cobranza: sus rutas asignadas; cada acción queda grabada y al terminar se envía el reporte al administrador */
@@ -126,7 +126,10 @@ export default function SupPanel() {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState('');
   const [phone, setPhone] = useState('');
-  const [freq, setFreq] = useState<Freq | 'all'>('all');
+  const freq: Freq | 'all' = 'all';
+  const [sheetTab, setSheetTab] = useState<ProfTab>('info');
+  const [sheetAcct, setSheetAcct] = useState<string | null>(null);
+  useEffect(() => { setSheetTab('info'); setSheetAcct(null); }, [sel?.id]);
   const [limit, setLimit] = useState(25);
   useEffect(() => { setLimit(25); }, [freq, q, rid]);
 
@@ -143,11 +146,12 @@ export default function SupPanel() {
   useEffect(() => { if (rid) loadRoute(rid); else setD(null); }, [rid, loadRoute]);
 
   const back = () => {
-    if (sel) setSel(null);
+    if (sel && sheetTab === 'acc' && sheetAcct) setSheetAcct(null);
+    else if (sel) setSel(null);
     else if (screen !== 'home') setScreen('home');
     else if (rid) { setRid(null); loadList(); }
   };
-  useBackButton((sel ? 1 : 0) + (screen !== 'home' ? 1 : 0) + (rid ? 1 : 0), back);
+  useBackButton((sel ? 1 : 0) + (sel && sheetTab === 'acc' && sheetAcct ? 1 : 0) + (screen !== 'home' ? 1 : 0) + (rid ? 1 : 0), back);
   const titles: Record<string, string> = { list: 'rt.list', pending: 'cx.pending', newclient: 'cx.newClient', map: 'rt.map', info: 'nav.routeInfo', liq: 'rt.liq', notes: 'sp.notes', rate: 'sp.rateCollector' };
   useHeaderSlot({
     title: userName,
@@ -269,33 +273,7 @@ export default function SupPanel() {
       {screen === 'list' && !sel && (
         <div className="space-y-3">
           <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('cust.search')} className={ui.input} />
-          <div className="flex flex-wrap gap-1">
-            {(['all', 'daily', 'weekly', 'biweekly', 'monthly'] as const).map((f) => {
-              const n = f === 'all' ? d.customers.length : d.customers.filter((c) => c.credits.some((k) => freqOf(k) === f)).length;
-              if (f !== 'all' && n === 0) return null;
-              return (
-                <button key={f} type="button" onClick={() => setFreq(f)}
-                  className={`rounded-full px-3 py-1 text-xs font-bold cursor-pointer ${freq === f ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'border border-slate-300 dark:border-slate-700'}`}>
-                  {f === 'all' ? t('card.all') : t(`card.f.${f}` as DictKey)} · {n}
-                </button>
-              );
-            })}
-          </div>
-          {list.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('rt.noCust')}</p></Card>}
-          {list.map((c) => (
-            <Card key={c.id} className={`space-y-3 ${c.visited_today ? 'opacity-80' : ''}`}>
-              <div className="flex items-start gap-3">
-                <span className="text-xl">{dot(c)}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="flex items-start gap-1.5 break-words font-bold leading-tight"><span className={`mt-1.5 inline-block h-2.5 w-2.5 shrink-0 rounded-full ${RATING_DOT[c.rating] ?? RATING_DOT.new}`} /><span className="min-w-0">{c.name}</span></p>
-                  <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
-                </div>
-                <button type="button" onClick={() => { setSel(c); setPhone(c.phone ?? ''); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>👤 {t('card.profile')}</button>
-              </div>
-              <Credits locked onReverse={d.can_delete_installments ? reverse : undefined} c={c} filter={freq} today={today} fmt={m} onSave={() => undefined} />
-              <RateRow cur={c.sup_rating} busy={busy} onPick={(r) => rate(c, r)} />
-            </Card>
-          ))}
+          <CustomerNames list={list} onPick={(id) => { const c = list.find((x) => x.id === id); if (c) { setSel(c); setPhone(c.phone ?? ''); } }} />
           <ShowMore rest={listAll.length - list.length} onClick={() => setLimit((x) => x + 25)} />
         </div>
       )}
@@ -329,31 +307,24 @@ export default function SupPanel() {
       )}
 
       {(screen === 'list' || screen === 'pending') && sel && (
-        <div className="space-y-3">
-          <Card className="space-y-3 text-sm">
-            <p className="text-lg font-extrabold">{sel.name}</p>
-            {sel.address && <p className={ui.muted}>📍 {sel.address}</p>}
-            {sel.tax_id && <p className={ui.muted}>🪪 {sel.tax_id}</p>}
-            <p className="font-bold">{t('rt.owes', { amount: m(sel.balance) })}{Number(sel.overdue) > 0 && <span className="text-red-600 dark:text-red-400"> · {t('rt.late', { amount: m(sel.overdue) })}</span>}</p>
-            <div className="grid grid-cols-2 gap-2">
-              <button type="button" disabled={busy} onClick={() => run(() => log('verify_customer', { customer: sel.name }), t('sp.done'))} className={`${ui.btnGhost} !py-2 text-xs`}>✔ {t('sp.verifyCust')}</button>
-              <button type="button" disabled={busy} onClick={() => run(() => log('verify_credit', { customer: sel.name }), t('sp.done'))} className={`${ui.btnGhost} !py-2 text-xs`}>✔ {t('sp.verifyCredit')}</button>
-            </div>
-            <RateRow cur={sel.sup_rating} busy={busy} onPick={(r) => rate(sel, r)} />
-            <div className="flex gap-2">
-              <input inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t('sp.phone')} className={ui.input} />
-              <button type="button" disabled={busy || !phone.trim() || phone.trim() === (sel.phone ?? '')}
-                onClick={() => run(async () => { await rpc('sup_update_customer', { p_route: rid, p_customer: sel.id, p_phone: phone, p_lat: null, p_lng: null }); patchCust(sel.id, { phone: phone.trim() }); }, t('sp.done'))}
-                className={`${ui.btnPrimary} shrink-0 !px-3 text-xs`}>{t('sp.savePhone')}</button>
-            </div>
-            <button type="button" disabled={busy} onClick={() => setLoc(sel)} className={`${ui.btnGhost} w-full !py-2 text-xs`}>📍 {t('sp.setLoc')}</button>
-          </Card>
-          {sel.credits.length === 0 ? <Card><p className={`text-sm ${ui.muted}`}>{t('card.noCards')}</p></Card> : sel.credits.map((k) => (
-            <Card key={k.id}>
-              <p className={`mb-2 text-xs ${ui.muted}`}>{new Date(k.created).toLocaleDateString(lang)} · {m(k.total)}</p>
-              <CreditCard credit={k} today={today} fmt={m} onSave={() => undefined} readOnly onReverse={d.can_delete_installments ? (ns) => reverse(k.id, ns) : undefined} />
-            </Card>
-          ))}
+        <div className="pb-24">
+          <CustomerProfile c={sel} fmt={m} online tab={sheetTab} acct={sheetAcct} onAcct={setSheetAcct} canChange={false}
+            renderCards={(only) => <Credits only={only} locked onReverse={d.can_delete_installments ? reverse : undefined} c={sel} filter="all" today={today} fmt={m} onSave={() => undefined} />}
+            extra={<>
+              <div className="grid grid-cols-2 gap-2">
+                <button type="button" disabled={busy} onClick={() => run(() => log('verify_customer', { customer: sel.name }), t('sp.done'))} className={`${ui.btnGhost} !py-2 text-xs`}>✔ {t('sp.verifyCust')}</button>
+                <button type="button" disabled={busy} onClick={() => run(() => log('verify_credit', { customer: sel.name }), t('sp.done'))} className={`${ui.btnGhost} !py-2 text-xs`}>✔ {t('sp.verifyCredit')}</button>
+              </div>
+              <RateRow cur={sel.sup_rating} busy={busy} onPick={(r) => rate(sel, r)} />
+              <div className="flex gap-2">
+                <input inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t('sp.phone')} className={ui.input} />
+                <button type="button" disabled={busy || !phone.trim() || phone.trim() === (sel.phone ?? '')}
+                  onClick={() => run(async () => { await rpc('sup_update_customer', { p_route: rid, p_customer: sel.id, p_phone: phone, p_lat: null, p_lng: null }); patchCust(sel.id, { phone: phone.trim() }); }, t('sp.done'))}
+                  className={`${ui.btnPrimary} shrink-0 !px-3 text-xs`}>{t('sp.savePhone')}</button>
+              </div>
+              <button type="button" disabled={busy} onClick={() => setLoc(sel)} className={`${ui.btnGhost} w-full !py-2 text-xs`}>📍 {t('sp.setLoc')}</button>
+            </>} />
+          <ProfileTabs tab={sheetTab} canChange={false} onTab={(k) => { setSheetTab(k); setSheetAcct(null); }} />
         </div>
       )}
 
