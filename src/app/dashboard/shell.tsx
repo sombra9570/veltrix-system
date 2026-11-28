@@ -108,7 +108,7 @@ export function AppShell({
       <div className="px-5 py-5">
         <Link href="/" aria-label="Veltrix System"><BrandMark size={28} className="text-lg" /></Link>
         <div className="mt-2 flex items-center gap-2">
-          {(brand?.logo || brand?.logo_dark) && <OrgLogo day={brand.logo} night={brand.logo_dark} name={shownName} size={44} />}
+          {(brand?.logo || brand?.logo_dark) && <OrgLogo day={brand.logo} night={brand.logo_dark} name={shownName} size={64} />}
           <p className="truncate text-xs font-semibold text-slate-500 dark:text-slate-400">{shownName}</p>
         </div>
       </div>
@@ -215,7 +215,7 @@ export function AppShell({
             <button type="button" onClick={slot.onBack} aria-label={t('cx.back')}
               className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700"><IconBack /></button>
           )}
-          {(brand?.logo || brand?.logo_dark) && !slot?.title && <span className="lg:hidden"><OrgLogo day={brand.logo} night={brand.logo_dark} name={shownName} size={44} /></span>}
+          {(brand?.logo || brand?.logo_dark) && !slot?.title && <span className="lg:hidden"><OrgLogo day={brand.logo} night={brand.logo_dark} name={shownName} size={64} /></span>}
           <button type="button" onClick={slot?.onTitle} disabled={!slot?.onTitle}
             className={`min-w-0 text-left ${slot ? '' : 'lg:hidden'} ${slot?.onTitle ? 'cursor-pointer' : 'cursor-default'}`}>
             <span className="block truncate text-sm font-bold text-slate-900 dark:text-white">{slot?.title ?? shownName}</span>
