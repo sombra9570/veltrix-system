@@ -201,7 +201,7 @@ export function AppShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="sticky top-0 z-30">
-        <header className="flex items-center gap-3 border-b border-slate-200 bg-white/90 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
+        <header className="relative z-20 flex items-center gap-3 border-b border-slate-200 bg-white/90 px-4 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
           <button
             type="button"
             onClick={() => setOpen(true)}
@@ -215,7 +215,7 @@ export function AppShell({
             <button type="button" onClick={slot.onBack} aria-label={t('cx.back')}
               className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700"><IconBack /></button>
           )}
-          {(brand?.logo || brand?.logo_dark) && !slot?.title && <span className="lg:hidden"><OrgLogo day={brand.logo} night={brand.logo_dark} name={shownName} size={64} /></span>}
+          {(brand?.logo || brand?.logo_dark) && !slot?.title && <span className="-mb-5 -mt-3 lg:hidden"><OrgLogo day={brand.logo} night={brand.logo_dark} name={shownName} size={72} /></span>}
           <button type="button" onClick={slot?.onTitle} disabled={!slot?.onTitle}
             className={`min-w-0 text-left ${slot ? '' : 'lg:hidden'} ${slot?.onTitle ? 'cursor-pointer' : 'cursor-default'}`}>
             <span className="block truncate text-sm font-bold text-slate-900 dark:text-white">{slot?.title ?? shownName}</span>
