@@ -10,7 +10,10 @@ import { PageTitle, Pill, Empty } from '../../kit';
 
 /* Información de la ruta: cifras del período abierto (desde el último cierre o liquidación hasta el próximo).
    Lee lo guardado en el teléfono (sirve sin internet) y se actualiza si hay señal. */
-type Credit = { id: string; total: number; every_days: number | null; i: [number, string, number, number, string | null][] };
+type Row = [number, string, number, number, string | null];
+// Según de dónde vengan los datos (servidor o lo guardado por la pantalla de cobro) las cuotas llegan como `i` o como `installments`
+type Credit = { id: string; total: number; every_days: number | null; i?: Row[]; installments?: { n: number; due: string; amount: number; paid: number; last_at: string | null }[] };
+const rowsOf = (k: Credit): Row[] => k.i ?? (k.installments ?? []).map((x) => [x.n, x.due, Number(x.amount), Number(x.paid), x.last_at] as Row);
 type Cust = { id: string; name: string; balance: number; credits?: Credit[] };
 type R = {
   id: string; name: string; branch: string; currency: string; today: string;
@@ -24,7 +27,7 @@ type Freq = 'daily' | 'weekly';
 
 // Diario = se paga cada 1 a 3 días; semanal = el resto (misma regla que usa la base de datos)
 const freqOf = (c: Credit): Freq => ((c.every_days ?? 7) <= 3 ? 'daily' : 'weekly');
-const left = (row: Credit['i'][number]) => Math.max(Number(row[2]) - Number(row[3]), 0);
+const left = (row: Row) => Math.max(Number(row[2]) - Number(row[3]), 0);
 
 export default function RouteInfoPage() {
   const { t, lang } = useT();
@@ -61,11 +64,12 @@ export default function RouteInfoPage() {
       for (const k of c.credits ?? []) {
         if (freqOf(k) !== freq) continue;
         any = true;
-        const bal = k.i.reduce((s, x) => s + left(x), 0);
+        const rows = rowsOf(k);
+        const bal = rows.reduce((s, x) => s + left(x), 0);
         balance += bal;
-        overdue += k.i.filter((x) => x[1] < r.today).reduce((s, x) => s + left(x), 0);
-        const next = k.i.find((x) => left(x) > 0.004)?.[1] ?? null;
-        cr.push({ id: k.id, name: c.name, total: Number(k.total), paid: k.i.filter((x) => left(x) <= 0.004).length, count: k.i.length, balance: bal, next });
+        overdue += rows.filter((x) => x[1] < r.today).reduce((s, x) => s + left(x), 0);
+        const next = rows.find((x) => left(x) > 0.004)?.[1] ?? null;
+        cr.push({ id: k.id, name: c.name, total: Number(k.total), paid: rows.filter((x) => left(x) <= 0.004).length, count: rows.length, balance: bal, next });
       }
       if (any) cl.push({ id: c.id, name: c.name, balance, overdue });
     }
