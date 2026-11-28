@@ -1328,6 +1328,8 @@ const fr: Record<DictKey, string> = {
   "cx.acc.amount": "Montant du crédit",
   "cx.acc.debt": "Dette totale",
   "cx.acc.paid": "Échéances payées",
+  "cx.nc.business": "Activité (ce qu'il fait)",
+  "cx.cs.business": "Activité",
   "perm.customers.change_location": "Modifier la position du client",
   "perm.customers.change_location.d": "Si activé, le collecteur voit l'onglet pour changer la position d'un client avec son GPS actuel.",
   "cx.tab.loc": "Position",

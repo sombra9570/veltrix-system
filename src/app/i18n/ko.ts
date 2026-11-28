@@ -1328,6 +1328,8 @@ const ko: Record<DictKey, string> = {
   "cx.acc.amount": "대출 금액",
   "cx.acc.debt": "총 부채",
   "cx.acc.paid": "납부한 회차",
+  "cx.nc.business": "사업(하는 일)",
+  "cx.cs.business": "사업",
   "perm.customers.change_location": "고객 위치 변경",
   "perm.customers.change_location.d": "켜면 수금원이 현재 GPS로 고객 위치를 변경하는 탭을 볼 수 있습니다.",
   "cx.tab.loc": "위치",

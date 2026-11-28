@@ -1328,6 +1328,8 @@ const ar: Record<DictKey, string> = {
   "cx.acc.amount": "مبلغ الائتمان",
   "cx.acc.debt": "إجمالي الدين",
   "cx.acc.paid": "الأقساط المدفوعة",
+  "cx.nc.business": "النشاط (ما يعمل به)",
+  "cx.cs.business": "النشاط",
   "perm.customers.change_location": "تغيير موقع العميل",
   "perm.customers.change_location.d": "عند التفعيل يرى المحصّل تبويب تغيير موقع العميل باستخدام GPS الحالي.",
   "cx.tab.loc": "الموقع",

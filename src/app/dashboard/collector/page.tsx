@@ -39,7 +39,7 @@ type Customer = {
   id: string; name: string; phone: string | null; address: string | null; lat: number | null; lng: number | null;
   balance: number; overdue: number; due_today: number; next_due: string | null; visited_today: boolean;
   credits?: Credit[];
-  tax_id?: string | null; g_name?: string | null; g_phone?: string | null; g_lat?: number | null; g_lng?: number | null; paid_today?: boolean;
+  tax_id?: string | null; business?: string | null; g_name?: string | null; g_phone?: string | null; g_lat?: number | null; g_lng?: number | null; paid_today?: boolean;
   rating?: string;
   last_visit?: { at: string; result: VisitResult; notes: string | null; promise_date: string | null; promise_amount: number | null } | null;
 };
@@ -262,7 +262,7 @@ export default function CollectorPage() {
             await rpc('collector_save_customer', {
               p_route: op.route, p_name: op.name, p_phone: op.phone || null, p_address: op.address || null, p_tax_id: op.ci || null,
               p_notes: null, p_lat: op.lat, p_lng: op.lng, p_g_name: op.gName || null, p_g_phone: op.gPhone || null, p_g_address: op.gAddress || null,
-              p_g_lat: op.gLat ?? null, p_g_lng: op.gLng ?? null, p_offline_uuid: op.id,
+              p_g_lat: op.gLat ?? null, p_g_lng: op.gLng ?? null, p_offline_uuid: op.id, p_business: op.business || null,
             });
             if (op.files && (op.files.doc || op.files.docback || op.files.photo || op.files.gphoto)) {
               const up = async (kind: 'doc' | 'docback' | 'photo' | 'gphoto'): Promise<string | null> => {
@@ -856,7 +856,6 @@ function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, tab, acct, onAcct, 
     if (!url) return;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(t('cx.cs.qrMsg', { name: c.name, url }))}`, '_blank', 'noopener');
   };
-  const gMap = c.g_lat != null && c.g_lng != null ? `https://maps.google.com/?q=${c.g_lat},${c.g_lng}` : null;
   const initials = c.name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join('');
   const [photo, setPhoto] = useState<string | null>(null);
   useEffect(() => {
@@ -965,10 +964,10 @@ function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, tab, acct, onAcct, 
           <a href={`tel:${c.phone.replace(/[^\d+]/g, '')}`} aria-label={t('col.call')} className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-blue-600 text-xl text-white">📞</a>
         </div>
       )}
+      {c.business && <p className={ro}>💼 {t('cx.cs.business')}: <b>{c.business}</b></p>}
       {c.address && <p className={ro}>📍 {c.address}</p>}
       {(c.g_name || c.g_phone) && (
-        <p className={`text-xs ${ui.muted}`}>{t('cx.cs.guarantor')}: {c.g_name ?? '—'}{c.g_phone ? ` · ${c.g_phone}` : ''}
-          {gMap && <> · <a href={gMap} target="_blank" rel="noopener noreferrer" className="underline">📍</a></>}</p>
+        <p className={`text-xs ${ui.muted}`}>{t('cx.cs.guarantor')}: {c.g_name ?? '—'}{c.g_phone ? ` · ${c.g_phone}` : ''}</p>
       )}
       {map && <a href={map} target="_blank" rel="noopener noreferrer" className={`${ui.btnGhost} w-full`}>📍 {t('col.map')}</a>}
       {qr && c.phone && <button type="button" onClick={sendQr} disabled={!online} className={`${ui.btnGhost} w-full`}>📲 {t('cx.cs.sendQr')}</button>}

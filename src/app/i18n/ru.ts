@@ -1328,6 +1328,8 @@ const ru: Record<DictKey, string> = {
   "cx.acc.amount": "Сумма кредита",
   "cx.acc.debt": "Общий долг",
   "cx.acc.paid": "Оплаченные взносы",
+  "cx.nc.business": "Бизнес (чем занимается)",
+  "cx.cs.business": "Бизнес",
   "perm.customers.change_location": "Менять местоположение клиента",
   "perm.customers.change_location.d": "Если включено, сборщик видит вкладку для смены местоположения клиента по текущему GPS.",
   "cx.tab.loc": "Местоположение",

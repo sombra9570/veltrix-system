@@ -1328,6 +1328,8 @@ const pt: Record<DictKey, string> = {
   "cx.acc.amount": "Valor do crédito",
   "cx.acc.debt": "Dívida total",
   "cx.acc.paid": "Parcelas pagas",
+  "cx.nc.business": "Negócio (a que se dedica)",
+  "cx.cs.business": "Negócio",
   "perm.customers.change_location": "Alterar a localização do cliente",
   "perm.customers.change_location.d": "Se ligado, o cobrador vê a aba para alterar a localização de um cliente com o GPS atual.",
   "cx.tab.loc": "Localização",

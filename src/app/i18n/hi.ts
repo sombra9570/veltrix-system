@@ -1328,6 +1328,8 @@ const hi: Record<DictKey, string> = {
   "cx.acc.amount": "क्रेडिट राशि",
   "cx.acc.debt": "कुल बकाया",
   "cx.acc.paid": "चुकाई गई किस्तें",
+  "cx.nc.business": "व्यवसाय (क्या करते हैं)",
+  "cx.cs.business": "व्यवसाय",
   "perm.customers.change_location": "ग्राहक का स्थान बदलना",
   "perm.customers.change_location.d": "चालू होने पर कलेक्टर वर्तमान GPS से ग्राहक का स्थान बदलने का टैब देखता है।",
   "cx.tab.loc": "स्थान",

@@ -1328,6 +1328,8 @@ const ja: Record<DictKey, string> = {
   "cx.acc.amount": "クレジット金額",
   "cx.acc.debt": "負債合計",
   "cx.acc.paid": "支払済み回数",
+  "cx.nc.business": "事業（職業）",
+  "cx.cs.business": "事業",
   "perm.customers.change_location": "顧客の位置を変更",
   "perm.customers.change_location.d": "オンにすると、集金担当は現在のGPSで顧客の位置を変更するタブを表示できます。",
   "cx.tab.loc": "位置",

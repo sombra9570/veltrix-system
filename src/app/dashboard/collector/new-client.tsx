@@ -11,7 +11,7 @@ import { putFile } from './offline-files';
 
 export type CustomerOp = {
   kind: 'customer'; id: string; at: string; route: string; name: string; ci: string; phone: string; address: string; lat: number; lng: number;
-  gName?: string; gPhone?: string; gAddress?: string; gLat?: number; gLng?: number; consent: boolean;
+  business?: string; gName?: string; gPhone?: string; gAddress?: string; gLat?: number; gLng?: number; consent: boolean;
   files?: { doc?: boolean; docback?: boolean; photo?: boolean; gphoto?: boolean };
 };
 
@@ -64,7 +64,7 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
   onSaved: (id: string) => Promise<void> | void; onLoan: (c: { id: string; name: string }) => void;
 }) {
   const { t } = useT();
-  const [f, setF] = useState({ name: '', ci: '', phone: '', address: '', gName: '', gPhone: '', gAddress: '' });
+  const [f, setF] = useState({ name: '', ci: '', phone: '', address: '', business: '', gName: '', gPhone: '', gAddress: '' });
   const [gps, setGps] = useState<Gps>(null);
   const [gGps, setGGps] = useState<Gps>(null);
   const [ciFront, setCiFront] = useState<File | null>(null);
@@ -108,7 +108,7 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
         for (const [k, file] of [['doc', ciFront], ['docback', ciBack], ['photo', photo], ['gphoto', gPhoto]] as const) {
           if (file) { await putFile(`${newId}:${k}`, await compressImage(file)); files[k] = true; }
         }
-        onQueue({ kind: 'customer', id: newId, at: new Date().toISOString(), route: routeId, name: f.name.trim(), ci: f.ci.trim(), phone: f.phone.trim(), address: f.address.trim(),
+        onQueue({ kind: 'customer', id: newId, at: new Date().toISOString(), route: routeId, name: f.name.trim(), ci: f.ci.trim(), phone: f.phone.trim(), address: f.address.trim(), business: f.business.trim() || undefined,
           lat: gps!.lat, lng: gps!.lng, gName: f.gName || undefined, gPhone: f.gPhone || undefined, gAddress: f.gAddress || undefined,
           gLat: gGps?.lat, gLng: gGps?.lng, consent, files });
         setBusy(false);
@@ -120,7 +120,7 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
     let id: string;
     try {
       id = await rpc<string>('collector_save_customer', {
-        p_route: routeId, p_name: f.name, p_phone: f.phone || null, p_address: f.address || null, p_tax_id: f.ci || null,
+        p_route: routeId, p_name: f.name, p_phone: f.phone || null, p_address: f.address || null, p_tax_id: f.ci || null, p_business: f.business.trim() || null,
         p_notes: null, p_lat: gps?.lat ?? null, p_lng: gps?.lng ?? null,
         p_g_name: f.gName || null, p_g_phone: f.gPhone || null, p_g_address: f.gAddress || null,
         p_g_lat: gGps?.lat ?? null, p_g_lng: gGps?.lng ?? null, p_offline_uuid: newId,
@@ -182,6 +182,7 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
           <div><label className={ui.label}>{t('cx.nc.ci')}</label><input required value={f.ci} onChange={(e) => set('ci', e.target.value)} className={ui.input} /></div>
           <div><label className={ui.label}>{t('cx.nc.phone')}</label><input required type="tel" inputMode="tel" value={f.phone} onChange={(e) => set('phone', e.target.value)} className={ui.input} /></div>
         </div>
+        <div><label className={ui.label}>{t('cx.nc.business')}</label><input value={f.business} maxLength={80} onChange={(e) => set('business', e.target.value)} className={ui.input} /></div>
         <div><label className={ui.label}>{t('cx.nc.address')}</label><input required value={f.address} onChange={(e) => set('address', e.target.value)} className={ui.input} /></div>
         <GpsButton value={gps} onChange={setGps} label={t('cx.nc.gpsBtn')} />
       </Card>

@@ -1328,6 +1328,8 @@ const zh: Record<DictKey, string> = {
   "cx.acc.amount": "贷款金额",
   "cx.acc.debt": "总债务",
   "cx.acc.paid": "已付期数",
+  "cx.nc.business": "生意（从事的行业）",
+  "cx.cs.business": "生意",
   "perm.customers.change_location": "更改客户位置",
   "perm.customers.change_location.d": "开启后，收款员可看到用当前GPS更改客户位置的标签页。",
   "cx.tab.loc": "位置",

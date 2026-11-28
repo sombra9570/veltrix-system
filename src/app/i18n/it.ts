@@ -1328,6 +1328,8 @@ const it: Record<DictKey, string> = {
   "cx.acc.amount": "Importo del credito",
   "cx.acc.debt": "Debito totale",
   "cx.acc.paid": "Rate pagate",
+  "cx.nc.business": "Attività (di cosa si occupa)",
+  "cx.cs.business": "Attività",
   "perm.customers.change_location": "Modificare la posizione del cliente",
   "perm.customers.change_location.d": "Se attivo, l'incaricato vede la scheda per cambiare la posizione di un cliente con il GPS attuale.",
   "cx.tab.loc": "Posizione",

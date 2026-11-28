@@ -1328,6 +1328,8 @@ const de: Record<DictKey, string> = {
   "cx.acc.amount": "Kreditbetrag",
   "cx.acc.debt": "Gesamtschuld",
   "cx.acc.paid": "Bezahlte Raten",
+  "cx.nc.business": "Geschäft (Tätigkeit)",
+  "cx.cs.business": "Geschäft",
   "perm.customers.change_location": "Kundenstandort ändern",
   "perm.customers.change_location.d": "Wenn an, sieht der Inkassomitarbeiter den Tab zum Ändern des Kundenstandorts mit seinem aktuellen GPS.",
   "cx.tab.loc": "Standort",

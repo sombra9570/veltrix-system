@@ -1328,6 +1328,8 @@ const en: Record<DictKey, string> = {
   "cx.acc.amount": "Credit amount",
   "cx.acc.debt": "Total debt",
   "cx.acc.paid": "Paid installments",
+  "cx.nc.business": "Business (what they do)",
+  "cx.cs.business": "Business",
   "perm.customers.change_location": "Change customer location",
   "perm.customers.change_location.d": "If on, the collector sees the tab to change a customer's location using their current GPS.",
   "cx.tab.loc": "Location",
