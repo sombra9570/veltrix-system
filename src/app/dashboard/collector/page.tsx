@@ -139,13 +139,10 @@ export default function CollectorPage() {
   const [loanFor, setLoanFor] = useState<{ id: string; name: string } | null>(null);
   useEffect(() => { if (panel !== 'loan') setLoanFor(null); }, [panel]);
   useEffect(() => { setSheetTab('info'); setSheetAcct(null); }, [sel?.id]);
-  const [view, setView] = useState<'cards' | 'list'>('list');
   const [freq, setFreq] = useState<Freq | 'all'>('all');
   // Se dibujan de a 25 clientes (tarjetas pesan): "Ver más" agrega el resto
   const [limit, setLimit] = useState(25);
-  useEffect(() => { setLimit(25); }, [freq, routeId, view]);
-  useEffect(() => { const v = load<string>('vx_col_view', 'list'); if (v === 'cards' || v === 'list') setView(v); }, []);
-  const pickView = (v: 'cards' | 'list') => { setView(v); save('vx_col_view', v); };
+  useEffect(() => { setLimit(25); }, [freq, routeId]);
   const router = useRouter();
   const [nearCount, setNearCount] = useState<number | null>(null);
   const [q, setQ] = useState('');
@@ -640,14 +637,6 @@ export default function CollectorPage() {
           <input type="search" placeholder={t('cx.search')} value={q} onChange={(e) => setQ(e.target.value)} className={ui.input} />
       {/* Vista: tarjetas o lista, y frecuencia de cobro */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex rounded-xl border border-slate-300 p-0.5 dark:border-slate-700" role="tablist">
-          {(['cards', 'list'] as const).map((v) => (
-            <button key={v} type="button" role="tab" aria-selected={view === v} onClick={() => pickView(v)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-bold cursor-pointer ${view === v ? 'bg-blue-600 text-white' : ''}`}>
-              {v === 'cards' ? `🗂️ ${t('card.viewCards')}` : `📋 ${t('card.viewList')}`}
-            </button>
-          ))}
-        </div>
         <div className="flex flex-wrap gap-1">
           {(['all', 'daily', 'weekly', 'biweekly', 'monthly'] as const).map((f) => {
             const n = f === 'all' ? route.customers.length : route.customers.filter((c) => c.credits?.some((k) => freqOf(k) === f)).length;
@@ -662,31 +651,8 @@ export default function CollectorPage() {
         </div>
       </div>
 
-      {/* Tarjetas de cobro */}
-      {view === 'cards' && (
-        <div className="space-y-3">
-          {shownQ.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('col.noCustomers')}</p></Card>}
-          {shownQ.map((c) => (
-            <Card key={c.id} className={`space-y-3 ${c.visited_today ? 'opacity-80' : ''}`}>
-              <div className="flex items-start gap-3">
-                <span className="text-xl">{c.visited_today ? '✅' : Number(c.overdue) > 0 ? '🔴' : Number(c.due_today) > 0 ? '🟡' : '⚪'}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="flex items-start gap-1.5 break-words font-bold leading-tight"><span className="mt-1.5"><Dot r={c.rating} /></span><span className="min-w-0">{c.name}</span></p>
-                  <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'}</p>
-                  {c.last_visit && <Note v={c.last_visit} />}
-                </div>
-                <button type="button" onClick={() => { setSel(c); setPanel(null); }} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>👤 {t('card.profile')}</button>
-              </div>
-              <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? (o, ns) => reverseInst(c.id, o, ns) : undefined} c={c} filter={freq} today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(c.id, order, amount, method)} />
-              {(c.credits ?? []).length === 0 && <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>}
-            </Card>
-          ))}
-          <ShowMore rest={shownAllQ.length - shownQ.length} onClick={() => setLimit((x) => x + 25)} />
-        </div>
-      )}
-
       {/* Clientes del día: primero los vencidos */}
-      {view === 'list' && <ul className="space-y-2">
+      {<ul className="space-y-2">
         {shownQ.length === 0 && <Card><p className={`text-sm ${ui.muted}`}>{t('col.noCustomers')}</p></Card>}
         {shownQ.map((c) => (
           <li key={c.id}>
@@ -706,7 +672,7 @@ export default function CollectorPage() {
           </li>
         ))}
       </ul>}
-      {view === 'list' && <ShowMore rest={shownAllQ.length - shownQ.length} onClick={() => setLimit((x) => x + 25)} />}
+      {<ShowMore rest={shownAllQ.length - shownQ.length} onClick={() => setLimit((x) => x + 25)} />}
 
         </>
       )}
