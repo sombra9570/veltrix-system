@@ -9,7 +9,10 @@ type Branding = { name: string; logo: string | null };
 const EVT = 'vx-branding';
 
 /** Los PNG se guardan con -t en el nombre para mostrarlos sin recuadro */
-export function isTransparentLogo(path?: string | null) { return !!path && /-t\.\w+$/.test(path); }
+export function isTransparentLogo(path?: string | null) { return !!path && /-t[dl]?\.\w+$/.test(path); }
+
+/** -td: logo oscuro (se invierte en modo noche) · -tl: logo claro (se invierte en modo día) */
+function logoTone(path?: string | null) { const m = path?.match(/-t([dl])?\.\w+$/); return m?.[1] ?? ''; }
 
 export function orgLogoUrl(path: string | null | undefined) {
   if (!path) return null;
@@ -38,7 +41,7 @@ export function OrgLogo({ path, name, size = 32 }: { path?: string | null; name:
   // PNG (marcado -t): se muestra tal cual, sin recuadro. Otros formatos: imagen en cuadro.
   if (isTransparentLogo(path)) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={url} alt={name} onError={() => setBad(true)} style={{ height: size, maxWidth: size * 2.5 }} className="shrink-0 object-contain" />;
+    return <img src={url} alt={name} onError={() => setBad(true)} style={{ height: size, maxWidth: size * 2.5 }} className={`shrink-0 object-contain ${logoTone(path) === 'd' ? 'dark:invert' : logoTone(path) === 'l' ? 'invert dark:invert-0' : ''}`} />;
   }
   // eslint-disable-next-line @next/next/no-img-element
   return <img src={url} alt={name} onError={() => setBad(true)} style={{ width: size, height: size }} className="shrink-0 rounded-lg object-cover" />;
@@ -78,6 +81,15 @@ export function BrandingCard({ orgId }: { orgId: string }) {
         else if (webp && webp.type === 'image/webp') { blob = webp; ext = 'webp'; }
         else throw new Error('big');
         tag = '-t';
+        // Si el logo es de un solo tono (negro/gris o blanco), se anota para invertirlo según día o noche
+        const px = cv.getContext('2d')!.getImageData(0, 0, cv.width, cv.height).data;
+        let n = 0, mono = 0, lum = 0;
+        for (let i = 0; i < px.length; i += 4) {
+          if (px[i + 3] < 128) continue;
+          n++; lum += (px[i] + px[i + 1] + px[i + 2]) / 3;
+          if (Math.max(px[i], px[i + 1], px[i + 2]) - Math.min(px[i], px[i + 1], px[i + 2]) < 40) mono++;
+        }
+        if (n > 0 && mono / n > 0.9) { const avg = lum / n; if (avg < 110) tag = '-td'; else if (avg > 170) tag = '-tl'; }
       } else { blob = await compressImage(f, 512, 0.85); ext = extFor(blob); }
       const path = `${orgId}/logo-${Date.now()}${tag}.${ext}`;
       const { error } = await supabase.storage.from('org-logos').upload(path, blob, { contentType: blob.type, cacheControl: '31536000', upsert: false });
