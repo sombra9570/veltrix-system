@@ -5,14 +5,14 @@ import { ui } from '../../site-header';
 import { CreditCard, freqOf, type Credit, type Freq, type Method } from './credit-card';
 import type { LoanPolicy } from './loan-form';
 
-export function Credits({ c, filter, today, policy, fmt, onSave, locked = false, onReverse }: {
-  locked?: boolean; onReverse?: (order: string, ns: number[]) => Promise<void> | void;
+export function Credits({ only, c, filter, today, policy, fmt, onSave, locked = false, onReverse }: {
+  only?: string; locked?: boolean; onReverse?: (order: string, ns: number[]) => Promise<void> | void;
   c: { credits?: Credit[] }; filter: Freq | 'all'; today: string; policy?: LoanPolicy; fmt: (n: number) => string;
   onSave: (order: string, amount: number, method: Method) => void;
 }) {
   const { t, lang } = useT();
   const all = c.credits ?? [];
-  const list = all.filter((k) => filter === 'all' || freqOf(k) === filter);
+  const list = all.filter((k) => (only ? k.id === only : filter === 'all' || freqOf(k) === filter));
   if (all.length === 0) return <p className={`text-xs ${ui.muted}`}>{t('card.noCards')}</p>;
   return (
     <div className="space-y-4">

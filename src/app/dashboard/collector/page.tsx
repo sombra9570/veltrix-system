@@ -134,8 +134,11 @@ export default function CollectorPage() {
   const [sel, setSel] = useState<Customer | null>(null);
   const [saleMode, setSaleMode] = useState<{ mode: 'loan' | 'merch'; can: boolean } | null>(null);
   const [panel, setPanel] = useState<'pay' | 'visit' | 'expense' | 'settle' | 'loan' | null>(null);
+  const [sheetTab, setSheetTab] = useState<'info' | 'acc'>('info');
+  const [sheetAcct, setSheetAcct] = useState<string | null>(null);
   const [loanFor, setLoanFor] = useState<{ id: string; name: string } | null>(null);
   useEffect(() => { if (panel !== 'loan') setLoanFor(null); }, [panel]);
+  useEffect(() => { setSheetTab('info'); setSheetAcct(null); }, [sel?.id]);
   const [view, setView] = useState<'cards' | 'list'>('list');
   const [freq, setFreq] = useState<Freq | 'all'>('all');
   // Se dibujan de a 25 clientes (tarjetas pesan): "Ver más" agrega el resto
@@ -153,8 +156,8 @@ export default function CollectorPage() {
   const go = (sc: Screen) => { setHist((h) => [...h, screen]); setScreen(sc); setSel(null); setPanel(null); };
   const back = () => { setHist((h) => { const n = [...h]; setScreen(n.pop() ?? 'home'); return n; }); setSel(null); setPanel(null); };
   const menu = () => { setHist([]); setScreen('home'); setSel(null); setPanel(null); };
-  useBackButton((sel ? 1 : 0) + (panel ? 1 : 0) + (screen !== 'home' ? 1 : 0), () => {
-    if (sel && panel) setPanel(null); else if (sel || panel) { setSel(null); setPanel(null); } else back();
+  useBackButton((sel ? 1 : 0) + (panel ? 1 : 0) + (sel && !panel && sheetAcct ? 1 : 0) + (screen !== 'home' ? 1 : 0), () => {
+    if (sel && !panel && sheetAcct) setSheetAcct(null); else if (sel && panel) setPanel(null); else if (sel || panel) { setSel(null); setPanel(null); } else back();
   });
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   // Último cobro, para ofrecer el comprobante por WhatsApp
@@ -711,20 +714,33 @@ export default function CollectorPage() {
       {/* Hoja inferior: cliente / gasto / rendición */}
       {(sel || panel) && (
         <div className="fixed inset-0 z-40 overflow-y-auto overscroll-contain bg-white dark:bg-slate-900">
-          <div className="mx-auto max-w-xl px-4 pb-[calc(2rem+env(safe-area-inset-bottom))]">
+          <div className={`mx-auto max-w-xl px-4 ${sel && !panel ? 'pb-[calc(6rem+env(safe-area-inset-bottom))]' : 'pb-[calc(2rem+env(safe-area-inset-bottom))]'}`}>
             <div className="sticky top-0 z-10 -mx-4 mb-3 flex items-center gap-2 border-b border-slate-200 bg-white px-4 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))] dark:border-slate-800 dark:bg-slate-900">
-              <button type="button" onClick={() => { if (sel && panel) setPanel(null); else { setSel(null); setPanel(null); } }} aria-label={t('cx.back')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">←</button>
+              <button type="button" onClick={() => { if (sel && !panel && sheetAcct) setSheetAcct(null); else if (sel && panel) setPanel(null); else { setSel(null); setPanel(null); } }} aria-label={t('cx.back')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">←</button>
               <span className="min-w-0 flex-1 truncate text-sm font-bold">{sel?.name ?? route.name}</span>
               <button type="button" onClick={() => { setSel(null); setPanel(null); menu(); }} aria-label={t('cx.menu')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">☰</button>
             </div>
 
             {sel && !panel && (
               <CustomerSheet locked={!!route.locked} c={selNow ?? sel} fmt={fmt} qr={route.pay_qr ?? null} online={online} onPay={() => setPanel('pay')} onVisit={() => setPanel('visit')}
-                cards={<>
-                  <Credits locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? (o, ns) => reverseInst(sel.id, o, ns) : undefined} c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
-                  <DeleteActions c={selNow ?? sel} canCredits={!!route.can_delete_credits} canCustomer={!!route.can_delete_customers} online={online}
-                    onDone={(what) => { const cid = sel.id; setSel(null); setPanel(null); void patch(route.id, what === 'customer' ? { removed: [cid], totals: true } : { customers: [cid], totals: true }); }} />
-                </>} />
+                tab={sheetTab} acct={sheetAcct} onAcct={setSheetAcct}
+                renderCards={(only) => (
+                  <Credits only={only} locked={!!route.locked} onReverse={route.can_delete_installments && !route.locked ? (o, ns) => reverseInst(sel.id, o, ns) : undefined} c={selNow ?? sel} filter="all" today={route.today} policy={route.policy} fmt={fmt} onSave={(order, amount, method) => cardPay(sel.id, order, amount, method)} />
+                )}
+                extra={<DeleteActions c={selNow ?? sel} canCredits={!!route.can_delete_credits} canCustomer={!!route.can_delete_customers} online={online}
+                  onDone={(what) => { const cid = sel.id; setSel(null); setPanel(null); void patch(route.id, what === 'customer' ? { removed: [cid], totals: true } : { customers: [cid], totals: true }); }} />} />
+            )}
+            {sel && !panel && (
+              <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] dark:border-slate-800 dark:bg-slate-900">
+                <div className="mx-auto grid max-w-xl grid-cols-2">
+                  {([['info', '👤', 'cx.tab.info'], ['acc', '💳', 'cx.tab.accounts']] as const).map(([k, ic, lk]) => (
+                    <button key={k} type="button" onClick={() => { setSheetTab(k); setSheetAcct(null); }}
+                      className={`flex flex-col items-center gap-0.5 py-2 text-xs font-bold cursor-pointer ${sheetTab === k ? 'text-blue-600 dark:text-blue-400' : ui.muted}`}>
+                      <span className="text-2xl leading-none">{ic}</span>{t(lk as DictKey)}
+                    </button>
+                  ))}
+                </div>
+              </nav>
             )}
             {sel && panel === 'pay' && (
               <PayForm c={sel} fmt={fmt} onDone={(method, amount) => {
@@ -823,7 +839,10 @@ function DeleteActions({ c, canCredits, canCustomer, online, onDone }: { c: Cust
   );
 }
 
-function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, cards, locked = false }: { locked?: boolean; c: Customer; fmt: (n: number) => string; qr: string | null; online: boolean; onPay: () => void; onVisit: () => void; cards: ReactNode }) {
+function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, tab, acct, onAcct, renderCards, extra, locked = false }: {
+  locked?: boolean; c: Customer; fmt: (n: number) => string; qr: string | null; online: boolean; onPay: () => void; onVisit: () => void;
+  tab: 'info' | 'acc'; acct: string | null; onAcct: (id: string | null) => void; renderCards: (only?: string) => ReactNode; extra: ReactNode;
+}) {
   const { t, lang } = useT();
   const map = c.lat != null && c.lng != null
     ? `https://maps.google.com/?q=${c.lat},${c.lng}`
@@ -836,17 +855,67 @@ function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, cards, locked = fal
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(t('cx.cs.qrMsg', { name: c.name, url }))}`, '_blank', 'noopener');
   };
   const gMap = c.g_lat != null && c.g_lng != null ? `https://maps.google.com/?q=${c.g_lat},${c.g_lng}` : null;
+  const initials = c.name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join('');
+  const [photo, setPhoto] = useState<string | null>(null);
+  useEffect(() => {
+    let off = false;
+    setPhoto(null);
+    if (!navigator.onLine) return;
+    (async () => {
+      try {
+        const { data } = await supabase.from('customers').select('photo_path').eq('id', c.id).maybeSingle();
+        const path = (data as { photo_path?: string | null } | null)?.photo_path;
+        if (!path) return;
+        const { data: u } = await supabase.storage.from('customer-files').createSignedUrl(path, 600);
+        if (!off && u?.signedUrl) setPhoto(u.signedUrl);
+      } catch { /* sin foto: se muestran las iniciales */ }
+    })();
+    return () => { off = true; };
+  }, [c.id]);
+  const credits = c.credits ?? [];
+  const ro = 'rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-900';
+
+  if (tab === 'acc') {
+    if (acct) return <div className="space-y-4">{renderCards(acct)}</div>;
+    return (
+      <div className="space-y-3">
+        {credits.length === 0 && <p className={`text-sm ${ui.muted}`}>{t('card.noCards')}</p>}
+        {credits.map((k) => {
+          const debt = k.installments.reduce((a, i) => a + Math.max(0, Number(i.amount) - Number(i.paid)), 0);
+          const paid = k.installments.filter((i) => Number(i.amount) - Number(i.paid) <= 0.004).length;
+          return (
+            <button key={k.id} type="button" onClick={() => onAcct(k.id)}
+              className={`w-full space-y-2 rounded-2xl p-4 text-left cursor-pointer ${ui.card}`}>
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-bold">💳 {new Date(k.created).toLocaleDateString(lang)}</p>
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold dark:bg-slate-800">{t(`card.f.${freqOf(k)}` as DictKey)}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-center text-sm">
+                <div><p className={`text-[11px] ${ui.muted}`}>{t('cx.acc.amount')}</p><p className="font-extrabold">{fmt(Number(k.total))}</p></div>
+                <div><p className={`text-[11px] ${ui.muted}`}>{t('cx.acc.debt')}</p><p className={`font-extrabold ${debt > 0 ? '' : 'text-emerald-600 dark:text-emerald-400'}`}>{fmt(debt)}</p></div>
+                <div><p className={`text-[11px] ${ui.muted}`}>{t('cx.acc.paid')}</p><p className="font-extrabold">{paid}/{k.installments.length}</p></div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      <div>
-        <h2 className="text-lg font-bold">{c.name}</h2>
-        <p className={`text-sm ${ui.muted}`}>{c.address ?? '—'}</p>
-        {c.tax_id && <p className={`text-xs ${ui.muted}`}>{t('cx.cs.ci')}: {c.tax_id}</p>}
-        {(c.g_name || c.g_phone) && (
-          <p className={`text-xs ${ui.muted}`}>{t('cx.cs.guarantor')}: {c.g_name ?? '—'}{c.g_phone ? ` · ${c.g_phone}` : ''}
-            {gMap && <> · <a href={gMap} target="_blank" rel="noopener noreferrer" className="underline">📍</a></>}</p>
-        )}
+      <div className="flex items-center gap-4 rounded-3xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/30 dark:bg-blue-500/10">
+        {photo
+          // eslint-disable-next-line @next/next/no-img-element
+          ? <img src={photo} alt={c.name} onError={() => setPhoto(null)} className="h-24 w-24 shrink-0 rounded-full object-cover" />
+          : <span className="grid h-24 w-24 shrink-0 place-items-center rounded-full bg-blue-600 text-3xl font-extrabold text-white">{initials || '👤'}</span>}
+        <div className="min-w-0 flex-1">
+          <h2 className="break-words text-lg font-bold leading-tight">{c.name}</h2>
+          {c.phone && <p className="truncate text-sm font-semibold text-blue-700 dark:text-blue-300">{c.phone}</p>}
+          {c.tax_id && <p className={`truncate text-xs ${ui.muted}`}>{t('cx.cs.ci')}: {c.tax_id}</p>}
+        </div>
       </div>
+
       <div className="grid grid-cols-3 gap-2 text-center">
         <div className="rounded-xl bg-slate-50 p-2 dark:bg-slate-800/50">
           <p className={`text-[11px] uppercase ${ui.muted}`}>{t('cust.overdue')}</p>
@@ -862,21 +931,26 @@ function CustomerSheet({ c, fmt, qr, online, onPay, onVisit, cards, locked = fal
         </div>
       </div>
       {c.next_due && <p className={`text-xs ${ui.muted}`}>{t('col.nextDue', { date: new Date(c.next_due + 'T12:00:00').toLocaleDateString(lang) })}</p>}
-      <div className="grid grid-cols-2 gap-2">
-        {c.phone ? <a href={whatsappLink(c.phone)} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>📞 {t('col.call')}</a> : <span />}
-        {map ? <a href={map} target="_blank" rel="noopener noreferrer" className={ui.btnGhost}>📍 {t('col.map')}</a> : <span />}
-      </div>
+
+      {c.phone && (
+        <div className="flex items-center gap-2">
+          <p className={`min-w-0 flex-1 truncate ${ro}`}>{c.phone}</p>
+          <a href={whatsappLink(c.phone)} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-emerald-500 text-xl text-white">💬</a>
+          <a href={`tel:${c.phone.replace(/[^\d+]/g, '')}`} aria-label={t('col.call')} className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-blue-600 text-xl text-white">📞</a>
+        </div>
+      )}
+      {c.address && <p className={ro}>📍 {c.address}</p>}
+      {(c.g_name || c.g_phone) && (
+        <p className={`text-xs ${ui.muted}`}>{t('cx.cs.guarantor')}: {c.g_name ?? '—'}{c.g_phone ? ` · ${c.g_phone}` : ''}
+          {gMap && <> · <a href={gMap} target="_blank" rel="noopener noreferrer" className="underline">📍</a></>}</p>
+      )}
+      {map && <a href={map} target="_blank" rel="noopener noreferrer" className={`${ui.btnGhost} w-full`}>📍 {t('col.map')}</a>}
       {qr && c.phone && <button type="button" onClick={sendQr} disabled={!online} className={`${ui.btnGhost} w-full`}>📲 {t('cx.cs.sendQr')}</button>}
       <div className="grid grid-cols-2 gap-2">
         <button type="button" disabled={locked} onClick={onVisit} className={ui.btnGhost}>📝 {t('col.visit')}</button>
         <button type="button" disabled={locked} onClick={onPay} className={`${ui.btnPrimary} py-3`}>💵 {t('col.collect')}</button>
       </div>
-      {(c.credits ?? []).length > 0 && (
-        <div className="space-y-2 border-t border-slate-200 pt-4 dark:border-slate-800">
-          <p className="font-bold">🗂️ {t('card.viewCards')}</p>
-          {cards}
-        </div>
-      )}
+      {extra}
     </div>
   );
 }
