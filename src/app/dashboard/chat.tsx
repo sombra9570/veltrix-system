@@ -8,6 +8,7 @@ import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 import { compressImage, extFor } from './image';
 import { useLive } from './live';
+import { IconBack } from '../icons';
 
 type Channel = { id: string; kind: 'announce' | 'branch' | 'direct'; name: string | null; can_post: boolean; last_at: string | null; last: string | null; unread: number };
 type Msg = { id: string; at: string; body: string | null; photo: string | null; sender_id: string; sender: string; client_id: string | null; pending?: boolean };
@@ -218,7 +219,7 @@ export function ChatScreen() {
         ) : (
           <>
             <div className="flex items-center gap-3 border-b border-slate-200 p-3 dark:border-slate-800">
-              <button type="button" onClick={() => { openId.current = null; setActive(null); setMsgs([]); setLoadingMsgs(false); }} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 lg:hidden cursor-pointer dark:border-slate-700">←</button>
+              <button type="button" onClick={() => { openId.current = null; setActive(null); setMsgs([]); setLoadingMsgs(false); }} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 lg:hidden cursor-pointer dark:border-slate-700"><IconBack /></button>
               <h2 className="min-w-0 flex-1 truncate font-bold">{title(active)}</h2>
             </div>
             <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-3">

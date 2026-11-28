@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ui } from '../site-header';
 import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
+import { IconClose } from '../icons';
 
 const N = 10;
 
@@ -44,7 +45,7 @@ export function HelpButton() {
                 <h2 className="text-lg font-extrabold">❓ {t('help.title')}</h2>
                 <p className={`text-xs ${ui.muted}`}>{t('help.subtitle')}</p>
               </div>
-              <button type="button" onClick={() => setOpen(false)} aria-label={t('pos.close')} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+              <button type="button" onClick={() => setOpen(false)} aria-label={t('pos.close')} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700"><IconClose /></button>
             </div>
             <div className="p-5 pb-2">
               <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('help.search')} className={ui.input} />

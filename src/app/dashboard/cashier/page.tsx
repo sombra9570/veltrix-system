@@ -12,6 +12,7 @@ import { RestaurantInbox } from '../delivery';
 import { SkuTag } from '../sku-tag';
 import { Sheet } from '../sheet';
 import { ReceiptButtons } from '../receipt-buttons';
+import { IconClose } from '../../icons';
 
 type Method = 'cash' | 'qr_transfer' | 'card';
 type MovType = 'expense' | 'withdrawal' | 'deposit' | 'change_fund';
@@ -362,7 +363,7 @@ function QueueTab({
       <p className="font-semibold">✅ {t('cash.chargedTitle')}</p>
       <span className="flex items-center gap-2">
         <ReceiptButtons orderId={done} />
-        <button type="button" onClick={() => setDone(null)} className={`${ui.btnGhost} !px-3 !py-1 text-xs`}>✕</button>
+        <button type="button" onClick={() => setDone(null)} className={`${ui.btnGhost} !px-3 !py-1 text-xs`}><IconClose /></button>
       </span>
     </Card>
   );
@@ -439,7 +440,7 @@ function QueueTab({
               <p className={`text-xs font-semibold uppercase tracking-wide ${ui.muted}`}>{t('cash.customer')}</p>
               <p className="truncate text-lg font-bold">{active.customer_name}</p>
             </div>
-            <button type="button" onClick={() => setActive(null)} aria-label={t('cash.cancel')} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+            <button type="button" onClick={() => setActive(null)} aria-label={t('cash.cancel')} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700"><IconClose /></button>
           </div>
 
           {items.length > 0 && (
@@ -576,7 +577,7 @@ function DebtsTab({
               <p className="truncate text-lg font-bold">{sel.name}</p>
               <p className={`text-xs ${ui.muted}`}>{sel.doc ?? ''}</p>
             </div>
-            <button type="button" onClick={() => setSel(null)} aria-label={t('cash.cancel')} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+            <button type="button" onClick={() => setSel(null)} aria-label={t('cash.cancel')} className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700"><IconClose /></button>
           </div>
           <div className="grid grid-cols-2 gap-3 text-center">
             <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50">

@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { rpc } from '../../lib/supabase';
 import { useT } from '../i18n';
 import AiPage from './ia-screen';
+import { IconClose } from '../icons';
 
 // Círculo flotante de Veltrix IA: se arrastra a cualquier lugar, se pega al borde y recuerda dónde quedó.
 // Aparece solo para quien tiene el permiso de usar la IA; al tocarlo abre la consulta sin salir de la pantalla.
@@ -55,7 +56,7 @@ export function AiBubble() {
             <img src="/veltrix-ia.png" alt="" width={24} height={24} className="h-6 w-6 rounded-full" />Veltrix IA
           </span>
           <button type="button" onClick={() => setOpen(false)} aria-label={t('pos.close')}
-            className="grid h-8 w-8 place-items-center rounded-lg text-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800">✕</button>
+            className="grid h-8 w-8 place-items-center rounded-lg text-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"><IconClose /></button>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto p-3"><AiPage /></div>
       </div>

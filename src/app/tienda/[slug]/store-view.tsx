@@ -10,6 +10,7 @@ import { ThemeToggle } from '../../theme';
 import { ui } from '../../site-header';
 import { storeImageUrl, storeThumbUrl } from '../../dashboard/image';
 import { Spinner } from '../../spinner';
+import { IconClose } from '../../icons';
 
 type Product = { id: string; name: string; price: number; type: string; description: string | null; photo: string | null; unit: string; available: boolean; model?: string | null; size?: string | null; color?: string | null };
 type Store = { slug: string; name: string; description: string | null; whatsapp: string | null; logo: string | null; theme?: string; address?: string | null; map_url?: string | null; currency: string; products: Product[] };
@@ -287,7 +288,7 @@ export function StoreView({ slug }: { slug: string }) {
           <div className="absolute inset-x-0 bottom-0 mx-auto max-h-[90dvh] max-w-xl space-y-4 overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] dark:bg-slate-900">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-extrabold">🛒 {t('shop2.cart')}</h2>
-              <button type="button" onClick={() => setOpen(false)} aria-label={t('pos.close')} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+              <button type="button" onClick={() => setOpen(false)} aria-label={t('pos.close')} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700"><IconClose /></button>
             </div>
             <ul className="space-y-2">
               {cart.map((l) => (

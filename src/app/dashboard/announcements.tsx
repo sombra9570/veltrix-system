@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
 import { rpc } from '../../lib/supabase';
+import { IconClose } from '../icons';
 
 type Notice = { id: string; title: string; body: string };
 
@@ -23,7 +24,7 @@ export function AnnouncementsBanner() {
             <p className="break-words text-sm font-bold">{a.title}</p>
             <p className="whitespace-pre-line break-words text-xs text-slate-600 dark:text-slate-300">{a.body}</p>
           </div>
-          <button type="button" onClick={() => close(a.id)} aria-label="Cerrar" className="cursor-pointer rounded-md px-2 py-1 text-sm font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white">✕</button>
+          <button type="button" onClick={() => close(a.id)} aria-label="Cerrar" className="cursor-pointer rounded-md px-2 py-1 text-sm font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white"><IconClose /></button>
         </div>
       ))}
     </div>

@@ -15,6 +15,7 @@ import { ApprovalsTray } from '../approvals';
 import { StoreOrdersBanner } from '../store-orders-alert';
 import SupPanel from './panel';
 import { useBoard, type SRoute, type SBranch } from './board';
+import { IconClose } from '../../icons';
 
 // Panel del supervisor: cajas de ruta de sus sucursales, cobrado y prestado por día,
 // cierre de caja e inversión según los permisos que le dio el administrador.
@@ -121,7 +122,7 @@ function RouteCard({ r, b, onChanged, onError }: { r: SRoute; b: SBranch; onChan
           <input inputMode="decimal" autoFocus placeholder={t('cash.amount')} value={mv.amount} onChange={(e) => setMv({ ...mv, amount: e.target.value })} className={ui.input} />
           <input placeholder={t('cust.notes')} value={mv.note} onChange={(e) => setMv({ ...mv, note: e.target.value })} className={ui.input} />
           <div className="flex gap-2">
-            <button type="button" onClick={() => setMv(null)} className={`${ui.btnGhost} !py-2 text-sm`}>✕</button>
+            <button type="button" onClick={() => setMv(null)} className={`${ui.btnGhost} !py-2 text-sm`}><IconClose /></button>
             <button type="button" onClick={moveFund} className={`${ui.btnPrimary} !py-2 text-sm`}>{mv.type === 'investment' ? `➕ ${t('fund.invest')}` : `➖ ${t('fund.withdraw')}`}</button>
           </div>
         </div>

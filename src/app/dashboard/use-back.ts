@@ -11,9 +11,11 @@ export function useBackButton(depth: number, goBack: () => void) {
   const fn = useRef(goBack);
   fn.current = goBack;
   const has = useRef(false);
+  const skip = useRef(0); // retrocesos pedidos por la propia pantalla: su popstate no debe cerrar nada
 
   useEffect(() => {
     const onPop = () => {
+      if (skip.current > 0) { skip.current -= 1; return; }
       if (!has.current) return;
       has.current = false;
       fn.current();
@@ -28,6 +30,7 @@ export function useBackButton(depth: number, goBack: () => void) {
       has.current = true;
     } else if (depth === 0 && has.current) {
       has.current = false; // la entrada se retira sin disparar goBack
+      skip.current += 1;
       window.history.back();
     }
   }, [depth]);

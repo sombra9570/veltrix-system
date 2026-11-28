@@ -17,6 +17,7 @@ import { AvisosPanel } from './avisos-panel';
 import { RecursosPanel } from './recursos-panel';
 import { ActividadPanel } from './actividad-panel';
 import { ConocimientoPanel } from './conocimiento-panel';
+import { IconClose } from '../../icons';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -765,7 +766,7 @@ export default function GlobalCoreAdminPage() {
           <div className="absolute inset-x-0 bottom-0 mx-auto max-h-[90dvh] max-w-xl space-y-3 overflow-y-auto rounded-t-3xl bg-slate-900 p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:rounded-3xl">
             <div className="flex items-center justify-between">
               <h2 className="font-bold">✉️ Correo a {mail.name}</h2>
-              <button type="button" onClick={() => setMail(null)} className="h-9 w-9 rounded-lg border border-slate-700 cursor-pointer">✕</button>
+              <button type="button" onClick={() => setMail(null)} className="h-9 w-9 rounded-lg border border-slate-700 cursor-pointer"><IconClose /></button>
             </div>
             <p className="text-xs text-slate-400">Se envía desde el correo institucional de Veltrix (veltrixsystem.app), no desde un correo personal.</p>
             <p className="text-sm"><span className="text-slate-400">Para:</span> {mail.to}</p>

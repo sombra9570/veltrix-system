@@ -4,6 +4,7 @@ import { rpc } from '../../../lib/supabase';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
+import { IconClose } from '../../icons';
 
 /* ---------- Corte de caja: se cuenta el efectivo, se registran las salidas por rubro y la caja queda cuadrada ---------- */
 const CATS: Record<'op_expense' | 'payment_out', string[]> = {
@@ -88,7 +89,7 @@ export function CutForm({ routeId, routeName, period, m, onCancel, onDone, onErr
             </select>
             <input inputMode="decimal" placeholder={t('cash.amount')} value={l.amount} onChange={(e) => set(i, { amount: e.target.value })} className={ui.input} />
             <input placeholder={t('cust.notes')} value={l.note} onChange={(e) => set(i, { note: e.target.value })} className={ui.input} />
-            <button type="button" onClick={() => setLines(lines.filter((_, k) => k !== i))} className="text-sm font-bold text-red-600 cursor-pointer" aria-label="✕">✕</button>
+            <button type="button" onClick={() => setLines(lines.filter((_, k) => k !== i))} className="text-sm font-bold text-red-600 cursor-pointer" aria-label="✕"><IconClose /></button>
           </div>
         ))}
         {kinds.length > 0 && <button type="button" onClick={() => setLines([...lines, { kind: kinds[0], category: CATS[kinds[0]][0], amount: '', note: '' }])} className={`${ui.btnGhost} !py-1.5 text-xs`}>➕ {t('liq.addLine')}</button>}

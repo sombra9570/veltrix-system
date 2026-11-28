@@ -6,6 +6,7 @@ import { useT } from '../../i18n';
 import { ui } from '../../site-header';
 import { storeImageUrl, storeThumbUrl } from '../../dashboard/image';
 import { Spinner } from '../../spinner';
+import { IconClose } from '../../icons';
 
 type Product = { id: string; name: string; price: number; type: string; description: string | null; photo: string | null; unit: string; available: boolean };
 type Menu = { table: string; name: string; logo: string | null; currency: string; products: Product[] };
@@ -212,7 +213,7 @@ export function TableMenu({ token }: { token: string }) {
           <div className="max-h-[92dvh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-md sm:rounded-3xl dark:bg-slate-900" onClick={(e) => e.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-lg font-extrabold">🛒 {t('shop2.cart')}</h2>
-              <button type="button" onClick={() => setOpen(false)} className="text-2xl cursor-pointer" aria-label="×">×</button>
+              <button type="button" onClick={() => setOpen(false)} className="text-2xl cursor-pointer" aria-label="×"><IconClose /></button>
             </div>
             <ul className="divide-y divide-slate-200 dark:divide-slate-800">
               {cart.map((l) => (

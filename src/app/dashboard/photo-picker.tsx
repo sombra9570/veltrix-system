@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { ui } from '../site-header';
 import { useT } from '../i18n';
+import { IconClose } from '../icons';
 
 /**
  * Elegir una foto de dos maneras, siempre las dos:
@@ -48,7 +49,7 @@ export function PhotoPicker({ value, onChange, facing = 'environment', disabled,
             <p className="truncate font-semibold">{value.name}</p>
             <p className={ui.muted}>{(value.size / 1048576).toFixed(1)} MB · {t('photo.willCompress')}</p>
           </div>
-          <button type="button" disabled={disabled} onClick={() => onChange(null)} aria-label={t('photo.remove')} className={`${ui.btnGhost} !px-2.5 !py-1.5 text-xs`}>✕</button>
+          <button type="button" disabled={disabled} onClick={() => onChange(null)} aria-label={t('photo.remove')} className={`${ui.btnGhost} !px-2.5 !py-1.5 text-xs`}><IconClose /></button>
         </div>
       )}
     </div>

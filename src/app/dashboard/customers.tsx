@@ -10,6 +10,7 @@ import { money, parseAmount } from './format';
 import { compressImage, extFor } from './image';
 import { PhotoPicker } from './photo-picker';
 import { useVeltrixAuth } from '../auth-system';
+import { IconClose } from '../icons';
 
 type Branch = { id: string; name: string; company: string; currency: string };
 type Row = {
@@ -327,7 +328,7 @@ export function CustomersScreen() {
                     onClick={() => setForm({ ...blank, id: detail.customer.id, name: detail.customer.name, tax_id: detail.customer.tax_id ?? '', phone: detail.customer.phone ?? '', address: detail.customer.address ?? '', limit: String(detail.customer.credit_limit), notes: detail.customer.notes ?? '' })}>
                     {t('prod.edit')}
                   </button>}
-                  <button type="button" onClick={() => setDetail(null)} aria-label={t('pos.close')} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+                  <button type="button" onClick={() => setDetail(null)} aria-label={t('pos.close')} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700"><IconClose /></button>
                 </div>
               </div>
 

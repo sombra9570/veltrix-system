@@ -5,6 +5,7 @@ import { useLanguage, COUNTRIES, LANGUAGES, CountryCode, LangCode } from './lang
 import { useT, countryName } from './i18n';
 import { ThemeToggle } from './theme';
 import { InstallAppButton } from './pwa';
+import { IconClose, IconMenu } from './icons';
 
 // Estilos compartidos por las pantallas públicas (inicio, ingresar, registro)
 export const ui = {
@@ -135,7 +136,7 @@ export function SiteHeader({ showAuthButtons = true }: { showAuthButtons?: boole
             aria-expanded={open}
             className="grid h-10 w-10 cursor-pointer place-items-center rounded-lg border border-slate-300 text-lg dark:border-slate-700"
           >
-            {open ? '✕' : '☰'}
+            {open ? <IconClose /> : <IconMenu />}
           </button>
         </div>
       </div>

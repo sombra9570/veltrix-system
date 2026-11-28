@@ -6,6 +6,7 @@ import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import { parseAmount } from '../../format';
 import { friendlyError } from '../owner-context';
+import { IconClose } from '../../../icons';
 
 type Target = { id: string; name: string; company: string };
 type StockItem = { id: string; name: string; unit: string; qty: number };
@@ -90,7 +91,7 @@ export function TransferForm({ branchId, items, flash, onDone }: {
                   onChange={(e) => setLines(lines.map((x, j) => j === k ? { ...x, qty: e.target.value } : x))} />
                 <button type="button" aria-label={t('inv.removeLine')}
                   onClick={() => setLines(lines.length > 1 ? lines.filter((_, j) => j !== k) : [emptyLine()])}
-                  className="grid min-h-10 place-items-center rounded-xl border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+                  className="grid min-h-10 place-items-center rounded-xl border border-slate-300 cursor-pointer dark:border-slate-700"><IconClose /></button>
               </div>
             );
           })}

@@ -27,6 +27,7 @@ import { CustomerNames, CustomerProfile, FreqChips, ProfileTabs } from '../custo
 import { SettingsScreen, payQrUrl } from './settings';
 import { useBackButton } from '../use-back';
 import { readSaleMode, cacheSaleMode, creditErrorKey, type CreditOp } from './credit-ops';
+import { IconBack, IconMenu } from '../../icons';
 
 /* ------------------------------------------------------------------
  * Cobrador de calle: trabaja SIN internet.
@@ -140,6 +141,14 @@ export default function CollectorPage() {
   const [loanFor, setLoanFor] = useState<{ id: string; name: string } | null>(null);
   useEffect(() => { if (panel !== 'loan') setLoanFor(null); }, [panel]);
   useEffect(() => { setSheetTab('info'); setSheetAcct(null); }, [sel?.id]);
+  // Con una pantalla encima, la de atrás no se desplaza ni se asoma
+  const overlayOpen = !!(sel || panel);
+  useEffect(() => {
+    if (!overlayOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = prev; };
+  }, [overlayOpen]);
   const [freq, setFreq] = useState<Freq | 'all'>('all');
   // Se dibujan de a 25 clientes (tarjetas pesan): "Ver más" agrega el resto
   const [limit, setLimit] = useState(25);
@@ -647,9 +656,9 @@ export default function CollectorPage() {
         <div className="fixed inset-0 z-40 overflow-y-auto overscroll-contain bg-white dark:bg-slate-900">
           <div className={`mx-auto max-w-xl px-4 ${sel && !panel ? 'pb-[calc(6rem+env(safe-area-inset-bottom))]' : 'pb-[calc(2rem+env(safe-area-inset-bottom))]'}`}>
             <div className="sticky top-0 z-10 -mx-4 mb-3 flex items-center gap-2 border-b border-slate-200 bg-white px-4 pb-2 pt-[calc(0.5rem+env(safe-area-inset-top))] dark:border-slate-800 dark:bg-slate-900">
-              <button type="button" onClick={() => { if (sel && !panel && sheetAcct) setSheetAcct(null); else if (sel && panel) setPanel(null); else { setSel(null); setPanel(null); } }} aria-label={t('cx.back')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">←</button>
+              <button type="button" onClick={() => { if (sel && !panel && sheetAcct) setSheetAcct(null); else if (sel && panel) setPanel(null); else { setSel(null); setPanel(null); } }} aria-label={t('cx.back')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700"><IconBack /></button>
               <span className="min-w-0 flex-1 truncate text-sm font-bold">{sel?.name ?? route.name}</span>
-              <button type="button" onClick={() => { setSel(null); setPanel(null); menu(); }} aria-label={t('cx.menu')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">☰</button>
+              <button type="button" onClick={() => { setSel(null); setPanel(null); menu(); }} aria-label={t('cx.menu')} className="grid h-10 w-10 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700"><IconMenu /></button>
             </div>
 
             {sel && !panel && (

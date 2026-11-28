@@ -14,6 +14,7 @@ import { CutForm, type Period } from '../../collector/cut-form';
 import { DeliveryMap, type MapPoint } from '../../delivery-map';
 import { CustomerNames, CustomerProfile, FreqChips, ProfileTabs, type FreqFilter, type ProfTab } from '../../customer-profile';
 import { useBackButton } from '../../use-back';
+import { IconClose } from '../../../icons';
 
 /* Pantalla de una ruta de cobro (administrador): lista de clientes, mapa, ajustes, información y liquidación */
 type Screen = 'home' | 'list' | 'map' | 'settings' | 'info' | 'liq';
@@ -323,7 +324,7 @@ function RouteScreen() {
                     <input inputMode="decimal" autoFocus placeholder={t('cash.amount')} value={mv.amount} onChange={(e) => setMv({ ...mv, amount: e.target.value })} className={ui.input} />
                     <input placeholder={t('cust.notes')} value={mv.note} onChange={(e) => setMv({ ...mv, note: e.target.value })} className={ui.input} />
                     <div className="flex gap-2">
-                      <button type="button" onClick={() => setMv(null)} className={`${ui.btnGhost} !py-2 text-sm`}>✕</button>
+                      <button type="button" onClick={() => setMv(null)} className={`${ui.btnGhost} !py-2 text-sm`}><IconClose /></button>
                       <button type="button" disabled={busy} onClick={moveFund} className={`${ui.btnPrimary} !py-2 text-sm`}>
                         {mv.type === 'investment' ? `➕ ${t('fund.invest')}` : `➖ ${t('fund.withdraw')}`}
                       </button>

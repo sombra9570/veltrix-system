@@ -11,6 +11,7 @@ import { QrRequests, TableQrCard } from './table-qr';
 import { DeliveryRequests, DeliveryBoard, DeliverySetup, CashReceive, CourierBoard } from './delivery';
 import { useLive } from './live';
 import { SkuTag } from './sku-tag';
+import { IconClose } from '../icons';
 
 type Branch = { id: string; name: string; company: string; currency: string };
 type Table = {
@@ -243,7 +244,7 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
           <h2 className="text-lg font-extrabold">{order.table}</h2>
           {order.guests && <p className={`text-xs ${ui.muted}`}>👤 {order.guests}</p>}
         </div>
-        <button type="button" onClick={onClose} aria-label={t('pos.close')} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+        <button type="button" onClick={onClose} aria-label={t('pos.close')} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700"><IconClose /></button>
       </div>
 
       {/* Lo que ya se pidió */}
@@ -264,7 +265,7 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
                 <button type="button" onClick={() => act('set_kitchen_item_status', { p_item: i.id, p_status: 'served' })} className="rounded-lg bg-emerald-600 px-2 py-1 text-xs font-bold text-white cursor-pointer">{t('rest.serve')}</button>
               )}
               {(i.kitchen === null || i.kitchen === 'pending') && (
-                <button type="button" onClick={() => act('remove_table_item', { p_item: i.id })} aria-label={t('rest.remove')} className={`text-xs ${ui.muted} hover:text-red-600 cursor-pointer`}>✕</button>
+                <button type="button" onClick={() => act('remove_table_item', { p_item: i.id })} aria-label={t('rest.remove')} className={`text-xs ${ui.muted} hover:text-red-600 cursor-pointer`}><IconClose /></button>
               )}
               <span className="w-20 shrink-0 text-right font-bold">{fmt(i.total)}</span>
             </li>
@@ -290,7 +291,7 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
                 {q > 0 && (
                   <>
                     <button type="button" onClick={() => sub(p, true)} aria-label={t('pos.removeItem')}
-                      className="absolute start-1 top-1 z-10 grid h-5 w-5 place-items-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-700 cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-slate-700 dark:text-slate-200">✕</button>
+                      className="absolute start-1 top-1 z-10 grid h-5 w-5 place-items-center rounded-full bg-slate-200 text-[10px] font-bold text-slate-700 cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-slate-700 dark:text-slate-200"><IconClose /></button>
                     <div className="absolute inset-x-1.5 bottom-1.5 z-10 flex items-center gap-1">
                       <button type="button" onClick={() => sub(p)} aria-label="−" className="h-7 flex-1 rounded-md border border-slate-300 bg-white font-bold text-slate-700 cursor-pointer dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200">−</button>
                       <span className="w-6 text-center text-xs font-extrabold tabular-nums">{q}</span>
@@ -311,7 +312,7 @@ function OrderPanel({ order, branchId, fmt, onClose, onChanged, onClosed, flash 
                 <input value={l.notes} placeholder={t('rest.notes')} maxLength={120}
                   onChange={(e) => setAdding((a) => a.map((x, j) => (j === k ? { ...x, notes: e.target.value } : x)))}
                   className={`${ui.input} !w-32 !py-1.5 text-xs`} />
-                <button type="button" onClick={() => setAdding((a) => a.filter((_, j) => j !== k))} className={`text-xs ${ui.muted} cursor-pointer`}>✕</button>
+                <button type="button" onClick={() => setAdding((a) => a.filter((_, j) => j !== k))} className={`text-xs ${ui.muted} cursor-pointer`}><IconClose /></button>
               </div>
             ))}
             <button type="button" disabled={busy} onClick={send} className={`${ui.btnPrimary} w-full`}>🔥 {t('rest.send')}</button>

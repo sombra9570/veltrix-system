@@ -14,6 +14,7 @@ import { loadAuth } from '../auth-system';
 import type { DictKey } from '../i18n/es';
 import { useLive } from './live';
 import { AiBubble } from './ia-bubble';
+import { IconBack, IconMenu } from '../icons';
 
 /** Un ítem del menú puede pedir uno o varios módulos ("a,b" = basta con uno) */
 export const navHas = (modules: string[] | null, need?: string) =>
@@ -200,12 +201,12 @@ export function AppShell({
             aria-label={t('shell.menu')}
             className="relative grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg lg:hidden dark:border-slate-700 cursor-pointer"
           >
-            ☰
+            <IconMenu />
             {unread > 0 && <span className="absolute -end-1 -top-1 h-3 w-3 rounded-full bg-blue-600 ring-2 ring-white dark:ring-slate-950" />}
           </button>
           {slot?.onBack && (
             <button type="button" onClick={slot.onBack} aria-label={t('cx.back')}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700">←</button>
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700"><IconBack /></button>
           )}
           <button type="button" onClick={slot?.onTitle} disabled={!slot?.onTitle}
             className={`min-w-0 text-left ${slot ? '' : 'lg:hidden'} ${slot?.onTitle ? 'cursor-pointer' : 'cursor-default'}`}>

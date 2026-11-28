@@ -14,6 +14,7 @@ import { useVeltrixAuth } from '../../../auth-system';
 import { TransferForm } from './transfer';
 import { AccountsCard, PaySheet, useAccounts } from './payments';
 import { ModelStock } from './model-stock';
+import { IconClose } from '../../../icons';
 
 type MBranch = { id: string; name: string; company_id: string; company: string; currency: string; company_wide: boolean };
 type Item = { id: string; name: string; sku: string; unit: string; type: string; qty: number; min: number; cost: number; price: number; value: number; model?: string | null; size?: string | null; color?: string | null; photo_path?: string | null; org_id?: string; company_id?: string };
@@ -316,7 +317,7 @@ export default function InventoryPage() {
                   <input inputMode="decimal" value={l.cost} placeholder={t('inv.unitCost')} aria-label={t('inv.unitCost')}
                     onChange={(e) => setLines(lines.map((x, j) => j === k ? { ...x, cost: e.target.value } : x))} className={ui.input} />
                   <button type="button" onClick={() => setLines(lines.length > 1 ? lines.filter((_, j) => j !== k) : [emptyLine()])}
-                    aria-label={t('inv.removeLine')} className="grid h-full min-h-10 place-items-center rounded-xl border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+                    aria-label={t('inv.removeLine')} className="grid h-full min-h-10 place-items-center rounded-xl border border-slate-300 cursor-pointer dark:border-slate-700"><IconClose /></button>
                 </div>
               ))}
               <button type="button" onClick={() => setLines([...lines, emptyLine()])} className={`${ui.btnGhost} w-full !py-2`}>+ {t('inv.addLine')}</button>

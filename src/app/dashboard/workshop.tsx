@@ -7,6 +7,7 @@ import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 import { money, parseAmount } from './format';
 import { WorkshopFiles } from './sale-files';
+import { IconClose } from '../icons';
 
 type Branch = { id: string; name: string; currency: string };
 type Status = 'received' | 'diagnosing' | 'waiting_approval' | 'waiting_parts' | 'in_progress' | 'done' | 'delivered' | 'cancelled';
@@ -271,7 +272,7 @@ function OrderDetail({ d, technicians, branchId, fmt, onClose, onChanged, flash 
           <div className="flex shrink-0 gap-2">
             {d.customer.phone && <a href={`tel:${d.customer.phone}`} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>📞</a>}
             <button type="button" onClick={sendWa} title={t('shop.waSend')} aria-label={t('shop.waSend')} className={`${ui.btnGhost} !px-3 !py-1.5 text-xs`}>💬</button>
-            <button type="button" onClick={onClose} aria-label={t('pos.close')} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+            <button type="button" onClick={onClose} aria-label={t('pos.close')} className="grid h-8 w-8 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700"><IconClose /></button>
           </div>
         </div>
         <p className="text-sm"><b>{t('shop.problem')}:</b> {d.problem}</p>
@@ -316,7 +317,7 @@ function OrderDetail({ d, technicians, branchId, fmt, onClose, onChanged, flash 
                 <span>{l.kind === 'labor' ? '🛠️' : '🔩'}</span>
                 <span className="min-w-0 flex-1 truncate">{Number(l.qty)} × {l.description}</span>
                 <span className="font-semibold">{fmt(l.total)}</span>
-                {!d.invoiced && <button type="button" onClick={() => call('wo_remove_line', { p_item: l.id })} className={`text-xs ${ui.muted} hover:text-red-600 cursor-pointer`}>✕</button>}
+                {!d.invoiced && <button type="button" onClick={() => call('wo_remove_line', { p_item: l.id })} className={`text-xs ${ui.muted} hover:text-red-600 cursor-pointer`}><IconClose /></button>}
               </li>
             ))}
           </ul>

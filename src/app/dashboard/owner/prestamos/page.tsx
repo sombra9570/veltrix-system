@@ -12,6 +12,7 @@ import { useOwner, friendlyError } from '../owner-context';
 import { RATING_DOT } from '../../collector/loan-form';
 import { DaysTable, type DayRow } from '../../collector/days-table';
 import { CutForm } from '../../collector/cut-form';
+import { IconClose } from '../../../icons';
 
 // Préstamos en calle: reglas que fija el administrador, aprobaciones pendientes y préstamos de las rutas.
 type Policy = Record<string, number>;
@@ -217,7 +218,7 @@ export default function LoansPage() {
                       <input inputMode="decimal" autoFocus placeholder={t('cash.amount')} value={mv.amount} onChange={(e) => setMv({ ...mv, amount: e.target.value })} className={ui.input} />
                       <input placeholder={t('cust.notes')} value={mv.note} onChange={(e) => setMv({ ...mv, note: e.target.value })} className={ui.input} />
                       <div className="flex gap-2">
-                        <button type="button" onClick={() => setMv(null)} className={`${ui.btnGhost} !py-2 text-sm`}>✕</button>
+                        <button type="button" onClick={() => setMv(null)} className={`${ui.btnGhost} !py-2 text-sm`}><IconClose /></button>
                         <button type="button" disabled={busy === 'fund'} onClick={moveFund} className={`${ui.btnPrimary} !py-2 text-sm`}>
                           {mv.type === 'investment' ? `➕ ${t('fund.invest')}` : `➖ ${t('fund.withdraw')}`}
                         </button>

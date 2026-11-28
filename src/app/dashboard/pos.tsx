@@ -14,6 +14,7 @@ import {
   cacheBranches, cacheCatalog, isNetworkError, loadPending, loadRejected, readBranches, readCatalog,
   savePending, saveRejected, type PendingSale, type RejectedSale,
 } from './offline-sales';
+import { IconClose } from '../icons';
 
 type Branch = { id: string; name: string; company: string; currency: string };
 type Product = { id: string; sku: string; name: string; price: number; type: string; unit: string; stock: number | null };
@@ -524,7 +525,7 @@ export function PosScreen() {
                     <>
                       {/* Quitar del todo */}
                       <button type="button" onClick={() => change(p.id, -qty)} aria-label={t('pos.removeItem')}
-                        className="absolute start-1.5 top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-slate-700 dark:text-slate-200">✕</button>
+                        className="absolute start-1.5 top-1.5 z-10 grid h-6 w-6 place-items-center rounded-full bg-slate-200 text-xs font-bold text-slate-700 cursor-pointer hover:bg-red-100 hover:text-red-700 dark:bg-slate-700 dark:text-slate-200"><IconClose /></button>
                       {/* − a la izquierda (quita uno), + a la derecha (agrega uno) */}
                       <div className="absolute inset-x-2 bottom-2 z-10 flex items-center justify-between gap-1">
                         <button type="button" onClick={() => change(p.id, -1)} aria-label="−"
@@ -631,7 +632,7 @@ export function PosScreen() {
           <div className="absolute inset-0 bg-black/50" onClick={() => setSheet(false)} />
           <div className="absolute inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto overscroll-contain rounded-t-3xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] dark:bg-slate-900">
             <div className="mb-3 flex justify-end">
-              <button type="button" onClick={() => setSheet(false)} aria-label={t('pos.close')} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700">✕</button>
+              <button type="button" onClick={() => setSheet(false)} aria-label={t('pos.close')} className="grid h-9 w-9 place-items-center rounded-lg border border-slate-300 cursor-pointer dark:border-slate-700"><IconClose /></button>
             </div>
             {cartPanel}
           </div>
