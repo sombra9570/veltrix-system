@@ -215,7 +215,7 @@ export function AppShell({
             <button type="button" onClick={slot.onBack} aria-label={t('cx.back')}
               className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700"><IconBack /></button>
           )}
-          {(brand?.logo || brand?.logo_dark) && !slot?.title && <span className="-mb-5 -mt-3 lg:hidden"><OrgLogo day={brand.logo} night={brand.logo_dark} name={shownName} size={72} /></span>}
+          {(brand?.logo || brand?.logo_dark) && !slot?.title && <span className="relative h-10 w-[72px] shrink-0 lg:hidden"><span className="absolute left-0 top-0"><OrgLogo day={brand.logo} night={brand.logo_dark} name={shownName} size={72} fit /></span></span>}
           <button type="button" onClick={slot?.onTitle} disabled={!slot?.onTitle}
             className={`min-w-0 text-left ${slot ? '' : 'lg:hidden'} ${slot?.onTitle ? 'cursor-pointer' : 'cursor-default'}`}>
             <span className="block truncate text-sm font-bold text-slate-900 dark:text-white">{slot?.title ?? shownName}</span>

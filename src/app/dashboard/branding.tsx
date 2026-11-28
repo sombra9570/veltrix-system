@@ -31,10 +31,15 @@ export function useOrgBranding(orgId?: string | null) {
   return b;
 }
 
-function LogoImg({ path, name, size, cls }: { path: string; name: string; size: number; cls: string }) {
+function LogoImg({ path, name, size, cls, fit }: { path: string; name: string; size: number; cls: string; fit?: boolean }) {
   const url = orgLogoUrl(path);
   const [bad, setBad] = useState(false);
   if (!url || bad) return null;
+  // Casilla fija (panel de arriba): cualquier forma o tamaño cabe centrado en el mismo cuadro
+  if (fit) return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={url} alt={name} onError={() => setBad(true)} style={{ width: size, height: size }} className={`object-contain ${isTransparentLogo(path) ? '' : 'rounded-lg'} ${cls}`} />
+  );
   // PNG (marcado -t): tal cual, sin recuadro. Otros formatos: imagen en cuadro.
   return isTransparentLogo(path)
     // eslint-disable-next-line @next/next/no-img-element
@@ -44,15 +49,15 @@ function LogoImg({ path, name, size, cls }: { path: string; name: string; size: 
 }
 
 /** Muestra el logo de día o de noche según el modo; si hay uno solo, el mismo en ambos */
-export function OrgLogo({ day, night, name, size = 32 }: { day?: string | null; night?: string | null; name: string; size?: number }) {
+export function OrgLogo({ day, night, name, size = 32, fit }: { day?: string | null; night?: string | null; name: string; size?: number; fit?: boolean }) {
   if (day && night) return (
     <>
-      <LogoImg path={day} name={name} size={size} cls="dark:hidden" />
-      <LogoImg path={night} name={name} size={size} cls="hidden dark:block" />
+      <LogoImg path={day} name={name} size={size} cls="dark:hidden" fit={fit} />
+      <LogoImg path={night} name={name} size={size} cls="hidden dark:block" fit={fit} />
     </>
   );
   const one = day || night;
-  return one ? <LogoImg path={one} name={name} size={size} cls="" /> : null;
+  return one ? <LogoImg path={one} name={name} size={size} cls="" fit={fit} /> : null;
 }
 
 /** Una casilla de logo (día o noche) en el editor */
