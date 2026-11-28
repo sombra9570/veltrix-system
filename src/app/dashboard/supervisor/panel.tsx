@@ -342,7 +342,7 @@ export default function SupPanel() {
               [t('cx.sum.lent'), Number(d.period.lent), 'text-violet-600 dark:text-violet-400'],
               [t('cx.sum.expenses'), Number(d.period.collector_expenses), 'text-red-600 dark:text-red-400'],
               [t('cx.sum.current'), Number(d.balance), ''],
-              [t('cx.sum.portfolio'), Number(d.portfolio), ''],
+              [t('cx.sum.portfolio'), Number(d.balance) + Number(d.portfolio), ''],
             ] as [string, number, string][]).map(([label, v, cls]) => (
               <li key={label} className="flex items-center justify-between gap-3 py-2.5"><span className={`text-sm ${ui.muted}`}>{label}</span><b className={`text-lg ${cls}`}>{m(v)}</b></li>
             ))}

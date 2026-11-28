@@ -305,7 +305,7 @@ function RouteScreen() {
               [t('cx.sum.lent'), Number(p.lent), 'text-violet-600 dark:text-violet-400'],
               [t('cx.sum.expenses'), Number(p.collector_expenses), 'text-red-600 dark:text-red-400'],
               [t('cx.sum.current'), Number(fund.balance), Number(fund.balance) < 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400'],
-              [t('cx.sum.portfolio'), Number(fund.portfolio)],
+              [t('cx.sum.portfolio'), Number(fund.balance) + Number(fund.portfolio)],
               [t('rt.commission', { pct: pct }), (Number(p.collected_cash) + Number(p.collected_digital)) * pct / 100, 'text-blue-600 dark:text-blue-400'],
             ];
             return (

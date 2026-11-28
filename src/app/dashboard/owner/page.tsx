@@ -157,7 +157,7 @@ function CobranzaHome() {
         <Card><p className={lbl}>{t('cx.sum.current')}</p>
           <p className="mt-2 text-2xl font-extrabold">{money(sum((f) => Number(f.balance)), cur, lang)}</p></Card>
         <Card><p className={lbl}>{t('cx.sum.portfolio')}</p>
-          <p className="mt-2 text-2xl font-extrabold">{money(sum((f) => Number(f.portfolio)), cur, lang)}</p></Card>
+          <p className="mt-2 text-2xl font-extrabold">{money(sum((f) => Number(f.balance) + Number(f.portfolio)), cur, lang)}</p></Card>
       </div>
       <GrowthCurves />
       <GrowthCard />
@@ -169,7 +169,7 @@ function CobranzaHome() {
               <p><span className={ui.muted}>{t('cx.sum.collected')}</span><br /><b className="text-base">{money(collected(f), f.currency, lang)}</b></p>
               <p><span className={ui.muted}>{t('cx.sum.lent')}</span><br /><b className="text-base">{money(lent(f), f.currency, lang)}</b></p>
               <p><span className={ui.muted}>{t('cx.sum.current')}</span><br /><b className="text-base">{money(Number(f.balance), f.currency, lang)}</b></p>
-              <p><span className={ui.muted}>{t('cx.sum.portfolio')}</span><br /><b className="text-base">{money(Number(f.portfolio), f.currency, lang)}</b></p>
+              <p><span className={ui.muted}>{t('cx.sum.portfolio')}</span><br /><b className="text-base">{money(Number(f.balance) + Number(f.portfolio), f.currency, lang)}</b></p>
             </div>
           </Card>
         ))}

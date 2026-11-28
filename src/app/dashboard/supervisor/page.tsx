@@ -106,7 +106,7 @@ function RouteCard({ r, b, onChanged, onError }: { r: SRoute; b: SBranch; onChan
         <p><span className={ui.muted}>{t('day.sinceLiqShort')} · {t('col.cash')}</span><br /><b>{m(tot.cash)}</b></p>
         <p><span className={ui.muted}>{t('day.sinceLiqShort')} · {t('loan.lent')}</span><br /><b>{m(tot.lent)}</b></p>
         <p><span className={ui.muted}>{t('fund.lentOpen')}</span><br /><b>{m(r.lent_open)}</b></p>
-        <p><span className={ui.muted}>{t('fund.portfolio')}</span><br /><b>{m(r.portfolio)}</b></p>
+        <p><span className={ui.muted}>{t('fund.portfolio')}</span><br /><b>{m(Number(r.balance) + Number(r.portfolio))}</b></p>
         {r.liquidations[0] && <p className="col-span-2"><span className={ui.muted}>✂️ {t('liq.last', { date: new Date(r.liquidations[0].created_at).toLocaleDateString(lang), amount: m(r.liquidations[0].closing) })}</span></p>}
       </div>
       <details className="rounded-lg bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800/50">
