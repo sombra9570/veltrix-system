@@ -100,7 +100,7 @@ export default function BranchesPage() {
 
   const u = overview?.usage;
   const branchesFull = !street && !!u && u.branches.max !== null && u.branches.used >= u.branches.max;
-  const companiesFull = !!u && u.companies.max !== null && u.companies.used >= u.companies.max;
+  const companiesFull = !street && !!u && u.companies.max !== null && u.companies.used >= u.companies.max;
   const sortedCountries = [...COUNTRIES].sort((a, b) => countryName(lang, a.code, a.name).localeCompare(countryName(lang, b.code, b.name), lang));
 
   return (
