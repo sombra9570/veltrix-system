@@ -6,7 +6,7 @@ import { Card, useHeaderSlot } from '../../shell';
 import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
 import type { DictKey } from '../../../i18n/es';
-import { money } from '../../format';
+import { moneyWhole } from '../../format';
 import { useOwner, friendlyError } from '../owner-context';
 import { MenuTile } from '../../collector/tiles';
 import { CreditCard, freqOf, type Credit } from '../../collector/credit-card';
@@ -96,7 +96,7 @@ function RouteScreen() {
   } : null, [route?.name, route?.collector, screen, sel?.id, lang]);
 
   const cur = route?.currency ?? 'USD';
-  const m = useCallback((n: number) => money(Number(n), cur, lang), [cur, lang]);
+  const m = useCallback((n: number) => moneyWhole(Number(n), cur, lang), [cur, lang]);
   const list = useMemo(() => {
     const s = q.trim().toLowerCase();
     return custs.filter((c) => (freq === 'all' || c.credits.some((k) => freqOf(toCredit(k)) === freq)) && (!s || c.name.toLowerCase().includes(s) || (c.address ?? '').toLowerCase().includes(s) || (c.phone ?? '').includes(s)));

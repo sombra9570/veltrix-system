@@ -5,7 +5,7 @@ import { rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
 import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
-import { money } from '../../format';
+import { moneyWhole } from '../../format';
 import { friendlyError } from '../owner-context';
 
 type Branch = { id: string; name: string; company: string; currency: string };
@@ -148,7 +148,7 @@ export default function RoutesPage() {
               <li key={c.id} className="flex flex-wrap items-center gap-3 py-2.5">
                 <div className="min-w-0 flex-1 basis-48">
                   <p className="truncate font-semibold">{c.name}</p>
-                  <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'} · {money(Number(c.balance), currency, lang)}</p>
+                  <p className={`truncate text-xs ${ui.muted}`}>{c.address ?? '—'} · {moneyWhole(Number(c.balance), currency, lang)}</p>
                 </div>
                 <select value={c.route_id ?? ''} onChange={(e) => assign(c.id, e.target.value)} className={`${ui.input} !w-auto !py-1.5 max-sm:!w-full`}>
                   <option value="">{t('routes.noRoute')}</option>

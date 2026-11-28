@@ -6,7 +6,7 @@ import { Card, useHeaderSlot } from '../shell';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
-import { money, parseAmount } from '../format';
+import { moneyWhole, parseAmount } from '../format';
 import { useStaff } from '../staff-context';
 import { useSync } from '../sync';
 import { isNetworkError } from '../offline-sales';
@@ -469,9 +469,9 @@ export default function CollectorPage() {
       setReceipt({ phone, text: [
         `🧾 ${t('rcpt.title')} · ${route.branch}`,
         `${t('rcpt.customer')}: ${c.name}`,
-        `${t('rcpt.amount')}: ${money(amount, route.currency, lang)} (${t(`cash.m.${method}` as DictKey)})`,
+        `${t('rcpt.amount')}: ${moneyWhole(amount, route.currency, lang)} (${t(`cash.m.${method}` as DictKey)})`,
         `${t('rcpt.date')}: ${when}`,
-        `${t('rcpt.balance')}: ${money(left, route.currency, lang)}`,
+        `${t('rcpt.balance')}: ${moneyWhole(left, route.currency, lang)}`,
         `${t('rcpt.collector')}: ${userName}`,
         `${t('rcpt.code')}: ${id.slice(0, 8).toUpperCase()}`,
       ].join('\n') });
@@ -480,7 +480,7 @@ export default function CollectorPage() {
   const cardPay = (customer: string, order: string, amount: number, method: Method) => pay(customer, method, amount, order);
   // La ficha abierta se mantiene al día con lo guardado (tarjetas marcadas)
   const selNow = sel ? route?.customers.find((x) => x.id === sel.id) ?? sel : null;
-  const fmt = (n: number) => money(Number(n), route?.currency ?? 'USD', lang);
+  const fmt = (n: number) => moneyWhole(Number(n), route?.currency ?? 'USD', lang);
 
   // Barra superior única de la app: nombre de la ruta, atrás y antena (sin segunda barra)
   const slotRoute = day?.routes.find((r) => r.id === routeId);

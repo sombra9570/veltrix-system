@@ -5,7 +5,7 @@ import { Card, useHeaderSlot } from '../shell';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import type { DictKey } from '../../i18n/es';
-import { money } from '../format';
+import { moneyWhole } from '../format';
 import { useStaff } from '../staff-context';
 import { MenuTile } from '../collector/tiles';
 import { freqOf, type Credit, type Freq } from '../collector/credit-card';
@@ -217,7 +217,7 @@ export default function SupPanel() {
   }
 
   if (!d) return <p className={`text-sm ${ui.muted}`}>{msg?.text ?? t('common.wait')}</p>;
-  const m = (n: number) => money(Number(n), d.currency, lang);
+  const m = (n: number) => moneyWhole(Number(n), d.currency, lang);
   const today = d.today ?? new Date().toISOString().slice(0, 10);
   const sq = q.trim().toLowerCase();
   const byFreq = freq === 'all' ? d.customers : d.customers.filter((c) => c.credits.some((k) => freqOf(k) === freq));

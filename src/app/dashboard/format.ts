@@ -7,6 +7,15 @@ export function money(amount: number, currency: string, lang: string) {
   }
 }
 
+/** Cobranza en calle: cifras exactas, sin decimales */
+export function moneyWhole(amount: number, currency: string, lang: string) {
+  try {
+    return new Intl.NumberFormat(lang, { style: 'currency', currency, maximumFractionDigits: 0, minimumFractionDigits: 0 }).format(amount);
+  } catch {
+    return `${currency} ${Math.round(amount)}`;
+  }
+}
+
 /** Hora corta (14:05) en el idioma del usuario */
 export function shortTime(iso: string, lang: string) {
   try {

@@ -4,7 +4,7 @@ import { rpc } from '../../../../lib/supabase';
 import { Card } from '../../shell';
 import { ui } from '../../../site-header';
 import { useT } from '../../../i18n';
-import { money } from '../../format';
+import { moneyWhole } from '../../format';
 import { useStaff } from '../../staff-context';
 import { PageTitle, Pill, Empty } from '../../kit';
 
@@ -79,7 +79,7 @@ export default function RouteInfoPage() {
 
   if (!r) return <Card><p className={`text-sm ${ui.muted}`}>{t('common.wait')}</p></Card>;
 
-  const fmt = (n: number) => money(Number(n), r.currency, lang);
+  const fmt = (n: number) => moneyWhole(Number(n), r.currency, lang);
   const sp = split[r.id]?.[freq] ?? { collected: 0, lent: 0 };
   const fund = r.fund_balance === undefined ? null : Number(r.fund_balance);
   // Caja anterior = lo que quedó al cerrar la última liquidación; sin liquidación anterior es 0
