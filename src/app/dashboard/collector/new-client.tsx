@@ -66,7 +66,7 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
   const { t } = useT();
   const [f, setF] = useState({ name: '', ci: '', phone: '', address: '', business: '', gName: '', gPhone: '', gAddress: '' });
   const [gps, setGps] = useState<Gps>(null);
-  const [gGps, setGGps] = useState<Gps>(null);
+  const [gGps] = useState<Gps>(null); // el fiador ya no lleva dirección ni ubicación
   const [ciFront, setCiFront] = useState<File | null>(null);
   const [ciBack, setCiBack] = useState<File | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
@@ -198,8 +198,6 @@ export function NewClient({ routeId, orgId, online, onQueue, canLoan, saleLabel 
         <p className="font-bold">🤝 {t('cx.nc.guarantor')}</p>
         <div><label className={ui.label}>{t('cx.nc.gName')}</label><input value={f.gName} onChange={(e) => set('gName', e.target.value)} className={ui.input} /></div>
         <div><label className={ui.label}>{t('cx.nc.gPhone')}</label><input type="tel" inputMode="tel" value={f.gPhone} onChange={(e) => set('gPhone', e.target.value)} className={ui.input} /></div>
-        <div><label className={ui.label}>{t('cx.nc.gAddress')}</label><input value={f.gAddress} onChange={(e) => set('gAddress', e.target.value)} className={ui.input} /></div>
-        <GpsButton value={gGps} onChange={setGGps} label={t('cx.nc.gGpsBtn')} />
         <div><label className={ui.label}>{t('cx.nc.gPhoto')}</label><PhotoPicker value={gPhoto} onChange={setGPhoto} cameraOnly={!allowGallery} facing="user" disabled={busy} /></div>
       </Card>
 
