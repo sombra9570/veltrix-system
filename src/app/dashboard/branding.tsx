@@ -8,6 +8,9 @@ import { ui } from '../site-header';
 type Branding = { name: string; logo: string | null };
 const EVT = 'vx-branding';
 
+/** Los PNG se guardan con -t en el nombre para mostrarlos sin recuadro */
+export function isTransparentLogo(path?: string | null) { return !!path && /-t\.\w+$/.test(path); }
+
 export function orgLogoUrl(path: string | null | undefined) {
   if (!path) return null;
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''}/storage/v1/object/public/org-logos/${path}`;
@@ -32,14 +35,13 @@ export function OrgLogo({ path, name, size = 32 }: { path?: string | null; name:
   const url = orgLogoUrl(path);
   const [bad, setBad] = useState(false);
   if (!url || bad) return null;
-  // Siempre sobre un fondo blanco redondeado: se ve bien en modo día y noche, con PNG transparente o logos oscuros
-  return (
-    <span className="grid shrink-0 place-items-center overflow-hidden rounded-lg bg-white ring-1 ring-slate-200 dark:ring-slate-600"
-      style={{ width: size, height: size, padding: Math.max(2, Math.round(size / 10)) }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={url} alt={name} onError={() => setBad(true)} className="h-full w-full object-contain" />
-    </span>
-  );
+  // PNG (marcado -t): se muestra tal cual, sin recuadro. Otros formatos: imagen en cuadro.
+  if (isTransparentLogo(path)) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img src={url} alt={name} onError={() => setBad(true)} style={{ height: size, maxWidth: size * 2.5 }} className="shrink-0 object-contain" />;
+  }
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={url} alt={name} onError={() => setBad(true)} style={{ width: size, height: size }} className="shrink-0 rounded-lg object-cover" />;
 }
 
 /** Editor del administrador: nombre y logo de su empresa */
@@ -62,8 +64,22 @@ export function BrandingCard({ orgId }: { orgId: string }) {
     if (!f) return;
     setBusy(true);
     try {
-      const blob = await compressImage(f, 512, 0.85);
-      const path = `${orgId}/logo-${Date.now()}.${extFor(blob)}`;
+      let blob: Blob; let ext: string; let tag = '';
+      if (f.type === 'image/png') {
+        // PNG: se conserva la transparencia (PNG o, si pesa mucho, WebP con transparencia)
+        const bmp = await createImageBitmap(f);
+        const sc = Math.min(1, 512 / Math.max(bmp.width, bmp.height));
+        const cv = document.createElement('canvas');
+        cv.width = Math.max(1, Math.round(bmp.width * sc)); cv.height = Math.max(1, Math.round(bmp.height * sc));
+        cv.getContext('2d')!.drawImage(bmp, 0, 0, cv.width, cv.height);
+        const png = await new Promise<Blob | null>((r) => cv.toBlob(r, 'image/png'));
+        const webp = await new Promise<Blob | null>((r) => cv.toBlob(r, 'image/webp', 0.9));
+        if (png && png.size <= 800_000) { blob = png; ext = 'png'; }
+        else if (webp && webp.type === 'image/webp') { blob = webp; ext = 'webp'; }
+        else throw new Error('big');
+        tag = '-t';
+      } else { blob = await compressImage(f, 512, 0.85); ext = extFor(blob); }
+      const path = `${orgId}/logo-${Date.now()}${tag}.${ext}`;
       const { error } = await supabase.storage.from('org-logos').upload(path, blob, { contentType: blob.type, cacheControl: '31536000', upsert: false });
       if (error) throw new Error(error.message);
       await rpc('set_org_branding', { p_org: orgId, p_name: null, p_logo: path });
@@ -84,8 +100,8 @@ export function BrandingCard({ orgId }: { orgId: string }) {
     <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-800">
       <p className="text-sm font-bold">{t('brand.title')}</p>
       <div className="mt-3 flex items-center gap-3">
-        <div className="grid h-16 w-16 shrink-0 place-items-center rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
-          {b?.logo ? <OrgLogo path={b.logo} name={b.name} size={64} /> : <span className={`text-[10px] ${ui.muted}`}>{t('brand.noLogo')}</span>}
+        <div className="grid h-24 w-24 shrink-0 place-items-center overflow-hidden rounded-xl border border-dashed border-slate-300 dark:border-slate-700">
+          {b?.logo ? <OrgLogo path={b.logo} name={b.name} size={80} /> : <span className={`text-[10px] ${ui.muted}`}>{t('brand.noLogo')}</span>}
         </div>
         <div className="flex flex-wrap gap-2">
           <button type="button" disabled={busy} onClick={() => file.current?.click()}
