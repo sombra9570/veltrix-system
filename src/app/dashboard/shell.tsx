@@ -1,4 +1,5 @@
 'use client';
+import { useOrgBranding, OrgLogo } from './branding';
 import { Fragment, Suspense, createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { rpc } from '../../lib/supabase';
 import Link from 'next/link';
@@ -60,10 +61,11 @@ export function useHeaderSlot(slot: HeaderSlot | null, deps: unknown[]) {
  * barra superior y contenido al centro.
  */
 export function AppShell({
-  nav, orgName, userName, roleLabel, onLogout, children, banner, help = false,
+  nav, orgName, orgId, userName, roleLabel, onLogout, children, banner, help = false,
 }: {
   nav: NavItem[];
   orgName: string;
+  orgId?: string;
   userName: string;
   roleLabel: string;
   onLogout: () => void;
@@ -76,6 +78,8 @@ export function AppShell({
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
   const [slot, setSlot] = useState<HeaderSlot | null>(null);
+  const brand = useOrgBranding(orgId);
+  const shownName = brand?.name ?? orgName;
 
   // Mensajes sin leer del equipo (insignia en "Mensajes")
   const loadUnread = () => rpc<number>('chat_unread_total').then((n) => setUnread(n ?? 0)).catch(() => {});
@@ -103,7 +107,10 @@ export function AppShell({
     <nav className="safe-top safe-bottom flex h-full flex-col">
       <div className="px-5 py-5">
         <Link href="/" aria-label="Veltrix System"><BrandMark size={28} className="text-lg" /></Link>
-        <p className="mt-1 truncate text-xs font-semibold text-slate-500 dark:text-slate-400">{orgName}</p>
+        <div className="mt-2 flex items-center gap-2">
+          {brand?.logo && <OrgLogo path={brand.logo} name={shownName} size={28} />}
+          <p className="truncate text-xs font-semibold text-slate-500 dark:text-slate-400">{shownName}</p>
+        </div>
       </div>
 
       <ul className="flex-1 space-y-0.5 overflow-y-auto px-3">
@@ -208,9 +215,10 @@ export function AppShell({
             <button type="button" onClick={slot.onBack} aria-label={t('cx.back')}
               className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-slate-300 text-lg cursor-pointer dark:border-slate-700"><IconBack /></button>
           )}
+          {brand?.logo && !slot?.title && <span className="lg:hidden"><OrgLogo path={brand.logo} name={shownName} size={32} /></span>}
           <button type="button" onClick={slot?.onTitle} disabled={!slot?.onTitle}
             className={`min-w-0 text-left ${slot ? '' : 'lg:hidden'} ${slot?.onTitle ? 'cursor-pointer' : 'cursor-default'}`}>
-            <span className="block truncate text-sm font-bold text-slate-900 dark:text-white">{slot?.title ?? orgName}</span>
+            <span className="block truncate text-sm font-bold text-slate-900 dark:text-white">{slot?.title ?? shownName}</span>
             {slot?.subtitle && <span className="block truncate text-[11px] text-slate-500 dark:text-slate-400">{slot.subtitle}</span>}
           </button>
           <div className="ml-auto flex items-center gap-2 rtl:ml-0 rtl:mr-auto">

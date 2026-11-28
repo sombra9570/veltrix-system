@@ -101,6 +101,7 @@ export function StaffProvider({
       <AppShell
         nav={menu}
         orgName={company?.name ?? ''}
+        orgId={company?.orgId}
         userName={session.name || session.email}
         roleLabel={t(`role.${session.role}` as DictKey)}
         onLogout={logout}

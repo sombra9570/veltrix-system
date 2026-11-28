@@ -9,6 +9,7 @@ import { StoreOrdersBanner } from '../store-orders-alert';
 import { ui } from '../../site-header';
 import { useT } from '../../i18n';
 import { GrowthCurves } from './growth';
+import { BrandingCard } from '../branding';
 
 function money(amount: number, currency: string, lang: string) {
   try {
@@ -178,8 +179,13 @@ function CobranzaHome() {
 }
 
 export default function OwnerHome() {
-  const { cobranza } = useOwner();
-  return cobranza ? <CobranzaHome /> : <GenericHome />;
+  const { cobranza, orgId } = useOwner();
+  return (
+    <div className="space-y-6">
+      {cobranza ? <CobranzaHome /> : <GenericHome />}
+      {orgId && <BrandingCard orgId={orgId} />}
+    </div>
+  );
 }
 
 function GenericHome() {

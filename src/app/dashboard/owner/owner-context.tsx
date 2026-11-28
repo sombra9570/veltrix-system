@@ -249,6 +249,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
           .map((n) => (overview?.street && n.href.endsWith('/plan') ? { ...n, label: 'street.nav' as const } : n))
           .map((n) => (cobranza && n.group === 'nav.g.sell' ? { ...n, group: 'nav.g.routesSup' as const } : n))}
         orgName={o?.name ?? ''}
+        orgId={orgId}
         userName={session.name || session.email}
         roleLabel={t('role.owner')}
         onLogout={logout}
