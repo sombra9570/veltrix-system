@@ -659,6 +659,8 @@ const ko: Record<DictKey, string> = {
   'brand.noLogo': "로고 없음",
   'brand.saved': "✅ 저장되었습니다.",
   'brand.failed': "저장할 수 없습니다.",
+  'brand.logoDay': "주간 모드 로고(검은 글자)",
+  'brand.logoNight': "야간 모드 로고(흰 글자)",
   'store.share': "공유",
   'store.shareBtn': "링크 공유",
   'store.view': "스토어 보기",

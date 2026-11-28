@@ -659,6 +659,8 @@ const zh: Record<DictKey, string> = {
   'brand.noLogo': "无徽标",
   'brand.saved': "✅ 已保存。",
   'brand.failed': "保存失败。",
+  'brand.logoDay': "日间模式徽标（黑字）",
+  'brand.logoNight': "夜间模式徽标（白字）",
   'store.share': "分享",
   'store.shareBtn': "分享链接",
   'store.view': "查看店铺",

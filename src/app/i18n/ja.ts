@@ -659,6 +659,8 @@ const ja: Record<DictKey, string> = {
   'brand.noLogo': "ロゴなし",
   'brand.saved': "✅ 保存しました。",
   'brand.failed': "保存できませんでした。",
+  'brand.logoDay': "昼モードのロゴ（黒文字）",
+  'brand.logoNight': "夜モードのロゴ（白文字）",
   'store.share': "共有",
   'store.shareBtn': "リンクを共有",
   'store.view': "ショップを見る",

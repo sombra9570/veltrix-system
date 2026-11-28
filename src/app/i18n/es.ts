@@ -668,6 +668,8 @@ const es = {
   'brand.noLogo': "Sin logo",
   'brand.saved': "✅ Guardado.",
   'brand.failed': "No se pudo guardar.",
+  'brand.logoDay': "Logo modo día (letras negras)",
+  'brand.logoNight': "Logo modo noche (letras blancas)",
   'store.share': "Compartir",
   'store.shareBtn': "Compartir enlace",
   'store.view': "Ver tienda",

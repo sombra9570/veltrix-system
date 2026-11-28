@@ -659,6 +659,8 @@ const en: Record<DictKey, string> = {
   'brand.noLogo': "No logo",
   'brand.saved': "✅ Saved.",
   'brand.failed': "Could not save.",
+  'brand.logoDay': "Day logo (dark lettering)",
+  'brand.logoNight': "Night logo (white lettering)",
   'store.share': "Share",
   'store.shareBtn': "Share link",
   'store.view': "View store",

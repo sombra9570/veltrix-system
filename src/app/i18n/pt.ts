@@ -659,6 +659,8 @@ const pt: Record<DictKey, string> = {
   'brand.noLogo': "Sem logotipo",
   'brand.saved': "✅ Salvo.",
   'brand.failed': "Não foi possível salvar.",
+  'brand.logoDay': "Logotipo do modo dia (letras pretas)",
+  'brand.logoNight': "Logotipo do modo noite (letras brancas)",
   'store.share': "Compartilhar",
   'store.shareBtn': "Compartilhar link",
   'store.view': "Ver loja",

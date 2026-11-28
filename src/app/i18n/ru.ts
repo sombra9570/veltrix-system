@@ -659,6 +659,8 @@ const ru: Record<DictKey, string> = {
   'brand.noLogo': "Нет логотипа",
   'brand.saved': "✅ Сохранено.",
   'brand.failed': "Не удалось сохранить.",
+  'brand.logoDay': "Логотип дневного режима (чёрные буквы)",
+  'brand.logoNight': "Логотип ночного режима (белые буквы)",
   'store.share': "Поделиться",
   'store.shareBtn': "Поделиться ссылкой",
   'store.view': "Открыть магазин",

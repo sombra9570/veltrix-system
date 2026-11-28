@@ -659,6 +659,8 @@ const hi: Record<DictKey, string> = {
   'brand.noLogo': "कोई लोगो नहीं",
   'brand.saved': "✅ सहेजा गया।",
   'brand.failed': "सहेजा नहीं जा सका।",
+  'brand.logoDay': "दिन मोड का लोगो (काले अक्षर)",
+  'brand.logoNight': "रात मोड का लोगो (सफेद अक्षर)",
   'store.share': "शेयर करें",
   'store.shareBtn': "लिंक शेयर करें",
   'store.view': "दुकान देखें",

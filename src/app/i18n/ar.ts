@@ -659,6 +659,8 @@ const ar: Record<DictKey, string> = {
   'brand.noLogo': "بدون شعار",
   'brand.saved': "✅ تم الحفظ.",
   'brand.failed': "تعذّر الحفظ.",
+  'brand.logoDay': "شعار الوضع النهاري (حروف سوداء)",
+  'brand.logoNight': "شعار الوضع الليلي (حروف بيضاء)",
   'store.share': "مشاركة",
   'store.shareBtn': "مشاركة الرابط",
   'store.view': "عرض المتجر",
