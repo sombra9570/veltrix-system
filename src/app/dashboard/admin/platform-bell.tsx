@@ -5,12 +5,13 @@ import { rpc } from '../../../lib/supabase';
 import { useLiveTopic } from '../live';
 import { BellPanel } from '../bell-panel';
 
-type Ev = { id: string; created_at: string; kind: 'lead' | 'company' | 'support_msg'; ref_id: string | null; title: string; detail: string | null; read_at: string | null };
+type Ev = { id: string; created_at: string; kind: 'lead' | 'company' | 'support_msg' | 'ai_request'; ref_id: string | null; title: string; detail: string | null; read_at: string | null };
 type Inbox = { unread: number; items: Ev[] };
 
 const KIND = {
   lead: { icon: '🆘', label: 'Pide ayuda', href: '/dashboard/admin/soporte?tab=leads' },
   company: { icon: '🏢', label: 'Empresa nueva', href: '/dashboard/admin' },
+  ai_request: { icon: '✨', label: 'Solicita Veltrix IA', href: '/dashboard/admin' },
   support_msg: { icon: '💬', label: 'Mensaje de un cliente', href: '/dashboard/admin/soporte' },
 } as const;
 

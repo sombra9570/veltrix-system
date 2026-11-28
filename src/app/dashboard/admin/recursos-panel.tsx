@@ -16,6 +16,36 @@ function Meter({ label, used, max, unit = '' }: { label: string; used: number; m
 }
 
 // Uso de recursos de cada organización frente a lo que incluye su plan.
+function AiOfferCard() {
+  const [price, setPrice] = useState('');
+  const [quota, setQuota] = useState('');
+  const [msg, setMsg] = useState('');
+  useEffect(() => {
+    rpc<{ price_usd: number | null; monthly_quota: number | null }>('ai_offer').then((o) => {
+      setPrice(o?.price_usd != null ? String(o.price_usd) : ''); setQuota(o?.monthly_quota != null ? String(o.monthly_quota) : '');
+    }).catch(() => {});
+  }, []);
+  const save = async () => {
+    setMsg('');
+    try {
+      await rpc('set_ai_offer', { p_price: price.trim() === '' ? null : Number(price), p_quota: quota.trim() === '' ? null : Math.round(Number(quota)) });
+      setMsg('✅ Guardado');
+    } catch { setMsg('No se pudo guardar'); }
+  };
+  const inp = 'mt-1 w-full rounded-lg border border-slate-300 bg-transparent px-3 py-2 text-sm dark:border-slate-700';
+  return (
+    <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900/70">
+      <h3 className="text-sm font-bold">✨ Veltrix IA: precio de activación que ve el cliente</h3>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <label className="text-xs font-semibold">Precio (USD por mes)<input inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} className={inp} /></label>
+        <label className="text-xs font-semibold">Consultas por mes<input inputMode="numeric" value={quota} onChange={(e) => setQuota(e.target.value)} className={inp} /></label>
+      </div>
+      <button type="button" onClick={save} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white cursor-pointer">Guardar</button>
+      {msg && <p className="text-xs font-semibold">{msg}</p>}
+    </div>
+  );
+}
+
 export function RecursosPanel() {
   const [rows, setRows] = useState<U[]>([]);
   const [err, setErr] = useState('');
@@ -23,6 +53,7 @@ export function RecursosPanel() {
   useEffect(() => { load(); }, [load]);
   return (
     <section className="space-y-3">
+      <AiOfferCard />
       <h2 className="text-sm font-bold">📦 Uso de recursos por organización</h2>
       {err && <p className="text-xs font-semibold text-red-400">{err}</p>}
       <div className="grid gap-3 md:grid-cols-2">

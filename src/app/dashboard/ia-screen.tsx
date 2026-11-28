@@ -7,6 +7,7 @@ import { useT } from '../i18n';
 import type { DictKey } from '../i18n/es';
 
 type Status = { allowed: boolean; reason?: string; quota?: number; used?: number; day_quota?: number; day_used?: number; resets?: string };
+type Offer = { price_usd: number | null; monthly_quota: number | null; requested: boolean };
 type Turn = { role: 'user' | 'assistant'; content: string };
 
 const SUGGESTIONS: DictKey[] = ['ai.s1', 'ai.s2', 'ai.s3', 'ai.s4', 'ai.s5', 'ai.s6'];
@@ -19,11 +20,22 @@ export default function AiPage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const bottom = useRef<HTMLDivElement | null>(null);
+  const [offer, setOffer] = useState<Offer | null>(null);
+  const [reqMsg, setReqMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   const load = useCallback(async () => {
     try { setStatus(await rpc<Status>('ai_quota_status')); } catch { setStatus({ allowed: false }); }
   }, []);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { rpc<Offer>('ai_offer').then(setOffer).catch(() => setOffer(null)); }, []);
+  const requestAi = async () => {
+    setBusy(true); setReqMsg(null);
+    try {
+      const r = await rpc<string>('request_veltrix_ai');
+      setReqMsg({ ok: true, text: t(r === 'already' ? 'ai.already' : 'ai.requested') });
+      setOffer((o) => (o ? { ...o, requested: true } : o));
+    } catch { setReqMsg({ ok: false, text: t('ai.requestFailed') }); } finally { setBusy(false); }
+  };
   useEffect(() => { bottom.current?.scrollIntoView({ behavior: 'smooth' }); }, [turns.length, busy]);
 
   const ask = async (question: string) => {
@@ -86,7 +98,18 @@ export default function AiPage() {
           <ul className="list-disc space-y-1 ps-5 text-sm">
             {SUGGESTIONS.slice(0, 4).map((k) => <li key={k}>{t(k)}</li>)}
           </ul>
-          <a href="mailto:hola@veltrixsystem.app?subject=Veltrix%20IA" className={`${ui.btnPrimary} w-full sm:w-auto`}>{t('ai.request')}</a>
+          <p className="text-sm font-bold">{t('ai.benefitsTitle')}</p>
+          <ul className="list-disc space-y-1 ps-5 text-sm">
+            <li>{t('ai.b1')}</li><li>{t('ai.b2')}</li><li>{t('ai.b3')}</li>
+          </ul>
+          <div className="rounded-lg bg-slate-100 px-3 py-2 text-sm dark:bg-slate-800">
+            <p className="font-bold">{offer?.price_usd != null ? t('ai.price', { price: String(offer.price_usd) }) : t('ai.priceTbd')}</p>
+            {offer?.monthly_quota != null && <p className={ui.muted}>{t('ai.quotaLine', { n: String(offer.monthly_quota) })}</p>}
+          </div>
+          {offer?.requested
+            ? <p className="text-sm font-semibold text-emerald-600">{t('ai.already')}</p>
+            : <button type="button" disabled={busy} onClick={requestAi} className={`${ui.btnPrimary} w-full sm:w-auto`}>{t('ai.request')}</button>}
+          {reqMsg && <p className={`text-sm font-semibold ${reqMsg.ok ? 'text-emerald-600' : 'text-red-600'}`}>{reqMsg.text}</p>}
         </Card>
       ) : (
         <>
