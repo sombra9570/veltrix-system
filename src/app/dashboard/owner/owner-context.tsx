@@ -88,6 +88,7 @@ export function friendlyError(msg: string, t: (k: DictKey) => string): string {
   if (msg.includes('PERM_DENIED')) return t('err.permDenied');
   if (msg.includes('PLAN_LIMIT_BRANCHES')) return t('err.limitBranches');
   if (msg.includes('STREET_COLLECTORS_LIMIT')) return t('err.streetCollectors');
+  if (msg.includes('STREET_SUPERVISOR_NEEDS_WORKER')) return t('err.streetSupNeedsWorker');
   if (msg.includes('STREET_SUPERVISORS_LIMIT')) return t('err.streetSupervisors');
   if (msg.includes('STREET_MANAGER_LOCKED')) return t('err.streetManagerLocked').replace('{n}', msg.match(/STREET_MANAGER_LOCKED:(\d+)/)?.[1] ?? '6');
   if (msg.includes('STREET_MANAGER_LIMIT')) return t('err.streetManagerLimit');

@@ -13,6 +13,7 @@ type Branch = { id: string; company_id: string; code: string; name: string; time
 export default function BranchesPage() {
   const { orgId, reload, overview } = useOwner();
   const { t, lang } = useT();
+  const street = !!overview?.street;
 
   const [companies, setCompanies] = useState<Company[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
@@ -20,8 +21,8 @@ export default function BranchesPage() {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const [branchForm, setBranchForm] = useState<{ open: boolean; companyId: string; name: string; address: string; tz: string; lang: string }>(
-    { open: false, companyId: '', name: '', address: '', tz: '', lang: '' });
+  const [branchForm, setBranchForm] = useState<{ open: boolean; companyId: string; name: string; address: string; tz: string; lang: string; mName: string; mEmail: string; mPass: string }>(
+    { open: false, companyId: '', name: '', address: '', tz: '', lang: '', mName: '', mEmail: '', mPass: '' });
   const [compForm, setCompForm] = useState<{ open: boolean; name: string; country: CountryCode; taxId: string }>(
     { open: false, name: '', country: 'PE', taxId: '' });
 
@@ -44,7 +45,7 @@ export default function BranchesPage() {
 
   const openBranchForm = (companyId: string) => {
     const tz = tzOptions(companyId)[0]?.tz ?? '';
-    setBranchForm({ open: true, companyId, name: '', address: '', tz, lang: '' });
+    setBranchForm({ open: true, companyId, name: '', address: '', tz, lang: '', mName: '', mEmail: '', mPass: '' });
     setMsg(null);
   };
 
@@ -71,6 +72,18 @@ export default function BranchesPage() {
         p_company: branchForm.companyId, p_name: branchForm.name, p_timezone: branchForm.tz || null, p_address: branchForm.address || null,
       });
       if (branchForm.lang && id) await rpc('set_branch_lang', { p_branch: id, p_lang: branchForm.lang });
+      // Cobranza: el gerente de la sucursal se crea al activarla
+      if (street && id && branchForm.mName.trim() && branchForm.mEmail.trim()) {
+        if (branchForm.mPass.length < 8) throw new Error(t('val.passMin'));
+        const { data: s } = await supabase.auth.getSession();
+        const res = await fetch('/api/workers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${s.session?.access_token ?? ''}` },
+          body: JSON.stringify({ companyId: branchForm.companyId, branchId: id, role: 'manager', name: branchForm.mName.trim(), email: branchForm.mEmail.trim(), password: branchForm.mPass }),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(body.error ?? '');
+      }
     }, t('branches.created'));
     if (ok) setBranchForm((f) => ({ ...f, open: false }));
   };
@@ -86,7 +99,7 @@ export default function BranchesPage() {
   };
 
   const u = overview?.usage;
-  const branchesFull = !!u && u.branches.max !== null && u.branches.used >= u.branches.max;
+  const branchesFull = !street && !!u && u.branches.max !== null && u.branches.used >= u.branches.max;
   const companiesFull = !!u && u.companies.max !== null && u.companies.used >= u.companies.max;
   const sortedCountries = [...COUNTRIES].sort((a, b) => countryName(lang, a.code, a.name).localeCompare(countryName(lang, b.code, b.name), lang));
 
@@ -99,7 +112,7 @@ export default function BranchesPage() {
         </div>
         {u && (
           <p className={`text-sm font-semibold ${ui.muted}`}>
-            {t('owner.usageBranches')}: {u.branches.max === null ? u.branches.used : t('owner.of', { used: u.branches.used, max: u.branches.max })}
+            {t('owner.usageBranches')}: {street || u.branches.max === null ? u.branches.used : t('owner.of', { used: u.branches.used, max: u.branches.max })}
           </p>
         )}
       </div>
@@ -170,6 +183,17 @@ export default function BranchesPage() {
                   <label className={ui.label}>{t('branches.address')}</label>
                   <input className={ui.input} value={branchForm.address} onChange={(e) => setBranchForm({ ...branchForm, address: e.target.value })} />
                 </div>
+                {street && (
+                  <div className="grid gap-3 sm:col-span-2 sm:grid-cols-3">
+                    <p className="text-sm font-bold sm:col-span-3">{t('branches.managerTitle')}</p>
+                    <div><label className={ui.label}>{t('team.name')}</label>
+                      <input className={ui.input} value={branchForm.mName} onChange={(e) => setBranchForm({ ...branchForm, mName: e.target.value })} /></div>
+                    <div><label className={ui.label}>{t('common.email')}</label>
+                      <input type="email" className={ui.input} value={branchForm.mEmail} onChange={(e) => setBranchForm({ ...branchForm, mEmail: e.target.value })} /></div>
+                    <div><label className={ui.label}>{t('common.password')}</label>
+                      <input type="password" autoComplete="new-password" className={ui.input} value={branchForm.mPass} onChange={(e) => setBranchForm({ ...branchForm, mPass: e.target.value })} /></div>
+                  </div>
+                )}
                 <div className="flex justify-end gap-2 sm:col-span-2">
                   <button type="button" onClick={() => setBranchForm({ ...branchForm, open: false })} className={ui.btnGhost}>{t('pwa.close')}</button>
                   <button type="submit" disabled={busy} className={`${ui.btnPrimary} max-sm:w-full`}>{busy ? t('common.wait') : t('branches.create')}</button>
