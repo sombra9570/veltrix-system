@@ -750,13 +750,13 @@ export default function CollectorPage() {
             {panel === 'loan' && merch && (
               <CreditSaleForm routeId={route.id} today={route.today} fmt={fmt} online={online} localCustomers={localCust(route)} fixedCustomer={loanFor ?? undefined}
                 onQueue={(op) => enqueue(op)}
-                onDone={async (text, ok, customerId) => { flash(ok, text); if (loanFor) menu(); setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
+                onDone={async (text, ok, customerId) => { flash(ok, text); if (ok) { setHist(['home']); setScreen('list'); setSel(null); } setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
             )}
             {panel === 'loan' && !merch && route.policy && (
               <LoanForm routeId={route.id} today={route.today} policy={route.policy} canInterest={!!route.can_interest}
                 canCustomers={route.can_customers !== false} fmt={fmt} online={online} localCustomers={localCust(route)}
                 fund={fund} maxLoan={Number(route.max_loan ?? 0)} onQueue={(op) => enqueue(op)} fixedCustomer={loanFor ?? undefined}
-                onDone={async (text, ok, customerId) => { flash(ok, text); if (loanFor) menu(); setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
+                onDone={async (text, ok, customerId) => { flash(ok, text); if (ok) { setHist(['home']); setScreen('list'); setSel(null); } setPanel(null); await patch(route.id, { customers: customerId ? [customerId] : [], totals: true }); }} />
             )}
             {panel === 'settle' && fund !== null && <PeriodSheet route={route} fmt={fmt} fund={fund} online={online}
               onChanged={async (text) => { flash(true, text); await patch(route.id, { totals: true }); }} onError={(text) => flash(false, text)} />}
