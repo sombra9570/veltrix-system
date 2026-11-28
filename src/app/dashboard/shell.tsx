@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { ThemeToggle } from '../theme';
 import { StoreOrdersBell } from './store-orders-alert';
-import { HelpButton } from './help';
+import { HelpButton, type HelpScope } from './help';
 import { BrandMark, RegionSelectors, ui } from '../site-header';
 import { useT } from '../i18n';
 import { useSync, SyncButton, NetBanner } from './sync';
@@ -61,7 +61,7 @@ export function useHeaderSlot(slot: HeaderSlot | null, deps: unknown[]) {
  * barra superior y contenido al centro.
  */
 export function AppShell({
-  nav, orgName, orgId, userName, roleLabel, onLogout, children, banner, help = false,
+  nav, orgName, orgId, userName, roleLabel, onLogout, children, banner, help = false, helpScope,
 }: {
   nav: NavItem[];
   orgName: string;
@@ -72,6 +72,7 @@ export function AppShell({
   children: React.ReactNode;
   banner?: React.ReactNode;
   help?: boolean;
+  helpScope?: HelpScope;
 }) {
   const pathname = usePathname();
   const { t } = useT();
@@ -226,7 +227,7 @@ export function AppShell({
             <div className="hidden sm:block"><RegionSelectors /></div>
             <StoreOrdersBell />
             {!slot?.hideSync && <SyncButton />}
-            {help && <HelpButton />}
+            {help && <HelpButton scope={helpScope} />}
             <ThemeToggle />
             {slot?.logout && (
               <button type="button" onClick={onLogout} aria-label={t('shell.logout')}

@@ -254,6 +254,7 @@ export function OwnerProvider({ children }: { children: React.ReactNode }) {
         roleLabel={t('role.owner')}
         onLogout={logout}
         help
+        helpScope={{ cobranza, field: modules.includes('field_collection'), store: storeEnabled }}
         banner={banner}
       >
         {children}

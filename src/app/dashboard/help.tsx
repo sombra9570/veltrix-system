@@ -8,7 +8,17 @@ import { IconClose } from '../icons';
 const N = 10;
 
 /** Ayuda rápida: las 10 dudas más comunes, en el idioma del usuario. Gratis y sin conexión. */
-export function HelpButton() {
+export type HelpScope = { cobranza?: boolean; field?: boolean; store?: boolean };
+
+/** Solo se muestran las ayudas que corresponden a lo que tiene la empresa (rubro y herramientas activas) */
+function helpApplies(i: number, s: HelpScope) {
+  if (i >= 1 && i <= 4) return !s.cobranza; // caja, ventas, crédito en punto de venta y productos: no aplican a cobranza en calle
+  if (i === 5) return !!s.field; // cobrador sin conexión
+  if (i === 6) return !!s.store; // tienda virtual
+  return true;
+}
+
+export function HelpButton({ scope = {} }: { scope?: HelpScope } = {}) {
   const { t } = useT();
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
@@ -22,12 +32,12 @@ export function HelpButton() {
   }, [open]);
 
   const items = useMemo(() => {
-    const all = Array.from({ length: N }, (_, i) => ({
-      i, q: t(`help.q${i + 1}` as DictKey), a: t(`help.a${i + 1}` as DictKey),
+    const all = Array.from({ length: N }, (_, i) => i).filter((i) => helpApplies(i, scope)).map((i, pos) => ({
+      i, pos, q: t(`help.q${i + 1}` as DictKey), a: t(`help.a${i + 1}` as DictKey),
     }));
     const s = q.trim().toLowerCase();
     return s ? all.filter((x) => x.q.toLowerCase().includes(s) || x.a.toLowerCase().includes(s)) : all;
-  }, [q, t]);
+  }, [q, t, scope.cobranza, scope.field, scope.store]);
 
   return (
     <>
@@ -58,7 +68,7 @@ export function HelpButton() {
                   <li key={x.i} className="rounded-2xl border border-slate-200 dark:border-slate-800">
                     <button type="button" onClick={() => setOpenIdx(openIdx === x.i ? null : x.i)}
                       className="flex w-full items-center gap-3 p-4 text-left font-semibold cursor-pointer">
-                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-blue-100 text-xs font-bold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">{x.i + 1}</span>
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-blue-100 text-xs font-bold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">{x.pos + 1}</span>
                       <span className="flex-1">{x.q}</span>
                       <span className={ui.muted}>{isOpen ? '−' : '+'}</span>
                     </button>
