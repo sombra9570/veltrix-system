@@ -387,10 +387,10 @@ export function LanguageDropdown() {
       <select
         value={country.code}
         onChange={(e) => setCountryByCode(e.target.value as CountryCode)}
-        className="bg-slate-900 border border-slate-700 hover:border-emerald-500 text-white text-xs font-semibold rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+        className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-emerald-500 text-slate-900 dark:text-white text-xs font-semibold rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
       >
         {COUNTRIES.map((c) => (
-          <option key={c.code} value={c.code} className="bg-slate-900 text-white">
+          <option key={c.code} value={c.code} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
             {c.flag} {c.name} ({c.currency})
           </option>
         ))}
@@ -399,10 +399,10 @@ export function LanguageDropdown() {
       <select
         value={lang}
         onChange={(e) => setLanguage(e.target.value as LangCode)}
-        className="bg-slate-900 border border-slate-700 hover:border-blue-500 text-white text-xs font-semibold rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+        className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 hover:border-blue-500 text-slate-900 dark:text-white text-xs font-semibold rounded-lg px-3 py-2.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
       >
         {LANGUAGES.map((l) => (
-          <option key={l.code} value={l.code} className="bg-slate-900 text-white">
+          <option key={l.code} value={l.code} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
             {l.flag} {l.name}
           </option>
         ))}
@@ -437,7 +437,7 @@ export function RegionalStatusBar() {
   const rawCountry = COUNTRIES.find((c) => c.code === country.code) || COUNTRIES[0];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8 bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 text-xs">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-8 bg-white dark:bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 text-xs">
       {/* 1. Reloj Local en vivo */}
       <div className="flex flex-col justify-center">
         <span className="text-slate-400">{t.localTimeLabel}</span>
@@ -455,10 +455,10 @@ export function RegionalStatusBar() {
         <select
           value={selectedTimezone.tz}
           onChange={(e) => setSelectedTimezoneByTz(e.target.value)}
-          className="mt-1 bg-slate-950 border border-slate-700 hover:border-blue-500 text-slate-200 font-semibold rounded-lg px-2.5 py-1.5 text-xs cursor-pointer focus:outline-none"
+          className="mt-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 hover:border-blue-500 text-slate-800 dark:text-slate-200 font-semibold rounded-lg px-2.5 py-1.5 text-xs cursor-pointer focus:outline-none"
         >
           {country.timezones.map((tzObj) => (
-            <option key={tzObj.tz} value={tzObj.tz} className="bg-slate-900 text-white">
+            <option key={tzObj.tz} value={tzObj.tz} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
               🌍 {tzObj.label} ({tzObj.utcOffset})
             </option>
           ))}
@@ -483,7 +483,7 @@ export function RegionalStatusBar() {
             )}
             <button
               onClick={syncOfficialRatesNow}
-              className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded"
+              className="text-[10px] bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded"
               title="Actualizar tipo de cambio oficial ahora"
             >
               🔄 Sync
@@ -497,13 +497,13 @@ export function RegionalStatusBar() {
             step="0.01"
             value={activeRate}
             onChange={(e) => setCustomRate(parseFloat(e.target.value) || 0)}
-            className="w-20 bg-slate-950 border border-slate-700 focus:border-blue-500 rounded px-2 py-1 text-white font-bold text-xs"
+            className="w-20 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 focus:border-blue-500 rounded px-2 py-1 text-slate-900 dark:text-white font-bold text-xs"
           />
-          <span className="text-slate-300 font-semibold">{country.currency}</span>
+          <span className="text-slate-700 dark:text-slate-300 font-semibold">{country.currency}</span>
           <select
             value={currencyMode}
             onChange={(e) => setCurrencyMode(e.target.value as CurrencyMode)}
-            className="ml-auto bg-slate-950 border border-slate-700 text-slate-200 rounded px-1.5 py-1 text-[11px]"
+            className="ml-auto bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded px-1.5 py-1 text-[11px]"
           >
             <option value="dual">{country.currency} + USD</option>
             <option value="local">Solo {country.currency}</option>
@@ -531,7 +531,7 @@ export function RegionalStatusBar() {
           <select
             value={taxRegime}
             onChange={(e) => setTaxRegime(e.target.value as TaxRegimeId)}
-            className="bg-slate-950 border border-slate-700 hover:border-purple-500 text-slate-200 rounded px-2 py-1 text-[11px] font-medium focus:outline-none"
+            className="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 hover:border-purple-500 text-slate-800 dark:text-slate-200 rounded px-2 py-1 text-[11px] font-medium focus:outline-none"
             title="Régimen Tributario del Negocio"
           >
             <option value="general">Régimen General ({rawCountry.taxRate}%)</option>
@@ -543,7 +543,7 @@ export function RegionalStatusBar() {
             value={businessSector}
             onChange={(e) => setBusinessSector(e.target.value as BusinessSectorId)}
             disabled={taxRegime !== 'general'}
-            className="bg-slate-950 border border-slate-700 hover:border-purple-500 disabled:opacity-40 text-slate-200 rounded px-2 py-1 text-[11px] font-medium focus:outline-none"
+            className="bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 hover:border-purple-500 disabled:opacity-40 text-slate-800 dark:text-slate-200 rounded px-2 py-1 text-[11px] font-medium focus:outline-none"
             title="Rubro o Sector Económico"
           >
             <option value="standard">Comercio / POS ({rawCountry.taxRate}%)</option>

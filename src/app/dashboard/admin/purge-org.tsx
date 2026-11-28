@@ -28,9 +28,9 @@ function explain(d: Json): string {
   }
 }
 
-const field = 'w-full rounded-lg border border-red-500/30 bg-slate-900 px-2 py-1 text-xs text-white';
+const field = 'w-full rounded-lg border border-red-500/30 bg-white dark:bg-slate-900 px-2 py-1 text-xs text-slate-900 dark:text-white';
 const dangerBtn = 'text-[11px] font-bold text-white bg-red-600 disabled:opacity-40 px-2.5 py-1 rounded-lg cursor-pointer';
-const ghostBtn = 'text-[11px] font-bold text-slate-300 border border-slate-600 px-2.5 py-1 rounded-lg cursor-pointer disabled:opacity-40';
+const ghostBtn = 'text-[11px] font-bold text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 px-2.5 py-1 rounded-lg cursor-pointer disabled:opacity-40';
 
 type Summary = { request: string; name: string; users: number; branches: number; customers: number; orders: number; files: number };
 
@@ -75,13 +75,13 @@ export function PurgeOrg({ orgId, name, onDone }: { orgId: string; name: string;
         <p className="text-[11px] text-red-300">
           Se borrará PARA SIEMPRE "{sum.name}": {sum.users} usuarios, {sum.branches} sucursales, {sum.customers} clientes, {sum.orders} pedidos y {sum.files} archivos, además de las cuentas de acceso del personal.
         </p>
-        <label className="block text-[11px] text-slate-300">1) Nombre exacto de la empresa
+        <label className="block text-[11px] text-slate-700 dark:text-slate-300">1) Nombre exacto de la empresa
           <input value={typed} onChange={(e) => setTyped(e.target.value)} className={field} autoComplete="off" />
         </label>
-        <label className="block text-[11px] text-slate-300">2) Clave de borrado
+        <label className="block text-[11px] text-slate-700 dark:text-slate-300">2) Clave de borrado
           <input type="password" value={key} onChange={(e) => setKey(e.target.value)} className={field} autoComplete="off" />
         </label>
-        <label className="block text-[11px] text-slate-300">3) Escribe BORRAR
+        <label className="block text-[11px] text-slate-700 dark:text-slate-300">3) Escribe BORRAR
           <input value={phrase} onChange={(e) => setPhrase(e.target.value)} className={field} autoComplete="off" />
         </label>
         {msg && <p className="text-[11px] font-semibold text-red-300">{msg}</p>}
@@ -111,7 +111,7 @@ export function SweepFiles({ onDone }: { onDone: (msg: string) => void }) {
   if (!open) return <button type="button" onClick={() => setOpen(true)} className={ghostBtn}>🧹 Limpiar archivos de empresas ya borradas</button>;
   return (
     <div className="max-w-xs space-y-2">
-      <p className="text-[11px] text-slate-300">Borra los archivos de empresas que ya no existen. Pide la clave de borrado.</p>
+      <p className="text-[11px] text-slate-700 dark:text-slate-300">Borra los archivos de empresas que ya no existen. Pide la clave de borrado.</p>
       <input type="password" value={key} onChange={(e) => setKey(e.target.value)} className={field} autoComplete="off" aria-label="Clave de borrado" />
       {msg && <p className="text-[11px] font-semibold text-red-300">{msg}</p>}
       <div className="flex gap-2">
@@ -148,16 +148,16 @@ export function AutoPurgePanel({ onDone }: { onDone: (msg: string) => void }) {
   if (!open) return <button type="button" onClick={show} className={ghostBtn}>⏱️ Borrado automático</button>;
   return (
     <div className="max-w-sm space-y-2">
-      {!st ? <p className="text-[11px] text-slate-300">Cargando…</p> : (<>
-        <p className="text-[11px] text-slate-300">
+      {!st ? <p className="text-[11px] text-slate-700 dark:text-slate-300">Cargando…</p> : (<>
+        <p className="text-[11px] text-slate-700 dark:text-slate-300">
           Estado: <b className={st.enabled ? 'text-red-300' : 'text-emerald-300'}>{st.enabled ? 'ENCENDIDO' : 'apagado'}</b>. Borra las empresas suspendidas por falta de renovación {st.days} días después de la suspensión, sin pedir la clave. No toca empresas piloto.
         </p>
         {st.list.length === 0 ? <p className="text-[11px] text-slate-400">Ninguna empresa suspendida por ahora.</p> : (
-          <ul className="space-y-1 text-[11px] text-slate-300">
+          <ul className="space-y-1 text-[11px] text-slate-700 dark:text-slate-300">
             {st.list.map((o) => <li key={o.org_id}>• {o.name}: suspendida el {day(o.suspended_since)} → se borraría el {day(o.delete_on)}</li>)}
           </ul>
         )}
-        <label className="block text-[11px] text-slate-300">Clave de borrado para {st.enabled ? 'apagarlo' : 'encenderlo'}
+        <label className="block text-[11px] text-slate-700 dark:text-slate-300">Clave de borrado para {st.enabled ? 'apagarlo' : 'encenderlo'}
           <input type="password" value={key} onChange={(e) => setKey(e.target.value)} className={field} autoComplete="off" />
         </label>
         {msg && <p className="text-[11px] font-semibold text-red-300">{msg}</p>}

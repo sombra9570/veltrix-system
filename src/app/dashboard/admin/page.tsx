@@ -18,6 +18,7 @@ import { RecursosPanel } from './recursos-panel';
 import { ActividadPanel } from './actividad-panel';
 import { ConocimientoPanel } from './conocimiento-panel';
 import { IconClose } from '../../icons';
+import { ThemeToggle } from '../../theme';
 
 // Lo que devuelve la función platform_metrics() de la base de datos
 type Stage = 'trial' | 'paying' | 'grace' | 'suspended';
@@ -272,7 +273,7 @@ export default function GlobalCoreAdminPage() {
   }, [loaded, session, refresh, loadOv]);
 
   if (!loaded || !session || session.role !== 'superadmin') {
-    return <div className="grid min-h-dvh place-items-center bg-slate-950"><Spinner /></div>;
+    return <div className="grid min-h-dvh place-items-center bg-slate-50 dark:bg-slate-950"><Spinner /></div>;
   }
 
   const f = m?.funnel ?? { total: 0, trial: 0, paying: 0, grace: 0, suspended: 0 };
@@ -282,7 +283,7 @@ export default function GlobalCoreAdminPage() {
   const growth = m?.growth ?? [];
 
   const cards: { key: Filter; label: string; value: number; on: string; text: string }[] = [
-    { key: 'all',       label: 'Organizaciones',  value: f.total,     on: 'bg-blue-950/40 border-blue-500',       text: 'text-white' },
+    { key: 'all',       label: 'Organizaciones',  value: f.total,     on: 'bg-blue-950/40 border-blue-500',       text: 'text-slate-900 dark:text-white' },
     { key: 'trial',     label: '🧪 En prueba',     value: f.trial,     on: 'bg-sky-950/40 border-sky-500',         text: 'text-sky-300' },
     { key: 'paying',    label: '🟢 Pagando',       value: f.paying,    on: 'bg-emerald-950/40 border-emerald-500', text: 'text-emerald-300' },
     { key: 'grace',     label: '🟡 En gracia',     value: f.grace,     on: 'bg-amber-950/40 border-amber-500',     text: 'text-amber-300' },
@@ -294,7 +295,7 @@ export default function GlobalCoreAdminPage() {
     <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
       {cards.map((c) => (
         <button key={c.key} onClick={() => onPick(c.key)}
-          className={`cursor-pointer rounded-xl border p-4 text-left transition ${filter === c.key && tab === 'clients' ? c.on : 'border-slate-800 bg-slate-900/50 hover:border-slate-600'}`}>
+          className={`cursor-pointer rounded-xl border p-4 text-left transition ${filter === c.key && tab === 'clients' ? c.on : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-slate-400 dark:hover:border-slate-600'}`}>
           <p className="text-xs font-semibold text-slate-400">{c.label}</p>
           <p className={`mt-1 text-2xl font-extrabold ${c.text}`}>{c.value}</p>
         </button>
@@ -314,12 +315,12 @@ export default function GlobalCoreAdminPage() {
   ];
 
   return (
-    <main className="min-h-dvh bg-slate-950 text-white px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:p-8">
+    <main className="min-h-dvh bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:p-8">
       <div className="w-full max-w-[1600px] mx-auto space-y-6 min-w-0">
         <NetBanner />
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
           <div className="min-w-0">
-            <BrandMark size={28} className="mb-2 !text-white" />
+            <BrandMark size={28} className="mb-2 !text-slate-900 dark:!text-white" />
             <span className="block w-fit rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-purple-400">
               🛡️ Superadmin
             </span>
@@ -328,14 +329,15 @@ export default function GlobalCoreAdminPage() {
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <div className="rounded-xl border border-slate-800 bg-slate-900 px-3 py-1.5">
+            <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5">
               <p className="text-[10px] text-slate-400">Ingreso mensual (MRR)</p>
               <p className="text-sm font-bold text-emerald-400">{formatMoney(m?.mrr_usd ?? 0)}</p>
             </div>
             <button onClick={refresh} disabled={busy} aria-label="Actualizar"
-              className="cursor-pointer rounded-lg border border-slate-700 bg-slate-900 px-3 py-2.5 text-xs font-semibold hover:bg-slate-800 disabled:opacity-50">
+              className="cursor-pointer rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 disabled:opacity-50">
               {busy ? '…' : '↻'}
             </button>
+            <ThemeToggle />
             <PlatformBell />
             <button onClick={logout}
               className="cursor-pointer rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-xs font-semibold text-red-400 hover:bg-red-500/20">
@@ -355,8 +357,8 @@ export default function GlobalCoreAdminPage() {
           <nav className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4" aria-label="Secciones">
             {TABS.map((x) => (
               <button key={x.id} type="button" onClick={() => setTab(x.id)}
-                className="flex min-h-32 cursor-pointer flex-col items-start gap-1.5 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 text-start transition hover:border-blue-500 hover:bg-slate-900">
-                <span className="flex w-full items-center justify-between"><span className="text-3xl" aria-hidden>{x.icon}</span>{x.n !== undefined && <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs font-bold text-slate-200">{x.n}</span>}</span>
+                className="flex min-h-32 cursor-pointer flex-col items-start gap-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-4 text-start transition hover:border-blue-500 hover:bg-slate-900">
+                <span className="flex w-full items-center justify-between"><span className="text-3xl" aria-hidden>{x.icon}</span>{x.n !== undefined && <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-bold text-slate-800 dark:text-slate-200">{x.n}</span>}</span>
                 <span className="text-base font-bold">{x.label}</span>
                 <span className="text-xs leading-snug text-slate-400">{x.d}</span>
               </button>
@@ -369,7 +371,7 @@ export default function GlobalCoreAdminPage() {
           </nav>
         ) : (
           <div className="flex items-center gap-3">
-            <button type="button" onClick={() => setTab('menu')} className="cursor-pointer rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-bold hover:bg-slate-800">← Menú</button>
+            <button type="button" onClick={() => setTab('menu')} className="cursor-pointer rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-800">← Menú</button>
             <h2 className="text-base font-bold">{TABS.find((x) => x.id === tab)?.icon} {TABS.find((x) => x.id === tab)?.label}</h2>
           </div>
         )}
@@ -381,19 +383,19 @@ export default function GlobalCoreAdminPage() {
 
         {/* CONVERSIÓN Y BAJAS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="p-4 rounded-xl border bg-slate-900/50 border-slate-800">
+          <div className="p-4 rounded-xl border bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800">
             <p className="text-xs text-slate-400 font-semibold">Conversión de prueba a pago</p>
-            <p className="text-2xl font-extrabold mt-1 text-white">{convPct === null ? '—' : `${convPct}%`}</p>
+            <p className="text-2xl font-extrabold mt-1 text-slate-900 dark:text-white">{convPct === null ? '—' : `${convPct}%`}</p>
             <p className="text-[11px] text-slate-500 mt-1">
               {conv.converted} de {conv.trials_finished} pruebas terminadas pagaron
             </p>
           </div>
-          <div className="p-4 rounded-xl border bg-slate-900/50 border-slate-800">
+          <div className="p-4 rounded-xl border bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800">
             <p className="text-xs text-slate-400 font-semibold">Bajas últimos 30 días</p>
             <p className="text-2xl font-extrabold mt-1 text-red-300">{m?.churn_30d ?? 0}</p>
             <p className="text-[11px] text-slate-500 mt-1">Empresas suspendidas por falta de pago</p>
           </div>
-          <div className="p-4 rounded-xl border bg-slate-900/50 border-slate-800">
+          <div className="p-4 rounded-xl border bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800">
             <p className="text-xs text-slate-400 font-semibold">Pruebas activas</p>
             <p className="text-2xl font-extrabold mt-1 text-sky-300">{f.trial}</p>
             <p className="text-[11px] text-slate-500 mt-1">14 días gratis desde que se registran</p>
@@ -403,7 +405,7 @@ export default function GlobalCoreAdminPage() {
 
         {/* CRECIMIENTO */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <section className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5">
+          <section className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
             <h2 className="text-sm font-bold">📈 Empresas nuevas por mes</h2>
             <p className="text-[11px] text-slate-500">Últimos 12 meses</p>
             <BarChart
@@ -412,7 +414,7 @@ export default function GlobalCoreAdminPage() {
               format={(n) => String(n)}
             />
           </section>
-          <section className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5">
+          <section className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5">
             <h2 className="text-sm font-bold">💰 Ingresos cobrados por mes</h2>
             <p className="text-[11px] text-slate-500">Pagos de suscripción confirmados</p>
             <BarChart
@@ -425,7 +427,7 @@ export default function GlobalCoreAdminPage() {
 
 
         {/* PRUEBAS POR VENCER */}
-        <section className="bg-slate-900/60 border border-sky-900/50 rounded-2xl p-5 space-y-3">
+        <section className="bg-white dark:bg-slate-900/60 border border-sky-900/50 rounded-2xl p-5 space-y-3">
           <div>
             <h2 className="text-sm font-bold">⏰ Pruebas por vencer</h2>
             <p className="text-[11px] text-slate-500">Contáctelos antes de que finalice el período de prueba para su conversión a clientes.</p>
@@ -435,7 +437,7 @@ export default function GlobalCoreAdminPage() {
           ) : (
             <div className="space-y-2">
               {m!.trials_expiring.map((x) => (
-                <div key={x.org_id} className="flex flex-wrap items-center justify-between gap-2 bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-xs">
+                <div key={x.org_id} className="flex flex-wrap items-center justify-between gap-2 bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-xs">
                   <div>
                     <p className="font-bold text-sm">{x.name}</p>
                     <p className="text-slate-400">{x.email} · Plan {x.plan}</p>
@@ -468,20 +470,20 @@ export default function GlobalCoreAdminPage() {
         {tab === 'plans' && (
         <>
         {/* VELTRIX IA */}
-        <section className="bg-slate-900/60 border border-violet-900/50 rounded-2xl p-5 space-y-3">
+        <section className="bg-white dark:bg-slate-900/60 border border-violet-900/50 rounded-2xl p-5 space-y-3">
           <div>
             <h2 className="text-sm font-bold">✨ Veltrix IA (complemento pagado)</h2>
             <p className="text-[11px] text-slate-500">Cupo mensual de preguntas por empresa. 0 = apagada. El consumo se reinicia cada mes.</p>
           </div>
           <div className="space-y-2">
             {ai.map((o) => (
-              <div key={o.org_id} className="flex flex-wrap items-center gap-3 bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-xs">
+              <div key={o.org_id} className="flex flex-wrap items-center gap-3 bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-xs">
                 <div className="min-w-0 flex-1">
                   <p className="font-bold text-sm truncate">{o.name}</p>
                   <p className="text-slate-400">Usadas {o.used} de {o.quota} · tokens {o.tokens_in.toLocaleString()} entrada / {o.tokens_out.toLocaleString()} salida</p>
                 </div>
                 <input inputMode="numeric" value={aiEdit[o.org_id] ?? String(o.quota)} onChange={(e) => setAiEdit({ ...aiEdit, [o.org_id]: e.target.value.replace(/\D/g, '') })}
-                  className="w-20 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
+                  className="w-20 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2 py-1.5 text-sm" />
                 <button type="button" onClick={() => saveQuota(o.org_id)} className="bg-violet-600/20 hover:bg-violet-600/30 text-violet-200 border border-violet-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar cuota</button>
               </div>
             ))}
@@ -489,18 +491,18 @@ export default function GlobalCoreAdminPage() {
         </section>
 
         {/* PLANES Y PRECIOS */}
-        <section className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
+        <section className="bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
           <div>
             <h2 className="text-sm font-bold">💲 Planes y precios</h2>
             <p className="text-[11px] text-slate-500">Modifique precios y límites en cualquier momento. Se aplican de inmediato en la portada, en "Mi plan" y en los límites de cada empresa. Si modifica un precio, actualícelo también en Paddle (Catálogo → Precios).</p>
           </div>
-          {planMsg && <p className="text-xs font-semibold text-slate-200">{planMsg}</p>}
+          {planMsg && <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">{planMsg}</p>}
           <div className="grid gap-3 lg:grid-cols-3">
             {plans.map((p) => (
-              <div key={p.code} className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-2 text-xs">
+              <div key={p.code} className="bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-2 text-xs">
                 <div className="flex items-center justify-between gap-2">
                   <input value={planVal(p, 'name')} onChange={(e) => setPlanEdit({ ...planEdit, [p.code]: { ...planEdit[p.code], name: e.target.value } })}
-                    className="min-w-0 flex-1 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm font-bold" />
+                    className="min-w-0 flex-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2 py-1.5 text-sm font-bold" />
                   <span className="shrink-0 text-slate-400">{p.orgs} empresas</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -509,13 +511,13 @@ export default function GlobalCoreAdminPage() {
                       <span className="block text-[11px] text-slate-400 mb-0.5">{label}</span>
                       <input inputMode="decimal" value={planVal(p, k)}
                         onChange={(e) => setPlanEdit({ ...planEdit, [p.code]: { ...planEdit[p.code], [k]: e.target.value } })}
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
+                        className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2 py-1.5 text-sm" />
                     </label>
                   ))}
                 </div>
                 {planEdit[p.code] && (
                   <div className="flex gap-2 pt-1">
-                    <button type="button" onClick={() => setPlanEdit((e) => { const c = { ...e }; delete c[p.code]; return c; })} className="flex-1 border border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
+                    <button type="button" onClick={() => setPlanEdit((e) => { const c = { ...e }; delete c[p.code]; return c; })} className="flex-1 border border-slate-300 dark:border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
                     <button type="button" onClick={() => savePlan(p)} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar</button>
                   </div>
                 )}
@@ -524,14 +526,14 @@ export default function GlobalCoreAdminPage() {
           </div>
           {street && (
             <div className="space-y-2 pt-2">
-              <h3 className="text-xs font-bold text-slate-300">🛵 Plan exclusivo de cobranza en calle y microfinanzas (precio mensual: Bolivia en bolivianos fijos, resto del mundo en dólares más impuestos; se muestra al cliente al final del registro)</h3>
-              <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-3 text-xs">
+              <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300">🛵 Plan exclusivo de cobranza en calle y microfinanzas (precio mensual: Bolivia en bolivianos fijos, resto del mundo en dólares más impuestos; se muestra al cliente al final del registro)</h3>
+              <div className="bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-3 text-xs">
                 <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   {([['base_bs', 'Bolivia: base (1 administrador + 1 cobrador), Bs'], ['collector_bs', 'Bolivia: cada cobrador adicional, Bs'], ['base_usd', 'Resto del mundo: base, USD'], ['collector_usd', 'Resto del mundo: cada cobrador adicional, USD'], ['collectors_per_supervisor', 'Un supervisor cada N cobradores'], ['manager_after_collectors', 'Gerente después del cobrador N']] as [keyof StreetCfg, string][]).map(([k, label]) => (
                     <label key={k} className="block">
                       <span className="block text-[11px] text-slate-400 mb-0.5">{label}</span>
                       <input inputMode="decimal" value={stVal(k)} onChange={(e) => setStEdit({ ...stEdit, [k]: e.target.value })}
-                        className="w-full rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
+                        className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2 py-1.5 text-sm" />
                     </label>
                   ))}
                 </div>
@@ -542,7 +544,7 @@ export default function GlobalCoreAdminPage() {
                 </label>
                 {Object.keys(stEdit).length > 0 && (
                   <div className="flex gap-2">
-                    <button type="button" onClick={() => setStEdit({})} className="flex-1 border border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
+                    <button type="button" onClick={() => setStEdit({})} className="flex-1 border border-slate-300 dark:border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
                     <button type="button" onClick={saveStreet} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar</button>
                   </div>
                 )}
@@ -551,10 +553,10 @@ export default function GlobalCoreAdminPage() {
           )}
           {addons.length > 0 && (
             <div className="space-y-2 pt-2">
-              <h3 className="text-xs font-bold text-slate-300">➕ Complementos que el administrador de cada empresa puede contratar sin cambiar de plan (precio mensual por unidad)</h3>
+              <h3 className="text-xs font-bold text-slate-700 dark:text-slate-300">➕ Complementos que el administrador de cada empresa puede contratar sin cambiar de plan (precio mensual por unidad)</h3>
               <div className="grid gap-3 lg:grid-cols-3">
                 {addons.map((a) => (
-                  <div key={a.code} className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 space-y-2 text-xs">
+                  <div key={a.code} className="bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-xl p-4 space-y-2 text-xs">
                     <p className="text-sm font-bold">{ADDON_NAME[a.code] ?? a.code}{a.code === 'storage' && <span className="text-slate-400 font-normal"> · {Math.round(a.unit_mb / 1024)} GB por unidad</span>}</p>
                     <div className="grid grid-cols-3 gap-2">
                       {([['price_usd', 'Latam (USD)'], ['price_global_usd', 'Mundo (USD)'], ['max_units', 'Máximo']] as [keyof AdminAddon, string][]).map(([k, label]) => (
@@ -562,13 +564,13 @@ export default function GlobalCoreAdminPage() {
                           <span className="block text-[11px] text-slate-400 mb-0.5">{label}</span>
                           <input inputMode="decimal" value={adVal(a, k)}
                             onChange={(e) => setAdEdit({ ...adEdit, [a.code]: { ...adEdit[a.code], [k]: e.target.value } })}
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
+                            className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2 py-1.5 text-sm" />
                         </label>
                       ))}
                     </div>
                     {adEdit[a.code] && (
                       <div className="flex gap-2 pt-1">
-                        <button type="button" onClick={() => setAdEdit((e) => { const c = { ...e }; delete c[a.code]; return c; })} className="flex-1 border border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
+                        <button type="button" onClick={() => setAdEdit((e) => { const c = { ...e }; delete c[a.code]; return c; })} className="flex-1 border border-slate-300 dark:border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
                         <button type="button" onClick={() => saveAddon(a)} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar</button>
                       </div>
                     )}
@@ -589,15 +591,15 @@ export default function GlobalCoreAdminPage() {
         <StreetRequests />
 
         {/* PILOTOS Y FUNDADORES */}
-        <section className="bg-slate-900/70 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
+        <section className="bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
           <div>
             <h2 className="text-sm font-bold">🤝 Pilotos y precio fundador</h2>
             <p className="text-[11px] text-slate-500">Días gratis con todo el plan. Al terminar paga con descuento de fundador durante los meses que elijas (no es de por vida) y luego el precio normal. Registra aquí los pagos por QR o transferencia.</p>
           </div>
-          {pMsg && <p className="text-xs font-semibold text-slate-200">{pMsg}</p>}
+          {pMsg && <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">{pMsg}</p>}
           <div className="space-y-2">
             {pilots.map((o) => (
-              <div key={o.org_id} className="bg-slate-950/70 border border-slate-800 rounded-xl px-4 py-3 text-xs space-y-2">
+              <div key={o.org_id} className="bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-xs space-y-2">
                 <div className="flex flex-wrap items-center gap-3">
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-sm truncate">
@@ -620,10 +622,10 @@ export default function GlobalCoreAdminPage() {
                 <div className="flex flex-wrap gap-2">
                   <button type="button" onClick={() => setPForm({ org: o.org_id, kind: 'pilot', a: '60', b: '50', c: '12' })} className="bg-sky-600/20 hover:bg-sky-600/30 text-sky-200 border border-sky-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">🧪 Activar piloto</button>
                   <button type="button" onClick={() => setPForm({ org: o.org_id, kind: 'pay', a: String(o.price_now), b: '1', c: '' })} className="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-200 border border-emerald-500/30 font-bold px-3 py-1.5 rounded-lg cursor-pointer">💵 Registrar pago</button>
-                  {o.founder_until && <button type="button" onClick={() => clearPilot(o.org_id)} className="border border-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Retirar descuento</button>}
+                  {o.founder_until && <button type="button" onClick={() => clearPilot(o.org_id)} className="border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Retirar descuento</button>}
                 </div>
                 {pForm?.org === o.org_id && (
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end border-t border-slate-800 pt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end border-t border-slate-200 dark:border-slate-800 pt-2">
                     {(pForm.kind === 'pilot'
                       ? [['a', 'Días gratis'], ['b', 'Descuento fundador %'], ['c', 'Meses con descuento']]
                       : [['a', 'Monto USD'], ['b', 'Meses que paga'], ['c', 'Referencia (n.º de QR o transferencia)']]
@@ -632,11 +634,11 @@ export default function GlobalCoreAdminPage() {
                         <span className="block text-[11px] text-slate-400 mb-1">{label}</span>
                         <input value={pForm[k as 'a' | 'b' | 'c']} inputMode={k === 'c' && pForm.kind === 'pay' ? 'text' : 'decimal'}
                           onChange={(e) => setPForm({ ...pForm, [k]: e.target.value })}
-                          className="w-full rounded-lg border border-slate-700 bg-slate-950 px-2 py-1.5 text-sm" />
+                          className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-2 py-1.5 text-sm" />
                       </label>
                     ))}
                     <div className="flex gap-2">
-                      <button type="button" onClick={() => setPForm(null)} className="flex-1 border border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
+                      <button type="button" onClick={() => setPForm(null)} className="flex-1 border border-slate-300 dark:border-slate-700 font-bold px-3 py-1.5 rounded-lg cursor-pointer">Cancelar</button>
                       <button type="button" onClick={savePilot} className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1.5 rounded-lg cursor-pointer">Guardar</button>
                     </div>
                   </div>
@@ -655,7 +657,7 @@ export default function GlobalCoreAdminPage() {
               🏢 {filter === 'all' ? 'Todas las organizaciones' : STAGE_INFO[filter].label} ({orgs.length})
             </h2>
             {orgs.length === 0 && (
-              <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-500">
+              <p className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-xs text-slate-500">
                 {busy ? 'Cargando…' : 'No hay organizaciones en esta etapa.'}
               </p>
             )}
@@ -665,13 +667,13 @@ export default function GlobalCoreAdminPage() {
               const cats: string[] = d ? Array.from(new Set<string>(d.companies.flatMap((c) => c.cats))) : [];
               const isOpen = open === o.org_id;
               return (
-                <div key={o.org_id} className="space-y-3 rounded-xl border border-slate-800 bg-slate-900/70 p-4">
+                <div key={o.org_id} className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-4">
                   <div className="flex flex-col justify-between gap-3 md:flex-row">
                     <div className="min-w-0 space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="font-bold">{o.name}</h3>
                         <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${STAGE_INFO[o.stage].badge}`}>{STAGE_INFO[o.stage].label}</span>
-                        <span className="rounded-full border border-slate-700 px-2.5 py-0.5 text-[11px] font-bold text-slate-300">Plan {o.plan}</span>
+                        <span className="rounded-full border border-slate-300 dark:border-slate-700 px-2.5 py-0.5 text-[11px] font-bold text-slate-700 dark:text-slate-300">Plan {o.plan}</span>
                       </div>
                       <p className="truncate text-xs text-slate-400">{o.email}</p>
                       {d?.signup_country && <p className="text-[11px] text-slate-400">📍 {[d.signup_city, d.signup_country].filter(Boolean).join(', ')}</p>}
@@ -691,7 +693,7 @@ export default function GlobalCoreAdminPage() {
                     <>
                       <div className="grid grid-cols-3 gap-2 text-center">
                         {([['🏢 Empresas', d.companies.length, d.limits.companies], ['📍 Sucursales', nBranches, d.limits.branches], ['👥 Usuarios', d.users, d.limits.users]] as const).map(([l, n, max]) => (
-                          <div key={l} className="rounded-lg border border-slate-800 bg-slate-950/50 px-2 py-2">
+                          <div key={l} className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-950/50 px-2 py-2">
                             <p className="text-[10px] font-semibold text-slate-400">{l}</p>
                             <p className="text-base font-extrabold">{n}<span className="text-xs font-semibold text-slate-500"> / {max}</span></p>
                           </div>
@@ -703,7 +705,7 @@ export default function GlobalCoreAdminPage() {
                         </div>
                       )}
                       <div className="flex flex-wrap gap-1.5">
-                        {d.modules.map((x) => <span key={x} className="rounded-md border border-slate-700 px-2 py-0.5 text-[10px] font-semibold text-slate-300">{MOD_LABEL[x] ?? x}</span>)}
+                        {d.modules.map((x) => <span key={x} className="rounded-md border border-slate-300 dark:border-slate-700 px-2 py-0.5 text-[10px] font-semibold text-slate-700 dark:text-slate-300">{MOD_LABEL[x] ?? x}</span>)}
                       </div>
                       <button type="button" onClick={() => setOpen(isOpen ? null : o.org_id)} className="cursor-pointer text-xs font-semibold text-sky-300 hover:underline">
                         {isOpen ? '▲ Ocultar detalle' : '▼ Ver empresas, sucursales y equipo'}
@@ -712,18 +714,18 @@ export default function GlobalCoreAdminPage() {
                         <div className="grid gap-3 md:grid-cols-2">
                           <ul className="space-y-2">
                             {d.companies.map((c) => (
-                              <li key={c.name} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3 text-xs">
+                              <li key={c.name} className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-950/50 p-3 text-xs">
                                 <p className="font-bold">{c.name}</p>
                                 <p className="text-slate-400">{c.cats.map((x) => CAT_LABEL[x] ?? x).join(' · ') || '—'}</p>
                                 <p className="mt-1 text-slate-500">📍 {c.branches.join(' · ') || 'Sin sucursales'}</p>
                               </li>
                             ))}
                           </ul>
-                          <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-3 text-xs">
+                          <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-950/50 p-3 text-xs">
                             <p className="mb-1 font-bold">Equipo por cargo</p>
                             <ul className="space-y-0.5">
                               {Object.entries(d.roles).map(([r, n]) => (
-                                <li key={r} className="flex justify-between"><span className="text-slate-300">{ROLE_LABEL[r] ?? r}</span><span className="font-bold">{n}</span></li>
+                                <li key={r} className="flex justify-between"><span className="text-slate-700 dark:text-slate-300">{ROLE_LABEL[r] ?? r}</span><span className="font-bold">{n}</span></li>
                               ))}
                             </ul>
                           </div>
@@ -747,7 +749,7 @@ export default function GlobalCoreAdminPage() {
         {tab === 'tools' && (
           <section className="space-y-3">
             <h2 className="text-sm font-bold">🛠️ Plataforma</h2>
-            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-800 bg-slate-900/70 p-4"><span className="text-xs font-semibold text-slate-400">País, moneda e idioma del panel</span><LanguageDropdown /></div>
+            <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-4"><span className="text-xs font-semibold text-slate-400">País, moneda e idioma del panel</span><LanguageDropdown /></div>
             <RegionalStatusBar />
             <div className="flex flex-wrap items-start gap-2"><AutoPurgePanel onDone={setPurgeDone} /><SweepFiles onDone={setPurgeDone} /></div>
             {purgeDone && <p className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-2 text-xs font-semibold text-emerald-300">{purgeDone}</p>}
@@ -758,20 +760,20 @@ export default function GlobalCoreAdminPage() {
         </div>
       </div>
       {mailMsg && !mail && (
-        <div className="fixed inset-x-0 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-50 mx-auto w-fit max-w-[calc(100vw-1.5rem)] break-words text-center rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold shadow-xl">{mailMsg}</div>
+        <div className="fixed inset-x-0 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-50 mx-auto w-fit max-w-[calc(100vw-1.5rem)] break-words text-center rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm font-semibold shadow-xl">{mailMsg}</div>
       )}
       {mail && (
         <div className="fixed inset-x-0 top-0 z-50 h-dvh">
           <div className="absolute inset-0 bg-black/60" onClick={() => setMail(null)} />
-          <div className="absolute inset-x-0 bottom-0 mx-auto max-h-[90dvh] max-w-xl space-y-3 overflow-y-auto rounded-t-3xl bg-slate-900 p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:rounded-3xl">
+          <div className="absolute inset-x-0 bottom-0 mx-auto max-h-[90dvh] max-w-xl space-y-3 overflow-y-auto rounded-t-3xl bg-white dark:bg-slate-900 p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:rounded-3xl">
             <div className="flex items-center justify-between">
               <h2 className="font-bold">✉️ Correo a {mail.name}</h2>
-              <button type="button" onClick={() => setMail(null)} className="h-9 w-9 rounded-lg border border-slate-700 cursor-pointer"><IconClose /></button>
+              <button type="button" onClick={() => setMail(null)} className="h-9 w-9 rounded-lg border border-slate-300 dark:border-slate-700 cursor-pointer"><IconClose /></button>
             </div>
             <p className="text-xs text-slate-400">Se envía desde el correo institucional de Veltrix (veltrixsystem.app), no desde un correo personal.</p>
             <p className="text-sm"><span className="text-slate-400">Para:</span> {mail.to}</p>
-            <input value={mail.subject} onChange={(e) => setMail({ ...mail, subject: e.target.value })} className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm" />
-            <textarea rows={9} value={mail.text} onChange={(e) => setMail({ ...mail, text: e.target.value })} className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm" />
+            <input value={mail.subject} onChange={(e) => setMail({ ...mail, subject: e.target.value })} className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2.5 text-sm" />
+            <textarea rows={9} value={mail.text} onChange={(e) => setMail({ ...mail, text: e.target.value })} className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2.5 text-sm" />
             {mailMsg && <p className="text-sm font-semibold text-amber-300">{mailMsg}</p>}
             <button type="button" disabled={sending} onClick={sendMail} className="w-full rounded-xl bg-blue-600 py-3 font-bold cursor-pointer disabled:opacity-50">
               {sending ? 'Enviando…' : 'Enviar desde Veltrix'}

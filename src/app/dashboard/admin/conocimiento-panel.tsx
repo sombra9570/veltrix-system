@@ -127,12 +127,12 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
     } catch (e) { setMsg(e instanceof Error ? e.message : 'No fue posible verificar'); } finally { setBusy(false); }
   };
 
-  const inp = 'w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm';
+  const inp = 'w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2.5 text-sm';
   const lbl = 'text-[11px] font-semibold text-slate-400';
   const folderBtn = (id: Folder, icon: string, label: string, n: number, sub = false) => (
     <button key={id} type="button" onClick={() => { setFolder(id); setArea(''); }}
-      className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl border px-3 py-2 text-left text-sm font-semibold transition ${sub ? 'ml-3 w-[calc(100%-0.75rem)]' : ''} ${folder === id ? 'border-blue-500 bg-blue-600/20 text-white' : 'border-slate-800 bg-slate-900/50 text-slate-300 hover:border-slate-600'}`}>
-      <span>{icon} {label}</span><span className="rounded-full bg-slate-800 px-2 py-0.5 text-[11px] text-slate-300">{n}</span>
+      className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded-xl border px-3 py-2 text-left text-sm font-semibold transition ${sub ? 'ml-3 w-[calc(100%-0.75rem)]' : ''} ${folder === id ? 'border-blue-500 bg-blue-600/20 text-slate-900 dark:text-white' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-700 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-600'}`}>
+      <span>{icon} {label}</span><span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[11px] text-slate-700 dark:text-slate-300">{n}</span>
     </button>
   );
 
@@ -152,7 +152,7 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
         {folderBtn('gaps', '🔎', 'Temas sin cobertura', gaps.length)}
       </nav>
 
-      <form onSubmit={(e) => { e.preventDefault(); save('draft'); }} className="space-y-3 self-start rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5">
+      <form onSubmit={(e) => { e.preventDefault(); save('draft'); }} className="space-y-3 self-start rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-4 sm:p-5">
         <h2 className="text-sm font-bold">{f.id ? 'Editar entrada' : 'Nueva entrada de conocimiento'}</h2>
         <p className="text-[11px] text-slate-500">Veltrix IA solo usa las entradas verificadas. Una regla tributaria o legal exige país, enlace de la fuente oficial y licencia. Sin país, la entrada pertenece a la base general de la IA.</p>
         <div className="grid grid-cols-2 gap-2">
@@ -173,7 +173,7 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
           <textarea rows={8} value={f.summary} onChange={(e) => setF({ ...f, summary: e.target.value })} className={inp} /></label>
         <div className="flex flex-wrap items-center gap-2">
           <input ref={file} type="file" accept=".txt,.md,.markdown,text/plain,text/markdown" onChange={onFile} className="hidden" />
-          <button type="button" onClick={() => file.current?.click()} className="cursor-pointer rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-bold hover:bg-slate-800">📎 Subir archivo (.txt o .md)</button>
+          <button type="button" onClick={() => file.current?.click()} className="cursor-pointer rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800">📎 Subir archivo (.txt o .md)</button>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <label className="space-y-1"><span className={lbl}>Nombre de la fuente</span><input value={f.source_name} onChange={(e) => setF({ ...f, source_name: e.target.value })} className={inp} /></label>
@@ -183,10 +183,10 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
         <p className="text-[11px] text-slate-500">Al verificar, la entrada queda registrada con tu nombre y la fecha de hoy.</p>
         {msg && <p className="text-xs font-semibold text-amber-300">{msg}</p>}
         <div className="grid grid-cols-2 gap-2">
-          <button type="submit" disabled={busy || !ready || !access.edit} className="cursor-pointer rounded-xl border border-slate-600 bg-slate-800 py-3 text-sm font-bold disabled:opacity-50">Guardar borrador</button>
+          <button type="submit" disabled={busy || !ready || !access.edit} className="cursor-pointer rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 py-3 text-sm font-bold disabled:opacity-50">Guardar borrador</button>
           {access.verify
             ? <button type="button" disabled={busy || !canVerify} onClick={() => save('verified')} className="cursor-pointer rounded-xl bg-blue-600 py-3 text-sm font-bold disabled:opacity-50">Marcar verificada</button>
-            : <p className="grid place-items-center rounded-xl border border-slate-800 px-2 text-center text-[11px] text-slate-500">La verificación la realiza quien tiene ese permiso.</p>}
+            : <p className="grid place-items-center rounded-xl border border-slate-200 dark:border-slate-800 px-2 text-center text-[11px] text-slate-500">La verificación la realiza quien tiene ese permiso.</p>}
         </div>
         {f.id && <button type="button" onClick={() => setF(EMPTY)} className="w-full cursor-pointer text-xs font-semibold text-slate-400 hover:underline">Cancelar edición</button>}
       </form>
@@ -194,10 +194,10 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
       <section className="space-y-2 self-start">
         <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por título, tema, contenido o fuente" className={inp} aria-label="Buscar en la biblioteca" />
         <div className="flex flex-wrap gap-1.5">
-          <button type="button" onClick={() => setArea('')} className={`cursor-pointer rounded-full border px-3 py-1 text-xs font-semibold ${area === '' ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 hover:border-slate-500'}`}>Todas las áreas</button>
+          <button type="button" onClick={() => setArea('')} className={`cursor-pointer rounded-full border px-3 py-1 text-xs font-semibold ${area === '' ? 'border-blue-500 bg-blue-600/20' : 'border-slate-300 dark:border-slate-700 hover:border-slate-500'}`}>Todas las áreas</button>
           {(Object.keys(AREAS) as Area[]).filter((a) => areaCounts.get(a)).map((a) => (
             <button key={a} type="button" onClick={() => setArea(area === a ? '' : a)}
-              className={`cursor-pointer rounded-full border px-3 py-1 text-xs font-semibold ${area === a ? 'border-blue-500 bg-blue-600/20' : 'border-slate-700 hover:border-slate-500'}`}>
+              className={`cursor-pointer rounded-full border px-3 py-1 text-xs font-semibold ${area === a ? 'border-blue-500 bg-blue-600/20' : 'border-slate-300 dark:border-slate-700 hover:border-slate-500'}`}>
               {AREAS[a].icon} {AREAS[a].label} · {areaCounts.get(a)}
             </button>
           ))}
@@ -208,11 +208,11 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
           </button>
         )}
         {review && access.verify && (cur ? (
-          <div className="space-y-2 rounded-2xl border border-blue-500/40 bg-slate-900 p-4">
+          <div className="space-y-2 rounded-2xl border border-blue-500/40 bg-white dark:bg-slate-900 p-4">
             <p className="text-[11px] font-semibold text-slate-400">Pendientes en esta vista: {queue.length}</p>
             <p className="font-bold">{cur.title}</p>
-            <p className="whitespace-pre-wrap text-sm text-slate-200">{cur.summary}</p>
-            <div className="space-y-1 rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-slate-300">
+            <p className="whitespace-pre-wrap text-sm text-slate-800 dark:text-slate-200">{cur.summary}</p>
+            <div className="space-y-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-3 text-xs text-slate-700 dark:text-slate-300">
               <p><b>Fuente:</b> {cur.source_url ? <a href={cur.source_url} target="_blank" rel="noreferrer" className="text-blue-400 underline">{cur.source_name || cur.source_url}</a> : 'sin enlace'}</p>
               <p><b>Licencia o condiciones:</b> {cur.license || 'sin dato'}</p>
               <p><b>País:</b> {cur.country_code ? countryName(cur.country_code) : 'Base general'} · <b>Área:</b> {AREAS[cur.area]?.label}</p>
@@ -221,18 +221,18 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
             {cur.kind !== 'veltrix_help' && !(cur.source_url && cur.license) && <p className="text-xs text-rose-300">Falta el enlace o la licencia: edita la entrada antes de verificarla.</p>}
             <div className="grid grid-cols-2 gap-2">
               <button type="button" disabled={busy || (cur.kind !== 'veltrix_help' && !(cur.source_url && cur.license))} onClick={() => reviewVerify(cur)} className="cursor-pointer rounded-xl bg-emerald-600 py-2.5 text-sm font-bold disabled:opacity-50">✅ Verificar</button>
-              <button type="button" onClick={() => edit(cur)} className="cursor-pointer rounded-xl border border-slate-600 py-2.5 text-sm font-bold">✏️ Corregir</button>
-              <button type="button" onClick={() => setSkipped([...skipped, cur.id])} className="cursor-pointer rounded-xl border border-slate-700 py-2.5 text-sm font-semibold text-slate-300">⏭ Omitir</button>
+              <button type="button" onClick={() => edit(cur)} className="cursor-pointer rounded-xl border border-slate-300 dark:border-slate-600 py-2.5 text-sm font-bold">✏️ Corregir</button>
+              <button type="button" onClick={() => setSkipped([...skipped, cur.id])} className="cursor-pointer rounded-xl border border-slate-300 dark:border-slate-700 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300">⏭ Omitir</button>
               <button type="button" disabled={busy} onClick={() => retire(cur)} className="cursor-pointer rounded-xl border border-red-500/40 py-2.5 text-sm font-semibold text-red-300">🗄️ Retirar</button>
             </div>
           </div>
-        ) : <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-400">No quedan entradas por revisar en esta vista.</p>)}
+        ) : <p className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-xs text-slate-400">No quedan entradas por revisar en esta vista.</p>)}
         {folder === 'gaps' && (
           <div className="space-y-2">
             <h2 className="text-sm font-bold">Temas consultados sin cobertura ({gaps.length})</h2>
-            {gaps.length === 0 && <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-500">Aún no hay temas consultados sin cobertura.</p>}
+            {gaps.length === 0 && <p className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-xs text-slate-500">Aún no hay temas consultados sin cobertura.</p>}
             {gaps.map((g) => (
-              <div key={`${g.topic}|${g.country_code}`} className="flex items-center justify-between gap-2 rounded-xl border border-slate-800 bg-slate-900/70 p-3 text-sm">
+              <div key={`${g.topic}|${g.country_code}`} className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-3 text-sm">
                 <span className="font-semibold">{g.topic}</span>
                 <span className="shrink-0 text-[11px] text-slate-400">{g.country_code ? countryName(g.country_code) : 'Sin país'} · {g.times} {g.times === 1 ? 'consulta' : 'consultas'} · {new Date(g.last_asked_at).toLocaleDateString('es')}</span>
               </div>
@@ -240,9 +240,9 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
           </div>
         )}
         {folder !== 'gaps' && <h2 className="text-sm font-bold">Entradas ({shown.length})</h2>}
-        {folder !== 'gaps' && shown.length === 0 && <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-500">No hay entradas en esta carpeta con ese filtro.</p>}
+        {folder !== 'gaps' && shown.length === 0 && <p className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-xs text-slate-500">No hay entradas en esta carpeta con ese filtro.</p>}
         {folder !== 'gaps' && shown.map((r) => (
-          <div key={r.id} className="space-y-1 rounded-xl border border-slate-800 bg-slate-900/70 p-3">
+          <div key={r.id} className="space-y-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-3">
             <div className="flex items-start justify-between gap-2">
               <p className="font-bold">{r.title}</p>
               <div className="flex shrink-0 gap-3 text-xs font-semibold">
@@ -250,11 +250,11 @@ export function ConocimientoPanel({ access = { edit: true, verify: true } }: { a
                 {access.verify && r.status !== 'retired' && <button type="button" disabled={busy} onClick={() => retire(r)} className="cursor-pointer text-red-400 hover:underline">Retirar</button>}
               </div>
             </div>
-            <p className="line-clamp-3 text-xs text-slate-300">{r.summary}</p>
+            <p className="line-clamp-3 text-xs text-slate-700 dark:text-slate-300">{r.summary}</p>
             <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-400">
-              <span className="rounded-full bg-slate-800 px-2 py-0.5">{AREAS[r.area]?.icon} {AREAS[r.area]?.label ?? r.area}</span>
-              <span className="rounded-full bg-slate-800 px-2 py-0.5">{r.country_code ? `🌎 ${countryName(r.country_code)}` : '🧠 Base de la IA'}</span>
-              <span className={`rounded-full px-2 py-0.5 ${r.status === 'verified' ? 'bg-emerald-500/20 text-emerald-300' : r.status === 'draft' ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-700 text-slate-300'}`}>{STATUS[r.status]}</span>
+              <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5">{AREAS[r.area]?.icon} {AREAS[r.area]?.label ?? r.area}</span>
+              <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5">{r.country_code ? `🌎 ${countryName(r.country_code)}` : '🧠 Base de la IA'}</span>
+              <span className={`rounded-full px-2 py-0.5 ${r.status === 'verified' ? 'bg-emerald-500/20 text-emerald-300' : r.status === 'draft' ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-700 text-slate-700 dark:text-slate-300'}`}>{STATUS[r.status]}</span>
               {r.kind === 'tax_rule' && r.status !== 'verified' && r.status !== 'retired' && <span className="rounded-full bg-rose-500/20 px-2 py-0.5 text-rose-300">Requiere revisión de un contador</span>}
             </div>
             <p className="text-[11px] text-slate-500">

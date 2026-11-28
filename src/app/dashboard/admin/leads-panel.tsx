@@ -4,9 +4,9 @@ import { rpc } from '../../../lib/supabase';
 import { useLiveTopic } from '../live';
 
 type Lead = { id: string; created_at: string; full_name: string; phone: string; email: string; place: string; note: string | null; status: 'new' | 'contacted' | 'closed'; answers: Record<string, unknown> };
-const ST = { new: { label: 'Nueva', cls: 'bg-amber-500/15 text-amber-300' }, contacted: { label: 'Contactada', cls: 'bg-sky-500/15 text-sky-300' }, closed: { label: 'Cerrada', cls: 'bg-slate-700 text-slate-300' } } as const;
-const card = 'rounded-2xl border border-slate-800 bg-slate-900 p-4';
-const ghost = 'rounded-lg border border-slate-700 px-3 py-1.5 text-xs font-semibold hover:bg-slate-800 cursor-pointer';
+const ST = { new: { label: 'Nueva', cls: 'bg-amber-500/15 text-amber-300' }, contacted: { label: 'Contactada', cls: 'bg-sky-500/15 text-sky-300' }, closed: { label: 'Cerrada', cls: 'bg-slate-700 text-slate-700 dark:text-slate-300' } } as const;
+const card = 'rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4';
+const ghost = 'rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer';
 
 /** Solicitudes de personas que no supieron qué elegir y pidieron que las contactemos. */
 export function LeadsPanel() {
@@ -27,7 +27,7 @@ export function LeadsPanel() {
     <section className="space-y-3">
       <div className="flex flex-wrap gap-2">
         {(['new', 'contacted', 'closed', 'all'] as const).map((f) => (
-          <button key={f} type="button" onClick={() => setFilter(f)} className={`rounded-full border px-3 py-1.5 text-xs font-bold cursor-pointer ${filter === f ? 'border-sky-500 bg-sky-600 text-white' : 'border-slate-700 text-slate-300'}`}>
+          <button key={f} type="button" onClick={() => setFilter(f)} className={`rounded-full border px-3 py-1.5 text-xs font-bold cursor-pointer ${filter === f ? 'border-sky-500 bg-sky-600 text-white' : 'border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300'}`}>
             {f === 'all' ? 'Todas' : ST[f].label}{list && f !== 'all' ? ` (${list.filter((l) => l.status === f).length})` : ''}
           </button>
         ))}
@@ -48,7 +48,7 @@ export function LeadsPanel() {
             <a className={ghost} href={`https://wa.me/${digits(l.phone)}`} target="_blank" rel="noreferrer">💬 WhatsApp</a>
             <a className={ghost} href={`mailto:${l.email}`}>✉️ {l.email}</a>
           </div>
-          {l.note && <p className="mt-3 rounded-lg bg-slate-950 p-3 text-sm">{l.note}</p>}
+          {l.note && <p className="mt-3 rounded-lg bg-slate-50 dark:bg-slate-950 p-3 text-sm">{l.note}</p>}
           {Array.isArray(l.answers?.unsure) && (l.answers.unsure as string[]).length > 0 && (
             <p className="mt-2 text-xs text-slate-400">No estaba seguro en: {(l.answers.unsure as string[]).join(', ')}</p>
           )}

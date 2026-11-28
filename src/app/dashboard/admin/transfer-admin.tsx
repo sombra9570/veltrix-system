@@ -7,8 +7,8 @@ import { grossUp } from '../../../lib/tax';
 type Info = { holder?: string; bank?: string; account?: string; currency?: string; note?: string; qr_path?: string };
 type Proof = { id: string; at: string; org: string; email: string | null; plan: string | null; plan_usd: number | null; months: number; amount: number; currency: string; reference: string | null; path: string };
 
-const box = 'bg-slate-900/70 border border-emerald-900/50 rounded-2xl p-4 sm:p-5 space-y-3';
-const inp = 'w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white';
+const box = 'bg-white dark:bg-slate-900/70 border border-emerald-300 dark:border-emerald-900/50 rounded-2xl p-4 sm:p-5 space-y-3';
+const inp = 'w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-sm text-slate-900 dark:text-white';
 const btn = 'font-bold px-3 py-1.5 rounded-lg cursor-pointer text-sm';
 
 /** Consola: datos para recibir transferencias/QR y aprobación de comprobantes de pago de suscripciones. */
@@ -76,16 +76,16 @@ export function TransferAdmin() {
         <h2 className="text-sm font-bold">🏦 Pagos por transferencia o QR ({proofs.length} por revisar)</h2>
         <p className="text-[11px] text-slate-500">Los clientes ven estos datos en "Mi plan", pagan desde su banco y suben la foto del comprobante. Al aprobar, la suscripción se extiende sola por los meses pagados.</p>
       </div>
-      {msg && <p className="text-xs font-semibold text-slate-200">{msg}</p>}
+      {msg && <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">{msg}</p>}
 
       {proofs.length > 0 && (
         <ul className="space-y-2">
           {proofs.map((p) => (
-            <li key={p.id} className="rounded-xl border border-slate-800 p-3 text-sm">
+            <li key={p.id} className="rounded-xl border border-slate-200 dark:border-slate-800 p-3 text-sm">
               <p className="font-bold">{p.org} <span className="font-normal text-slate-400">· {p.plan ?? '—'} · {new Date(p.at).toLocaleString('es')}</span></p>
-              <p className="text-slate-300">Pagó {p.currency} {Number(p.amount).toLocaleString('es')} por {p.months} mes(es){p.reference ? ` · Ref: ${p.reference}` : ''}{p.email ? ` · ${p.email}` : ''}</p>
+              <p className="text-slate-700 dark:text-slate-300">Pagó {p.currency} {Number(p.amount).toLocaleString('es')} por {p.months} mes(es){p.reference ? ` · Ref: ${p.reference}` : ''}{p.email ? ` · ${p.email}` : ''}</p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <button type="button" onClick={() => view(p.path)} className={`${btn} bg-slate-800 text-slate-200`}>🧾 Ver comprobante</button>
+                <button type="button" onClick={() => view(p.path)} className={`${btn} bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200`}>🧾 Ver comprobante</button>
                 <label className="flex items-center gap-1 text-xs text-slate-400">USD a registrar
                   <input className={`${inp} w-24`} inputMode="decimal" value={usd[p.id] ?? ''} onChange={(e) => setUsd({ ...usd, [p.id]: e.target.value })} />
                 </label>
@@ -97,8 +97,8 @@ export function TransferAdmin() {
         </ul>
       )}
 
-      <details className="rounded-xl border border-slate-800 p-3">
-        <summary className="cursor-pointer text-xs font-bold text-slate-300">Datos de tu cuenta para recibir pagos</summary>
+      <details className="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
+        <summary className="cursor-pointer text-xs font-bold text-slate-700 dark:text-slate-300">Datos de tu cuenta para recibir pagos</summary>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {f('holder', 'Titular')}
           {f('bank', 'Banco')}

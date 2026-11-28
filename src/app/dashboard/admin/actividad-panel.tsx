@@ -23,13 +23,13 @@ export function ActividadPanel() {
           <h2 className="text-sm font-bold">🧾 Registro de actividad</h2>
           <p className="text-[11px] text-slate-500">Cambios en organizaciones, empresas, sucursales, equipos y módulos. No se muestran las ventas ni los datos operativos de cada negocio.</p>
         </div>
-        <button type="button" onClick={load} disabled={busy} className="cursor-pointer rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-semibold disabled:opacity-50">{busy ? '…' : '↻'}</button>
+        <button type="button" onClick={load} disabled={busy} className="cursor-pointer rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-xs font-semibold disabled:opacity-50">{busy ? '…' : '↻'}</button>
       </div>
       {err && <p className="text-xs font-semibold text-red-400">{err}</p>}
-      {rows.length === 0 && !busy && <p className="rounded-xl border border-slate-800 bg-slate-900/50 p-4 text-xs text-slate-500">Aún no hay actividad registrada.</p>}
+      {rows.length === 0 && !busy && <p className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 text-xs text-slate-500">Aún no hay actividad registrada.</p>}
       <ul className="space-y-1.5">
         {rows.map((r, i) => (
-          <li key={i} className="rounded-xl border border-slate-800 bg-slate-900/70 px-3 py-2 text-xs">
+          <li key={i} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 px-3 py-2 text-xs">
             <div className="flex flex-wrap items-center justify-between gap-1">
               <p className="font-bold">{ACTION[r.action] ?? r.action} · {TABLE[r.table] ?? r.table}{r.what ? ` · ${r.what}` : ''}</p>
               <p className="text-[11px] text-slate-500">{new Date(r.at).toLocaleString('es-BO', { dateStyle: 'short', timeStyle: 'short' })}</p>

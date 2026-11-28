@@ -57,11 +57,11 @@ export function PlatformBell() {
   return (
     <div className="relative">
       <button type="button" onClick={() => setOpen((o) => !o)} aria-label="Avisos"
-        className="relative rounded-lg border border-slate-700 px-3 py-2 text-sm font-semibold hover:bg-slate-800 cursor-pointer">
+        className="relative rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
         🔔
         {inbox.unread > 0 && <span className="absolute -right-1.5 -top-1.5 min-w-5 rounded-full bg-red-600 px-1.5 text-center text-[11px] font-bold text-white">{inbox.unread > 99 ? '99+' : inbox.unread}</span>}
       </button>
-      <BellPanel open={open} onClose={() => setOpen(false)} className="border-slate-700 bg-slate-900 text-white">
+      <BellPanel open={open} onClose={() => setOpen(false)} className="border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
         <div>
           <div className="flex items-center justify-between">
             <p className="text-sm font-extrabold">Avisos</p>
@@ -75,7 +75,7 @@ export function PlatformBell() {
             {inbox.items.map((e) => (
               <li key={e.id}>
                 <Link href={KIND[e.kind].href} onClick={() => { setOpen(false); if (!e.read_at) void readOne(e.id); }}
-                  className={`block rounded-xl border px-3 py-2 ${e.read_at ? 'border-slate-800 opacity-70' : 'border-sky-500/40 bg-sky-500/10'}`}>
+                  className={`block rounded-xl border px-3 py-2 ${e.read_at ? 'border-slate-200 dark:border-slate-800 opacity-70' : 'border-sky-500/40 bg-sky-500/10'}`}>
                   <p className="text-xs font-bold">{KIND[e.kind].icon} {KIND[e.kind].label} <span className="font-normal text-slate-400">· {ago(e.created_at)}</span></p>
                   <p className="text-sm font-semibold">{e.title}</p>
                   {e.detail && <p className="break-words text-xs text-slate-400">{e.detail}</p>}
